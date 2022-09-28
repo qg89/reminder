@@ -2,7 +2,7 @@ version: '1.0'
 name: branch-pipeline
 displayName: BranchPipeline
 triggers:
-  trigger: auto
+  trigger: manual
   push:
     branches:
       include:
@@ -18,7 +18,7 @@ stages:
       - step: build@gradle
         name: build_gradle
         displayName: Gradle 构建
-        jdkVersion: '11'
+        jdkVersion: '8'
         gradleVersion: '4.4'
         commands:
           - chmod +x ./gradlew
