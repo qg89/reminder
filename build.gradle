@@ -8,6 +8,38 @@ group = 'com.q.reminder'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
+buildscript {
+	repositories {
+		maven { url "https://maven.aliyun.com/repository/central"}
+		maven { url 'https://maven.aliyun.com/repository/public' }
+		maven { url 'https://maven.aliyun.com/repository/releases' }
+		maven { url "https://repo1.maven.org/maven2/" }
+		maven { url "https://nexus.pentaho.org/content/groups/omni/" }
+		maven { url "https://oss.sonatype.org/content/groups/public/" }
+		maven { url "https://repo.spring.io/libs-milestone/" }
+		maven { url "https://plugins.gradle.org/m2/"}
+		maven {
+			credentials {
+				username 'YJQZJ4'
+				password 'jezcfz1al1' }
+			url 'https://packages.aliyun.com/maven/repository/2005435-snapshot-ENKNHJ/'
+		}
+	}
+	dependencies {
+		classpath "com.google.protobuf:protobuf-gradle-plugin:0.8.17"
+		classpath "io.spring.gradle:dependency-management-plugin:${dependencyManagementVersion}"
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+	}
+	ext {
+		grpcVersion = '1.40.1'
+		guavaVersion = '30.1.1-jre'
+		protobufVersion = '3.15.8'
+	}
+}
+
+apply plugin: 'java'
+
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
