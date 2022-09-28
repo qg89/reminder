@@ -1,0 +1,80 @@
+plugins {
+	id 'org.springframework.boot' version '2.7.4'
+	id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+	id 'java'
+}
+
+group = 'com.q.reminder'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+buildscript {
+	repositories {
+		maven { url "https://maven.aliyun.com/repository/central"}
+		maven { url 'https://maven.aliyun.com/repository/public' }
+		maven { url 'https://maven.aliyun.com/repository/releases' }
+		maven { url "https://repo1.maven.org/maven2/" }
+		maven { url "https://nexus.pentaho.org/content/groups/omni/" }
+		maven { url "https://oss.sonatype.org/content/groups/public/" }
+		maven { url "https://repo.spring.io/libs-milestone/" }
+		maven { url "https://plugins.gradle.org/m2/"}
+		maven {
+			credentials {
+				username 'YJQZJ4'
+				password 'jezcfz1al1' }
+			url 'https://packages.aliyun.com/maven/repository/2005435-snapshot-ENKNHJ/'
+		}
+	}
+	dependencies {
+		classpath "com.google.protobuf:protobuf-gradle-plugin:0.8.17"
+		classpath "io.spring.gradle:dependency-management-plugin:${dependencyManagementVersion}"
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+	}
+	ext {
+		grpcVersion = '1.40.1'
+		guavaVersion = '30.1.1-jre'
+		protobufVersion = '3.15.8'
+	}
+}
+
+apply plugin: 'java'
+
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-quartz'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'mysql:mysql-connector-java'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	implementation "mysql:mysql-connector-java:8.0.27"
+	implementation 'com.alibaba:druid-spring-boot-starter:1.2.13-SNSAPSHOT'
+	implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.2'
+	implementation 'com.github.jeffreyning:mybatisplus-plus:1.5.1-RELEASE'
+
+	implementation 'cn.hutool:hutool-all:5.8.6'
+	implementation 'org.apache.commons:commons-lang3:3.12.0'
+	implementation 'com.alibaba:fastjson:2.0.13'
+
+	implementation 'com.squareup.okhttp3:okhttp:4.10.0'
+
+	implementation 'com.taskadapter:redmine-java-api:4.0.0.rc4'
+	implementation 'joda-time:joda-time:2.11.1'
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
