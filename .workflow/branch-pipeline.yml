@@ -18,7 +18,7 @@ stages:
       - step: build@gradle
         name: build_gradle
         displayName: Gradle 构建
-        jdkVersion: '8'
+        jdkVersion: '11'
         gradleVersion: '4.4'
         commands:
           - chmod +x ./gradlew
