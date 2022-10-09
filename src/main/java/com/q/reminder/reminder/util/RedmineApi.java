@@ -37,6 +37,10 @@ public class RedmineApi {
 
     private static void readCoverity(Integer projectId, Integer viewId) {
         List<CoverityVo> coverityVoList = CoverityApi.queryHightMidQ("E6E6E8432545DE9FB6A106BA6B47AB98", projectId, viewId);
+        if (coverityVoList == null || coverityVoList.isEmpty()) {
+            log.info("coverity 返回结果为空");
+            return;
+        }
         coverityVoList.forEach(e -> {
             String type = e.getDisplayType();
             String cid = String.valueOf(e.getCid());
