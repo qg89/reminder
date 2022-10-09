@@ -1,9 +1,5 @@
 package com.q.reminder.reminder.util;
 
-import cn.hutool.core.text.csv.CsvData;
-import cn.hutool.core.text.csv.CsvReader;
-import cn.hutool.core.text.csv.CsvRow;
-import cn.hutool.core.text.csv.CsvUtil;
 import com.q.reminder.reminder.entity.CoverityVo;
 import com.taskadapter.redmineapi.*;
 import com.taskadapter.redmineapi.bean.Issue;
@@ -14,7 +10,6 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
-import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,6 +32,10 @@ public class RedmineApi {
 
     private static void readCoverity(Integer projectId, Integer viewId) {
         List<CoverityVo> coverityVoList = CoverityApi.queryHightMidQ("E6E6E8432545DE9FB6A106BA6B47AB98", projectId, viewId);
+        if (coverityVoList == null || coverityVoList.isEmpty()) {
+            log.info("coverity 返回结果为空");
+            return;
+        }
         coverityVoList.forEach(e -> {
             String type = e.getDisplayType();
             String cid = String.valueOf(e.getCid());
