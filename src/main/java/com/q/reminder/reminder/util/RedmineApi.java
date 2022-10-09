@@ -1,11 +1,20 @@
 package com.q.reminder.reminder.util;
 
+import cn.hutool.core.text.csv.CsvData;
+import cn.hutool.core.text.csv.CsvReader;
+import cn.hutool.core.text.csv.CsvRow;
+import cn.hutool.core.text.csv.CsvUtil;
+import com.q.reminder.reminder.entity.CoverityVo;
 import com.taskadapter.redmineapi.*;
 import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.Tracker;
+import com.taskadapter.redmineapi.internal.ResultsWrapper;
+import com.taskadapter.redmineapi.internal.Transport;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,36 +29,30 @@ import java.util.stream.Collectors;
 public class RedmineApi {
     public static final String REDMINE_URL = "http://redmine-qa.mxnavi.com/";
 
-//    public static void query() throws RedmineException {
-//        String f = "utf8: ✓\n" +
-//                "set_filter: 1\n" +
-//                "f[]: status_id\n" +
-//                "op[status_id]: =\n" +
-//                "v[status_id][]: 1\n" +
-//                "f[]: project_id\n" +
-//                "op[project_id]: =\n" +
-//                "v[project_id][]: 510302-sell\n" +
-//                "v[project_id][]: 203301_vehicle_digitization\n" +
-//                "v[project_id][]: 203302_4s_eservice\n" +
-//                "v[project_id][]: dcsp-2\n" +
-//                "f[]: due_date\n" +
-//                "op[due_date]: <=\n" +
-//                "v[due_date][]: 2022-09-26\n" ;
-//        String[] groupF = StringUtils.split(f, "\n");
-//        RedmineManager mgr = RedmineManagerFactory.createWithApiKey("http://redmine-qa.mxnavi.com/", "1f905383da4f783bad92e22f430c7db0b15ae258");
-//        IssueManager issueManager = mgr.getIssueManager();
-//        Params params = new Params();
-//        for (String s : groupF) {
-//            String[] kv = s.split(":");
-//            params.add(StringUtils.trim(kv[0]), StringUtils.trim(kv[1]));
-//        }
-//        params.add("offset", "0");
-//        params.add("limit", "100");
-//
-//
-//        List<Issue> results = issueManager.getIssues(params).getResults();
-//        System.out.println(results);
-//    }
+    public static void main(String[] args) {
+        final Integer projectId = 10077;
+        final Integer viewId = 10738;
+        readCoverity(projectId, viewId);
+    }
+
+    private static void readCoverity(Integer projectId, Integer viewId) {
+        List<CoverityVo> coverityVoList = CoverityApi.queryHightMidQ("E6E6E8432545DE9FB6A106BA6B47AB98", projectId, viewId);
+        coverityVoList.forEach(e -> {
+            String type = e.getDisplayType();
+            String cid = String.valueOf(e.getCid());
+            String content = "类型:" + type + "," + "CID:" + cid + "\r\n" +
+                    "类别:" + e.getDisplayCategory() + "\r\n" +
+                    "文件路径:" + e.getDisplayFile() + "\r\n" +
+                    "行数:" + e.getLineNumber();
+            String subject = type + "-" + cid;
+            try {
+                saveTask(subject, content, cid);
+            } catch (RedmineException ex) {
+                ex.printStackTrace();
+            }
+        });
+    }
+
 
     public static Map<String, List<Issue>> queryUserList(Set<String> projects, List<String> noneStatusList) {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(REDMINE_URL, "1f905383da4f783bad92e22f430c7db0b15ae258");
@@ -68,5 +71,36 @@ public class RedmineApi {
             }
         });
         return allIssueList.stream().collect(Collectors.groupingBy(Issue::getAssigneeName));
+    }
+
+    public static void saveTask(String subject, String content, String cid) throws RedmineException {
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(REDMINE_URL, "1f905383da4f783bad92e22f430c7db0b15ae258");
+        IssueManager issueManager = mgr.getIssueManager();
+        Params params = new Params();
+        params.add("f[]", "subject");
+        params.add("op[subject]", "~");
+        params.add("v[subject][]", cid);
+        ResultsWrapper<Issue> issues = issueManager.getIssues(params);
+        List<Issue> results = issues.getResults();
+        if (results != null && !results.isEmpty()) {
+            return;
+        }
+
+        Tracker tracker = new Tracker();
+        tracker.setId(38);
+        tracker.setName("评审问题");
+        Issue issue = new Issue()
+                .setTracker(tracker)
+                .setAssigneeId(2751)
+                .setCreatedOn(new Date())
+                .setDueDate(DateTime.now().plusDays(5).toDate())
+                .setSubject(subject)
+                .setStatusId(1)
+                .setProjectId(1806)
+                .setDescription(content);
+        Transport transport = mgr.getTransport();
+        issue.setTransport(transport);
+        issueManager.createIssue(issue);
+
     }
 }
