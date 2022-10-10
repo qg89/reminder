@@ -23,15 +23,14 @@ import java.util.stream.Collectors;
  */
 @Log4j2
 public class RedmineApi {
-    private static final String REDMINE_URL = "http://redmine-qa.mxnavi.com/";
-    private static final String API_ACCESS_KEY = "1f905383da4f783bad92e22f430c7db0b15ae258";
 
-    public static void main(String[] args) throws RedmineException {
+    public static void main(String[] args) {
+        String redmineUrl = "http://redmine-qa.mxnavi.com/";
+        String apiAccessKey = "1f905383da4f783bad92e22f430c7db0b15ae258";
         final Integer projectId = 10077;
         final Integer viewId = 10738;
-//        readCoverity(projectId, viewId,API_ACCESS_KEY, REDMINE_URL);
-//        time_entries(API_ACCESS_KEY, REDMINE_URL);
-        queryIssue();
+//        readCoverity(projectId, viewId, apiAccessKey, redmineUrl);
+//        timeEntries(apiAccessKey, redmineUrl);
     }
 
     private static void readCoverity(Integer projectId, Integer viewId, String apiAccessKey, String redmineUrl) {
@@ -103,18 +102,26 @@ public class RedmineApi {
                 .setDescription(content);
         Transport transport = mgr.getTransport();
         issue.setTransport(transport);
-        issue.create();
-//        issueManager.createIssue(issue);
+//        issue.create();
+        issueManager.createIssue(issue);
 
     }
 
-    public static void time_entries(String apiAccessKey, String redmineUrl) throws RedmineException {
+    public static void timeEntries(String apiAccessKey, String redmineUrl) {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, apiAccessKey);
         TimeEntryManager timeEntryManager = mgr.getTimeEntryManager();
         Map<String, String> params = new HashMap<>(4);
         params.put("project_id", "bug_cause_analysis");
         params.put("limit", "101");
-        ResultsWrapper<TimeEntry> entries = timeEntryManager.getTimeEntries(params);
+        ResultsWrapper<TimeEntry> entries = null;
+        try {
+            entries = timeEntryManager.getTimeEntries(params);
+        } catch (RedmineException e) {
+            e.printStackTrace();
+        }
+        if (entries == null) {
+            return;
+        }
         int totalFoundOnServer = entries.getTotalFoundOnServer();
         List<TimeEntry> results = entries.getResults();
         System.out.println(results);
