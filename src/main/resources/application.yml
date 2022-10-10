@@ -37,3 +37,8 @@ mybatis-plus:
 app:
   id: cli_a3a736fcfe39d013
   secret: gMkBV9DWT39sHpmN6p5LYb7uvU7RLoKg
+
+redmine-config:
+  api-access-key:
+    saiko: 1f905383da4f783bad92e22f430c7db0b15ae258
+  old_url: http://redmine-qa.mxnavi.com/

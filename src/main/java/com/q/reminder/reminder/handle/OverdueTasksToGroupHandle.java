@@ -31,6 +31,10 @@ public class OverdueTasksToGroupHandle {
     private String appId;
     @Value("${app.secret}")
     private String appSecret;
+    @Value("{redmine-config.old_url}")
+    private String redmineOldUrl;
+    @Value("${redmine-config.api-access-key.saiko}")
+    private String apiAccessKeySaiko;
 
     @Autowired
     private UserMemberService userMemberService;
@@ -54,7 +58,7 @@ public class OverdueTasksToGroupHandle {
         qw.select(NoneStatus::getNoneStatus);
         List<String> noneStatusList = noneStatusService.listObjs(qw, (Object::toString));
 
-        Map<String, List<Issue>> listMap = RedmineApi.queryUserList(projectIds, noneStatusList);
+        Map<String, List<Issue>> listMap = RedmineApi.queryUserList(projectIds, noneStatusList, apiAccessKeySaiko, redmineOldUrl);
 
         // 通过人员查看对应redmine人员关系，并返回redmine姓名和飞书member_id关系
         List<UserMemgerInfo> list = userMemberService.list();
@@ -70,7 +74,7 @@ public class OverdueTasksToGroupHandle {
             issueList.forEach(i -> {
                 Integer id = i.getId();
                 OverdueTaskHistory history = new OverdueTaskHistory();
-                content.append(RedmineApi.REDMINE_URL + "issues/").append(id).append("\r\n");
+                content.append(redmineOldUrl + "issues/").append(id).append("\r\n");
                 content.append("任务主题:").append(i.getSubject()).append("\r\n");
                 content.append("=============================").append("\r\n");
                 history.setAssigneeName(name);

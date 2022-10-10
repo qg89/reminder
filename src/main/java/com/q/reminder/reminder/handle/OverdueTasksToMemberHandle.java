@@ -43,9 +43,12 @@ public class OverdueTasksToMemberHandle {
 
     @Value("${app.id}")
     private String appId;
-
     @Value("${app.secret}")
     private String appSecret;
+    @Value("{redmine-config.old_url}")
+    private String redmineOldUrl;
+    @Value("${redmine-config.api-access-key.saiko}")
+    private String apiAccessKeySaiko;
 
 
     //    @Scheduled(cron = "*/20 * * * * ?")
@@ -67,7 +70,7 @@ public class OverdueTasksToMemberHandle {
         List<String> noneStatusList = noneStatusService.listObjs(qw, (Object::toString));
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("获取排除状态!").append("\r\n");
 
-        Map<String, List<Issue>> listMap = RedmineApi.queryUserList(projectIds, noneStatusList);
+        Map<String, List<Issue>> listMap = RedmineApi.queryUserList(projectIds, noneStatusList, apiAccessKeySaiko, redmineOldUrl);
         if (CollectionUtils.isEmpty(listMap)) {
             contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append("\r\n");
             contentAll.append("执行完成!");
@@ -85,7 +88,7 @@ public class OverdueTasksToMemberHandle {
                 Integer id = i.getId();
                 OverdueTaskHistory history = new OverdueTaskHistory();
                 content.append("过期任务如下:").append("\r\n");
-                content.append(RedmineApi.REDMINE_URL + "issues/").append(id).append("\r\n");
+                content.append(redmineOldUrl).append("issues/").append(id).append("\r\n");
                 content.append("任务主题:").append(i.getSubject()).append("\r\n");
                 content.append("=============================").append("\r\n");
                 history.setAssigneeName(name);
