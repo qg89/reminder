@@ -1,6 +1,6 @@
 package com.q.reminder.reminder.util;
 
-import com.q.reminder.reminder.entity.CoverityVo;
+import com.q.reminder.reminder.vo.CoverityAndRedmineSaveTaskVo;
 import com.taskadapter.redmineapi.*;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.TimeEntry;
@@ -18,44 +18,21 @@ import java.util.stream.Collectors;
  * @author : saiko
  * @version : v1.0
  * @ClassName : com.q.reminder.reminder.util.RedmineApi
- * @Description :
+ * @Description : redmine相关API
  * @date :  2022.09.26 15:14
  */
 @Log4j2
 public class RedmineApi {
 
-    public static void main(String[] args) {
-        String redmineUrl = "http://redmine-qa.mxnavi.com/";
-        String apiAccessKey = "1f905383da4f783bad92e22f430c7db0b15ae258";
-        final Integer projectId = 10077;
-        final Integer viewId = 10738;
-//        readCoverity(projectId, viewId, apiAccessKey, redmineUrl);
-//        timeEntries(apiAccessKey, redmineUrl);
-    }
-
-    private static void readCoverity(Integer projectId, Integer viewId, String apiAccessKey, String redmineUrl) {
-        List<CoverityVo> coverityVoList = CoverityApi.queryHightMidQ("E6E6E8432545DE9FB6A106BA6B47AB98", projectId, viewId);
-        if (coverityVoList == null || coverityVoList.isEmpty()) {
-            log.info("coverity 返回结果为空");
-            return;
-        }
-        coverityVoList.forEach(e -> {
-            String type = e.getDisplayType();
-            String cid = String.valueOf(e.getCid());
-            String content = "类型:" + type + "," + "CID:" + cid + "\r\n" +
-                    "类别:" + e.getDisplayCategory() + "\r\n" +
-                    "文件路径:" + e.getDisplayFile() + "\r\n" +
-                    "行数:" + e.getLineNumber();
-            String subject = type + "-" + cid;
-            try {
-                saveTask(subject, content, cid, apiAccessKey, redmineUrl);
-            } catch (RedmineException ex) {
-                ex.printStackTrace();
-            }
-        });
-    }
-
-
+    /**
+     * 通过项目读取redmine过期任务
+     *
+     * @param projects       redmine项目名称
+     * @param noneStatusList 排查状态
+     * @param apiAccessKey   redmine密钥
+     * @param redmineUrl     redmineURL
+     * @return 按指派人员返回问题列表
+     */
     public static Map<String, List<Issue>> queryUserList(Set<String> projects, List<String> noneStatusList, String apiAccessKey, String redmineUrl) {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, apiAccessKey);
         IssueManager issueManager = mgr.getIssueManager();
@@ -75,39 +52,67 @@ public class RedmineApi {
         return allIssueList.stream().collect(Collectors.groupingBy(Issue::getAssigneeName));
     }
 
-    public static void saveTask(String subject, String content, String cid, String apiAccessKey, String redmineUrl) throws RedmineException {
+    /**
+     * 通过coverity扫描的问题，保存到redmine任务
+     *
+     * @param vo           redmine保存的信息
+     * @param apiAccessKey redmine授权密钥
+     * @param redmineUrl   redmine URL
+     */
+    public static void saveTask(CoverityAndRedmineSaveTaskVo vo, String apiAccessKey, String redmineUrl) {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, apiAccessKey);
         IssueManager issueManager = mgr.getIssueManager();
         Params params = new Params();
         params.add("f[]", "subject");
         params.add("op[subject]", "~");
-        params.add("v[subject][]", cid);
-        ResultsWrapper<Issue> issues = issueManager.getIssues(params);
+        params.add("v[subject][]", "CID:[" + vo.getCid() + "]");
+        ResultsWrapper<Issue> issues = null;
+        try {
+            issues = issueManager.getIssues(params);
+        } catch (RedmineException e) {
+            log.error("[保存到redmine任务]异常 ", e);
+        }
+        if (issues == null) {
+            log.info("[保存到redmine任务] 失败,未查询相关任务");
+            return;
+        }
         List<Issue> results = issues.getResults();
         if (results != null && !results.isEmpty()) {
             return;
         }
 
         Tracker tracker = new Tracker();
+        // 评审问题
         tracker.setId(38);
         tracker.setName("评审问题");
         Issue issue = new Issue()
                 .setTracker(tracker)
-                .setAssigneeId(2751)
+                .setAssigneeId(vo.getAssigneeId())
                 .setCreatedOn(new Date())
                 .setDueDate(DateTime.now().plusDays(5).toDate())
-                .setSubject(subject)
+                .setSubject(vo.getSubject())
+                // 状态 NEW
                 .setStatusId(1)
-                .setProjectId(1806)
-                .setDescription(content);
+                .setProjectId(vo.getRedmineProjectId())
+                .setDescription(vo.getDescription())
+                .setParentId(vo.getParentId());
         Transport transport = mgr.getTransport();
         issue.setTransport(transport);
-//        issue.create();
-        issueManager.createIssue(issue);
-
+        try {
+            issue.create();
+        } catch (RedmineException e) {
+            log.error("创建redmine任务异常", e);
+        }
     }
 
-    public static void timeEntries(String apiAccessKey, String redmineUrl) {
+    /**
+     * TODO
+     * 查询工时
+     *
+     * @param apiAccessKey
+     * @param redmineUrl
+     */
+    private static void timeEntries(String apiAccessKey, String redmineUrl) {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, apiAccessKey);
         TimeEntryManager timeEntryManager = mgr.getTimeEntryManager();
         Map<String, String> params = new HashMap<>(4);
@@ -127,10 +132,16 @@ public class RedmineApi {
         System.out.println(results);
     }
 
-    public static void queryIssue() throws RedmineException {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey("http://redmine-buganalysis-qa.mxnavi.com/", "e6ca9498eba37aa49a8a70c6415a8bd1667893db");
+    /**
+     * TODO
+     * 查看问题
+     *
+     * @throws RedmineException
+     */
+    private static void queryIssue() throws RedmineException {
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey("http://redmine-qa.mxnavi.com/", "1f905383da4f783bad92e22f430c7db0b15ae258");
         IssueManager issueManager = mgr.getIssueManager();
-        Issue issueById = issueManager.getIssueById(3140, Include.attachments);
+        Issue issueById = issueManager.getIssueById(589298, Include.attachments);
         System.out.println(issueById);
     }
 }
