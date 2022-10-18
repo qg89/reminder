@@ -28,7 +28,7 @@ public class FeiShuApi {
     private final static String SEND_URL = "https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=open_id";
     private final static String SEND_GROUP_URL = "https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=chat_id";
     private final static String TOKEN_URL = "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal";
-    private final static String MEMBERS_URL = "https://open.feishu.cn/open-apis/im/v1/chats/%s/members";
+    private final static String MEMBERS_URL = "https://open.feishu.cn/open-apis/im/v1/chats/%s/members?page_size=100";
     private final static String CHATS_URL = "https://open.feishu.cn/open-apis/im/v1/chats";
 
     /**
@@ -119,7 +119,7 @@ public class FeiShuApi {
 
     /**
      * 通过chat_id 获取人员open_id
-     *
+     * TODO
      * @param chats
      */
     public static List<UserMemgerInfo> getMembersByChats(List<GroupInfo> chats, String security, List<UserGroup> userGroupList) {
