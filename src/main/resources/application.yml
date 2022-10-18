@@ -35,8 +35,8 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 app:
-  id: cli_a3a736fcfe39d013
-  secret: gMkBV9DWT39sHpmN6p5LYb7uvU7RLoKg
+  id: cli_a1144b112738d013
+  secret: AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx
 
 redmine-config:
   api-access-key:

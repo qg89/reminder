@@ -47,7 +47,7 @@ public class OverdueTasksToGroupHandle {
     @Autowired
     private UserGroupService userGroupService;
 
-    @Scheduled(cron = "*/20 * * * * ?")
+//    @Scheduled(cron = "*/20 * * * * ?")
     public void sendOverdueTask() {
         String secret = FeiShuApi.getSecret(appId, appSecret);
         // 组装数据， 通过人员，获取要发送的内容

@@ -8,9 +8,12 @@ import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.internal.ResultsWrapper;
 import com.taskadapter.redmineapi.internal.Transport;
 import lombok.extern.log4j.Log4j2;
+import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,6 +26,9 @@ import java.util.stream.Collectors;
  */
 @Log4j2
 public class RedmineApi {
+
+    private static String login_url = "http://redmine-qa.mxnavi.com/login";
+    private static final HashMap<String, List<Cookie>> COOKIE_STORE = new HashMap<>();
 
     /**
      * 通过项目读取redmine过期任务
@@ -143,5 +149,57 @@ public class RedmineApi {
         IssueManager issueManager = mgr.getIssueManager();
         Issue issueById = issueManager.getIssueById(589298, Include.attachments);
         System.out.println(issueById);
+    }
+
+
+    public static OkHttpClient login() {
+        RequestBody body = new FormBody.Builder()
+                .add("username", "qig")
+                .add("password", "MAnsiontech^7")
+                .add("authenticity_token", UUID.randomUUID().toString())
+                .add("back_url", "http://redmine-qa.mxnavi.com/")
+                .add("login", "登录 »")
+                .build();
+        Headers.Builder builder = new Headers.Builder();
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .cookieJar(new CookieJar() {
+                    @Override
+                    public void saveFromResponse(@NotNull HttpUrl httpUrl, @NotNull List<Cookie> cookies) {
+                        if (cookies.size() > 0) {
+                            COOKIE_STORE.put(getCacheKey(httpUrl), cookies);
+                        }
+                    }
+
+                    @NotNull
+                    @Override
+                    public List<Cookie> loadForRequest(@NotNull HttpUrl httpUrl) {
+                        List<Cookie> cookies = COOKIE_STORE.get(getCacheKey(httpUrl));
+                        return cookies != null ? cookies : new ArrayList<>();
+                    }
+                })
+                .build();
+
+        Request post = new Request.Builder()
+                .url(login_url)
+                .method("POST", body)
+                .headers(builder.build())
+                .build();
+
+        try {
+            client.newCall(post).execute();
+            return client;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return client;
+    }
+
+    private static String getCacheKey(HttpUrl url) {
+        return url.host() + ":" + url.port();
+    }
+
+    public static void main(String[] args) {
+        OkHttpClient login = login();
+        System.out.println(login);
     }
 }

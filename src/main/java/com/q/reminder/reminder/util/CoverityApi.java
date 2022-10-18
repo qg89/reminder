@@ -33,7 +33,8 @@ public class CoverityApi {
      * @param vo coverity 所用项目、视图
      */
     public static List<CoverityAndRedmineSaveTaskVo> readCoverity(CoverityAndRedmineSaveTaskVo vo) {
-        List<CoverityVo> coverityVoList = login();
+        OkHttpClient client = login();
+        List<CoverityVo> coverityVoList = queryList(client);
         if (coverityVoList.isEmpty()) {
             log.info("coverity 返回结果为空");
             return new ArrayList<>(0);
@@ -60,8 +61,7 @@ public class CoverityApi {
         return url.host() + ":" + url.port();
     }
 
-    public static List<CoverityVo> login() {
-        List<CoverityVo> list = new ArrayList<>();
+    public static OkHttpClient login() {
         RequestBody body = new FormBody.Builder()
                 .add("username", "d3")
                 .add("password", "t6AnB7")
@@ -94,24 +94,35 @@ public class CoverityApi {
 
         try {
             client.newCall(post).execute();
-            String cookie = "COVJSESSIONID8080PI=" + COOKIE_STORE.get(DOMAIN).get(0).value();
-            Request get = new Request.Builder()
-                    .url(String.format(URL, 10072, 10738))
-                    .header("Cookie", cookie)
-                    .header("Host", DOMAIN)
-                    .get()
-                    .build();
-
-            Response response = client.newCall(get).execute();
-            String result = Objects.requireNonNull(response.body()).string();
-            JSONObject resultJson = JSONObject.parseObject(result).getJSONObject("resultSet");
-            List<CoverityVo> resultList = resultJson.getJSONArray("results").toJavaList(CoverityVo.class, IgnoreNoneSerializable);
-            if (resultList != null) {
-                return resultList;
-            }
+            return client;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return list;
+        return client;
+    }
+
+    static List<CoverityVo> queryList(OkHttpClient client) {
+        String cookie = "COVJSESSIONID8080PI=" + COOKIE_STORE.get(DOMAIN).get(0).value();
+        Request get = new Request.Builder()
+                .url(String.format(URL, 10072, 10738))
+                .header("Cookie", cookie)
+                .header("Host", DOMAIN)
+                .get()
+                .build();
+
+        Response response;
+        String result = "";
+        try {
+            response = client.newCall(get).execute();
+            result = Objects.requireNonNull(response.body()).string();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        JSONObject resultJson = JSONObject.parseObject(result).getJSONObject("resultSet");
+        List<CoverityVo> resultList = resultJson.getJSONArray("results").toJavaList(CoverityVo.class, IgnoreNoneSerializable);
+        if (resultList != null) {
+            return resultList;
+        }
+        return new ArrayList<>();
     }
 }

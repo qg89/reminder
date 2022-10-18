@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -45,13 +46,13 @@ public class OverdueTasksToMemberHandle {
     private String appId;
     @Value("${app.secret}")
     private String appSecret;
-    @Value("{redmine-config.old_url}")
+    @Value("${redmine-config.old_url}")
     private String redmineOldUrl;
     @Value("${redmine-config.api-access-key.saiko}")
     private String apiAccessKeySaiko;
 
 
-    //    @Scheduled(cron = "*/20 * * * * ?")
+//    @Scheduled(cron = "*/20 * * * * ?")
     public void feiShu() {
         String secret = FeiShuApi.getSecret(appId, appSecret);
         StringBuilder contentAll = new StringBuilder();
