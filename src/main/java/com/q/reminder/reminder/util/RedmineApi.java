@@ -59,6 +59,35 @@ public class RedmineApi {
     }
 
     /**
+     * 通过项目读取redmine过期任务
+     *
+     * @param projects       redmine项目名称
+     * @param noneStatusList 排查状态
+     * @param apiAccessKey   redmine密钥
+     * @param redmineUrl     redmineURL
+     * @param expiredDay
+     * @return 按指派人员返回问题列表
+     */
+    public static Map<String, List<Issue>> queryUserByExpiredDayList(Set<String> projects, List<String> noneStatusList, String apiAccessKey, String redmineUrl, int expiredDay) {
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, apiAccessKey);
+        IssueManager issueManager = mgr.getIssueManager();
+        List<Issue> allIssueList = new ArrayList<>();
+        projects.forEach(p -> {
+            try {
+                List<Issue> issues = issueManager.getIssues(p, null, Include.watchers);
+                List<Issue> issueList = issues.stream().filter(e -> {
+                    Date dueDate = e.getDueDate();
+                    return dueDate != null && new DateTime().minusDays(expiredDay).isAfter(new DateTime(dueDate)) && !noneStatusList.contains(e.getStatusName()) && StringUtils.isNotBlank(e.getAssigneeName());
+                }).collect(Collectors.toList());
+                allIssueList.addAll(issueList);
+            } catch (RedmineException e) {
+                log.error("读取redmine异常");
+            }
+        });
+        return allIssueList.stream().collect(Collectors.groupingBy(Issue::getAssigneeName));
+    }
+
+    /**
      * 通过coverity扫描的问题，保存到redmine任务
      *
      * @param vo           redmine保存的信息
@@ -198,8 +227,8 @@ public class RedmineApi {
         return url.host() + ":" + url.port();
     }
 
-    public static void main(String[] args) {
-        OkHttpClient login = login();
-        System.out.println(login);
-    }
+//    public static void main(String[] args) {
+//        OkHttpClient login = login();
+//        System.out.println(login);
+//    }
 }

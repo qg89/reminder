@@ -1,0 +1,26 @@
+package com.q.reminder.reminder.handle;
+
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+/**
+ * @author : saiko
+ * @version : v1.0
+ * @ClassName : com.q.reminder.reminder.handle.OverdueTasksHandle
+ * @Description : Resolved 状态，并且未关闭，过期两天
+ * @date :  2022.10.18 17:02
+ */
+@Log4j2
+@Component
+public class OverdueTwoDayAgoTasksHandle {
+
+    @Autowired
+    private QueryTasksToMemberBase queryTasksToMemberBase;
+
+    @Scheduled(cron = "0 0 17 * * ?")
+    public void query() {
+        queryTasksToMemberBase.feiShu(2);
+    }
+}

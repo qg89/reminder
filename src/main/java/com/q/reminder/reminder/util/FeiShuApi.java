@@ -1,12 +1,14 @@
 package com.q.reminder.reminder.util;
 
 import cn.hutool.http.HttpUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.JSONWriter;
 import com.q.reminder.reminder.entity.GroupInfo;
 import com.q.reminder.reminder.entity.UserGroup;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
+import com.q.reminder.reminder.vo.SendVo;
 import lombok.extern.log4j.Log4j2;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
@@ -36,11 +38,32 @@ public class FeiShuApi {
     /**
      * 通过人员ID 发送消息
      *
-     * @param receiveId
-     * @param contentStr
+     * @param vo
+     * @param authorization
+     * @param contentAll
      * @throws IOException
      */
-    public static void send(String receiveId, String contentStr, String security) throws IOException {
+    public static void sendPost(SendVo vo, String authorization, StringBuilder contentAll) throws IOException {
+        JSONObject requestParam = new JSONObject();
+        String receiveId = vo.getMemberId();
+        String content = vo.getContent();
+        requestParam.put("receive_id", receiveId);
+        requestParam.put("msg_type", "post");
+        requestParam.put("content", content);
+        requestParam.put("uuid", UUID.randomUUID());
+
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
+        MediaType mediaType = MediaType.parse("application/json");
+        RequestBody body = RequestBody.create(requestParam.toJSONString(), mediaType);
+        Request request = new Request.Builder().url(SEND_URL).method("POST", body)
+                .addHeader("Content-Type", "application/json")
+                .addHeader("Authorization", authorization)
+                .build();
+        Response response = client.newCall(request).execute();
+        contentAll.append("消息发送状态:").append("指派人员:").append(vo.getAssigneeName()).append(", 飞书返回状态: ").append(response.code()).append("\r\n");
+    }
+
+    public static void sendText(String receiveId, String contentStr, String security) throws IOException {
         JSONObject content = new JSONObject();
         JSONObject text = new JSONObject();
         text.put("text", contentStr);
@@ -63,21 +86,19 @@ public class FeiShuApi {
      * 通过人员ID 发送消息 到指定群
      *
      * @param chatId
-     * @param contentStr
+     * @param content
      * @param security
      * @throws IOException
      */
-    public static void sendGroupByChats(String chatId, String contentStr, String security) throws IOException {
-        JSONObject content = new JSONObject();
-        JSONObject text = new JSONObject();
-        text.put("text", contentStr);
-        content.put("receive_id", chatId);
-        content.put("msg_type", "text");
-        content.put("content", text.toJSONString());
-        content.put("uuid", UUID.randomUUID());
+    public static void sendGroupByChats(String chatId, String content, String security) throws IOException {
+        JSONObject paramsJson = new JSONObject();
+        paramsJson.put("receive_id", chatId);
+        paramsJson.put("msg_type", "post");
+        paramsJson.put("content", content);
+        paramsJson.put("uuid", UUID.randomUUID());
         OkHttpClient client = new OkHttpClient().newBuilder().build();
         MediaType mediaType = MediaType.parse("application/json");
-        RequestBody body = RequestBody.create(content.toJSONString(), mediaType);
+        RequestBody body = RequestBody.create(paramsJson.toJSONString(), mediaType);
         Request request = new Request.Builder().url(SEND_GROUP_URL).method("POST", body)
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Authorization", security)

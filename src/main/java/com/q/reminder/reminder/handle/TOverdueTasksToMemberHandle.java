@@ -6,6 +6,7 @@ import com.q.reminder.reminder.entity.*;
 import com.q.reminder.reminder.service.*;
 import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
+import com.q.reminder.reminder.vo.SendVo;
 import com.taskadapter.redmineapi.bean.Issue;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
  */
 @Log4j2
 @Component
-public class OverdueTasksToMemberHandle {
+public class TOverdueTasksToMemberHandle {
 
     @Autowired
     private UserMemberService userMemberService;
@@ -80,9 +81,10 @@ public class OverdueTasksToMemberHandle {
         }
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append(" 查询redmine过期人员集合完成!").append("\r\n");
         // key: member_id, value: content
-        Map<String, String> sendMap = new HashMap<>();
+        Map<String, SendVo> sendMap = new HashMap<>();
         List<OverdueTaskHistory> historys = new ArrayList<>();
         listMap.forEach((k, issueList) -> {
+            SendVo sendVo = new SendVo();
             String name = k.replace(" ", "");
             StringBuilder content = new StringBuilder();
             issueList.forEach(i -> {
@@ -103,7 +105,11 @@ public class OverdueTasksToMemberHandle {
             if (StringUtils.isBlank(memberId)) {
                 return;
             }
-            sendMap.put(memberId, content.toString());
+
+            sendVo.setContent(content.toString());
+            sendVo.setAssigneeName(name);
+            sendVo.setMemberId(memberId);
+            sendMap.put(memberId, sendVo);
         });
         if (CollectionUtils.isEmpty(sendMap)) {
             contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("当日暂无过期任务!").append("\r\n");
@@ -111,7 +117,7 @@ public class OverdueTasksToMemberHandle {
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("发送飞书任务开始!").append("\r\n");
         sendMap.forEach((k, v) -> {
             try {
-                FeiShuApi.send(k, v, secret);
+                FeiShuApi.sendPost(v, secret, contentAll);
             } catch (IOException e) {
                 log.error("", e);
             }
@@ -127,7 +133,7 @@ public class OverdueTasksToMemberHandle {
         List<AdminInfo> adminInfos = adminInfoService.list();
         adminInfos.forEach(e -> {
             try {
-                FeiShuApi.send(e.getMemberId(), content, secret);
+                FeiShuApi.sendText(e.getMemberId(), content, secret);
             } catch (IOException ex) {
                 log.error("管理员任务发送失败 {}", e);
             }
