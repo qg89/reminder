@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class UserMemberServiceImpl extends ServiceImpl<UserMapping, UserMemgerInfo> implements UserMemberService {
     @Override
     public Boolean saveOrupdateBatchByNameIsNull(List<UserMemgerInfo> membersByChats) {
-        Map<String, String> userMap = membersByChats.stream().peek(e -> e.setUserName(new StringBuilder(e.getName()).insert(1, " ").toString())).collect(Collectors.toMap(UserMemgerInfo::getMemberId, UserMemgerInfo::getUserName));
+        Map<String, String> userMap = membersByChats.stream().collect(Collectors.toMap(UserMemgerInfo::getMemberId, UserMemgerInfo::getUserName));
         List<UserMemgerInfo> userMemgerInfos = baseMapper.selectList(new QueryWrapper<>());
         Set<String> userSet = userMemgerInfos.stream().map(UserMemgerInfo::getMemberId).collect(Collectors.toSet());
         // 当人员新增、初始化时

@@ -2,6 +2,7 @@ package com.q.reminder.reminder.util;
 
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.q.reminder.reminder.entity.GroupInfo;
 import com.q.reminder.reminder.entity.UserGroup;
@@ -29,6 +30,7 @@ public class FeiShuApi {
     private final static String SEND_GROUP_URL = "https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=chat_id";
     private final static String TOKEN_URL = "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal";
     private final static String MEMBERS_URL = "https://open.feishu.cn/open-apis/im/v1/chats/%s/members?page_size=100";
+    private final static String MEMBERS_PAGE_URL = MEMBERS_URL + "&page_token=%s";
     private final static String CHATS_URL = "https://open.feishu.cn/open-apis/im/v1/chats";
 
     /**
@@ -86,7 +88,8 @@ public class FeiShuApi {
 
     /**
      * 获取授权密钥
-     *
+     * @param appId
+     * @param security
      * @return
      */
     public static String getSecret(String appId, String security) {
@@ -113,35 +116,84 @@ public class FeiShuApi {
             return null;
         }
         JSONObject data = jsonObject.getJSONObject("data");
-        List<GroupInfo> object = JSON.parseArray(data.getJSONArray("items").toJSONString(), GroupInfo.class);
-        return object;
+        return JSON.parseArray(data.getJSONArray("items").toJSONString(), GroupInfo.class);
     }
 
     /**
      * 通过chat_id 获取人员open_id
-     * TODO
      * @param chats
+     * @param security
+     * @param userGroupList
+     * @return
      */
     public static List<UserMemgerInfo> getMembersByChats(List<GroupInfo> chats, String security, List<UserGroup> userGroupList) {
         List<UserMemgerInfo> lists = new ArrayList<>();
         chats.forEach(chat -> {
-            String result = HttpUtil.createGet(String.format(MEMBERS_URL, chat.getChatId())).addHeaders(Map.of("Authorization", security)).execute().body();
+            String chatId = chat.getChatId();
+            String result = HttpUtil.createGet(String.format(MEMBERS_URL, chatId)).addHeaders(Map.of("Authorization", security)).execute().body();
             JSONObject jsonObject = JSON.parseObject(result, JSONObject.class);
             if (jsonObject.getInteger("code") != 0) {
                 String msg = jsonObject.getString("msg");
                 log.error("获取人员失败,{}", msg);
                 return;
             }
-            List<UserMemgerInfo> items = JSON.parseArray(jsonObject.getJSONObject("data").getJSONArray("items").toJSONString(), UserMemgerInfo.class);
+            JSONObject data = jsonObject.getJSONObject("data");
+            JSONArray itemsJson = data.getJSONArray("items");
+            List<UserMemgerInfo> items = JSON.parseArray(itemsJson.toJSONString(), UserMemgerInfo.class);
             lists.addAll(items);
             items.forEach(e -> {
-                UserGroup ug = new UserGroup();
-                ug.setChatId(chat.getChatId());
-                ug.setMemberId(e.getMemberId());
-                userGroupList.add(ug);
+                e.setUserName(new StringBuilder(e.getName()).insert(1, " ").toString());
+                addUserGroupList(chatId, e, userGroupList);
             });
+            Integer memberTotal = data.getInteger("member_total");
+            int itemsTotal = itemsJson.size();
+            if (memberTotal > itemsTotal) {
+                String pageToken = data.getString("page_token");
+                query(lists, chatId, security, userGroupList, pageToken);
+            }
         });
         return lists;
+    }
+
+    /**
+     * 分页查询
+     * @param lists
+     * @param chatId
+     * @param security
+     * @param userGroupList
+     * @param pageToken
+     */
+    private static void query(List<UserMemgerInfo> lists, String chatId, String security, List<UserGroup> userGroupList, String pageToken) {
+        String body = HttpUtil.createGet(String.format(MEMBERS_PAGE_URL, chatId, pageToken)).addHeaders(Map.of("Authorization", security)).execute().body();
+        JSONObject jsonObject = JSON.parseObject(body, JSONObject.class);
+        if (jsonObject.getInteger("code") != 0) {
+            String msg = jsonObject.getString("msg");
+            log.error("获取人员失败,{}", msg);
+            return;
+        }
+        JSONObject data = jsonObject.getJSONObject("data");
+        JSONArray itemsJson = data.getJSONArray("items");
+        Integer memberTotal = data.getInteger("member_total");;
+        if (memberTotal >= (itemsJson.size() + lists.size())) {
+            List<UserMemgerInfo> items = JSON.parseArray(itemsJson.toJSONString(), UserMemgerInfo.class);
+            items.forEach(e -> {
+                e.setUserName(new StringBuilder(e.getName()).insert(1, " ").toString());
+                addUserGroupList(chatId, e, userGroupList);
+            });
+            lists.addAll(items);
+            if (lists.size() == memberTotal) {
+                return;
+            }
+            pageToken = data.getString("page_token");
+            query(lists, chatId, security, userGroupList, pageToken);
+        }
+    }
+
+    private static void addUserGroupList(String chatId, UserMemgerInfo e, List<UserGroup> userGroupList) {
+        UserGroup ug = new UserGroup();
+        ug.setChatId(chatId);
+        ug.setMemberId(e.getMemberId());
+        userGroupList.add(ug);
     }
 
 }

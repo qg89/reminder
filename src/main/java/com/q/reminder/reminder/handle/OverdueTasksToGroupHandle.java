@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * @author : saiko
  * @version : v1.0
  * @ClassName : com.q.reminder.reminder.handle.OverdueTasksHandle
- * @Description : 过期任务提醒群组
+ * @Description : 过期任务提醒群组，每天9点半提醒，为该状态的人员
  * @date :  2022.09.27 19:13
  */
 @Log4j2
@@ -31,7 +31,7 @@ public class OverdueTasksToGroupHandle {
     private String appId;
     @Value("${app.secret}")
     private String appSecret;
-    @Value("{redmine-config.old_url}")
+    @Value("${redmine-config.old_url}")
     private String redmineOldUrl;
     @Value("${redmine-config.api-access-key.saiko}")
     private String apiAccessKeySaiko;
@@ -47,7 +47,7 @@ public class OverdueTasksToGroupHandle {
     @Autowired
     private UserGroupService userGroupService;
 
-//    @Scheduled(cron = "*/20 * * * * ?")
+    @Scheduled(cron = "0 30 9 * * ?")
     public void sendOverdueTask() {
         String secret = FeiShuApi.getSecret(appId, appSecret);
         // 组装数据， 通过人员，获取要发送的内容

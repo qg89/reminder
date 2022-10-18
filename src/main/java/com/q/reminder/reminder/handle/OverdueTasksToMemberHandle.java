@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
  * @author : saiko
  * @version : v1.0
  * @ClassName : com.q.reminder.reminder.handle.FeiShuHandle
- * @Description : 过期任务提醒个人
+ * @Description : 过期任务提醒个人，每天8点提醒
  * @date :  2022.09.27 08:38
  */
 @Log4j2
@@ -52,7 +52,7 @@ public class OverdueTasksToMemberHandle {
     private String apiAccessKeySaiko;
 
 
-//    @Scheduled(cron = "*/20 * * * * ?")
+    @Scheduled(cron = "0 0 8 * * ?")
     public void feiShu() {
         String secret = FeiShuApi.getSecret(appId, appSecret);
         StringBuilder contentAll = new StringBuilder();
