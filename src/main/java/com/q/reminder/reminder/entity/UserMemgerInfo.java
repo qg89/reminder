@@ -15,7 +15,7 @@ import java.io.Serializable;
  * @Description :
  * @date :  2022.09.23 14:30
  */
-@TableName("user_member_info")
+@TableName("fs_user_member_info")
 @Data
 public class UserMemgerInfo implements Serializable {
     private static final long serialVersionUID = 7510561412354805175L;

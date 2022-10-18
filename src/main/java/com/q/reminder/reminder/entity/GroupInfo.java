@@ -16,7 +16,7 @@ import java.io.Serializable;
  * @date :  2022.09.27 08:40
  */
 @Data
-@TableName("group_info")
+@TableName("fs_group_info")
 public class GroupInfo implements Serializable {
     private static final long serialVersionUID = 6352091359792413686L;
     @TableId(type = IdType.INPUT)
