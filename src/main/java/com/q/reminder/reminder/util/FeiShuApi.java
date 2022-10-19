@@ -4,7 +4,6 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.fastjson2.JSONWriter;
 import com.q.reminder.reminder.entity.GroupInfo;
 import com.q.reminder.reminder.entity.UserGroup;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
@@ -63,6 +62,13 @@ public class FeiShuApi {
         contentAll.append("消息发送状态:").append("指派人员:").append(vo.getAssigneeName()).append(", 飞书返回状态: ").append(response.code()).append("\r\n");
     }
 
+    /**
+     * 发送消息，文本
+     * @param receiveId
+     * @param contentStr
+     * @param security
+     * @throws IOException
+     */
     public static void sendText(String receiveId, String contentStr, String security) throws IOException {
         JSONObject content = new JSONObject();
         JSONObject text = new JSONObject();

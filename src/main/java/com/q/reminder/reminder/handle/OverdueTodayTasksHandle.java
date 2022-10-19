@@ -19,8 +19,8 @@ public class OverdueTodayTasksHandle {
     @Autowired
     private QueryTasksToMemberBase queryTasksToMemberBase;
 
-    @Scheduled(cron = "0 22 17 * * ?")
+    @Scheduled(cron = "0 30 17 * * ?")
     public void query() {
-        queryTasksToMemberBase.feiShu(0);
+        queryTasksToMemberBase.feiShu(0, "Resolved");
     }
 }

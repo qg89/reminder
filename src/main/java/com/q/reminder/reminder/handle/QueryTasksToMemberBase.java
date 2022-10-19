@@ -3,7 +3,6 @@ package com.q.reminder.reminder.handle;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.q.reminder.reminder.contents.ExpiredDaysContents;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
 import com.q.reminder.reminder.entity.ProjectInfo;
@@ -57,7 +56,7 @@ public class QueryTasksToMemberBase {
     private String apiAccessKeySaiko;
 
 
-    public void feiShu(int expiredDay) {
+    public void feiShu(int expiredDay, String statusName) {
         String authorization = FeiShuApi.getSecret(appId, appSecret);
         StringBuilder contentAll = new StringBuilder();
         contentAll.append("当日执行情况如下(").append(new DateTime().toString("yyyy-MM-dd")).append("):\r\n");
@@ -73,7 +72,12 @@ public class QueryTasksToMemberBase {
         List<String> noneStatusList = noneStatusService.queryUnInStatus();
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("获取排除状态!").append("\r\n");
 
-        Map<String, List<Issue>> listMap = RedmineApi.queryUserByExpiredDayList(projectIds, noneStatusList, apiAccessKeySaiko, redmineOldUrl, expiredDay);
+        Map<String, List<Issue>> listMap;
+        if (StringUtils.isNotBlank(statusName)) {
+            listMap = RedmineApi.queryUserByResolvedList(projectIds, noneStatusList, apiAccessKeySaiko, redmineOldUrl, expiredDay);
+        } else {
+            listMap = RedmineApi.queryUserByExpiredDayList(projectIds, noneStatusList, apiAccessKeySaiko, redmineOldUrl, expiredDay);
+        }
         if (CollectionUtils.isEmpty(listMap)) {
             contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append("\r\n");
             contentAll.append("执行完成!");

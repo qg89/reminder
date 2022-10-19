@@ -87,6 +87,25 @@ public class RedmineApi {
         return allIssueList.stream().collect(Collectors.groupingBy(Issue::getAssigneeName));
     }
 
+    public static Map<String, List<Issue>> queryUserByResolvedList(Set<String> projects, List<String> noneStatusList, String apiAccessKey, String redmineUrl, int expiredDay) {
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, apiAccessKey);
+        IssueManager issueManager = mgr.getIssueManager();
+        List<Issue> allIssueList = new ArrayList<>();
+        projects.forEach(p -> {
+            try {
+                List<Issue> issues = issueManager.getIssues(p, null, Include.watchers);
+                List<Issue> issueList = issues.stream().filter(e -> {
+                    Date dueDate = e.getDueDate();
+                    return dueDate != null && new DateTime().minusDays(expiredDay).isAfter(new DateTime(dueDate)) && "Resolved".equals(e.getStatusName()) && StringUtils.isNotBlank(e.getAssigneeName());
+                }).collect(Collectors.toList());
+                allIssueList.addAll(issueList);
+            } catch (RedmineException e) {
+                log.error("读取redmine异常");
+            }
+        });
+        return allIssueList.stream().collect(Collectors.groupingBy(Issue::getAssigneeName));
+    }
+
     /**
      * 通过coverity扫描的问题，保存到redmine任务
      *
