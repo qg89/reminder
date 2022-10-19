@@ -20,9 +20,9 @@ import java.util.stream.Collectors;
 @Service
 public class NoneStatusServiceImpl extends ServiceImpl<NoneStatusMapping, NoneStatus> implements NoneStatusService {
     @Override
-    public List<String> queryUnInStatus() {
+    public List<String> queryUnInStatus(Integer expiredDays) {
         LambdaQueryWrapper<NoneStatus> lqw = new LambdaQueryWrapper<>();
-        lqw.eq(NoneStatus::getNoneStatus, "Closed");
+        lqw.in(NoneStatus::getExpiredDays, expiredDays);
         lqw.select(NoneStatus::getNoneStatus);
         return this.listObjs(lqw, (Object::toString));
     }

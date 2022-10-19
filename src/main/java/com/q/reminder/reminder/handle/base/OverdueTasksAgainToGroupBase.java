@@ -1,12 +1,19 @@
-package com.q.reminder.reminder.handle;
+package com.q.reminder.reminder.handle.base;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.q.reminder.reminder.entity.*;
-import com.q.reminder.reminder.service.*;
+import com.q.reminder.reminder.entity.OverdueTaskHistory;
+import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.UserGroup;
+import com.q.reminder.reminder.entity.UserMemgerInfo;
+import com.q.reminder.reminder.service.OverdueTaskHistoryService;
+import com.q.reminder.reminder.service.ProjectInfoService;
+import com.q.reminder.reminder.service.UserGroupService;
+import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
+import com.q.reminder.reminder.vo.QueryRedmineVo;
 import com.q.reminder.reminder.vo.SendVo;
 import com.taskadapter.redmineapi.bean.Issue;
 import lombok.extern.log4j.Log4j2;
@@ -14,7 +21,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -25,12 +31,12 @@ import java.util.stream.Collectors;
  * @author : saiko
  * @version : v1.0
  * @ClassName : com.q.reminder.reminder.handle.OverdueTasksHandle
- * @Description : 过期任务提醒群组，每天9点半提醒，为该状态的人员
+ * @Description : 每天9点半提醒，群提醒
  * @date :  2022.09.27 19:13
  */
 @Log4j2
 @Component
-public class OverdueTasksAgainToGroupHandle {
+public class OverdueTasksAgainToGroupBase {
     @Value("${app.id}")
     private String appId;
     @Value("${app.secret}")
@@ -45,25 +51,24 @@ public class OverdueTasksAgainToGroupHandle {
     @Autowired
     private ProjectInfoService projectInfoService;
     @Autowired
-    private NoneStatusService noneStatusService;
-    @Autowired
     private OverdueTaskHistoryService overdueTaskHistoryService;
     @Autowired
     private UserGroupService userGroupService;
 
-        @Scheduled(cron = "0 30 9 * * ?")
-//    @Scheduled(cron = "0/20 * * * * ?")
-    public void sendOverdueTask() {
+    public void overdueTasksAgainToGroup(int expiredDay, List<String> noneStatusList, Boolean containStatus) {
         String secret = FeiShuApi.getSecret(appId, appSecret);
         // 组装数据， 通过人员，获取要发送的内容
         List<ProjectInfo> projectInfoList = projectInfoService.list();
         Set<String> projectIds = projectInfoList.stream().map(ProjectInfo::getPId).collect(Collectors.toSet());
 
-        LambdaQueryWrapper<NoneStatus> qw = new LambdaQueryWrapper<>();
-        qw.select(NoneStatus::getNoneStatus);
-        List<String> noneStatusList = noneStatusService.listObjs(qw, (Object::toString));
-
-        Map<String, List<Issue>> listMap = RedmineApi.queryUserList(projectIds, noneStatusList, apiAccessKeySaiko, redmineOldUrl);
+        QueryRedmineVo vo = new QueryRedmineVo();
+        vo.setProjects(projectIds);
+        vo.setNoneStatusList(noneStatusList);
+        vo.setApiAccessKey(apiAccessKeySaiko);
+        vo.setRedmineUrl(redmineOldUrl);
+        vo.setExpiredDay(expiredDay);
+        vo.setContainsStatus(containStatus);
+        Map<String, List<Issue>> listMap = RedmineApi.queryUserByExpiredDayList(vo);
 
         // 通过人员查看对应redmine人员关系，并返回redmine姓名和飞书member_id关系
         List<UserMemgerInfo> list = userMemberService.list();
@@ -84,35 +89,40 @@ public class OverdueTasksAgainToGroupHandle {
 
             issueList.forEach(i -> {
                 Integer id = i.getId();
+                String subject = i.getSubject();
+                String statusName = i.getStatusName();
+                Date dueDate = i.getDueDate();
+                Date updatedOn = i.getUpdatedOn();
+                String projectName = i.getProjectName();
                 JSONArray subContentJsonObject = new JSONArray();
-                JSONObject subject = new JSONObject();
-                subject.put("tag", "text");
-                subject.put("text", "任务主题: ");
-                subContentJsonObject.add(subject);
+                JSONObject subjectJson = new JSONObject();
+                subjectJson.put("tag", "text");
+                subjectJson.put("text", "任务主题: ");
+                subContentJsonObject.add(subjectJson);
 
                 JSONObject a = new JSONObject();
                 a.put("tag", "a");
                 a.put("href", redmineOldUrl + "issues/" + id);
-                a.put("text", i.getSubject());
+                a.put("text", subject);
                 subContentJsonObject.add(a);
 
                 JSONObject task = new JSONObject();
                 task.put("tag", "text");
-                task.put("text", "\r\n当前任务状态: " + i.getStatusName());
+                task.put("text", "\r\n当前任务状态: " + statusName);
                 subContentJsonObject.add(task);
 
-                JSONObject dueDate = new JSONObject();
-                dueDate.put("tag", "text");
-                dueDate.put("text", "\r\n计划完成日期: " + new DateTime(i.getDueDate()).toString("yyyy-MM-dd"));
-                subContentJsonObject.add(dueDate);
+                JSONObject dueDateJson = new JSONObject();
+                dueDateJson.put("tag", "text");
+                dueDateJson.put("text", "\r\n计划完成日期: " + new DateTime(dueDate).toString("yyyy-MM-dd"));
+                subContentJsonObject.add(dueDateJson);
                 contentJsonArray.add(subContentJsonObject);
 
                 OverdueTaskHistory history = new OverdueTaskHistory();
                 history.setAssigneeName(name);
-                history.setProjectName(i.getProjectName());
-                history.setSubjectName(i.getSubject());
+                history.setProjectName(projectName);
+                history.setSubjectName(subject);
                 history.setRedmineId(id);
-                history.setLastUpdateTime(i.getUpdatedOn());
+                history.setLastUpdateTime(updatedOn);
                 history.setType("1");
                 historys.add(history);
             });

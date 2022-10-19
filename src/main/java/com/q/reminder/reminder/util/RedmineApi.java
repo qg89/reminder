@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.util;
 
 import com.q.reminder.reminder.vo.CoverityAndRedmineSaveTaskVo;
+import com.q.reminder.reminder.vo.QueryRedmineVo;
 import com.taskadapter.redmineapi.*;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.TimeEntry;
@@ -27,28 +28,34 @@ import java.util.stream.Collectors;
 @Log4j2
 public class RedmineApi {
 
-    private static String login_url = "http://redmine-qa.mxnavi.com/login";
+    private static final String LOGIN_URL = "http://redmine-qa.mxnavi.com/login";
     private static final HashMap<String, List<Cookie>> COOKIE_STORE = new HashMap<>();
 
+
     /**
      * 通过项目读取redmine过期任务
      *
-     * @param projects       redmine项目名称
-     * @param noneStatusList 排查状态
-     * @param apiAccessKey   redmine密钥
-     * @param redmineUrl     redmineURL
+     * @param vo
      * @return 按指派人员返回问题列表
      */
-    public static Map<String, List<Issue>> queryUserList(Set<String> projects, List<String> noneStatusList, String apiAccessKey, String redmineUrl) {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, apiAccessKey);
+    public static Map<String, List<Issue>> queryUserByExpiredDayList(QueryRedmineVo vo) {
+        List<String> noneStatusList = vo.getNoneStatusList();
+        Integer expiredDay = vo.getExpiredDay();
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(vo.getRedmineUrl(), vo.getApiAccessKey());
         IssueManager issueManager = mgr.getIssueManager();
         List<Issue> allIssueList = new ArrayList<>();
+        Set<String> projects = vo.getProjects();
         projects.forEach(p -> {
             try {
                 List<Issue> issues = issueManager.getIssues(p, null, Include.watchers);
                 List<Issue> issueList = issues.stream().filter(e -> {
                     Date dueDate = e.getDueDate();
-                    return dueDate != null && new DateTime().minusDays(1).isAfter(new DateTime(dueDate)) && !noneStatusList.contains(e.getStatusName()) && StringUtils.isNotBlank(e.getAssigneeName());
+                    boolean filter = dueDate != null && new DateTime().minusDays(expiredDay).isAfter(new DateTime(dueDate)) && StringUtils.isNotBlank(e.getAssigneeName());
+                    if (vo.getContainsStatus()) {
+                        return filter && noneStatusList.contains(e.getStatusName());
+                    } else {
+                        return filter && !noneStatusList.contains(e.getStatusName());
+                    }
                 }).collect(Collectors.toList());
                 allIssueList.addAll(issueList);
             } catch (RedmineException e) {
@@ -58,53 +65,6 @@ public class RedmineApi {
         return allIssueList.stream().collect(Collectors.groupingBy(Issue::getAssigneeName));
     }
 
-    /**
-     * 通过项目读取redmine过期任务
-     *
-     * @param projects       redmine项目名称
-     * @param noneStatusList 排查状态
-     * @param apiAccessKey   redmine密钥
-     * @param redmineUrl     redmineURL
-     * @param expiredDay
-     * @return 按指派人员返回问题列表
-     */
-    public static Map<String, List<Issue>> queryUserByExpiredDayList(Set<String> projects, List<String> noneStatusList, String apiAccessKey, String redmineUrl, int expiredDay) {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, apiAccessKey);
-        IssueManager issueManager = mgr.getIssueManager();
-        List<Issue> allIssueList = new ArrayList<>();
-        projects.forEach(p -> {
-            try {
-                List<Issue> issues = issueManager.getIssues(p, null, Include.watchers);
-                List<Issue> issueList = issues.stream().filter(e -> {
-                    Date dueDate = e.getDueDate();
-                    return dueDate != null && new DateTime().minusDays(expiredDay).isAfter(new DateTime(dueDate)) && !noneStatusList.contains(e.getStatusName()) && StringUtils.isNotBlank(e.getAssigneeName());
-                }).collect(Collectors.toList());
-                allIssueList.addAll(issueList);
-            } catch (RedmineException e) {
-                log.error("读取redmine异常");
-            }
-        });
-        return allIssueList.stream().collect(Collectors.groupingBy(Issue::getAssigneeName));
-    }
-
-    public static Map<String, List<Issue>> queryUserByResolvedList(Set<String> projects, List<String> noneStatusList, String apiAccessKey, String redmineUrl, int expiredDay) {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, apiAccessKey);
-        IssueManager issueManager = mgr.getIssueManager();
-        List<Issue> allIssueList = new ArrayList<>();
-        projects.forEach(p -> {
-            try {
-                List<Issue> issues = issueManager.getIssues(p, null, Include.watchers);
-                List<Issue> issueList = issues.stream().filter(e -> {
-                    Date dueDate = e.getDueDate();
-                    return dueDate != null && new DateTime().minusDays(expiredDay).isAfter(new DateTime(dueDate)) && "Resolved".equals(e.getStatusName()) && StringUtils.isNotBlank(e.getAssigneeName());
-                }).collect(Collectors.toList());
-                allIssueList.addAll(issueList);
-            } catch (RedmineException e) {
-                log.error("读取redmine异常");
-            }
-        });
-        return allIssueList.stream().collect(Collectors.groupingBy(Issue::getAssigneeName));
-    }
 
     /**
      * 通过coverity扫描的问题，保存到redmine任务
@@ -228,7 +188,7 @@ public class RedmineApi {
                 .build();
 
         Request post = new Request.Builder()
-                .url(login_url)
+                .url(LOGIN_URL)
                 .method("POST", body)
                 .headers(builder.build())
                 .build();

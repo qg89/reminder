@@ -13,5 +13,10 @@ import java.util.List;
  * @date :  2022.09.23 14:30
  */
 public interface NoneStatusService extends IService<NoneStatus> {
-    List<String> queryUnInStatus();
+    /**
+     * 根据天数查询过滤的状态
+     * @param expiredDays
+     * @return
+     */
+    List<String> queryUnInStatus(Integer expiredDays);
 }
