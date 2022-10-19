@@ -67,7 +67,7 @@ public class UpdateFeishuRedmineHandle {
         }
         log.info("保存机器人所在群组和人员关系完成!");
 
-        boolean userGroup = userGroupService.saveBatchAll(userGroupList);
+        boolean userGroup = userGroupService.saveOrUpdateBatchByMultiId(userGroupList);
         if (!userGroup) {
             log.error("保存机器人所在群组和人员关系失败!");
         }

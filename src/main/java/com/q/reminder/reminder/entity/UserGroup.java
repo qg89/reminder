@@ -21,8 +21,10 @@ import java.io.Serializable;
 public class UserGroup implements Serializable {
     private static final long serialVersionUID = 2388537062682977582L;
 
+    @MppMultiId
     @TableField("chat_id")
     private String chatId;
+    @MppMultiId
     @TableField("member_id")
     private String memberId;
 }

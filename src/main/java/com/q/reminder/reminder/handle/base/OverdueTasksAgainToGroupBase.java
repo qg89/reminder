@@ -3,13 +3,10 @@ package com.q.reminder.reminder.handle.base;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.q.reminder.reminder.entity.OverdueTaskHistory;
-import com.q.reminder.reminder.entity.ProjectInfo;
-import com.q.reminder.reminder.entity.UserGroup;
-import com.q.reminder.reminder.entity.UserMemgerInfo;
+import com.q.reminder.reminder.entity.*;
+import com.q.reminder.reminder.service.GroupInfoService;
 import com.q.reminder.reminder.service.OverdueTaskHistoryService;
 import com.q.reminder.reminder.service.ProjectInfoService;
-import com.q.reminder.reminder.service.UserGroupService;
 import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
@@ -53,7 +50,7 @@ public class OverdueTasksAgainToGroupBase {
     @Autowired
     private OverdueTaskHistoryService overdueTaskHistoryService;
     @Autowired
-    private UserGroupService userGroupService;
+    private GroupInfoService groupInfoService;
 
     public void overdueTasksAgainToGroup(int expiredDay, List<String> noneStatusList, Boolean containStatus) {
         String secret = FeiShuApi.getSecret(appId, appSecret);
@@ -85,20 +82,26 @@ public class OverdueTasksAgainToGroupBase {
             at.put("user_id", memberIds.get(name));
             at.put("user_name", name);
             atjsonArray.add(at);
+
+            JSONObject taskSizeJson = new JSONObject();
+            taskSizeJson.put("tag", "text");
+            taskSizeJson.put("text", " 过期任务数量:【" + issueList.size() + "】 ==> ");
+            atjsonArray.add(taskSizeJson);
+            JSONObject myTask = new JSONObject();
+            myTask.put("tag", "a");
+            myTask.put("href", "http://redmine-qa.mxnavi.com/issues?assigned_to_id=me&set_filter=1&sort=priority%3Adesc%2Cupdated_on%3Adesc");
+            myTask.put("text", "查看指派给我的任务");
+            atjsonArray.add(myTask);
+
             contentJsonArray.add(atjsonArray);
 
-            issueList.forEach(i -> {
-                Integer id = i.getId();
-                String subject = i.getSubject();
-                String statusName = i.getStatusName();
-                Date dueDate = i.getDueDate();
-                Date updatedOn = i.getUpdatedOn();
-                String projectName = i.getProjectName();
+            for (Issue issue : issueList) {
+                Integer id = issue.getId();
+                String subject = issue.getSubject();
+                Date updatedOn = issue.getUpdatedOn();
+                String projectName = issue.getProjectName();
                 JSONArray subContentJsonObject = new JSONArray();
-                JSONObject subjectJson = new JSONObject();
-                subjectJson.put("tag", "text");
-                subjectJson.put("text", "任务主题: ");
-                subContentJsonObject.add(subjectJson);
+
 
                 JSONObject a = new JSONObject();
                 a.put("tag", "a");
@@ -106,15 +109,10 @@ public class OverdueTasksAgainToGroupBase {
                 a.put("text", subject);
                 subContentJsonObject.add(a);
 
-                JSONObject task = new JSONObject();
-                task.put("tag", "text");
-                task.put("text", "\r\n当前任务状态: " + statusName);
-                subContentJsonObject.add(task);
-
-                JSONObject dueDateJson = new JSONObject();
-                dueDateJson.put("tag", "text");
-                dueDateJson.put("text", "\r\n计划完成日期: " + new DateTime(dueDate).toString("yyyy-MM-dd"));
-                subContentJsonObject.add(dueDateJson);
+                JSONObject noneLine = new JSONObject();
+                noneLine.put("tag", "text");
+                noneLine.put("text", "\r\n\t");
+                subContentJsonObject.add(noneLine);
                 contentJsonArray.add(subContentJsonObject);
 
                 OverdueTaskHistory history = new OverdueTaskHistory();
@@ -125,7 +123,14 @@ public class OverdueTasksAgainToGroupBase {
                 history.setLastUpdateTime(updatedOn);
                 history.setType("1");
                 historys.add(history);
-            });
+            }
+
+            JSONArray subNoneContentJsonObject = new JSONArray();
+            JSONObject line = new JSONObject();
+            line.put("tag", "text");
+            line.put("text", "\r------------------------------------------------");
+            subNoneContentJsonObject.add(line);
+            contentJsonArray.add(subNoneContentJsonObject);
 
             String memberId = memberIds.get(name);
             if (StringUtils.isBlank(memberId)) {
@@ -138,7 +143,15 @@ public class OverdueTasksAgainToGroupBase {
         });
         LambdaQueryWrapper<UserGroup> lq = new LambdaQueryWrapper<>();
         lq.in(UserGroup::getMemberId, sendMap.keySet());
-        List<UserGroup> usergroupList = userGroupService.list();
+
+        LambdaQueryWrapper<GroupInfo> lqw = new LambdaQueryWrapper<>();
+        lqw.eq(GroupInfo::getSendType, "0");
+        lqw.select(GroupInfo::getChatId);
+        List<String> sendLists = groupInfoService.listObjs(lqw, Objects::toString);
+
+        if (contentJsonArray.size() == 0) {
+            return;
+        }
 
         JSONObject content = new JSONObject();
         JSONObject all = new JSONObject();
@@ -146,7 +159,7 @@ public class OverdueTasksAgainToGroupBase {
         all.put("content", contentJsonArray);
         content.put("zh_cn", all);
 
-        usergroupList.stream().map(UserGroup::getChatId).forEach(e -> {
+        sendLists.forEach(e -> {
             try {
                 FeiShuApi.sendGroupByChats(e, content.toJSONString(), secret);
             } catch (IOException ex) {

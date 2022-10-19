@@ -26,11 +26,12 @@ public class OverdueTasksAgain1ToGroupHandle {
     @Autowired
     private NoneStatusService noneStatusService;
 
-    @Scheduled(cron = "0 30 9 * * ?")
+//    @Scheduled(cron = "0 30 9 * * ?")
+    @Scheduled(cron = "0/20 * * * * ?")
     public void query() {
         List<String> noneStatusList = noneStatusService.queryUnInStatus(2);
         // 组装数据， 通过人员，获取要发送的内容
         overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(1, noneStatusList, Boolean.FALSE);
-        overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(2, noneStatusList, Boolean.TRUE);
+//        overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(2, noneStatusList, Boolean.TRUE);
     }
 }

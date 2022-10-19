@@ -1,10 +1,7 @@
 package com.q.reminder.reminder.entity;
 
 import com.alibaba.fastjson2.annotation.JSONField;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -29,6 +26,9 @@ public class GroupInfo implements Serializable {
     private String ownerId;
     @JSONField(name = "owner_id_type")
     private String ownerIdType;
+
+    @TableField(value = "send_type")
+    private String sendType;
     @TableLogic(value = "0", delval = "1")
     private String isDelete;
 }
