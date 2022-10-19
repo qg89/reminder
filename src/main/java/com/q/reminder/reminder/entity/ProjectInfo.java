@@ -18,5 +18,6 @@ public class ProjectInfo implements Serializable {
 
     private static final long serialVersionUID = 6718764047088702656L;
     private String pId;
+    private String pKey;
     private String pName;
 }

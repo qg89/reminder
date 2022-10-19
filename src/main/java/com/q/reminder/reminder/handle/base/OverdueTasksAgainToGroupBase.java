@@ -56,7 +56,7 @@ public class OverdueTasksAgainToGroupBase {
         String secret = FeiShuApi.getSecret(appId, appSecret);
         // 组装数据， 通过人员，获取要发送的内容
         List<ProjectInfo> projectInfoList = projectInfoService.list();
-        Set<String> projectIds = projectInfoList.stream().map(ProjectInfo::getPId).collect(Collectors.toSet());
+        Set<String> projectIds = projectInfoList.stream().map(ProjectInfo::getPKey).collect(Collectors.toSet());
 
         QueryRedmineVo vo = new QueryRedmineVo();
         vo.setProjects(projectIds);

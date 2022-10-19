@@ -71,7 +71,7 @@ public class QueryTasksToMemberBase {
 
         // 组装数据， 通过人员，获取要发送的内容
         List<ProjectInfo> projectInfoList = projectInfoService.list();
-        Set<String> projectIds = projectInfoList.stream().map(ProjectInfo::getPId).collect(Collectors.toSet());
+        Set<String> projectIds = projectInfoList.stream().map(ProjectInfo::getPKey).collect(Collectors.toSet());
 
         QueryRedmineVo vo = new QueryRedmineVo();
         vo.setProjects(projectIds);
@@ -96,7 +96,7 @@ public class QueryTasksToMemberBase {
             JSONObject con = new JSONObject();
             JSONObject all = new JSONObject();
             con.put("zh_cn", all);
-            all.put("title", "【过期任务提醒 (" + DateTime.now().toString("yyyy-MM-dd") + ")");
+            all.put("title", "【过期任务提醒 (" + DateTime.now().toString("yyyy-MM-dd") + ")】");
             JSONArray contentJsonArray = new JSONArray();
             all.put("content", contentJsonArray);
 

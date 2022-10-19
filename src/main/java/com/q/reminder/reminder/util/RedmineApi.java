@@ -65,6 +65,38 @@ public class RedmineApi {
         return allIssueList.stream().collect(Collectors.groupingBy(Issue::getAssigneeName));
     }
 
+    /**
+     * 根据项目查询redmine修改任务
+     * @param vo
+     * @return
+     */
+    public static List<Issue> queryUpdateIssue(QueryRedmineVo vo) {
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(vo.getRedmineUrl(), vo.getApiAccessKey());
+        IssueManager issueManager = mgr.getIssueManager();
+        Params params = new Params();
+        params.add("f[]", "project_id");
+        params.add("op[project_id]", "=");
+        for (String project : vo.getProjects()) {
+            params.add("v[project_id][]", project);
+        }
+        DateTime dateTime = DateTime.now();
+        params.add("f[]", "updated_on");
+        params.add("op[updated_on]", "><");
+        params.add("v[updated_on][]", dateTime.minusSeconds(10).toString());
+        params.add("v[updated_on][]", dateTime.toString());
+        ResultsWrapper<Issue> issues = null;
+        try {
+            issues = issueManager.getIssues(params);
+        } catch (RedmineException e) {
+            e.printStackTrace();
+        }
+        if (issues == null) {
+            log.info("[保存到redmine任务] 失败,未查询相关任务");
+            return new ArrayList<>();
+        }
+        return issues.getResults();
+    }
+
 
     /**
      * 通过coverity扫描的问题，保存到redmine任务
@@ -206,8 +238,6 @@ public class RedmineApi {
         return url.host() + ":" + url.port();
     }
 
-//    public static void main(String[] args) {
-//        OkHttpClient login = login();
-//        System.out.println(login);
-//    }
+
+
 }
