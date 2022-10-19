@@ -38,8 +38,8 @@ public class UpdateFeishuRedmineHandle {
     @Value("${app.secret}")
     private String appSecret;
 
-//    @Scheduled(cron = "0 0 23 ? * MON-FRI")
-    @Scheduled(cron = "0/20 * * * * ?")
+    @Scheduled(cron = "0 0 23 ? * MON-FRI")
+//    @Scheduled(cron = "0/20 * * * * ?")
     public void update() {
         String secret = FeiShuApi.getSecret(appId, appSecret);
         List<GroupInfo> groupToChats = FeiShuApi.getGroupToChats(secret);
