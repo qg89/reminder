@@ -1,11 +1,14 @@
 package com.q.reminder.reminder.util;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.text.UnicodeUtil;
 import com.q.reminder.reminder.vo.CoverityAndRedmineSaveTaskVo;
 import com.q.reminder.reminder.vo.QueryRedmineVo;
 import com.taskadapter.redmineapi.*;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.Tracker;
+import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.ResultsWrapper;
 import com.taskadapter.redmineapi.internal.Transport;
 import lombok.extern.log4j.Log4j2;
@@ -47,7 +50,7 @@ public class RedmineApi {
         Set<String> projects = vo.getProjects();
         projects.forEach(p -> {
             try {
-                List<Issue> issues = issueManager.getIssues(p, null, Include.watchers);
+                List<Issue> issues = issueManager.getIssues(p, null);
                 List<Issue> issueList = issues.stream().filter(e -> {
                     Date dueDate = e.getDueDate();
                     boolean filter = dueDate != null && new DateTime().minusDays(expiredDay).isAfter(new DateTime(dueDate)) && StringUtils.isNotBlank(e.getAssigneeName());
@@ -66,35 +69,28 @@ public class RedmineApi {
     }
 
     /**
-     * 根据项目查询redmine修改任务
+     * 查询redmine当天修改的任务
      * @param vo
      * @return
      */
     public static List<Issue> queryUpdateIssue(QueryRedmineVo vo) {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(vo.getRedmineUrl(), vo.getApiAccessKey());
-        IssueManager issueManager = mgr.getIssueManager();
-        Params params = new Params();
-        params.add("f[]", "project_id");
-        params.add("op[project_id]", "=");
+        Transport transport = mgr.getTransport();
+        List<Issue> issues = new ArrayList<>();
+        List<RequestParam> params = new ArrayList<>();
         for (String project : vo.getProjects()) {
-            params.add("v[project_id][]", project);
+            params.add(new RequestParam("project_id", project));
+            params.add(new RequestParam("status_id", "*"));
+            params.add(new RequestParam("updated_on", DateUtil.today()));
+            List<Issue> objectsList = new ArrayList<>();
+            try {
+                objectsList = transport.getObjectsList(Issue.class, params);
+            } catch (RedmineException e) {
+                log.error("redmind 查询当天更新的任务异常");
+            }
+            issues.addAll(objectsList);
         }
-        DateTime dateTime = DateTime.now();
-        params.add("f[]", "updated_on");
-        params.add("op[updated_on]", "><");
-        params.add("v[updated_on][]", dateTime.minusSeconds(10).toString());
-        params.add("v[updated_on][]", dateTime.toString());
-        ResultsWrapper<Issue> issues = null;
-        try {
-            issues = issueManager.getIssues(params);
-        } catch (RedmineException e) {
-            e.printStackTrace();
-        }
-        if (issues == null) {
-            log.info("[保存到redmine任务] 失败,未查询相关任务");
-            return new ArrayList<>();
-        }
-        return issues.getResults();
+        return issues;
     }
 
 
@@ -238,6 +234,32 @@ public class RedmineApi {
         return url.host() + ":" + url.port();
     }
 
+    public static void main(String[] args) {
 
-
+        QueryRedmineVo vo = new QueryRedmineVo();
+        vo.setRedmineUrl("http://redmine-qa.mxnavi.com");
+        vo.setApiAccessKey("1f905383da4f783bad92e22f430c7db0b15ae258");
+        vo.setProjects(Set.of("203301_vehicle_digitization",
+                "203302_4s_eservice",
+                "510302-sell",
+                "bu5",
+                "dcsp-2"));
+        vo.setExpiredDay(300);
+        vo.setContainsStatus(false);
+        vo.setNoneStatusList(new ArrayList<>());
+        List<Issue> issues = queryUpdateIssue(vo);
+        for (Issue issue : issues) {
+            Integer id = issue.getId();
+            String statusName = issue.getStatusName();
+            System.out.println(id + " " + statusName);
+        }
+        System.out.println(UnicodeUtil.toUnicode("http://redmine-qa.mxnavi.com/projects/dcsp-2/issues?utf8=✓&set_filter=1&f[]=updated_on&op[updated_on]=%3D&v[updated_on][]=2022-10-19&f[]=&spent_on=&c[]=tracker&c[]=status&c[]=priority&c[]=subject&c[]=assigned_to&c[]=start_date&c[]=due_date&group_by="));
+//        List<Issue> issues = queryUpdateIssue1(vo);
+//        issues.forEach(e -> {
+//            System.out.print(new DateTime(e.getUpdatedOn()).toString("yyyy-MM-dd HH:mm:ss") + ",");
+//            System.out.print(e.getId() + ",");
+//            System.out.print(e.getAssigneeName());
+//            System.out.println();
+//        });
+    }
 }
