@@ -11,7 +11,7 @@
  Target Server Version : 50731
  File Encoding         : 65001
 
- Date: 18/10/2022 09:10:27
+ Date: 20/10/2022 14:28:30
 */
 
 SET NAMES utf8mb4;
@@ -36,6 +36,8 @@ CREATE TABLE `fs_group_info`  (
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '群名称',
   `owner_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '群主 ID',
   `owner_id_type` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '群主 ID 类型\r\n\r\n',
+  `send_type` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '0' COMMENT '发送群消息类型：0，三部日常提醒',
+  `reminder_none` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '提醒文案',
   `is_delete` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '0' COMMENT '删除标识',
   PRIMARY KEY (`chat_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '飞书群组详情' ROW_FORMAT = Dynamic;
@@ -71,7 +73,8 @@ CREATE TABLE `fs_user_member_info`  (
 DROP TABLE IF EXISTS `none_status`;
 CREATE TABLE `none_status`  (
   `none_status` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '排除的状态',
-  PRIMARY KEY (`none_status`) USING BTREE
+  `expired_days` tinyint(5) NOT NULL COMMENT '过期天数：\r\n0当天；\r\n1 过期1天；\r\n2 过期2天。',
+  PRIMARY KEY (`none_status`, `expired_days`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'redmine排除筛选状态' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
@@ -95,6 +98,7 @@ CREATE TABLE `overdue_tasks_history`  (
 DROP TABLE IF EXISTS `project_info`;
 CREATE TABLE `project_info`  (
   `p_id` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'redmine项目ID',
+  `p_key` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'redmine项目key',
   `p_name` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'redmine项目名称',
   PRIMARY KEY (`p_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'redmine 项目表' ROW_FORMAT = Dynamic;
