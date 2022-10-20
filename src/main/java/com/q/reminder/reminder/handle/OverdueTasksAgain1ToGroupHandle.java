@@ -45,7 +45,6 @@ public class OverdueTasksAgain1ToGroupHandle {
         lq.in(NoneStatus::getExpiredDays, 1, 2);
         List<NoneStatus> noneStatusList = noneStatusService.list(lq);
         Map<String, List<NoneStatus>> statusMap = noneStatusList.stream().collect(Collectors.groupingBy(e -> String.valueOf(e.getExpiredDays())));
-        List<String> noneStatusStrList = new ArrayList<>();
 
         QueryVo vo = new QueryVo();
         vo.setApiAccessKey(apiAccessKeySaiko);
