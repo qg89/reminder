@@ -72,7 +72,7 @@ public class RedmineUpdateHandle {
             JSONObject con = new JSONObject();
             JSONObject all = new JSONObject();
             con.put("zh_cn", all);
-            all.put("title", "【任务变更提醒 (" + DateTime.now() + ")】");
+            all.put("title", "【任务变更提醒 (" + DateUtil.now() + ")】");
             JSONArray contentJsonArray = new JSONArray();
             all.put("content", contentJsonArray);
             for (Issue issue : issueList) {
