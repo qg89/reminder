@@ -1,9 +1,7 @@
 package com.q.reminder.reminder.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.alibaba.fastjson2.annotation.JSONField;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -16,14 +14,23 @@ import java.io.Serializable;
  * @date :  2022.09.27 08:40
  */
 @Data
-@TableName("group_info")
+@TableName("fs_group_info")
 public class GroupInfo implements Serializable {
     private static final long serialVersionUID = 6352091359792413686L;
+
+    @JSONField(name = "chat_id")
     @TableId(type = IdType.INPUT)
     private String chatId;
     private String name;
+    @JSONField(name = "owner_id")
     private String ownerId;
+    @JSONField(name = "owner_id_type")
     private String ownerIdType;
+
+    @TableField("reminder_none")
+    private String reminderNone;
+    @TableField(value = "send_type")
+    private String sendType;
     @TableLogic(value = "0", delval = "1")
     private String isDelete;
 }

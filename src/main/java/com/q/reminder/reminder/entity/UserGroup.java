@@ -16,13 +16,15 @@ import java.io.Serializable;
  * @Description :
  * @date :  2022.09.27 20:14
  */
-@TableName("user_group")
+@TableName("fs_user_group")
 @Data
 public class UserGroup implements Serializable {
     private static final long serialVersionUID = 2388537062682977582L;
 
+    @MppMultiId
     @TableField("chat_id")
     private String chatId;
+    @MppMultiId
     @TableField("member_id")
     private String memberId;
 }

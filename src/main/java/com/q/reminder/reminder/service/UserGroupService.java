@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.jeffreyning.mybatisplus.service.IMppService;
 import com.q.reminder.reminder.entity.UserGroup;
 
 import java.util.List;
@@ -12,6 +13,6 @@ import java.util.List;
  * @Description :
  * @date :  2022.09.27 20:15
  */
-public interface UserGroupService extends IService<UserGroup> {
+public interface UserGroupService extends IMppService<UserGroup> {
     Boolean saveBatchAll(List<UserGroup> userGroupList);
 }

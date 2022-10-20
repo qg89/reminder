@@ -39,6 +39,7 @@ public class UpdateFeishuRedmineHandle {
     private String appSecret;
 
     @Scheduled(cron = "0 0 23 ? * MON-FRI")
+//    @Scheduled(cron = "0/20 * * * * ?")
     public void update() {
         String secret = FeiShuApi.getSecret(appId, appSecret);
         List<GroupInfo> groupToChats = FeiShuApi.getGroupToChats(secret);
@@ -53,7 +54,6 @@ public class UpdateFeishuRedmineHandle {
             log.error("获取机器人所在群组信息为空");
         }
 
-
         log.info("开始数据保存!");
         boolean group = groupInfoService.saveOrUpdateBatch(groupToChats);
         if (!group) {
@@ -61,14 +61,13 @@ public class UpdateFeishuRedmineHandle {
         }
         log.info("更新机器人所在群组完成!");
 
-        membersByChats.forEach(e -> e.setUserName(new StringBuilder(e.getName()).insert(1, " ").toString()));
-        boolean member = userMemberService.saveOrUpdateBatch(membersByChats);
+        Boolean member = userMemberService.saveOrupdateBatchByNameIsNull(membersByChats);
         if (!member) {
             log.error("保存机器人所在群组和人员关系失败!");
         }
         log.info("保存机器人所在群组和人员关系完成!");
 
-        boolean userGroup = userGroupService.saveBatchAll(userGroupList);
+        boolean userGroup = userGroupService.saveOrUpdateBatchByMultiId(userGroupList);
         if (!userGroup) {
             log.error("保存机器人所在群组和人员关系失败!");
         }

@@ -1,6 +1,6 @@
 package com.q.reminder.reminder.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.jeffreyning.mybatisplus.service.MppServiceImpl;
 import com.q.reminder.reminder.entity.UserGroup;
 import com.q.reminder.reminder.mapper.UserGroupMapping;
 import com.q.reminder.reminder.service.UserGroupService;
@@ -16,7 +16,7 @@ import java.util.List;
  * @date :  2022.09.27 20:16
  */
 @Service
-public class UserGroupServiceImpl extends ServiceImpl<UserGroupMapping, UserGroup> implements UserGroupService {
+public class UserGroupServiceImpl extends MppServiceImpl<UserGroupMapping, UserGroup> implements UserGroupService {
     @Override
     public Boolean saveBatchAll(List<UserGroup> userGroupList) {
         return baseMapper.saveBatchAll(userGroupList);

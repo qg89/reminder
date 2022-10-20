@@ -11,7 +11,7 @@
  Target Server Version : 50731
  File Encoding         : 65001
 
- Date: 28/09/2022 16:05:38
+ Date: 18/10/2022 09:10:27
 */
 
 SET NAMES utf8mb4;
@@ -28,10 +28,10 @@ CREATE TABLE `admin_info`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '管理员通知名单' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for group_info
+-- Table structure for fs_group_info
 -- ----------------------------
-DROP TABLE IF EXISTS `group_info`;
-CREATE TABLE `group_info`  (
+DROP TABLE IF EXISTS `fs_group_info`;
+CREATE TABLE `fs_group_info`  (
   `chat_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '群组 ID',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '群名称',
   `owner_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '群主 ID',
@@ -39,6 +39,31 @@ CREATE TABLE `group_info`  (
   `is_delete` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '0' COMMENT '删除标识',
   PRIMARY KEY (`chat_id`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '飞书群组详情' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for fs_user_group
+-- ----------------------------
+DROP TABLE IF EXISTS `fs_user_group`;
+CREATE TABLE `fs_user_group`  (
+  `chat_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `member_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '成员的用户ID，ID值与查询参数中的 member_id_type 对应。',
+  PRIMARY KEY (`chat_id`, `member_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户、群主关系表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Table structure for fs_user_member_info
+-- ----------------------------
+DROP TABLE IF EXISTS `fs_user_member_info`;
+CREATE TABLE `fs_user_member_info`  (
+  `member_id` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '飞书用户ID',
+  `name` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '飞书用户名称',
+  `tenant_key` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '为租户在飞书上的唯一标识，用来换取对应的tenant_access_token，也可以用作租户在应用里面的唯一标识',
+  `member_id_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '飞书用户ID类型',
+  `user_name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'redmine 用户名',
+  `r_user_id` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'redmine api key',
+  `is_delete` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '0',
+  PRIMARY KEY (`member_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'redmine、飞书用户表关系表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for none_status
@@ -75,28 +100,15 @@ CREATE TABLE `project_info`  (
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'redmine 项目表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for user_group
+-- Table structure for redmine_user_info
 -- ----------------------------
-DROP TABLE IF EXISTS `user_group`;
-CREATE TABLE `user_group`  (
-  `chat_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `member_id` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '成员的用户ID，ID值与查询参数中的 member_id_type 对应。',
-  PRIMARY KEY (`chat_id`, `member_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户、群主关系表' ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Table structure for user_member_info
--- ----------------------------
-DROP TABLE IF EXISTS `user_member_info`;
-CREATE TABLE `user_member_info`  (
-  `member_id` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '飞书用户ID',
-  `name` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '飞书用户名称',
-  `tenant_key` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '为租户在飞书上的唯一标识，用来换取对应的tenant_access_token，也可以用作租户在应用里面的唯一标识',
-  `member_id_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '飞书用户ID类型',
-  `user_name` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'redmine 用户名',
-  `r_user_id` varchar(40) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'redmine api key',
-  `is_delete` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '0',
-  PRIMARY KEY (`member_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'redmine、飞书用户表关系表' ROW_FORMAT = Dynamic;
+DROP TABLE IF EXISTS `redmine_user_info`;
+CREATE TABLE `redmine_user_info`  (
+  `assignee_id` int(11) NOT NULL COMMENT 'redmine人员ID',
+  `assignee_name` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT 'redmine人员姓名',
+  `redmine_type` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '1' COMMENT 'redmine类型',
+  `is_delete` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT '0' COMMENT '删除标识',
+  PRIMARY KEY (`assignee_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = 'redmine人员列表' ROW_FORMAT = Dynamic;
 
 SET FOREIGN_KEY_CHECKS = 1;

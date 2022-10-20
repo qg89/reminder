@@ -16,4 +16,5 @@ public class NoneStatus implements Serializable {
     private static final long serialVersionUID = 6130557307718159071L;
 
     private String noneStatus;
+    private Integer expiredDays;
 }
