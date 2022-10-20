@@ -59,8 +59,9 @@ public class FeiShuApi {
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Authorization", authorization)
                 .build();
-        Response response = client.newCall(request).execute();
-        contentAll.append("消息发送状态:").append("指派人员:").append(vo.getAssigneeName()).append(", 飞书返回状态: ").append(response.code()).append("\r\n");
+        try (Response response = client.newCall(request).execute();) {
+            contentAll.append("消息发送状态:").append("指派人员:").append(vo.getAssigneeName()).append(", 飞书返回状态: ").append(response.code()).append("\r\n");
+        }
     }
 
     /**
@@ -85,8 +86,9 @@ public class FeiShuApi {
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Authorization", security)
                 .build();
-        Response response = client.newCall(request).execute();
-        log.info("消息发送状态:{}, receive_id:{}", response.code(), receiveId);
+        try (Response response = client.newCall(request).execute();) {
+            log.info("消息发送状态:{}, receive_id:{}", response.code(), receiveId);
+        }
     }
 
     /**
@@ -110,8 +112,9 @@ public class FeiShuApi {
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Authorization", security)
                 .build();
-        Response response = client.newCall(request).execute();
-        log.info("消息发送状态:{}, receive_id:{}", response.code(), chatId);
+        try (Response response = client.newCall(request).execute()) {
+            log.info("消息发送状态:{}, receive_id:{}", response.code(), chatId);
+        }
     }
 
     /**

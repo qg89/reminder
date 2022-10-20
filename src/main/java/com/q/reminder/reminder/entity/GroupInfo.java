@@ -27,6 +27,8 @@ public class GroupInfo implements Serializable {
     @JSONField(name = "owner_id_type")
     private String ownerIdType;
 
+    @TableField("reminder_none")
+    private String reminderNone;
     @TableField(value = "send_type")
     private String sendType;
     @TableLogic(value = "0", delval = "1")

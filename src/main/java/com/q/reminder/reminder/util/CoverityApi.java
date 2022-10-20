@@ -109,13 +109,10 @@ public class CoverityApi {
                 .header("Host", DOMAIN)
                 .get()
                 .build();
-
-        Response response;
         String result = "";
-        try {
-            response = client.newCall(get).execute();
+        try (Response response = client.newCall(get).execute();){
             result = Objects.requireNonNull(response.body()).string();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         JSONObject resultJson = JSONObject.parseObject(result).getJSONObject("resultSet");

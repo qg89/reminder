@@ -10,7 +10,7 @@ import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.service.*;
 import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
-import com.q.reminder.reminder.vo.QueryRedmineVo;
+import com.q.reminder.reminder.vo.QueryVo;
 import com.q.reminder.reminder.vo.SendVo;
 import com.taskadapter.redmineapi.bean.Issue;
 import lombok.extern.log4j.Log4j2;
@@ -73,7 +73,7 @@ public class QueryTasksToMemberBase {
         List<ProjectInfo> projectInfoList = projectInfoService.list();
         Set<String> projectIds = projectInfoList.stream().map(ProjectInfo::getPKey).collect(Collectors.toSet());
 
-        QueryRedmineVo vo = new QueryRedmineVo();
+        QueryVo vo = new QueryVo();
         vo.setProjects(projectIds);
         vo.setNoneStatusList(noneStatusList);
         vo.setApiAccessKey(apiAccessKeySaiko);

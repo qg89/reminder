@@ -2,7 +2,7 @@ package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
 import com.q.reminder.reminder.vo.CoverityAndRedmineSaveTaskVo;
-import com.q.reminder.reminder.vo.QueryRedmineVo;
+import com.q.reminder.reminder.vo.QueryVo;
 import com.taskadapter.redmineapi.IssueManager;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
@@ -34,7 +34,7 @@ public class RedmineApi {
      * @param vo
      * @return 按指派人员返回问题列表
      */
-    public static Map<String, List<Issue>> queryUserByExpiredDayList(QueryRedmineVo vo) {
+    public static Map<String, List<Issue>> queryUserByExpiredDayList(QueryVo vo) {
         List<String> noneStatusList = vo.getNoneStatusList();
         Integer expiredDay = vo.getExpiredDay();
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(vo.getRedmineUrl(), vo.getApiAccessKey());
@@ -67,7 +67,7 @@ public class RedmineApi {
      * @param vo
      * @return
      */
-    public static List<Issue> queryUpdateIssue(QueryRedmineVo vo) {
+    public static List<Issue> queryUpdateIssue(QueryVo vo) {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(vo.getRedmineUrl(), vo.getApiAccessKey());
         Transport transport = mgr.getTransport();
         List<Issue> issues = new ArrayList<>();

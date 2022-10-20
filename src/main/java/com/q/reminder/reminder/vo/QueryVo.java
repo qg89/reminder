@@ -14,7 +14,7 @@ import java.util.Set;
  * @date :  2022.10.19 09:49
  */
 @Data
-public class QueryRedmineVo implements Serializable {
+public class QueryVo implements Serializable {
 
     private static final long serialVersionUID = -2299536628917442487L;
     private Set<String> projects;
@@ -23,4 +23,5 @@ public class QueryRedmineVo implements Serializable {
     private String redmineUrl;
     private Integer expiredDay;
     private Boolean containsStatus;
+    private String redminderType;
 }
