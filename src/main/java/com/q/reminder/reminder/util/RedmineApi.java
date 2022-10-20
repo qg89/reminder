@@ -1,23 +1,18 @@
 package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.text.UnicodeUtil;
 import com.q.reminder.reminder.vo.CoverityAndRedmineSaveTaskVo;
 import com.q.reminder.reminder.vo.QueryRedmineVo;
 import com.taskadapter.redmineapi.*;
 import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.ResultsWrapper;
 import com.taskadapter.redmineapi.internal.Transport;
 import lombok.extern.log4j.Log4j2;
-import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,12 +26,8 @@ import java.util.stream.Collectors;
 @Log4j2
 public class RedmineApi {
 
-    private static final String LOGIN_URL = "http://redmine-qa.mxnavi.com/login";
-    private static final HashMap<String, List<Cookie>> COOKIE_STORE = new HashMap<>();
-
-
     /**
-     * 通过项目读取redmine过期任务
+     * 通过项目读取redmine过期任务,只包含打开的状态
      *
      * @param vo
      * @return 按指派人员返回问题列表
@@ -69,7 +60,8 @@ public class RedmineApi {
     }
 
     /**
-     * 查询redmine当天修改的任务
+     * 查询redmine当天修改的任务，所有状态
+     *
      * @param vo
      * @return
      */
@@ -77,11 +69,12 @@ public class RedmineApi {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(vo.getRedmineUrl(), vo.getApiAccessKey());
         Transport transport = mgr.getTransport();
         List<Issue> issues = new ArrayList<>();
-        List<RequestParam> params = new ArrayList<>();
         for (String project : vo.getProjects()) {
-            params.add(new RequestParam("project_id", project));
-            params.add(new RequestParam("status_id", "*"));
-            params.add(new RequestParam("updated_on", DateUtil.today()));
+            List<RequestParam> params = List.of(
+                    new RequestParam("project_id", project),
+                    new RequestParam("status_id", "*"),
+                    new RequestParam("assigned_to_id", "*"),
+                    new RequestParam("updated_on", DateUtil.today()));
             List<Issue> objectsList = new ArrayList<>();
             try {
                 objectsList = transport.getObjectsList(Issue.class, params);
@@ -92,7 +85,6 @@ public class RedmineApi {
         }
         return issues;
     }
-
 
     /**
      * 通过coverity扫描的问题，保存到redmine任务
@@ -145,121 +137,5 @@ public class RedmineApi {
         } catch (RedmineException e) {
             log.error("创建redmine任务异常", e);
         }
-    }
-
-    /**
-     * TODO
-     * 查询工时
-     *
-     * @param apiAccessKey
-     * @param redmineUrl
-     */
-    private static void timeEntries(String apiAccessKey, String redmineUrl) {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, apiAccessKey);
-        TimeEntryManager timeEntryManager = mgr.getTimeEntryManager();
-        Map<String, String> params = new HashMap<>(4);
-        params.put("project_id", "bug_cause_analysis");
-        params.put("limit", "101");
-        ResultsWrapper<TimeEntry> entries = null;
-        try {
-            entries = timeEntryManager.getTimeEntries(params);
-        } catch (RedmineException e) {
-            e.printStackTrace();
-        }
-        if (entries == null) {
-            return;
-        }
-        int totalFoundOnServer = entries.getTotalFoundOnServer();
-        List<TimeEntry> results = entries.getResults();
-        System.out.println(results);
-    }
-
-    /**
-     * TODO
-     * 查看问题
-     *
-     * @throws RedmineException
-     */
-    private static void queryIssue() throws RedmineException {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey("http://redmine-qa.mxnavi.com/", "1f905383da4f783bad92e22f430c7db0b15ae258");
-        IssueManager issueManager = mgr.getIssueManager();
-        Issue issueById = issueManager.getIssueById(589298, Include.attachments);
-        System.out.println(issueById);
-    }
-
-
-    public static OkHttpClient login() {
-        RequestBody body = new FormBody.Builder()
-                .add("username", "qig")
-                .add("password", "MAnsiontech^7")
-                .add("authenticity_token", UUID.randomUUID().toString())
-                .add("back_url", "http://redmine-qa.mxnavi.com/")
-                .add("login", "登录 »")
-                .build();
-        Headers.Builder builder = new Headers.Builder();
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .cookieJar(new CookieJar() {
-                    @Override
-                    public void saveFromResponse(@NotNull HttpUrl httpUrl, @NotNull List<Cookie> cookies) {
-                        if (cookies.size() > 0) {
-                            COOKIE_STORE.put(getCacheKey(httpUrl), cookies);
-                        }
-                    }
-
-                    @NotNull
-                    @Override
-                    public List<Cookie> loadForRequest(@NotNull HttpUrl httpUrl) {
-                        List<Cookie> cookies = COOKIE_STORE.get(getCacheKey(httpUrl));
-                        return cookies != null ? cookies : new ArrayList<>();
-                    }
-                })
-                .build();
-
-        Request post = new Request.Builder()
-                .url(LOGIN_URL)
-                .method("POST", body)
-                .headers(builder.build())
-                .build();
-
-        try {
-            client.newCall(post).execute();
-            return client;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return client;
-    }
-
-    private static String getCacheKey(HttpUrl url) {
-        return url.host() + ":" + url.port();
-    }
-
-    public static void main(String[] args) {
-
-        QueryRedmineVo vo = new QueryRedmineVo();
-        vo.setRedmineUrl("http://redmine-qa.mxnavi.com");
-        vo.setApiAccessKey("1f905383da4f783bad92e22f430c7db0b15ae258");
-        vo.setProjects(Set.of("203301_vehicle_digitization",
-                "203302_4s_eservice",
-                "510302-sell",
-                "bu5",
-                "dcsp-2"));
-        vo.setExpiredDay(300);
-        vo.setContainsStatus(false);
-        vo.setNoneStatusList(new ArrayList<>());
-        List<Issue> issues = queryUpdateIssue(vo);
-        for (Issue issue : issues) {
-            Integer id = issue.getId();
-            String statusName = issue.getStatusName();
-            System.out.println(id + " " + statusName);
-        }
-        System.out.println(UnicodeUtil.toUnicode("http://redmine-qa.mxnavi.com/projects/dcsp-2/issues?utf8=✓&set_filter=1&f[]=updated_on&op[updated_on]=%3D&v[updated_on][]=2022-10-19&f[]=&spent_on=&c[]=tracker&c[]=status&c[]=priority&c[]=subject&c[]=assigned_to&c[]=start_date&c[]=due_date&group_by="));
-//        List<Issue> issues = queryUpdateIssue1(vo);
-//        issues.forEach(e -> {
-//            System.out.print(new DateTime(e.getUpdatedOn()).toString("yyyy-MM-dd HH:mm:ss") + ",");
-//            System.out.print(e.getId() + ",");
-//            System.out.print(e.getAssigneeName());
-//            System.out.println();
-//        });
     }
 }

@@ -1,8 +1,9 @@
 package com.q.reminder.reminder.handle;
 
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.service.ProjectInfoService;
@@ -20,6 +21,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,7 +53,6 @@ public class RedmineUpdateHandle {
     private UserMemberService userMemberService;
 
     @Scheduled(cron = "0 0/10 * * * ?")
-//    @Scheduled(cron = "0/10 * * * * ?")
     public void redmineUpdate10() {
         Set<String> projectIds = projectInfoService.list().stream().map(ProjectInfo::getPId).collect(Collectors.toSet());
         QueryRedmineVo vo = new QueryRedmineVo();
@@ -59,7 +60,9 @@ public class RedmineUpdateHandle {
         vo.setApiAccessKey(apiAccessKeySaiko);
         vo.setRedmineUrl(redmineOldUrl);
         List<Issue> issues = RedmineApi.queryUpdateIssue(vo);
-        Map<String, List<Issue>> issueMap = issues.stream().collect(Collectors.groupingBy(Issue::getAssigneeName));
+        Map<String, List<Issue>> issueMap = issues.stream().filter(issue ->
+                DateUtil.between(issue.getUpdatedOn(), new Date(), DateUnit.MINUTE) <= 10
+        ).collect(Collectors.groupingBy(Issue::getAssigneeName));
 
         List<UserMemgerInfo> userMemgerInfos = userMemberService.list();
         Map<String, String> userNameMap = userMemgerInfos.stream().collect(Collectors.toMap(UserMemgerInfo::getUserName, UserMemgerInfo::getMemberId));
@@ -92,8 +95,9 @@ public class RedmineUpdateHandle {
             try {
                 FeiShuApi.sendPost(sendVo, authorization, new StringBuilder());
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e);
             }
+            log.info("{},变更提醒,任务发送成功", name);
         });
     }
 }
