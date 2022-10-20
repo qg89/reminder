@@ -148,7 +148,7 @@ public class OverdueTasksAgainToGroupBase {
             atjsonArray.add(taskSizeJson);
             JSONObject myTask = new JSONObject();
             myTask.put("tag", "a");
-            myTask.put("href", "http://redmine-qa.mxnavi.com/issues?assigned_to_id=me&set_filter=1&sort=priority%3Adesc%2Cupdated_on%3Adesc");
+            myTask.put("href", redmineOldUrl + "/issues?assigned_to_id=me&set_filter=1&sort=priority%3Adesc%2Cupdated_on%3Adesc");
             myTask.put("text", "查看指派给我的任务");
             atjsonArray.add(myTask);
 

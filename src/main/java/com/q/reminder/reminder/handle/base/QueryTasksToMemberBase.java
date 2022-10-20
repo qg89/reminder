@@ -114,7 +114,7 @@ public class QueryTasksToMemberBase {
 
                 JSONObject a = new JSONObject();
                 a.put("tag", "a");
-                a.put("href", redmineOldUrl + "issues/" + id);
+                a.put("href", redmineOldUrl + "/issues/" + id);
                 a.put("text", i.getSubject());
                 subContentJsonObject.add(a);
 
@@ -144,7 +144,7 @@ public class QueryTasksToMemberBase {
             JSONArray subContentJsonArray = new JSONArray();
             JSONObject myTask = new JSONObject();
             myTask.put("tag", "a");
-            myTask.put("href", "http://redmine-qa.mxnavi.com/issues?assigned_to_id=me&set_filter=1&sort=priority%3Adesc%2Cupdated_on%3Adesc");
+            myTask.put("href", redmineOldUrl + "/issues?assigned_to_id=me&set_filter=1&sort=priority%3Adesc%2Cupdated_on%3Adesc");
             myTask.put("text", "点击查看指派给我的任务");
             subContentJsonArray.add(myTask);
             contentJsonArray.add(subContentJsonArray);
