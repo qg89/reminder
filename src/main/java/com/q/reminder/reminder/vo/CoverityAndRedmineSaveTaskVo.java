@@ -22,6 +22,10 @@ public class CoverityAndRedmineSaveTaskVo implements Serializable {
      */
     private Integer redmineProjectId;
     /**
+     * 项目名称
+     */
+    private String redmineProjectName;
+    /**
      * redmine 任务父ID
      */
     private Integer parentId;

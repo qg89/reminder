@@ -34,9 +34,9 @@ public class CoverityApi {
      */
     public static List<CoverityAndRedmineSaveTaskVo> readCoverity(CoverityAndRedmineSaveTaskVo vo) {
         OkHttpClient client = login();
-        List<CoverityVo> coverityVoList = queryList(client);
+        List<CoverityVo> coverityVoList = queryList(client, vo);
         if (coverityVoList.isEmpty()) {
-            log.info("coverity 返回结果为空");
+            log.info("【Coverity】-项目名称:{} , 暂无问题！", vo.getRedmineProjectName());
             return new ArrayList<>(0);
         }
         List<CoverityAndRedmineSaveTaskVo> resultList = new ArrayList<>();
@@ -101,10 +101,10 @@ public class CoverityApi {
         return client;
     }
 
-    static List<CoverityVo> queryList(OkHttpClient client) {
+    static List<CoverityVo> queryList(OkHttpClient client, CoverityAndRedmineSaveTaskVo vo) {
         String cookie = "COVJSESSIONID8080PI=" + COOKIE_STORE.get(DOMAIN).get(0).value();
         Request get = new Request.Builder()
-                .url(String.format(URL, 10072, 10738))
+                .url(String.format(URL, vo.getCoverityProjectId(), vo.getViewId()))
                 .header("Cookie", cookie)
                 .header("Host", DOMAIN)
                 .get()

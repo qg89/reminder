@@ -3,11 +3,13 @@ package com.q.reminder.reminder.util;
 import cn.hutool.core.date.DateUtil;
 import com.q.reminder.reminder.vo.CoverityAndRedmineSaveTaskVo;
 import com.q.reminder.reminder.vo.QueryRedmineVo;
-import com.taskadapter.redmineapi.*;
+import com.taskadapter.redmineapi.IssueManager;
+import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.RedmineManager;
+import com.taskadapter.redmineapi.RedmineManagerFactory;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.internal.RequestParam;
-import com.taskadapter.redmineapi.internal.ResultsWrapper;
 import com.taskadapter.redmineapi.internal.Transport;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -95,23 +97,21 @@ public class RedmineApi {
      */
     public static void saveTask(CoverityAndRedmineSaveTaskVo vo, String apiAccessKey, String redmineUrl) {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, apiAccessKey);
-        IssueManager issueManager = mgr.getIssueManager();
-        Params params = new Params();
-        params.add("f[]", "subject");
-        params.add("op[subject]", "~");
-        params.add("v[subject][]", "CID:[" + vo.getCid() + "]");
-        ResultsWrapper<Issue> issues = null;
+        Transport transport = mgr.getTransport();
+        List<RequestParam> params = List.of(new RequestParam("f[]", "subject"),
+                new RequestParam("op[subject]", "~"),
+                new RequestParam("v[subject][]", "CID:[" + vo.getCid() + "]"));
+        List<Issue> issueList = null;
         try {
-            issues = issueManager.getIssues(params);
+            issueList = transport.getObjectsList(Issue.class, params);
         } catch (RedmineException e) {
             log.error("[保存到redmine任务]异常 ", e);
         }
-        if (issues == null) {
+        if (issueList == null) {
             log.info("[保存到redmine任务] 失败,未查询相关任务");
             return;
         }
-        List<Issue> results = issues.getResults();
-        if (results != null && !results.isEmpty()) {
+        if (!issueList.isEmpty()) {
             return;
         }
 
@@ -130,7 +130,6 @@ public class RedmineApi {
                 .setProjectId(vo.getRedmineProjectId())
                 .setDescription(vo.getDescription())
                 .setParentId(vo.getParentId());
-        Transport transport = mgr.getTransport();
         issue.setTransport(transport);
         try {
             issue.create();
