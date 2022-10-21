@@ -1,4 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.q.reminder.reminder.mapper.UserMapping">
+    <select id="queryUserGroupList" resultType="com.q.reminder.reminder.vo.SendUserByGroupVo">
+        SELECT
+            ug.member_id AS memberId,
+            ui.user_name AS userName,
+            gi.chat_id AS chatId,
+            gi.reminder_none AS reminderNone,
+            CONCAT( ' (', CURDATE(), '）', gi.reminder_title ) AS reminderTitle
+        FROM
+            `fs_user_group` ug,
+            fs_group_info gi,
+            fs_user_member_info ui
+        WHERE
+            gi.chat_id = ug.chat_id
+          AND ui.member_id = ug.member_id
+          AND gi.send_type = 0
+          AND gi.is_delete = 0
+          AND ui.is_delete = 0
+          AND ui.user_name is not null
+    </select>
 </mapper>

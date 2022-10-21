@@ -80,7 +80,7 @@ public class QueryTasksToMemberBase {
         vo.setRedmineUrl(redmineOldUrl);
         vo.setExpiredDay(expiredDay);
         vo.setContainsStatus(contentStatus);
-        Map<String, List<Issue>> listMap = RedmineApi.queryUserByExpiredDayList(vo);
+        Map<String, List<Issue>> listMap = RedmineApi.queryUserByExpiredDayList(vo).stream().collect(Collectors.groupingBy(Issue::getAssigneeName));
         if (CollectionUtils.isEmpty(listMap)) {
             contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append("\r\n");
             contentAll.append("执行完成!");

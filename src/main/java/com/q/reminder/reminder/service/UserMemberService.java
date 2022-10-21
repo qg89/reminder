@@ -2,8 +2,10 @@ package com.q.reminder.reminder.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
+import com.q.reminder.reminder.vo.SendUserByGroupVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author : saiko
@@ -14,4 +16,11 @@ import java.util.List;
  */
 public interface UserMemberService extends IService<UserMemgerInfo> {
     Boolean saveOrupdateBatchByNameIsNull(List<UserMemgerInfo> membersByChats);
+
+    /**
+     * 查询可用发生群内的成员信息
+     * @return
+     */
+    List<SendUserByGroupVo> queryUserGroupToMap();
+
 }

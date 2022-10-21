@@ -34,7 +34,7 @@ public class RedmineApi {
      * @param vo
      * @return 按指派人员返回问题列表
      */
-    public static Map<String, List<Issue>> queryUserByExpiredDayList(QueryVo vo) {
+    public static List<Issue> queryUserByExpiredDayList(QueryVo vo) {
         List<String> noneStatusList = vo.getNoneStatusList();
         Integer expiredDay = vo.getExpiredDay();
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(vo.getRedmineUrl(), vo.getApiAccessKey());
@@ -58,7 +58,7 @@ public class RedmineApi {
                 log.error("读取redmine异常");
             }
         });
-        return allIssueList.stream().collect(Collectors.groupingBy(Issue::getAssigneeName));
+        return allIssueList;
     }
 
     /**

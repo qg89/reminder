@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.mapper.UserMapping;
 import com.q.reminder.reminder.service.UserMemberService;
+import com.q.reminder.reminder.vo.SendUserByGroupVo;
 import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -49,5 +51,10 @@ public class UserMemberServiceImpl extends ServiceImpl<UserMapping, UserMemgerIn
             });
         }
         return Boolean.TRUE;
+    }
+
+    @Override
+    public  List<SendUserByGroupVo> queryUserGroupToMap() {
+        return baseMapper.queryUserGroupList();
     }
 }
