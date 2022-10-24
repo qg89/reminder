@@ -1,22 +1,18 @@
 package com.q.reminder.reminder.handle;
 
-import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.q.reminder.reminder.entity.NoneStatus;
-import com.q.reminder.reminder.entity.PublicHolidays;
+import com.q.reminder.reminder.handle.base.HoldayBase;
 import com.q.reminder.reminder.handle.base.OverdueTasksAgainToGroupBase;
 import com.q.reminder.reminder.service.NoneStatusService;
-import com.q.reminder.reminder.service.PublicHolidaysService;
 import com.q.reminder.reminder.vo.QueryVo;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,7 +33,7 @@ public class OverdueTasksAgain1ToGroupHandle {
     @Autowired
     private NoneStatusService noneStatusService;
     @Autowired
-    private PublicHolidaysService publicHolidaysService;
+    private HoldayBase holdayBase;
 
     @Value("${redmine-config.old_url}")
     private String redmineOldUrl;
@@ -47,11 +43,7 @@ public class OverdueTasksAgain1ToGroupHandle {
     @Scheduled(cron = "0 30 9 * * ?")
 //    @Scheduled(cron = "0/20 * * * * ?")
     public void query() {
-        String today = DateUtil.today();
-        LambdaQueryWrapper<PublicHolidays> holdayWrapper = new LambdaQueryWrapper<>();
-        holdayWrapper.eq(PublicHolidays::getHoliday, today);
-        PublicHolidays holidays = publicHolidaysService.getOne(holdayWrapper);
-        if (DateUtil.isWeekend(new Date()) && (holidays == null || !"1".equals(holidays.getType()))) {
+        if (holdayBase.queryHoliday()) {
             log.info("节假日放假!!!!");
             return;
         }

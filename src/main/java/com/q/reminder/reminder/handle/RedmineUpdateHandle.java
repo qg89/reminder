@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.handle;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONArray;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
  * @author : saiko
  * @version : v1.0
  * @ClassName : com.q.reminder.reminder.handle.RedmineUpdateHandle
- * @Description :
+ * @Description : 每10分钟提醒一次变更的任务
  * @date :  2022.10.19 13:42
  */
 @Log4j2
@@ -98,5 +99,6 @@ public class RedmineUpdateHandle {
             }
             log.info("{},变更提醒,任务发送成功", name);
         });
+        log.info("变更提醒,任务执行完成!");
     }
 }

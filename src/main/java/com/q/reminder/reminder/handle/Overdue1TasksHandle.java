@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.handle;
 
+import com.q.reminder.reminder.handle.base.HoldayBase;
 import com.q.reminder.reminder.handle.base.QueryTasksToMemberBase;
 import com.q.reminder.reminder.service.NoneStatusService;
 import lombok.extern.log4j.Log4j2;
@@ -24,9 +25,16 @@ public class Overdue1TasksHandle {
     private QueryTasksToMemberBase queryTasksToMemberBase;
     @Autowired
     private NoneStatusService noneStatusService;
+    @Autowired
+    private HoldayBase holdayBase;
 
     @Scheduled(cron = "0 0 8 * * ?")
     public void query() {
+        if (holdayBase.queryHoliday()) {
+            log.info("节假日放假!!!!");
+            return;
+        }
+
         List<String> noneStatusList = noneStatusService.queryUnInStatus(0);
         queryTasksToMemberBase.feiShu( 1, noneStatusList, Boolean.FALSE);
     }
