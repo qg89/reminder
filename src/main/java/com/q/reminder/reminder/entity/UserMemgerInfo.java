@@ -35,11 +35,6 @@ public class UserMemgerInfo implements Serializable {
      */
     @JSONField(name = "member_id_type")
     private String memberIdType;
-
-    /**
-     * redmine名称（带空格）
-     */
-    private String userName;
     /**
      * redmineID
      */
