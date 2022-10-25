@@ -173,7 +173,7 @@ public class FeiShuApi {
             List<UserMemgerInfo> items = JSON.parseArray(itemsJson.toJSONString(), UserMemgerInfo.class);
             lists.addAll(items);
             items.forEach(e -> {
-                e.setUserName(new StringBuilder(e.getName()).insert(1, " ").toString());
+//                e.setUserName(new StringBuilder(e.getName()).insert(1, " ").toString());
                 addUserGroupList(chatId, e, userGroupList);
             });
             Integer memberTotal = data.getInteger("member_total");
@@ -208,7 +208,7 @@ public class FeiShuApi {
         if (memberTotal >= (itemsJson.size() + lists.size())) {
             List<UserMemgerInfo> items = JSON.parseArray(itemsJson.toJSONString(), UserMemgerInfo.class);
             items.forEach(e -> {
-                e.setUserName(new StringBuilder(e.getName()).insert(1, " ").toString());
+//                e.setUserName(new StringBuilder(e.getName()).insert(1, " ").toString());
                 addUserGroupList(chatId, e, userGroupList);
             });
             lists.addAll(items);

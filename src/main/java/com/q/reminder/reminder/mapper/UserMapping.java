@@ -2,7 +2,10 @@ package com.q.reminder.reminder.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
+import com.q.reminder.reminder.vo.SendUserByGroupVo;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * @author : saiko
@@ -13,5 +16,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface UserMapping extends BaseMapper<UserMemgerInfo> {
+
+    List<SendUserByGroupVo> queryUserGroupList();
 
 }

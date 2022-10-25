@@ -2,6 +2,7 @@ package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
 import com.q.reminder.reminder.vo.CoverityAndRedmineSaveTaskVo;
+import com.q.reminder.reminder.vo.QueryRedmineVo;
 import com.q.reminder.reminder.vo.QueryVo;
 import com.taskadapter.redmineapi.IssueManager;
 import com.taskadapter.redmineapi.RedmineException;
@@ -15,7 +16,10 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -34,7 +38,7 @@ public class RedmineApi {
      * @param vo
      * @return 按指派人员返回问题列表
      */
-    public static Map<String, List<Issue>> queryUserByExpiredDayList(QueryVo vo) {
+    public static List<Issue> queryUserByExpiredDayList(QueryVo vo) {
         List<String> noneStatusList = vo.getNoneStatusList();
         Integer expiredDay = vo.getExpiredDay();
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(vo.getRedmineUrl(), vo.getApiAccessKey());
@@ -58,7 +62,7 @@ public class RedmineApi {
                 log.error("读取redmine异常");
             }
         });
-        return allIssueList.stream().collect(Collectors.groupingBy(Issue::getAssigneeName));
+        return allIssueList;
     }
 
     /**
@@ -67,23 +71,28 @@ public class RedmineApi {
      * @param vo
      * @return
      */
-    public static List<Issue> queryUpdateIssue(QueryVo vo) {
+    public static List<QueryRedmineVo> queryUpdateIssue(QueryVo vo) {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(vo.getRedmineUrl(), vo.getApiAccessKey());
         Transport transport = mgr.getTransport();
-        List<Issue> issues = new ArrayList<>();
+        List<QueryRedmineVo> issues = new ArrayList<>();
         for (String project : vo.getProjects()) {
             List<RequestParam> params = List.of(
                     new RequestParam("project_id", project),
                     new RequestParam("status_id", "*"),
                     new RequestParam("assigned_to_id", "*"),
                     new RequestParam("updated_on", DateUtil.today()));
-            List<Issue> objectsList = new ArrayList<>();
             try {
-                objectsList = transport.getObjectsList(Issue.class, params);
+                transport.getObjectsList(Issue.class, params).stream().filter(e -> StringUtils.isNotBlank(e.getAssigneeName())).forEach(e -> {
+                    QueryRedmineVo queryRedmineVo = new QueryRedmineVo();
+                    queryRedmineVo.setUpdatedOn(e.getUpdatedOn());
+                    queryRedmineVo.setSubject(e.getSubject());
+                    queryRedmineVo.setId(e.getId() + "");
+                    queryRedmineVo.setAssigneeName(e.getAssigneeName().replace(" ", ""));
+                    issues.add(queryRedmineVo);
+                });
             } catch (RedmineException e) {
                 log.error("redmind 查询当天更新的任务异常");
             }
-            issues.addAll(objectsList);
         }
         return issues;
     }

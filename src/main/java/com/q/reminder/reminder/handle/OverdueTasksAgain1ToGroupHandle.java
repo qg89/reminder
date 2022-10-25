@@ -2,6 +2,7 @@ package com.q.reminder.reminder.handle;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.q.reminder.reminder.entity.NoneStatus;
+import com.q.reminder.reminder.handle.base.HoldayBase;
 import com.q.reminder.reminder.handle.base.OverdueTasksAgainToGroupBase;
 import com.q.reminder.reminder.service.NoneStatusService;
 import com.q.reminder.reminder.vo.QueryVo;
@@ -12,7 +13,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,6 +32,8 @@ public class OverdueTasksAgain1ToGroupHandle {
     private OverdueTasksAgainToGroupBase overdueTasksAgainToGroupBase;
     @Autowired
     private NoneStatusService noneStatusService;
+    @Autowired
+    private HoldayBase holdayBase;
 
     @Value("${redmine-config.old_url}")
     private String redmineOldUrl;
@@ -39,8 +41,12 @@ public class OverdueTasksAgain1ToGroupHandle {
     private String apiAccessKeySaiko;
 
     @Scheduled(cron = "0 30 9 * * ?")
-//    @Scheduled(cron = "0/20 * * * * ?")
     public void query() {
+        if (holdayBase.queryHoliday()) {
+            log.info("节假日放假!!!!");
+            return;
+        }
+
         LambdaQueryWrapper<NoneStatus> lq = new LambdaQueryWrapper<>();
         lq.in(NoneStatus::getExpiredDays, 1, 2);
         List<NoneStatus> noneStatusList = noneStatusService.list(lq);
