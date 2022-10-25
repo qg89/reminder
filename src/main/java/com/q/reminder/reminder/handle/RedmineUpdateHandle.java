@@ -65,7 +65,7 @@ public class RedmineUpdateHandle {
 
         LambdaQueryWrapper<UserMemgerInfo> lqw = new LambdaQueryWrapper<>();
         lqw.select(UserMemgerInfo::getName, UserMemgerInfo::getMemberId);
-        Map<String, Object> userNameMap = userMemberService.getMap(lqw);
+        Map<String, String> userNameMap = userMemberService.list(lqw).stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
 
         String authorization = FeiShuApi.getSecret(appId, appSecret);
         issueMap.forEach((assigneeName, issueList) -> {
@@ -91,7 +91,8 @@ public class RedmineUpdateHandle {
 
             SendVo sendVo = new SendVo();
             sendVo.setContent(con.toJSONString());
-            sendVo.setMemberId(String.valueOf(userNameMap.get(assigneeName)));
+            sendVo.setMemberId(userNameMap.get(assigneeName));
+            sendVo.setAssigneeName(assigneeName);
             try {
                 FeiShuApi.sendPost(sendVo, authorization, new StringBuilder());
             } catch (IOException e) {

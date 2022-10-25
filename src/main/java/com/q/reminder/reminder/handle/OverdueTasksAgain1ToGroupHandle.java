@@ -41,7 +41,6 @@ public class OverdueTasksAgain1ToGroupHandle {
     private String apiAccessKeySaiko;
 
     @Scheduled(cron = "0 30 9 * * ?")
-//    @Scheduled(cron = "0/20 * * * * ?")
     public void query() {
         if (holdayBase.queryHoliday()) {
             log.info("节假日放假!!!!");
