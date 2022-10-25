@@ -22,6 +22,6 @@
           AND gi.is_delete = 0
           AND ui.is_delete = 0
           AND ui.resign = '0'
-          AND ui.user_name IS NOT NULL
+          AND ui.`name` IS NOT NULL
     </select>
 </mapper>
