@@ -90,7 +90,7 @@ public class OverdueTasksAgainToGroupBase {
         JSONArray contentJsonArray = new JSONArray();
         if (!overdueTask) {
             // 处理不在群内的成员
-            issueUserList.removeIf(e -> !sendUsers.contains(String.valueOf(e.getId())));
+            issueUserList.removeIf(e -> !sendUsers.contains(String.valueOf(e.getAssigneeId())));
             if (issueUserList.isEmpty()) {
                 log.info("群发送,过期任务人员为空!");
                 overdueTask = true;
