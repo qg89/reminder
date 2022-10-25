@@ -38,8 +38,8 @@ public class UpdateFeishuRedmineHandle {
     @Value("${app.secret}")
     private String appSecret;
 
-    @Scheduled(cron = "0 0 23 ? * MON-FRI")
-//    @Scheduled(cron = "0/20 * * * * ?")
+//    @Scheduled(cron = "0 0 23 ? * MON-FRI")
+    @Scheduled(cron = "0/20 * * * * ?")
     public void update() {
         String secret = FeiShuApi.getSecret(appId, appSecret);
         List<GroupInfo> groupToChats = FeiShuApi.getGroupToChats(secret);
@@ -61,7 +61,7 @@ public class UpdateFeishuRedmineHandle {
         }
         log.info("更新机器人所在群组完成!");
 
-        Boolean member = userMemberService.saveOrupdateBatchByNameIsNull(membersByChats);
+        Boolean member = userMemberService.saveOrUpdateBatchAll(membersByChats);
         if (!member) {
             log.error("保存机器人所在群组和人员关系失败!");
         }

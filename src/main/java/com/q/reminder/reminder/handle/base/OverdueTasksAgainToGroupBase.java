@@ -81,16 +81,16 @@ public class OverdueTasksAgainToGroupBase {
         List<Issue> issueUserList = RedmineApi.queryUserByExpiredDayList(vo);
 
         // 查询要群对应的人员信息
-        List<SendUserByGroupVo> sendUserByGroupVoList = userMemberService.queryUserGroupToMap();
+        List<SendUserByGroupVo> sendUserByGroupVoList = userMemberService.queryUserGroupList();
         // 群内人员
-        Set<String> sendUsers = sendUserByGroupVoList.stream().map(SendUserByGroupVo::getUserName).collect(Collectors.toSet());
+        Set<String> sendUsers = sendUserByGroupVoList.stream().map(SendUserByGroupVo::getAssigneeId).collect(Collectors.toSet());
         // 是否有过期任务
         boolean overdueTask = CollectionUtils.isEmpty(issueUserList);
 
         JSONArray contentJsonArray = new JSONArray();
         if (!overdueTask) {
             // 处理不在群内的成员
-            issueUserList.removeIf(e -> !sendUsers.contains(e.getAssigneeName()));
+            issueUserList.removeIf(e -> !sendUsers.contains(String.valueOf(e.getId())));
             if (issueUserList.isEmpty()) {
                 log.info("群发送,过期任务人员为空!");
                 overdueTask = true;

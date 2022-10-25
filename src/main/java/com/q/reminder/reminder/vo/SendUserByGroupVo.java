@@ -16,10 +16,11 @@ import java.io.Serializable;
 public class SendUserByGroupVo implements Serializable {
 
     private static final long serialVersionUID = -4346456365733315964L;
-    private String userName;
+    private String name;
     private String memberId;
     private String chatId;
     private String reminderNone;
+    private String assigneeId;
     private JSONArray reminderContent;
     private String reminderTitle;
 

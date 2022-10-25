@@ -92,7 +92,7 @@ public class QueryTasksToMemberBase {
         Map<String, SendVo> sendMap = new HashMap<>();
         List<OverdueTaskHistory> historys = new ArrayList<>();
 
-        listMap.forEach((k, issueList) -> {
+        listMap.forEach((assigneeName, issueList) -> {
             JSONObject con = new JSONObject();
             JSONObject all = new JSONObject();
             con.put("zh_cn", all);
@@ -100,10 +100,9 @@ public class QueryTasksToMemberBase {
             JSONArray contentJsonArray = new JSONArray();
             all.put("content", contentJsonArray);
 
-            String name = k.replace(" ", "");
-            issueList.forEach(i -> {
-                Integer id = i.getId();
-                String assigneeName = i.getAssigneeName();
+            String name = assigneeName.replace(" ", "");
+            issueList.forEach(issue -> {
+                Integer id = issue.getId();
                 OverdueTaskHistory history = new OverdueTaskHistory();
 
                 JSONArray subContentJsonObject = new JSONArray();
@@ -115,12 +114,12 @@ public class QueryTasksToMemberBase {
                 JSONObject a = new JSONObject();
                 a.put("tag", "a");
                 a.put("href", redmineOldUrl + "/issues/" + id);
-                a.put("text", i.getSubject());
+                a.put("text", issue.getSubject());
                 subContentJsonObject.add(a);
 
                 JSONObject task = new JSONObject();
                 task.put("tag", "text");
-                task.put("text", "\r\n当前任务状态: " + i.getStatusName());
+                task.put("text", "\r\n当前任务状态: " + issue.getStatusName());
                 subContentJsonObject.add(task);
 
                 JSONObject assignee = new JSONObject();
@@ -130,14 +129,14 @@ public class QueryTasksToMemberBase {
 
                 JSONObject dueDate = new JSONObject();
                 dueDate.put("tag", "text");
-                dueDate.put("text", "\r\n计划完成日期: " + new DateTime(i.getDueDate()).toString("yyyy-MM-dd"));
+                dueDate.put("text", "\r\n计划完成日期: " + new DateTime(issue.getDueDate()).toString("yyyy-MM-dd"));
                 subContentJsonObject.add(dueDate);
 
                 history.setAssigneeName(name);
-                history.setProjectName(i.getProjectName());
-                history.setSubjectName(i.getSubject());
+                history.setProjectName(issue.getProjectName());
+                history.setSubjectName(issue.getSubject());
                 history.setRedmineId(id);
-                history.setLastUpdateTime(i.getUpdatedOn());
+                history.setLastUpdateTime(issue.getUpdatedOn());
                 historys.add(history);
                 contentJsonArray.add(subContentJsonObject);
             });
