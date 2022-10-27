@@ -7,6 +7,7 @@ import com.taskadapter.redmineapi.IssueManager;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.RedmineManagerFactory;
+import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.internal.RequestParam;
@@ -164,22 +165,27 @@ public class RedmineApi {
         Integer projectId = definition.getProjectId();
         featureList.forEach(vo -> {
             String testTime = vo.getTestTime();
-            Date dueDate = new Date();
+            String redmineSubject = vo.getRedmineSubject();
+            Date dueDate;
             if (StringUtils.isBlank(testTime)) {
                 dueDate = DateTime.now().plusDays(10).toDate();
             } else {
                 dueDate = new DateTime(testTime).plusDays(7).toDate();
             }
             vo.setFeatureId(IdWorker.get32UUID().substring(22));
+            CustomField customField = new CustomField();
+            customField.setName("需求ID");
+            customField.setValue(vo.getFeatureId());
             Issue issue = new Issue()
                     .setTracker(tracker)
                     .setAssigneeId(productAssigneeId)
                     .setCreatedOn(new Date())
                     .setDueDate(dueDate)
-                    .setSubject(vo.getRedmineSubject())
+                    .setSubject(redmineSubject)
                     // 状态 NEW
                     .setStatusId(1)
                     .setProjectId(projectId)
+                    .addCustomField(customField)
                     .setDescription(vo.getDesc());
             issue.setTransport(transport);
             Issue newIssue = new Issue();

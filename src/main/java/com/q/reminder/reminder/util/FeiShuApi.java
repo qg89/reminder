@@ -234,22 +234,22 @@ public class FeiShuApi {
 
     private static String bearer = "t-g104aqgEZ4WWCKWYNJE2H6KGBGXCJO52RVDIYJ4M";
 
-    public static void main(String[] args) {
-        String spreadsheetToken = "shtcnKDY4BUliWySLgo0LnDDtme";
-        String sheetId = "ZBTGux";
-        String viewsId = "pH9hbVcCXA";
-        String range = "ZBTGux!A1:AJ2000,GVO53c!A1:O2";
-        String secret = getSecret("cli_a1144b112738d013", "AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx");
-
-//        String view = getView(spreadsheetToken, sheetId, viewsId);
-//        createFilter(spreadsheetToken, sheetId, viewsId);
-        List<JSONObject> list = getRanges(spreadsheetToken, range, secret);
-//        List<FeatureListVo> featureList = getFeatureList(valueRange);
-//        System.out.println(featureList);
-        List<SheetVo> spredsheets = getSpredsheets(spreadsheetToken, secret);
-        System.out.println(spredsheets);
-//        updateRange(spreadsheetToken);
-    }
+//    public static void main(String[] args) {
+//        String spreadsheetToken = "shtcnKDY4BUliWySLgo0LnDDtme";
+//        String sheetId = "ZBTGux";
+//        String viewsId = "pH9hbVcCXA";
+//        String range = "ZBTGux!A1:AJ2000,GVO53c!A1:O2";
+//        String secret = getSecret("cli_a1144b112738d013", "AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx");
+//
+////        String view = getView(spreadsheetToken, sheetId, viewsId);
+////        createFilter(spreadsheetToken, sheetId, viewsId);
+//        List<JSONObject> list = getRanges(spreadsheetToken, range, secret);
+////        List<FeatureListVo> featureList = getFeatureList(valueRange);
+////        System.out.println(featureList);
+//        List<SheetVo> spredsheets = getSpredsheets(spreadsheetToken, secret);
+//        System.out.println(spredsheets);
+////        updateRange(spreadsheetToken);
+//    }
 
     /**
      * 获取单个范围
@@ -506,7 +506,7 @@ public class FeiShuApi {
         map.put("需求ID", "featureId");
         map.put("模块", "module");
         map.put("里程碑", "milestone");
-        map.put("Redmine ID/链接", "redmineSubject");
+        map.put("RedmineID/链接", "redmineSubject");
         map.put("一级", "menuOne");
         map.put("二级", "menuTwo");
         map.put("三级", "menuThree");

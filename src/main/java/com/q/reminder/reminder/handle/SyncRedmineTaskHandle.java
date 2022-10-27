@@ -41,13 +41,15 @@ public class SyncRedmineTaskHandle {
     private String appSecret;
     @Value("${redmine-config.old_url}")
     private String redmineOldUrl;
+    @Value("${redmine-config.api-access-key.saiko}")
+    private String apiAccessKeySaiko;
 
     @Autowired
     private ProjectInfoService projectInfoService;
     @Autowired
     private RedmineUserInfoService redmineUserInfoService;
 
-    @Scheduled(cron = "0/20 * * * * ?")
+    @Scheduled(cron = "0/50 * * * * ?")
     public void syncRedmineTask() {
         // 查询项目对应的需求管理表token
         LambdaQueryWrapper<ProjectInfo> lq = new LambdaQueryWrapper<>();
@@ -57,9 +59,7 @@ public class SyncRedmineTaskHandle {
 
         String secret = FeiShuApi.getSecret(appId, appSecret);
         projectInfos.forEach(e -> {
-            String pName = e.getPName();
             String pId = e.getPId();
-            String pKey = e.getPKey();
             String featureToken = e.getFeatureToken();
             // 获取各项目中需求管理表中sheetId和sheet名称
             List<SheetVo> sheeList = FeiShuApi.getSpredsheets(featureToken, secret);
@@ -85,6 +85,7 @@ public class SyncRedmineTaskHandle {
             List<FeatureListVo> featureList = new ArrayList<>();
             DefinitionVo definition = new DefinitionVo();
             definition.setRedmineUrl(redmineOldUrl);
+            definition.setApiAccessKey(apiAccessKeySaiko);
             definition.setProjectId(Integer.valueOf(pId));
             for (JSONObject rangeJson : rangeList) {
                 String range = rangeJson.getString("range");
@@ -102,8 +103,12 @@ public class SyncRedmineTaskHandle {
             // 构建redmine发送任务的实体集合
             featureList = RedmineApi.createTask(featureList, definition, redmineUserMap);
 
-            // 同步更新需求管理表featureId
-            FeiShuApi.updateRange(featureToken, secret, "", "");
+            featureList.forEach(feature -> {
+                String featureId = feature.getFeatureId();
+                String range = feature.getRange();
+                // 同步更新需求管理表featureId
+                FeiShuApi.updateRange(featureToken, secret, range, featureId);
+            });
         });
     }
 }
