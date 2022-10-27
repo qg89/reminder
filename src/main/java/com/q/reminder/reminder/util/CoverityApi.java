@@ -1,7 +1,7 @@
 package com.q.reminder.reminder.util;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.q.reminder.reminder.entity.CoverityVo;
+import com.q.reminder.reminder.vo.CoverityVo;
 import com.q.reminder.reminder.vo.CoverityAndRedmineSaveTaskVo;
 import lombok.extern.log4j.Log4j2;
 import okhttp3.*;

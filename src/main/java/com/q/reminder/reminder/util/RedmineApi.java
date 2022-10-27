@@ -1,9 +1,8 @@
 package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
-import com.q.reminder.reminder.vo.CoverityAndRedmineSaveTaskVo;
-import com.q.reminder.reminder.vo.QueryRedmineVo;
-import com.q.reminder.reminder.vo.QueryVo;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.q.reminder.reminder.vo.*;
 import com.taskadapter.redmineapi.IssueManager;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
@@ -16,10 +15,7 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -145,5 +141,55 @@ public class RedmineApi {
         } catch (RedmineException e) {
             log.error("创建redmine任务异常", e);
         }
+    }
+
+    /**
+     * 创建redmine任务，并且返回需求ID
+     *
+     * @param featureList
+     * @param definition
+     * @param redmineUserMap
+     * @return
+     */
+    public static List<FeatureListVo> createTask(List<FeatureListVo> featureList, DefinitionVo definition, Map<String, Integer> redmineUserMap) {
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(definition.getRedmineUrl(), definition.getApiAccessKey());
+        Transport transport = mgr.getTransport();
+        Tracker tracker = new Tracker();
+        tracker.setId(2);
+        tracker.setName("需求");
+        Integer productAssigneeId = redmineUserMap.get(definition.getProduct());
+        Integer bigDataAssigneeId = redmineUserMap.get(definition.getBigData());
+        Integer appAssigneeId = redmineUserMap.get(definition.getApplication());
+        Integer testAssigneeId = redmineUserMap.get(definition.getTest());
+        Integer projectId = definition.getProjectId();
+        featureList.forEach(vo -> {
+            String testTime = vo.getTestTime();
+            Date dueDate = new Date();
+            if (StringUtils.isBlank(testTime)) {
+                dueDate = DateTime.now().plusDays(10).toDate();
+            } else {
+                dueDate = new DateTime(testTime).plusDays(7).toDate();
+            }
+            vo.setFeatureId(IdWorker.get32UUID().substring(22));
+            Issue issue = new Issue()
+                    .setTracker(tracker)
+                    .setAssigneeId(productAssigneeId)
+                    .setCreatedOn(new Date())
+                    .setDueDate(dueDate)
+                    .setSubject(vo.getRedmineSubject())
+                    // 状态 NEW
+                    .setStatusId(1)
+                    .setProjectId(projectId)
+                    .setDescription(vo.getDesc());
+            issue.setTransport(transport);
+            Issue newIssue = new Issue();
+            try {
+                newIssue = issue.create();
+            } catch (RedmineException e) {
+                log.error("创建redmine任务异常", e);
+            }
+            System.out.println(newIssue);
+        });
+        return featureList;
     }
 }

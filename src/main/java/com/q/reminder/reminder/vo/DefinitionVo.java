@@ -16,7 +16,14 @@ public class DefinitionVo implements Serializable {
 
     private static final long serialVersionUID = 3180616623542952311L;
     private String product;
+
     private String application;
+
     private String test;
+
     private String bigData;
+
+    private String redmineUrl;
+    private String apiAccessKey;
+    private Integer projectId;
 }

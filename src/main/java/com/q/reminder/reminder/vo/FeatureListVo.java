@@ -17,6 +17,10 @@ public class FeatureListVo implements Serializable {
 
     private static final long serialVersionUID = 7892264413369571086L;
     /**
+     * 该单元格sheetId!A1:B2
+     */
+    private String range;
+    /**
      * rfq ID
      */
     private String rfqId;

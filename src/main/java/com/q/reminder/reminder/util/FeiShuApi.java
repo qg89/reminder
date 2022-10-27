@@ -1,5 +1,7 @@
 package com.q.reminder.reminder.util;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
@@ -236,12 +238,12 @@ public class FeiShuApi {
         String spreadsheetToken = "shtcnKDY4BUliWySLgo0LnDDtme";
         String sheetId = "ZBTGux";
         String viewsId = "pH9hbVcCXA";
-        String range = "ZBTGux!A1:AJ2000";
+        String range = "ZBTGux!A1:AJ2000,GVO53c!A1:O2";
         String secret = getSecret("cli_a1144b112738d013", "AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx");
 
 //        String view = getView(spreadsheetToken, sheetId, viewsId);
 //        createFilter(spreadsheetToken, sheetId, viewsId);
-//        JSONObject valueRange = getRange(spreadsheetToken, range, secret);
+        List<JSONObject> list = getRanges(spreadsheetToken, range, secret);
 //        List<FeatureListVo> featureList = getFeatureList(valueRange);
 //        System.out.println(featureList);
         List<SheetVo> spredsheets = getSpredsheets(spreadsheetToken, secret);
@@ -271,7 +273,7 @@ public class FeiShuApi {
         } catch (IOException e) {
             log.error(e);
         }
-        return null;
+        return new ArrayList<>();
     }
 
     /**
@@ -281,7 +283,7 @@ public class FeiShuApi {
      * @param sheetId
      * @return
      */
-    public static List<FeatureListVo> getFeatureList(List<List<String>> cellList, String sheetId) {
+    public static List<FeatureListVo> getFeatureList(List<List> cellList, String sheetId) {
         if (CollectionUtils.isEmpty(cellList)) {
             log.info("飞书获取的需求列表为空!");
             return new ArrayList<>();
@@ -309,7 +311,7 @@ public class FeiShuApi {
                 continue;
             }
             if (StringUtils.isBlank(featureListVo.getFeatureId())) {
-                featureListVo.setFeatureId(sheetId + "!B" + (i + 1) + ":B" + (i + 1));
+                featureListVo.setRange(sheetId + "!B" + (i + 1) + ":B" + (i + 1));
                 list.add(featureListVo);
             }
         }
@@ -320,21 +322,35 @@ public class FeiShuApi {
      * 获取定义
      *
      * @param cellList
+     * @param definition
      * @return
      */
-    public static DefinitionVo getDefinitionList(List<List<String>> cellList) {
-        DefinitionVo vo = new DefinitionVo();
+    public static DefinitionVo getDefinitionList(List<List> cellList, DefinitionVo definition) {
         if (CollectionUtils.isEmpty(cellList)) {
             log.info("飞书获取的定义为空!");
-            return vo;
+            return definition;
         }
         Map<String, String> fieldsMap = fieldsDefinitionMap();
         Map<String, String> map = new HashMap<>();
         for (int i = 1; i < cellList.size(); i++) {
-            map.put(cellList.get(0).get(i), cellList.get(1).get(i));
+            for (int j = 0; j < cellList.get(1).size(); j++) {
+                Object key = cellList.get(0).get(j);
+                if (key == null) {
+                    continue;
+                }
+                String fileKey = fieldsMap.get(key.toString());
+                if (StringUtils.isBlank(fileKey)) {
+                    continue;
+                }
+                map.put(fileKey, Optional.ofNullable(cellList.get(1).get(j)).orElse("").toString());
+            }
         }
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.convertValue(map, DefinitionVo.class);
+        DefinitionVo definitionVo = objectMapper.convertValue(map, DefinitionVo.class);
+        CopyOptions copyOptions = new CopyOptions();
+        copyOptions.setIgnoreNullValue(true);
+        BeanUtil.copyProperties(definitionVo, definition, copyOptions);
+        return definition;
     }
 
 
@@ -442,7 +458,7 @@ public class FeiShuApi {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return list;
     }
 
     /**

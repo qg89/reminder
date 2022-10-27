@@ -1,4 +1,4 @@
-package com.q.reminder.reminder.entity;
+package com.q.reminder.reminder.vo;
 
 import lombok.Data;
 
