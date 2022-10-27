@@ -49,7 +49,7 @@ public class SyncRedmineTaskHandle {
     @Autowired
     private RedmineUserInfoService redmineUserInfoService;
 
-    @Scheduled(cron = "0/20 * * * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
     public void syncRedmineTask() {
         // 查询项目对应的需求管理表token
         LambdaQueryWrapper<ProjectInfo> lq = new LambdaQueryWrapper<>();
