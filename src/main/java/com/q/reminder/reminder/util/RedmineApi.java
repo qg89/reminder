@@ -15,6 +15,7 @@ import com.taskadapter.redmineapi.internal.Transport;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -150,9 +151,8 @@ public class RedmineApi {
      * @param featureList
      * @param definition
      * @param redmineUserMap
-     * @return
      */
-    public static List<FeatureListVo> createTask(List<FeatureListVo> featureList, DefinitionVo definition, Map<String, Integer> redmineUserMap) {
+    public static void createTask(List<FeatureListVo> featureList, DefinitionVo definition, Map<String, Integer> redmineUserMap) {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(definition.getRedmineUrl(), definition.getApiAccessKey());
         Transport transport = mgr.getTransport();
         Tracker tracker = new Tracker();
@@ -164,18 +164,37 @@ public class RedmineApi {
         Integer testAssigneeId = redmineUserMap.get(definition.getTest());
         Integer projectId = definition.getProjectId();
         featureList.forEach(vo -> {
+            String featureId = IdWorker.get32UUID().substring(22);
             String testTime = vo.getTestTime();
             String redmineSubject = vo.getRedmineSubject();
+            String menuOne = vo.getMenuOne();
+            String menuTwo = vo.getMenuTwo();
+            String menuThree = vo.getMenuThree();
+            if (StringUtils.isNotBlank(menuOne)) {
+                redmineSubject += "-[" + menuOne + "]";
+            }
+            if (StringUtils.isNotBlank(menuTwo)) {
+                redmineSubject += "-[" + menuTwo + "]";
+            }
+            if (StringUtils.isNotBlank(menuThree)) {
+                redmineSubject += "-[" + menuThree + "]";
+            }
+            boolean check = checkRedmineTask(mgr, redmineSubject);
+            if (check) {
+                return;
+            }
+
             Date dueDate;
             if (StringUtils.isBlank(testTime)) {
                 dueDate = DateTime.now().plusDays(10).toDate();
             } else {
                 dueDate = new DateTime(testTime).plusDays(7).toDate();
             }
-            vo.setFeatureId(IdWorker.get32UUID().substring(22));
+            vo.setFeatureId(featureId);
             CustomField customField = new CustomField();
             customField.setName("需求ID");
-            customField.setValue(vo.getFeatureId());
+            customField.setId(5);
+            customField.setValue(featureId);
             Issue issue = new Issue()
                     .setTracker(tracker)
                     .setAssigneeId(productAssigneeId)
@@ -196,6 +215,28 @@ public class RedmineApi {
             }
             System.out.println(newIssue);
         });
-        return featureList;
+    }
+
+    /**
+     * 检查是否有redmine任务
+     * @param mgr
+     * @param redmineSubject
+     * @return
+     */
+    private static boolean checkRedmineTask(RedmineManager mgr, String redmineSubject) {
+        Transport transport = mgr.getTransport();
+        List<RequestParam> params = List.of(new RequestParam("f[]", "subject"),
+                new RequestParam("op[subject]", "~"),
+                new RequestParam("v[subject][]", redmineSubject));
+        List<Issue> issueList = null;
+        try {
+            issueList = transport.getObjectsList(Issue.class, params);
+        } catch (RedmineException e) {
+            log.error("[保存到redmine任务]异常 ", e);
+        }
+        if (CollectionUtils.isEmpty(issueList)) {
+            return false;
+        }
+        return true;
     }
 }

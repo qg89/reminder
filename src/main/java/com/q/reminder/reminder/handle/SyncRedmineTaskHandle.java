@@ -49,7 +49,7 @@ public class SyncRedmineTaskHandle {
     @Autowired
     private RedmineUserInfoService redmineUserInfoService;
 
-    @Scheduled(cron = "0/50 * * * * ?")
+    @Scheduled(cron = "0/20 * * * * ?")
     public void syncRedmineTask() {
         // 查询项目对应的需求管理表token
         LambdaQueryWrapper<ProjectInfo> lq = new LambdaQueryWrapper<>();
@@ -75,7 +75,7 @@ public class SyncRedmineTaskHandle {
                     continue;
                 }
                 if ("定义".equals(title)) {
-                    definitionRange = (sheetId + "!A1:Z2");
+                    definitionRange = (sheetId + "!A1:AZ2");
                     ranges.append(definitionRange);
                 }
             }
@@ -101,11 +101,15 @@ public class SyncRedmineTaskHandle {
                 }
             }
             // 构建redmine发送任务的实体集合
-            featureList = RedmineApi.createTask(featureList, definition, redmineUserMap);
+            RedmineApi.createTask(featureList, definition, redmineUserMap);
 
             featureList.forEach(feature -> {
                 String featureId = feature.getFeatureId();
                 String range = feature.getRange();
+                if (StringUtils.isBlank(featureId)) {
+                    log.info("该任务已存在,不再重新新增任务");
+                    return;
+                }
                 // 同步更新需求管理表featureId
                 FeiShuApi.updateRange(featureToken, secret, range, featureId);
             });
