@@ -62,11 +62,11 @@ public class SyncRedmineTaskHandle {
             String pId = e.getPId();
             String featureToken = e.getFeatureToken();
             // 获取各项目中需求管理表中sheetId和sheet名称
-            List<SheetVo> sheeList = FeiShuApi.getSpredsheets(featureToken, secret);
+            List<SheetVo> sheetList = FeiShuApi.getSpredsheets(featureToken, secret);
             StringBuilder ranges = new StringBuilder();
             String featureRange = "";
             String definitionRange = "";
-            for (SheetVo sheetVo : sheeList) {
+            for (SheetVo sheetVo : sheetList) {
                 String sheetId = sheetVo.getSheetId();
                 String title = sheetVo.getTitle();
                 if ("需求管理表".equals(title)) {
