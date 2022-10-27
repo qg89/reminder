@@ -154,6 +154,7 @@ public class RedmineApi {
      */
     public static void createTask(List<FeatureListVo> featureList, DefinitionVo definition, Map<String, Integer> redmineUserMap) {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(definition.getRedmineUrl(), definition.getApiAccessKey());
+
         Transport transport = mgr.getTransport();
         Tracker tracker = new Tracker();
         tracker.setId(2);
@@ -163,9 +164,9 @@ public class RedmineApi {
         Integer appAssigneeId = redmineUserMap.get(definition.getApplication());
         Integer testAssigneeId = redmineUserMap.get(definition.getTest());
         Integer projectId = definition.getProjectId();
+        Date dueDate = DateTime.now().plusDays(10).toDate();
         featureList.forEach(vo -> {
             String featureId = IdWorker.get32UUID().substring(22);
-            String testTime = vo.getTestTime();
             String redmineSubject = vo.getRedmineSubject();
             String menuOne = vo.getMenuOne();
             String menuTwo = vo.getMenuTwo();
@@ -184,17 +185,17 @@ public class RedmineApi {
                 return;
             }
 
-            Date dueDate;
-            if (StringUtils.isBlank(testTime)) {
-                dueDate = DateTime.now().plusDays(10).toDate();
-            } else {
-                dueDate = new DateTime(testTime).plusDays(7).toDate();
-            }
             vo.setFeatureId(featureId);
-            CustomField customField = new CustomField();
-            customField.setName("需求ID");
-            customField.setId(5);
-            customField.setValue(featureId);
+            List<CustomField> customFieldList = new ArrayList<>();
+            CustomField customField = new CustomField().setName("需求ID").setId(5).setValue(featureId);
+            customFieldList.add(customField);
+            customField = new CustomField().setId(42).setName("需求类型").setValue("功能");
+            customFieldList.add(customField);
+            customField = new CustomField().setId(43).setName("原始需求").setValue(vo.getRfqId());
+            customFieldList.add(customField);
+            customField = new CustomField().setId(30).setName("是否需要验证").setValue("是");
+            customFieldList.add(customField);
+
             Issue issue = new Issue()
                     .setTracker(tracker)
                     .setAssigneeId(productAssigneeId)
@@ -204,7 +205,7 @@ public class RedmineApi {
                     // 状态 NEW
                     .setStatusId(1)
                     .setProjectId(projectId)
-                    .addCustomField(customField)
+                    .addCustomFields(customFieldList)
                     .setDescription(vo.getDesc());
             issue.setTransport(transport);
             Issue newIssue = new Issue();
