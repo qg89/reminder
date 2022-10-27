@@ -20,4 +20,5 @@ public class ProjectInfo implements Serializable {
     private String pId;
     private String pKey;
     private String pName;
+    private String featureToken;
 }

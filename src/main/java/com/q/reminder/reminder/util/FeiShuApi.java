@@ -9,11 +9,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.q.reminder.reminder.entity.GroupInfo;
 import com.q.reminder.reminder.entity.UserGroup;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
+import com.q.reminder.reminder.vo.DefinitionVo;
 import com.q.reminder.reminder.vo.FeatureListVo;
 import com.q.reminder.reminder.vo.SendVo;
+import com.q.reminder.reminder.vo.SheetVo;
 import lombok.extern.log4j.Log4j2;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -238,10 +241,11 @@ public class FeiShuApi {
 
 //        String view = getView(spreadsheetToken, sheetId, viewsId);
 //        createFilter(spreadsheetToken, sheetId, viewsId);
-        JSONObject valueRange = getRange(spreadsheetToken, range, secret);
-        List<FeatureListVo> featureList = getFeatureList(valueRange);
-        System.out.println(featureList);
-//        spredsheets(spreadsheetToken);
+//        JSONObject valueRange = getRange(spreadsheetToken, range, secret);
+//        List<FeatureListVo> featureList = getFeatureList(valueRange);
+//        System.out.println(featureList);
+        List<SheetVo> spredsheets = getSpredsheets(spreadsheetToken, secret);
+        System.out.println(spredsheets);
 //        updateRange(spreadsheetToken);
     }
 
@@ -249,13 +253,13 @@ public class FeiShuApi {
      * 获取单个范围
      *
      * @param spreadsheetToken
-     * @param range
+     * @param ranges
      * @param secret
      */
-    public static JSONObject getRange(String spreadsheetToken, String range, String secret) {
+    public static List<JSONObject> getRanges(String spreadsheetToken, String ranges, String secret) {
         OkHttpClient client = new OkHttpClient().newBuilder().build();
         Request request = new Request.Builder()
-                .url("https://open.feishu.cn/open-apis/sheets/v2/spreadsheets/" + spreadsheetToken + "/values/" + range + "?valueRenderOption=UnformattedValue&dateTimeRenderOption=FormattedString")
+                .url("https://open.feishu.cn/open-apis/sheets/v2/spreadsheets/" + spreadsheetToken + "/values_batch_get?ranges=" + ranges + "&valueRenderOption=UnformattedValue&dateTimeRenderOption=FormattedString")
                 .method("GET", null)
                 .addHeader("Authorization", secret)
                 .build();
@@ -263,7 +267,7 @@ public class FeiShuApi {
             Response response = client.newCall(request).execute();
             ResponseBody result = response.body();
             JSONObject resultJson = JSONObject.parseObject(result.string());
-            return resultJson.getJSONObject("data").getJSONObject("valueRange");
+            return resultJson.getJSONObject("data").getJSONArray("valueRanges").toJavaList(JSONObject.class, JSONReader.Feature.IgnoreNoneSerializable);
         } catch (IOException e) {
             log.error(e);
         }
@@ -272,22 +276,22 @@ public class FeiShuApi {
 
     /**
      * 获取featureId为空的需求列表
-     * @param valueRange
+     *
+     * @param cellList
+     * @param sheetId
      * @return
      */
-    public static List<FeatureListVo> getFeatureList(JSONObject valueRange) {
-        if (valueRange == null) {
+    public static List<FeatureListVo> getFeatureList(List<List<String>> cellList, String sheetId) {
+        if (CollectionUtils.isEmpty(cellList)) {
             log.info("飞书获取的需求列表为空!");
             return new ArrayList<>();
         }
-        String sheetId = valueRange.getString("range").split("!")[0];
-        List<List> cellList = valueRange.getJSONArray("values").toJavaList(List.class, JSONReader.Feature.TrimString);
-        Map<String, String> fieldsMap = fieldsMap();
+        Map<String, String> fieldsMap = fieldsFeatureMap();
         List<FeatureListVo> list = new ArrayList<>();
         for (int i = 1; i < cellList.size(); i++) {
             Map<String, String> map = new HashMap<>();
             for (int j = 0; j < cellList.get(i).size(); j++) {
-                Object k =  cellList.get(0).get(j);
+                Object k = cellList.get(0).get(j);
                 if (Objects.equals(k, null)) {
                     continue;
                 }
@@ -305,12 +309,34 @@ public class FeiShuApi {
                 continue;
             }
             if (StringUtils.isBlank(featureListVo.getFeatureId())) {
-                featureListVo.setFeatureId(sheetId + "!B" + (i + 1) + ":B"+ (i+1));
+                featureListVo.setFeatureId(sheetId + "!B" + (i + 1) + ":B" + (i + 1));
                 list.add(featureListVo);
             }
         }
         return list;
     }
+
+    /**
+     * 获取定义
+     *
+     * @param cellList
+     * @return
+     */
+    public static DefinitionVo getDefinitionList(List<List<String>> cellList) {
+        DefinitionVo vo = new DefinitionVo();
+        if (CollectionUtils.isEmpty(cellList)) {
+            log.info("飞书获取的定义为空!");
+            return vo;
+        }
+        Map<String, String> fieldsMap = fieldsDefinitionMap();
+        Map<String, String> map = new HashMap<>();
+        for (int i = 1; i < cellList.size(); i++) {
+            map.put(cellList.get(0).get(i), cellList.get(1).get(i));
+        }
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.convertValue(map, DefinitionVo.class);
+    }
+
 
     /**
      * 创建赛选视图
@@ -392,42 +418,49 @@ public class FeiShuApi {
     /**
      * 获取电子表格sheets
      */
-    public static void spredsheets(String spreadsheetToken) {
+    public static List<SheetVo> getSpredsheets(String spreadsheetToken, String secret) {
+        List<SheetVo> list = new ArrayList<>();
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
-        MediaType mediaType = MediaType.parse("");
         Request request = new Request.Builder()
                 .url("https://open.feishu.cn/open-apis/sheets/v3/spreadsheets/" + spreadsheetToken + "/sheets/query")
                 .method("GET", null)
-                .addHeader("Authorization", "Bearer " + bearer)
+                .addHeader("Authorization", secret)
                 .build();
         try {
             Response response = client.newCall(request).execute();
             String result = response.body().string();
             JSONArray sheets = JSONObject.parseObject(result).getJSONObject("data").getJSONArray("sheets");
             sheets.forEach(e -> {
+                SheetVo vo = new SheetVo();
                 JSONObject jsonObject = (JSONObject) e;
-                System.out.println(jsonObject.getString("sheet_id"));
-                System.out.println(jsonObject.getString("title"));
+                vo.setTitle(jsonObject.getString("title"));
+                vo.setSheetId(jsonObject.getString("sheet_id"));
+                list.add(vo);
             });
+            return list;
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return null;
     }
 
     /**
      * 更新单元格数据
      *
      * @param spreadsheetToken
+     * @param secret
+     * @param range
+     * @param value
      */
-    public static void updateRange(String spreadsheetToken) {
+    public static void updateRange(String spreadsheetToken, String secret, String range, String value) {
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         MediaType mediaType = MediaType.parse("application/json; charset=utf-8");
-        RequestBody body = RequestBody.create("{\"valueRange\":{\"range\": \"ZBTGux!B2:B2\",\n" +
+        RequestBody body = RequestBody.create("{\"valueRange\":{\"range\": \"" + range + "\",\n" +
                 "    \"values\": [\n" +
                 "      [\n" +
-                "        \"55555555555555555\"\n" +
+                "        \"" + value + "\"\n" +
                 "      ]\n" +
                 "    ]\n" +
                 "    }\n" +
@@ -435,12 +468,12 @@ public class FeiShuApi {
         Request request = new Request.Builder()
                 .url("https://open.feishu.cn/open-apis/sheets/v2/spreadsheets/" + spreadsheetToken + "/values")
                 .method("PUT", body)
-                .addHeader("Authorization", "Bearer " + bearer)
+                .addHeader("Authorization", secret)
                 .addHeader("Content-Type", "application/json")
                 .build();
         try {
             Response response = client.newCall(request).execute();
-            System.out.println(response.body().string());
+            log.info("更新单元格成功, " + response.body().string());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -451,7 +484,7 @@ public class FeiShuApi {
      *
      * @return
      */
-    public static Map<String, String> fieldsMap() {
+    private static Map<String, String> fieldsFeatureMap() {
         Map<String, String> map = new HashMap<>();
         map.put("RFQID", "rfqId");
         map.put("需求ID", "featureId");
@@ -472,5 +505,13 @@ public class FeiShuApi {
         return map;
     }
 
+    private static Map<String, String> fieldsDefinitionMap() {
+        Map<String, String> map = new HashMap<>();
+        map.put("产品接口人", "product");
+        map.put("应用端接口人", "application");
+        map.put("测试接口人", "test");
+        map.put("大数据接口人", "bigData");
+        return map;
+    }
 
 }
