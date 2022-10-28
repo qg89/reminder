@@ -58,7 +58,7 @@ public class SyncRedmineTaskHandle {
             String pId = e.getPId();
             String featureToken = e.getFeatureToken();
             String redmineUrl = e.getRedmineUrl();
-            String apiAccessKey = e.getApiAccessKey();
+            String apiAccessKey = e.getAccessKey();
             // 获取各项目中需求管理表中sheetId和sheet名称
             List<SheetVo> sheetList = FeiShuApi.getSpredsheets(featureToken, secret);
             StringBuilder ranges = new StringBuilder();

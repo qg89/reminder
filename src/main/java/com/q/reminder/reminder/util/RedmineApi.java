@@ -42,7 +42,7 @@ public class RedmineApi {
         List<QueryRedmineVo> allIssueList = new ArrayList<>();
         projectInfoList.forEach(p -> {
             String redmineUrl = p.getRedmineUrl();
-            RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, p.getApiAccessKey());
+            RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, p.getAccessKey());
             IssueManager issueManager = mgr.getIssueManager();
             try {
                 issueManager.getIssues(p.getPKey(), null).stream().filter(e -> {
@@ -82,7 +82,7 @@ public class RedmineApi {
     public static List<QueryRedmineVo> queryUpdateIssue(List<ProjectInfo> projectInfoList) {
         List<QueryRedmineVo> issues = new ArrayList<>();
         for (ProjectInfo project : projectInfoList) {
-            RedmineManager mgr = RedmineManagerFactory.createWithApiKey(project.getRedmineUrl(), project.getApiAccessKey());
+            RedmineManager mgr = RedmineManagerFactory.createWithApiKey(project.getRedmineUrl(), project.getAccessKey());
             Transport transport = mgr.getTransport();
             List<RequestParam> params = List.of(
                     new RequestParam("project_id", project.getPId()),
