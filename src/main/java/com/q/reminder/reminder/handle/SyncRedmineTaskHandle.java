@@ -39,10 +39,6 @@ public class SyncRedmineTaskHandle {
     private String appId;
     @Value("${app.secret}")
     private String appSecret;
-    @Value("${redmine-config.old_url}")
-    private String redmineOldUrl;
-    @Value("${redmine-config.api-access-key.saiko}")
-    private String apiAccessKeySaiko;
 
     @Autowired
     private ProjectInfoService projectInfoService;
@@ -61,6 +57,8 @@ public class SyncRedmineTaskHandle {
         projectInfos.forEach(e -> {
             String pId = e.getPId();
             String featureToken = e.getFeatureToken();
+            String redmineUrl = e.getRedmineUrl();
+            String apiAccessKey = e.getApiAccessKey();
             // 获取各项目中需求管理表中sheetId和sheet名称
             List<SheetVo> sheetList = FeiShuApi.getSpredsheets(featureToken, secret);
             StringBuilder ranges = new StringBuilder();
@@ -70,7 +68,7 @@ public class SyncRedmineTaskHandle {
                 String sheetId = sheetVo.getSheetId();
                 String title = sheetVo.getTitle();
                 if ("需求管理表".equals(title)) {
-                    featureRange = (sheetId + "!A1:AJ2000");
+                    featureRange = (sheetId + "!A1:AZ2000");
                     ranges.append(featureRange).append(",");
                     continue;
                 }
@@ -84,8 +82,8 @@ public class SyncRedmineTaskHandle {
             List<JSONObject> rangeList = FeiShuApi.getRanges(featureToken, ranges.toString(), secret);
             List<FeatureListVo> featureList = new ArrayList<>();
             DefinitionVo definition = new DefinitionVo();
-            definition.setRedmineUrl(redmineOldUrl);
-            definition.setApiAccessKey(apiAccessKeySaiko);
+            definition.setRedmineUrl(redmineUrl);
+            definition.setApiAccessKey(apiAccessKey);
             definition.setProjectId(Integer.valueOf(pId));
             for (JSONObject rangeJson : rangeList) {
                 String range = rangeJson.getString("range");
