@@ -1,6 +1,5 @@
 package com.q.reminder.reminder.handle;
 
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONArray;
@@ -13,9 +12,7 @@ import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.vo.QueryRedmineVo;
-import com.q.reminder.reminder.vo.QueryVo;
 import com.q.reminder.reminder.vo.SendVo;
-import com.taskadapter.redmineapi.bean.Issue;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +20,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -41,10 +40,6 @@ public class RedmineUpdateHandle {
     private String appId;
     @Value("${app.secret}")
     private String appSecret;
-    @Value("${redmine-config.old_url}")
-    private String redmineOldUrl;
-    @Value("${redmine-config.api-access-key.saiko}")
-    private String apiAccessKeySaiko;
 
     @Autowired
     private ProjectInfoService projectInfoService;
@@ -53,12 +48,8 @@ public class RedmineUpdateHandle {
 
     @Scheduled(cron = "0 0/10 * * * ?")
     public void redmineUpdate10() {
-        Set<String> projectIds = projectInfoService.list().stream().map(ProjectInfo::getPId).collect(Collectors.toSet());
-        QueryVo vo = new QueryVo();
-        vo.setProjects(projectIds);
-        vo.setApiAccessKey(apiAccessKeySaiko);
-        vo.setRedmineUrl(redmineOldUrl);
-        List<QueryRedmineVo> issues = RedmineApi.queryUpdateIssue(vo);
+        List<ProjectInfo> projectInfoList = projectInfoService.list();
+        List<QueryRedmineVo> issues = RedmineApi.queryUpdateIssue(projectInfoList);
         Map<String, List<QueryRedmineVo>> issueMap = issues.stream().filter(issue ->
                 DateUtil.between(issue.getUpdatedOn(), new Date(), DateUnit.MINUTE) <= 10
         ).collect(Collectors.groupingBy(QueryRedmineVo::getAssigneeName));
@@ -83,7 +74,7 @@ public class RedmineUpdateHandle {
                 subContentJsonArray.add(subject);
                 JSONObject a = new JSONObject();
                 a.put("tag", "a");
-                a.put("href", redmineOldUrl + "/issues/" + issue.getId());
+                a.put("href", issue.getRedmineUrl() + "/issues/" + issue.getId());
                 a.put("text", issue.getSubject());
                 subContentJsonArray.add(a);
                 contentJsonArray.add(subContentJsonArray);
