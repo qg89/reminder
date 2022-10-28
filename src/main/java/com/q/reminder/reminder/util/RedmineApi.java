@@ -57,7 +57,7 @@ public class RedmineApi {
                 }).collect(Collectors.toList());
                 allIssueList.addAll(issueList);
             } catch (RedmineException e) {
-                log.error("读取redmine异常");
+                log.error("Redmine-读取任务异常");
             }
         });
         return allIssueList;
@@ -89,7 +89,7 @@ public class RedmineApi {
                     issues.add(queryRedmineVo);
                 });
             } catch (RedmineException e) {
-                log.error("redmind 查询当天更新的任务异常");
+                log.error("Redmine-查询当天更新的任务异常");
             }
         }
         return issues;
@@ -112,10 +112,11 @@ public class RedmineApi {
         try {
             issueList = transport.getObjectsList(Issue.class, params);
         } catch (RedmineException e) {
-            log.error("[保存到redmine任务]异常 ", e);
+            log.error("Redmine-[保存评审问题任务]异常 ", e);
+            return;
         }
         if (issueList == null) {
-            log.info("[保存到redmine任务] 失败,未查询相关任务");
+            log.info("Redmine-[保存评审问题任务] 失败,未查询相关任务");
             return;
         }
         if (!issueList.isEmpty()) {
@@ -141,7 +142,7 @@ public class RedmineApi {
         try {
             issue.create();
         } catch (RedmineException e) {
-            log.error("创建redmine任务异常", e);
+            log.error("Redmine-创建评审问题任务异常", e);
         }
     }
 
@@ -185,7 +186,6 @@ public class RedmineApi {
                 return;
             }
 
-            vo.setFeatureId(featureId);
             List<CustomField> customFieldList = new ArrayList<>();
             CustomField customField = new CustomField().setName("需求ID").setId(5).setValue(featureId);
             customFieldList.add(customField);
@@ -208,13 +208,15 @@ public class RedmineApi {
                     .addCustomFields(customFieldList)
                     .setDescription(vo.getDesc());
             issue.setTransport(transport);
-            Issue newIssue = new Issue();
+            Issue newIssue = null;
             try {
                 newIssue = issue.create();
             } catch (RedmineException e) {
-                log.error("创建redmine任务异常", e);
+                log.error("Redmine-创建需求任务异常", e);
+                return;
             }
-            System.out.println(newIssue);
+            vo.setFeatureId(featureId);
+            log.info("Redmine-创建需求任务成功, redmineId: {}, 主题:[{}]", newIssue.getId(), redmineSubject);
         });
     }
 
@@ -233,11 +235,26 @@ public class RedmineApi {
         try {
             issueList = transport.getObjectsList(Issue.class, params);
         } catch (RedmineException e) {
-            log.error("[保存到redmine任务]异常 ", e);
+            log.error("Redmine-[保存任务]异常 ", e);
+            return false;
         }
         if (CollectionUtils.isEmpty(issueList)) {
             return false;
         }
         return true;
+    }
+
+    private void createSubTask(Integer assigneeId, Tracker tracker, Issue parentIssue, String subject) {
+        Issue issue = parentIssue
+                .setTracker(tracker)
+                .setAssigneeId(assigneeId)
+                .setSubject(subject + "-" + parentIssue.getSubject());
+        try {
+            issue.create();
+        } catch (RedmineException e) {
+            log.error("Redmine-创建{}子需求任务异常", subject);
+            return;
+        }
+        log.info("Redmine-创建{}}任务成功, redmineId: {}, 主题:[{}]", subject, issue.getId(), issue.getSubject());
     }
 }
