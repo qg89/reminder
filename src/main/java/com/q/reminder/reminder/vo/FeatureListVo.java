@@ -88,4 +88,8 @@ public class FeatureListVo implements Serializable {
      * 转测时间
      */
     private String testTime;
+    /**
+     * redmineId
+     */
+    private String redmineId;
 }

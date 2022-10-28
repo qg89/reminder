@@ -28,5 +28,12 @@ public class ProjectInfo implements Serializable {
      */
     private String isSendGroup;
 
+    /**
+     * 飞书群ID
+     */
     private String sendGroupChatId;
+    /**
+     * 产品经理飞书ID
+     */
+    private String productMemberId;
 }

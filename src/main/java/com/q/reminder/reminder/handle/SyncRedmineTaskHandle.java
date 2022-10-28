@@ -12,6 +12,7 @@ import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.vo.DefinitionVo;
 import com.q.reminder.reminder.vo.FeatureListVo;
+import com.q.reminder.reminder.vo.QueryRedmineVo;
 import com.q.reminder.reminder.vo.SheetVo;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -54,16 +57,20 @@ public class SyncRedmineTaskHandle {
         Map<String, Integer> redmineUserMap = redmineUserInfoService.list(Wrappers.<RedmineUserInfo>lambdaQuery().isNotNull(RedmineUserInfo::getAssigneeName)).stream().collect(Collectors.toMap(e -> e.getAssigneeName().replace(" ", ""), RedmineUserInfo::getAssigneeId));
 
         String secret = FeiShuApi.getSecret(appId, appSecret);
-        projectInfos.forEach(e -> {
-            String pId = e.getPId();
-            String featureToken = e.getFeatureToken();
-            String redmineUrl = e.getRedmineUrl();
-            String apiAccessKey = e.getAccessKey();
+        projectInfos.forEach(projectInfo -> {
+            String pId = projectInfo.getPId();
+            String featureToken = projectInfo.getFeatureToken();
+            String redmineUrl = projectInfo.getRedmineUrl();
+            String apiAccessKey = projectInfo.getAccessKey();
             // 获取各项目中需求管理表中sheetId和sheet名称
             List<SheetVo> sheetList = FeiShuApi.getSpredsheets(featureToken, secret);
             StringBuilder ranges = new StringBuilder();
             String featureRange = "";
             String definitionRange = "";
+            DefinitionVo definition = new DefinitionVo();
+            definition.setApiAccessKey(apiAccessKey);
+            definition.setRedmineUrl(redmineUrl);
+            definition.setProjectId(Integer.valueOf(pId));
             for (SheetVo sheetVo : sheetList) {
                 String sheetId = sheetVo.getSheetId();
                 String title = sheetVo.getTitle();
@@ -77,14 +84,10 @@ public class SyncRedmineTaskHandle {
                     ranges.append(definitionRange);
                 }
             }
-
             // 获取飞书文档中需求ID为空的数据
             List<JSONObject> rangeList = FeiShuApi.getRanges(featureToken, ranges.toString(), secret);
             List<FeatureListVo> featureList = new ArrayList<>();
-            DefinitionVo definition = new DefinitionVo();
-            definition.setRedmineUrl(redmineUrl);
-            definition.setApiAccessKey(apiAccessKey);
-            definition.setProjectId(Integer.valueOf(pId));
+
             for (JSONObject rangeJson : rangeList) {
                 String range = rangeJson.getString("range");
                 JSONArray valuesJson = rangeJson.getJSONArray("values");
@@ -101,6 +104,7 @@ public class SyncRedmineTaskHandle {
             // 构建redmine发送任务的实体集合
             RedmineApi.createTask(featureList, definition, redmineUserMap);
 
+            List<QueryRedmineVo> redmineVos = new ArrayList<>();
             featureList.forEach(feature -> {
                 String featureId = feature.getFeatureId();
                 String range = feature.getRange();
@@ -108,9 +112,46 @@ public class SyncRedmineTaskHandle {
                     log.info("该任务已存在,不再重新新增任务");
                     return;
                 }
+                QueryRedmineVo vo = new QueryRedmineVo();
+                vo.setRedmineId(feature.getRedmineId());
+                vo.setSubject(feature.getRedmineSubject());
+                redmineVos.add(vo);
                 // 同步更新需求管理表featureId
                 FeiShuApi.updateRange(featureToken, secret, range, featureId);
             });
+
+            String isSendGroup = projectInfo.getIsSendGroup();
+            if ("0".equals(isSendGroup) && !CollectionUtils.isEmpty(redmineVos)) {
+                String sendGroupChatId = projectInfo.getSendGroupChatId();
+                String productMemberId = projectInfo.getProductMemberId();
+                JSONObject content = new JSONObject();
+                JSONObject all = new JSONObject();
+                all.put("title", "新增需求如下:");
+                JSONArray contentJsonArray = new JSONArray();
+                JSONArray subContentJsonArray = new JSONArray();
+                JSONObject at = new JSONObject();
+                at.put("tag", "at");
+                at.put("user_id", productMemberId);
+                at.put("user_name", definition.getProduct());
+                subContentJsonArray.add(at);
+
+                for (QueryRedmineVo redmineVo : redmineVos) {
+                    JSONObject a = new JSONObject();
+                    a.put("tag", "a");
+                    a.put("href", redmineUrl + "/issues/" + redmineVo.getRedmineId());
+                    a.put("text", "\r\n" + redmineVo.getSubject());
+                    subContentJsonArray.add(a);
+                }
+
+                contentJsonArray.add(subContentJsonArray);
+                all.put("content", contentJsonArray);
+                content.put("zh_cn", all);
+                try {
+                    FeiShuApi.sendGroupByChats(sendGroupChatId, content.toJSONString(), secret);
+                } catch (IOException e) {
+                    log.error("发送飞书需求群异常");
+                }
+            }
         });
     }
 }
