@@ -2,6 +2,7 @@ package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.vo.*;
 import com.taskadapter.redmineapi.IssueManager;
 import com.taskadapter.redmineapi.RedmineException;
@@ -33,19 +34,18 @@ public class RedmineApi {
     /**
      * 通过项目读取redmine过期任务,只包含打开的状态
      *
-     * @param vo
+     * @param projectInfoList
      * @return 按指派人员返回问题列表
      */
-    public static List<Issue> queryUserByExpiredDayList(QueryVo vo) {
+    public static List<Issue> queryUserByExpiredDayList(QueryVo vo, List<ProjectInfo> projectInfoList) {
         List<String> noneStatusList = vo.getNoneStatusList();
         Integer expiredDay = vo.getExpiredDay();
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(vo.getRedmineUrl(), vo.getApiAccessKey());
-        IssueManager issueManager = mgr.getIssueManager();
         List<Issue> allIssueList = new ArrayList<>();
-        Set<String> projects = vo.getProjects();
-        projects.forEach(p -> {
+        projectInfoList.forEach(p -> {
+            RedmineManager mgr = RedmineManagerFactory.createWithApiKey(p.getRedmineUrl(), p.getApiAccessKey());
+            IssueManager issueManager = mgr.getIssueManager();
             try {
-                List<Issue> issues = issueManager.getIssues(p, null);
+                List<Issue> issues = issueManager.getIssues(p.getPKey(), null);
                 List<Issue> issueList = issues.stream().filter(e -> {
                     Date dueDate = e.getDueDate();
                     boolean filter = dueDate != null && new DateTime().minusDays(expiredDay).isAfter(new DateTime(dueDate)) && StringUtils.isNotBlank(e.getAssigneeName());
@@ -66,16 +66,16 @@ public class RedmineApi {
     /**
      * 查询redmine当天修改的任务，所有状态
      *
-     * @param vo
+     * @param projectInfoList
      * @return
      */
-    public static List<QueryRedmineVo> queryUpdateIssue(QueryVo vo) {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(vo.getRedmineUrl(), vo.getApiAccessKey());
-        Transport transport = mgr.getTransport();
+    public static List<QueryRedmineVo> queryUpdateIssue(List<ProjectInfo> projectInfoList) {
         List<QueryRedmineVo> issues = new ArrayList<>();
-        for (String project : vo.getProjects()) {
+        for (ProjectInfo project : projectInfoList) {
+            RedmineManager mgr = RedmineManagerFactory.createWithApiKey(project.getRedmineUrl(), project.getApiAccessKey());
+            Transport transport = mgr.getTransport();
             List<RequestParam> params = List.of(
-                    new RequestParam("project_id", project),
+                    new RequestParam("project_id", project.getPId()),
                     new RequestParam("status_id", "*"),
                     new RequestParam("assigned_to_id", "*"),
                     new RequestParam("updated_on", DateUtil.today()));
@@ -86,6 +86,7 @@ public class RedmineApi {
                     queryRedmineVo.setSubject(e.getSubject());
                     queryRedmineVo.setId(e.getId() + "");
                     queryRedmineVo.setAssigneeName(e.getAssigneeName().replace(" ", ""));
+                    queryRedmineVo.setRedmineUrl(project.getRedmineUrl());
                     issues.add(queryRedmineVo);
                 });
             } catch (RedmineException e) {
@@ -244,17 +245,24 @@ public class RedmineApi {
         return true;
     }
 
-    private void createSubTask(Integer assigneeId, Tracker tracker, Issue parentIssue, String subject) {
+    /**
+     *
+     * @param assigneeId
+     * @param tracker
+     * @param parentIssue
+     * @param type
+     */
+    private void createSubTask(Integer assigneeId, Tracker tracker, Issue parentIssue, String type) {
         Issue issue = parentIssue
                 .setTracker(tracker)
                 .setAssigneeId(assigneeId)
-                .setSubject(subject + "-" + parentIssue.getSubject());
+                .setSubject(type + "-" + parentIssue.getSubject());
         try {
             issue.create();
         } catch (RedmineException e) {
-            log.error("Redmine-创建{}子需求任务异常", subject);
+            log.error("Redmine-创建{}子需求任务异常", type);
             return;
         }
-        log.info("Redmine-创建{}}任务成功, redmineId: {}, 主题:[{}]", subject, issue.getId(), issue.getSubject());
+        log.info("Redmine-创建{}}任务成功, redmineId: {}, 主题:[{}]", type, issue.getId(), issue.getSubject());
     }
 }
