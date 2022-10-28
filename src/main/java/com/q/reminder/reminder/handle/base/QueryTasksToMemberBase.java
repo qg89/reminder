@@ -51,8 +51,6 @@ public class QueryTasksToMemberBase {
     private String appSecret;
     @Value("${redmine-config.old_url}")
     private String redmineOldUrl;
-    @Value("${redmine-config.api-access-key.saiko}")
-    private String apiAccessKeySaiko;
 
 
     /**
@@ -71,16 +69,12 @@ public class QueryTasksToMemberBase {
 
         // 组装数据， 通过人员，获取要发送的内容
         List<ProjectInfo> projectInfoList = projectInfoService.list();
-        Set<String> projectIds = projectInfoList.stream().map(ProjectInfo::getPKey).collect(Collectors.toSet());
 
         QueryVo vo = new QueryVo();
-        vo.setProjects(projectIds);
         vo.setNoneStatusList(noneStatusList);
-        vo.setApiAccessKey(apiAccessKeySaiko);
-        vo.setRedmineUrl(redmineOldUrl);
         vo.setExpiredDay(expiredDay);
         vo.setContainsStatus(contentStatus);
-        Map<String, List<Issue>> listMap = RedmineApi.queryUserByExpiredDayList(vo).stream().collect(Collectors.groupingBy(Issue::getAssigneeName));
+        Map<String, List<Issue>> listMap = RedmineApi.queryUserByExpiredDayList(vo, projectInfoList).stream().collect(Collectors.groupingBy(Issue::getAssigneeName));
         if (CollectionUtils.isEmpty(listMap)) {
             contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append("\r\n");
             contentAll.append("执行完成!");
