@@ -29,6 +29,10 @@ public class FeatureListVo implements Serializable {
      */
     private String featureId;
     /**
+     * 是否等级redmine
+     */
+    private String isRedmine;
+    /**
      * 模块
      */
     private String module;

@@ -13,14 +13,20 @@ import java.io.Serializable;
  * @date :  2022.09.27 13:56
  */
 @Data
-@TableName("project_info")
+@TableName("r_project_info")
 public class ProjectInfo implements Serializable {
 
-    private static final long serialVersionUID = 6718764047088702656L;
+    private static final long serialVersionUID = 6061440968825915105L;
     private String pId;
     private String pKey;
     private String pName;
     private String featureToken;
     private String redmineUrl;
     private String accessKey;
+    /**
+     * 是否发送需求群
+     */
+    private String isSendGroup;
+
+    private String sendGroupChatId;
 }

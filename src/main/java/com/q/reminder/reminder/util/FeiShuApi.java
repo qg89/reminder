@@ -307,10 +307,7 @@ public class FeiShuApi {
             }
             ObjectMapper objectMapper = new ObjectMapper();
             FeatureListVo featureListVo = objectMapper.convertValue(map, FeatureListVo.class);
-            if (StringUtils.isBlank(featureListVo.getRfqId())) {
-                continue;
-            }
-            if (StringUtils.isBlank(featureListVo.getFeatureId())) {
+            if ("是".equals(featureListVo.getIsRedmine()) && StringUtils.isBlank(featureListVo.getFeatureId())) {
                 featureListVo.setRange(sheetId + "!B" + (i + 1) + ":B" + (i + 1));
                 list.add(featureListVo);
             }
@@ -503,6 +500,7 @@ public class FeiShuApi {
     private static Map<String, String> fieldsFeatureMap() {
         Map<String, String> map = new HashMap<>();
         map.put("RFQID", "rfqId");
+        map.put("登记Redmine", "isRedmine");
         map.put("需求ID", "featureId");
         map.put("模块", "module");
         map.put("里程碑", "milestone");
