@@ -121,9 +121,9 @@ public class SyncRedmineTaskHandle {
             });
 
             String isSendGroup = projectInfo.getIsSendGroup();
-            if ("0".equals(isSendGroup) && !CollectionUtils.isEmpty(redmineVos)) {
-                String sendGroupChatId = projectInfo.getSendGroupChatId();
-                String productMemberId = projectInfo.getProductMemberId();
+            String sendGroupChatId = projectInfo.getSendGroupChatId();
+            String productMemberId = projectInfo.getProductMemberId();
+            if ("0".equals(isSendGroup) && StringUtils.isNotBlank(sendGroupChatId) && StringUtils.isNotBlank(productMemberId) && !CollectionUtils.isEmpty(redmineVos)) {
                 JSONObject content = new JSONObject();
                 JSONObject all = new JSONObject();
                 all.put("title", "新增需求如下:");
