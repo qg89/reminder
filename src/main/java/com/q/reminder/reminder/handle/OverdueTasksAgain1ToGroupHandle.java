@@ -8,7 +8,6 @@ import com.q.reminder.reminder.service.NoneStatusService;
 import com.q.reminder.reminder.vo.QueryVo;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -35,11 +34,6 @@ public class OverdueTasksAgain1ToGroupHandle {
     @Autowired
     private HoldayBase holdayBase;
 
-    @Value("${redmine-config.old_url}")
-    private String redmineOldUrl;
-    @Value("${redmine-config.api-access-key.saiko}")
-    private String apiAccessKeySaiko;
-
     @Scheduled(cron = "0 30 9 * * ?")
     public void query() {
         if (holdayBase.queryHoliday()) {
@@ -53,8 +47,6 @@ public class OverdueTasksAgain1ToGroupHandle {
         Map<String, List<NoneStatus>> statusMap = noneStatusList.stream().collect(Collectors.groupingBy(e -> String.valueOf(e.getExpiredDays())));
 
         QueryVo vo = new QueryVo();
-        vo.setApiAccessKey(apiAccessKeySaiko);
-        vo.setRedmineUrl(redmineOldUrl);
         vo.setExpiredDay(1);
         vo.setContainsStatus(Boolean.FALSE);
         if (statusMap.containsKey("1")) {

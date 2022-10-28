@@ -19,7 +19,6 @@ import org.joda.time.DateTime;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author : saiko
@@ -37,16 +36,16 @@ public class RedmineApi {
      * @param projectInfoList
      * @return 按指派人员返回问题列表
      */
-    public static List<Issue> queryUserByExpiredDayList(QueryVo vo, List<ProjectInfo> projectInfoList) {
+    public static List<QueryRedmineVo> queryUserByExpiredDayList(QueryVo vo, List<ProjectInfo> projectInfoList) {
         List<String> noneStatusList = vo.getNoneStatusList();
         Integer expiredDay = vo.getExpiredDay();
-        List<Issue> allIssueList = new ArrayList<>();
+        List<QueryRedmineVo> allIssueList = new ArrayList<>();
         projectInfoList.forEach(p -> {
-            RedmineManager mgr = RedmineManagerFactory.createWithApiKey(p.getRedmineUrl(), p.getApiAccessKey());
+            String redmineUrl = p.getRedmineUrl();
+            RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, p.getApiAccessKey());
             IssueManager issueManager = mgr.getIssueManager();
             try {
-                List<Issue> issues = issueManager.getIssues(p.getPKey(), null);
-                List<Issue> issueList = issues.stream().filter(e -> {
+                issueManager.getIssues(p.getPKey(), null).stream().filter(e -> {
                     Date dueDate = e.getDueDate();
                     boolean filter = dueDate != null && new DateTime().minusDays(expiredDay).isAfter(new DateTime(dueDate)) && StringUtils.isNotBlank(e.getAssigneeName());
                     if (vo.getContainsStatus()) {
@@ -54,8 +53,19 @@ public class RedmineApi {
                     } else {
                         return filter && !noneStatusList.contains(e.getStatusName());
                     }
-                }).collect(Collectors.toList());
-                allIssueList.addAll(issueList);
+                }).forEach(e -> {
+                    QueryRedmineVo queryRedmineVo = new QueryRedmineVo();
+                    queryRedmineVo.setDueDate(e.getDueDate());
+                    queryRedmineVo.setSubject(e.getSubject());
+                    queryRedmineVo.setRedmineUrl(redmineUrl);
+                    queryRedmineVo.setUpdatedOn(e.getUpdatedOn());
+                    queryRedmineVo.setRedmineId(String.valueOf(e.getId()));
+                    queryRedmineVo.setAssigneeName(e.getAssigneeName());
+                    queryRedmineVo.setStatusName(e.getStatusName());
+                    queryRedmineVo.setAssigneeId(String.valueOf(e.getAssigneeId()));
+                    queryRedmineVo.setProjectName(e.getProjectName());
+                    allIssueList.add(queryRedmineVo);
+                });
             } catch (RedmineException e) {
                 log.error("Redmine-读取任务异常");
             }
@@ -84,7 +94,7 @@ public class RedmineApi {
                     QueryRedmineVo queryRedmineVo = new QueryRedmineVo();
                     queryRedmineVo.setUpdatedOn(e.getUpdatedOn());
                     queryRedmineVo.setSubject(e.getSubject());
-                    queryRedmineVo.setId(e.getId() + "");
+                    queryRedmineVo.setRedmineId(e.getId() + "");
                     queryRedmineVo.setAssigneeName(e.getAssigneeName().replace(" ", ""));
                     queryRedmineVo.setRedmineUrl(project.getRedmineUrl());
                     issues.add(queryRedmineVo);

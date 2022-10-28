@@ -7,12 +7,15 @@ import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
-import com.q.reminder.reminder.service.*;
+import com.q.reminder.reminder.service.AdminInfoService;
+import com.q.reminder.reminder.service.OverdueTaskHistoryService;
+import com.q.reminder.reminder.service.ProjectInfoService;
+import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
+import com.q.reminder.reminder.vo.QueryRedmineVo;
 import com.q.reminder.reminder.vo.QueryVo;
 import com.q.reminder.reminder.vo.SendVo;
-import com.taskadapter.redmineapi.bean.Issue;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -23,6 +26,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -49,8 +53,6 @@ public class QueryTasksToMemberBase {
     private String appId;
     @Value("${app.secret}")
     private String appSecret;
-    @Value("${redmine-config.old_url}")
-    private String redmineOldUrl;
 
 
     /**
@@ -74,7 +76,7 @@ public class QueryTasksToMemberBase {
         vo.setNoneStatusList(noneStatusList);
         vo.setExpiredDay(expiredDay);
         vo.setContainsStatus(contentStatus);
-        Map<String, List<Issue>> listMap = RedmineApi.queryUserByExpiredDayList(vo, projectInfoList).stream().collect(Collectors.groupingBy(Issue::getAssigneeName));
+        Map<String, List<QueryRedmineVo>> listMap = RedmineApi.queryUserByExpiredDayList(vo, projectInfoList).stream().collect(Collectors.groupingBy(QueryRedmineVo::getAssigneeName));
         if (CollectionUtils.isEmpty(listMap)) {
             contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append("\r\n");
             contentAll.append("执行完成!");
@@ -93,10 +95,17 @@ public class QueryTasksToMemberBase {
             all.put("title", "【过期任务提醒 (" + DateTime.now().toString("yyyy-MM-dd") + ")】");
             JSONArray contentJsonArray = new JSONArray();
             all.put("content", contentJsonArray);
+            String redmineUrl = "";
 
             String name = assigneeName.replace(" ", "");
-            issueList.forEach(issue -> {
-                Integer id = issue.getId();
+            for (QueryRedmineVo issue : issueList) {
+                String redmineId = issue.getRedmineId();
+                String issueSubject = issue.getSubject();
+                String statusName = issue.getStatusName();
+                Date dueDate1 = issue.getDueDate();
+                String projectName = issue.getProjectName();
+                Date updatedOn = issue.getUpdatedOn();
+                redmineUrl = issue.getRedmineUrl();
                 OverdueTaskHistory history = new OverdueTaskHistory();
 
                 JSONArray subContentJsonObject = new JSONArray();
@@ -107,13 +116,13 @@ public class QueryTasksToMemberBase {
 
                 JSONObject a = new JSONObject();
                 a.put("tag", "a");
-                a.put("href", redmineOldUrl + "/issues/" + id);
-                a.put("text", issue.getSubject());
+                a.put("href", redmineUrl + "/issues/" + redmineId);
+                a.put("text", issueSubject);
                 subContentJsonObject.add(a);
 
                 JSONObject task = new JSONObject();
                 task.put("tag", "text");
-                task.put("text", "\r\n当前任务状态: " + issue.getStatusName());
+                task.put("text", "\r\n当前任务状态: " + statusName);
                 subContentJsonObject.add(task);
 
                 JSONObject assignee = new JSONObject();
@@ -123,21 +132,21 @@ public class QueryTasksToMemberBase {
 
                 JSONObject dueDate = new JSONObject();
                 dueDate.put("tag", "text");
-                dueDate.put("text", "\r\n计划完成日期: " + new DateTime(issue.getDueDate()).toString("yyyy-MM-dd"));
+                dueDate.put("text", "\r\n计划完成日期: " + new DateTime(dueDate1).toString("yyyy-MM-dd"));
                 subContentJsonObject.add(dueDate);
 
                 history.setAssigneeName(name);
-                history.setProjectName(issue.getProjectName());
-                history.setSubjectName(issue.getSubject());
-                history.setRedmineId(id);
-                history.setLastUpdateTime(issue.getUpdatedOn());
+                history.setProjectName(projectName);
+                history.setSubjectName(issueSubject);
+                history.setRedmineId(Integer.valueOf(redmineId));
+                history.setLastUpdateTime(updatedOn);
                 historys.add(history);
                 contentJsonArray.add(subContentJsonObject);
-            });
+            }
             JSONArray subContentJsonArray = new JSONArray();
             JSONObject myTask = new JSONObject();
             myTask.put("tag", "a");
-            myTask.put("href", redmineOldUrl + "/issues?assigned_to_id=me&set_filter=1&sort=priority%3Adesc%2Cupdated_on%3Adesc");
+            myTask.put("href", redmineUrl + "/issues?assigned_to_id=me&set_filter=1&sort=priority%3Adesc%2Cupdated_on%3Adesc");
             myTask.put("text", "点击查看指派给我的任务");
             subContentJsonArray.add(myTask);
             contentJsonArray.add(subContentJsonArray);

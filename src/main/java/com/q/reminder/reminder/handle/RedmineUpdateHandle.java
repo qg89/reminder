@@ -74,7 +74,7 @@ public class RedmineUpdateHandle {
                 subContentJsonArray.add(subject);
                 JSONObject a = new JSONObject();
                 a.put("tag", "a");
-                a.put("href", issue.getRedmineUrl() + "/issues/" + issue.getId());
+                a.put("href", issue.getRedmineUrl() + "/issues/" + issue.getRedmineId());
                 a.put("text", issue.getSubject());
                 subContentJsonArray.add(a);
                 contentJsonArray.add(subContentJsonArray);

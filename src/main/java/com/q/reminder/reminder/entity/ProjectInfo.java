@@ -21,4 +21,6 @@ public class ProjectInfo implements Serializable {
     private String pKey;
     private String pName;
     private String featureToken;
+    private String redmineUrl;
+    private String apiAccessKey;
 }

@@ -5,15 +5,14 @@ import com.alibaba.fastjson2.JSONObject;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
-import com.q.reminder.reminder.service.GroupInfoService;
 import com.q.reminder.reminder.service.OverdueTaskHistoryService;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
+import com.q.reminder.reminder.vo.QueryRedmineVo;
 import com.q.reminder.reminder.vo.QueryVo;
 import com.q.reminder.reminder.vo.SendUserByGroupVo;
-import com.taskadapter.redmineapi.bean.Issue;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +39,6 @@ public class OverdueTasksAgainToGroupBase {
     private String appId;
     @Value("${app.secret}")
     private String appSecret;
-    @Value("${redmine-config.old_url}")
-    private String redmineOldUrl;
 
 
     @Autowired
@@ -50,8 +47,6 @@ public class OverdueTasksAgainToGroupBase {
     private ProjectInfoService projectInfoService;
     @Autowired
     private OverdueTaskHistoryService overdueTaskHistoryService;
-    @Autowired
-    private GroupInfoService groupInfoService;
 
     /**
      * 无任务提醒
@@ -77,8 +72,8 @@ public class OverdueTasksAgainToGroupBase {
         String redminderType = vo.getRedminderType();
         String secret = FeiShuApi.getSecret(appId, appSecret);
         // 组装数据， 通过人员，获取要发送的内容
-        vo.setProjects(projectInfoService.list().stream().map(ProjectInfo::getPKey).collect(Collectors.toSet()));
-        List<Issue> issueUserList = RedmineApi.queryUserByExpiredDayList(vo);
+        List<ProjectInfo> projectInfoList = projectInfoService.list();
+        List<QueryRedmineVo> issueUserList = RedmineApi.queryUserByExpiredDayList(vo, projectInfoList);
 
         // 查询要群对应的人员信息
         List<SendUserByGroupVo> sendUserByGroupVoList = userMemberService.queryUserGroupList();
@@ -90,12 +85,12 @@ public class OverdueTasksAgainToGroupBase {
         JSONArray contentJsonArray = new JSONArray();
         if (!overdueTask) {
             // 处理不在群内的成员
-            issueUserList.removeIf(e -> !sendUsers.contains(String.valueOf(e.getAssigneeId())));
+            issueUserList.removeIf(e -> !sendUsers.contains(e.getAssigneeId()));
             if (issueUserList.isEmpty()) {
                 log.info("群发送,过期任务人员为空!");
                 overdueTask = true;
             } else {
-                contentJsonArray = extracted(issueUserList.stream().collect(Collectors.groupingBy(Issue::getAssigneeName)), historys);
+                contentJsonArray = extracted(issueUserList.stream().collect(Collectors.groupingBy(QueryRedmineVo::getAssigneeName)), historys);
             }
         }
 
@@ -132,10 +127,11 @@ public class OverdueTasksAgainToGroupBase {
 
     /**
      * 发送消息组装数据
-     *  @param listMap
+     *
+     * @param listMap
      * @param historys
      */
-    private JSONArray extracted(Map<String, List<Issue>> listMap, List<OverdueTaskHistory> historys) {
+    private JSONArray extracted(Map<String, List<QueryRedmineVo>> listMap, List<OverdueTaskHistory> historys) {
         // 通过人员查看对应redmine人员关系，并返回redmine姓名和飞书member_id关系
         List<UserMemgerInfo> list = userMemberService.list();
         Map<String, String> memberIds = list.stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
@@ -153,24 +149,18 @@ public class OverdueTasksAgainToGroupBase {
             taskSizeJson.put("tag", "text");
             taskSizeJson.put("text", " 过期任务数量:【" + issueList.size() + "】 ==> ");
             atjsonArray.add(taskSizeJson);
-            JSONObject myTask = new JSONObject();
-            myTask.put("tag", "a");
-            myTask.put("href", redmineOldUrl + "/issues?assigned_to_id=me&set_filter=1&sort=priority%3Adesc%2Cupdated_on%3Adesc");
-            myTask.put("text", "查看指派给我的任务");
-            atjsonArray.add(myTask);
-
-            contentJsonArray.add(atjsonArray);
-
-            for (Issue issue : issueList) {
-                Integer id = issue.getId();
+            String redmineUrl = "";
+            for (QueryRedmineVo issue : issueList) {
+                String id = issue.getRedmineId();
                 String subject = issue.getSubject();
                 Date updatedOn = issue.getUpdatedOn();
                 String projectName = issue.getProjectName();
+                redmineUrl = issue.getRedmineUrl();
                 JSONArray subContentJsonArray = new JSONArray();
 
                 JSONObject a = new JSONObject();
                 a.put("tag", "a");
-                a.put("href", redmineOldUrl + "/issues/" + id);
+                a.put("href", redmineUrl + "/issues/" + id);
                 a.put("text", subject);
                 subContentJsonArray.add(a);
 
@@ -184,11 +174,18 @@ public class OverdueTasksAgainToGroupBase {
                 history.setAssigneeName(name);
                 history.setProjectName(projectName);
                 history.setSubjectName(subject);
-                history.setRedmineId(id);
+                history.setRedmineId(Integer.valueOf(id));
                 history.setLastUpdateTime(updatedOn);
                 history.setType("1");
                 historys.add(history);
             }
+            JSONObject myTask = new JSONObject();
+            myTask.put("tag", "a");
+            myTask.put("href", redmineUrl + "/issues?assigned_to_id=me&set_filter=1&sort=priority%3Adesc%2Cupdated_on%3Adesc");
+            myTask.put("text", "查看指派给我的任务");
+            atjsonArray.add(myTask);
+
+            contentJsonArray.add(atjsonArray);
 
             JSONArray subNoneContentJsonObject = new JSONArray();
             JSONObject line = new JSONObject();

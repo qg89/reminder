@@ -16,8 +16,13 @@ import java.util.Date;
 public class QueryRedmineVo implements Serializable {
 
     private static final long serialVersionUID = -3624229091490386847L;
-    private String id;
+    private String redmineId;
     private String subject;
+    private String statusName;
+    private String projectName;
     private Date updatedOn;
+    private Date dueDate;
+    private String assigneeId;
     private String assigneeName;
+    private String redmineUrl;
 }
