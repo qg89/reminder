@@ -150,13 +150,13 @@ public class OverdueTasksAgainToGroupBase {
             taskSizeJson.put("text", " 过期任务数量:【" + issueList.size() + "】 ==> ");
             atjsonArray.add(taskSizeJson);
             String redmineUrl = "";
+            JSONArray subContentJsonArray = new JSONArray();
             for (QueryRedmineVo issue : issueList) {
                 String id = issue.getRedmineId();
                 String subject = issue.getSubject();
                 Date updatedOn = issue.getUpdatedOn();
                 String projectName = issue.getProjectName();
                 redmineUrl = issue.getRedmineUrl();
-                JSONArray subContentJsonArray = new JSONArray();
 
                 JSONObject a = new JSONObject();
                 a.put("tag", "a");
@@ -168,7 +168,6 @@ public class OverdueTasksAgainToGroupBase {
                 noneLine.put("tag", "text");
                 noneLine.put("text", "\r\n\t");
                 subContentJsonArray.add(noneLine);
-                contentJsonArray.add(subContentJsonArray);
 
                 OverdueTaskHistory history = new OverdueTaskHistory();
                 history.setAssigneeName(name);
@@ -186,6 +185,7 @@ public class OverdueTasksAgainToGroupBase {
             atjsonArray.add(myTask);
 
             contentJsonArray.add(atjsonArray);
+            contentJsonArray.add(subContentJsonArray);
 
             JSONArray subNoneContentJsonObject = new JSONArray();
             JSONObject line = new JSONObject();
