@@ -147,7 +147,7 @@ public class OverdueTasksAgainToGroupBase {
 
             JSONObject taskSizeJson = new JSONObject();
             taskSizeJson.put("tag", "text");
-            taskSizeJson.put("text", " 过期任务数量:【" + issueList.size() + "】 ==> ");
+            taskSizeJson.put("text", " 过期任务数量:【" + issueList.size() + "】");
             atjsonArray.add(taskSizeJson);
             String redmineUrl = "";
             JSONArray subContentJsonArray = new JSONArray();
@@ -161,13 +161,13 @@ public class OverdueTasksAgainToGroupBase {
                 JSONObject a = new JSONObject();
                 a.put("tag", "a");
                 a.put("href", redmineUrl + "/issues/" + id);
-                a.put("text", subject);
+                a.put("text", "\r\n\t" + subject);
                 subContentJsonArray.add(a);
 
-                JSONObject noneLine = new JSONObject();
-                noneLine.put("tag", "text");
-                noneLine.put("text", "\r\n\t");
-                subContentJsonArray.add(noneLine);
+//                JSONObject noneLine = new JSONObject();
+//                noneLine.put("tag", "text");
+//                noneLine.put("text", "\r\n");
+//                subContentJsonArray.add(noneLine);
 
                 OverdueTaskHistory history = new OverdueTaskHistory();
                 history.setAssigneeName(name);
@@ -178,11 +178,6 @@ public class OverdueTasksAgainToGroupBase {
                 history.setType("1");
                 historys.add(history);
             }
-            JSONObject myTask = new JSONObject();
-            myTask.put("tag", "a");
-            myTask.put("href", redmineUrl + "/issues?assigned_to_id=me&set_filter=1&sort=priority%3Adesc%2Cupdated_on%3Adesc");
-            myTask.put("text", "查看指派给我的任务");
-            atjsonArray.add(myTask);
 
             contentJsonArray.add(atjsonArray);
             contentJsonArray.add(subContentJsonArray);
@@ -190,8 +185,13 @@ public class OverdueTasksAgainToGroupBase {
             JSONArray subNoneContentJsonObject = new JSONArray();
             JSONObject line = new JSONObject();
             line.put("tag", "text");
-            line.put("text", "\r------------------------------------------------");
+            line.put("text", "\r\n———————————————————————————————————————————————————");
             subNoneContentJsonObject.add(line);
+            JSONObject myTask = new JSONObject();
+            myTask.put("tag", "a");
+            myTask.put("href", redmineUrl + "/issues?assigned_to_id=me&set_filter=1&sort=priority%3Adesc%2Cupdated_on%3Adesc");
+            myTask.put("text", "\r\n查看指派给我的任务");
+            subNoneContentJsonObject.add(myTask);
             contentJsonArray.add(subNoneContentJsonObject);
         });
         return contentJsonArray;
