@@ -169,13 +169,13 @@ public class QueryTasksToMemberBase {
             try {
                 FeiShuApi.sendPost(v, authorization, contentAll);
             } catch (IOException e) {
-                FeiShuApi.sendAdmin(adminInfoList, "任务保存历史记录失败", authorization);
+                FeiShuApi.sendAdmin(adminInfoList, "发送群消息异常！", authorization);
             }
         });
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("发送飞书任务完成!").append("\r\n");
         overdueTaskHistoryService.saveOrUpdateBatch(historys);
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("执行完成!").append("\r\n");
-        FeiShuApi.sendAdmin(adminInfoList, "任务保存历史记录失败", authorization);
+        FeiShuApi.sendAdmin(adminInfoList, contentAll.toString(), authorization);
         log.info("过期任务提醒个人,执行完成");
     }
 }

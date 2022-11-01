@@ -122,7 +122,7 @@ public class OverdueTasksAgainToGroupBase {
 
         if (!overdueTask) {
             if (!overdueTaskHistoryService.saveOrUpdateBatch(historys)) {
-                FeiShuApi.sendAdmin(adminInfoList, "任务保存历史记录失败", secret);
+                FeiShuApi.sendAdmin(adminInfoList, "任务保存历史记录失败！", secret);
                 return;
             }
         }
