@@ -20,7 +20,7 @@ import static com.alibaba.fastjson2.JSONReader.Feature.IgnoreNoneSerializable;
  * @date :  2022.10.09 09:12
  */
 @Log4j2
-public class CoverityApi {
+public abstract class CoverityApi {
     private static final String DOMAIN = "192.168.2.39:8080";
     private final static String LOGIN_URL = "http://" + DOMAIN;
     private final static String URL = LOGIN_URL + "/reports/table.json?projectId=%d&viewId=%d";

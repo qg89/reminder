@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -38,4 +39,16 @@ public class ProjectInfo implements Serializable {
      * 产品经理飞书ID
      */
     private String productMemberId;
+
+    /**
+     * 项目周报项目短名称
+     */
+    @TableField("project_short_name")
+    private String projectShortName;
+
+    /**
+     * 周报文件夹token
+     */
+    @TableField("folder_token")
+    private String folderToken;
 }

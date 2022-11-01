@@ -16,6 +16,7 @@ import com.q.reminder.reminder.vo.DefinitionVo;
 import com.q.reminder.reminder.vo.FeatureListVo;
 import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.SheetVo;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,7 @@ public class SyncRedmineTaskHandle {
     @Autowired
     private AdminInfoService adminInfoService;
 
-    @Scheduled(cron = "0 0/10 * * * ?")
+    @XxlJob("syncRedmineTask")
     public void syncRedmineTask() {
         // 查询项目对应的需求管理表token
         LambdaQueryWrapper<ProjectInfo> lq = new LambdaQueryWrapper<>();

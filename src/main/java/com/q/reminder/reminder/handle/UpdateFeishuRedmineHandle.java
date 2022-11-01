@@ -9,6 +9,7 @@ import com.q.reminder.reminder.service.GroupInfoService;
 import com.q.reminder.reminder.service.UserGroupService;
 import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.FeiShuApi;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +43,7 @@ public class UpdateFeishuRedmineHandle {
     @Value("${app.secret}")
     private String appSecret;
 
-    @Scheduled(cron = "0 0 23 ? * MON-FRI")
+    @XxlJob("everyDaySyncMember")
     public void update() {
         String secret = FeiShuApi.getSecret(appId, appSecret);
         List<GroupInfo> groupToChats = FeiShuApi.getGroupToChats(secret);

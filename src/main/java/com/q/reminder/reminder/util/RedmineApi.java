@@ -28,7 +28,7 @@ import java.util.*;
  * @date :  2022.09.26 15:14
  */
 @Log4j2
-public class RedmineApi {
+public abstract class RedmineApi {
 
     /**
      * 通过项目读取redmine过期任务,只包含打开的状态

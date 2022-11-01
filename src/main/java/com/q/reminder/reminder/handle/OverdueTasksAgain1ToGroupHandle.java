@@ -6,6 +6,7 @@ import com.q.reminder.reminder.handle.base.HoldayBase;
 import com.q.reminder.reminder.handle.base.OverdueTasksAgainToGroupBase;
 import com.q.reminder.reminder.service.NoneStatusService;
 import com.q.reminder.reminder.vo.QueryVo;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -34,7 +35,7 @@ public class OverdueTasksAgain1ToGroupHandle {
     @Autowired
     private HoldayBase holdayBase;
 
-    @Scheduled(cron = "0 30 9 * * ?")
+    @XxlJob("overdueTasksAgain1ToGroupHandle")
     public void query() {
         if (holdayBase.queryHoliday()) {
             log.info("节假日放假!!!!");

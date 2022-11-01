@@ -13,6 +13,7 @@ import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.SendVo;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,7 +47,7 @@ public class RedmineUpdateHandle {
     @Autowired
     private UserMemberService userMemberService;
 
-    @Scheduled(cron = "0 0/10 * * * ?")
+    @XxlJob("redmineUpdate10")
     public void redmineUpdate10() {
         List<ProjectInfo> projectInfoList = projectInfoService.list();
         List<RedmineVo> issues = RedmineApi.queryUpdateIssue(projectInfoList);

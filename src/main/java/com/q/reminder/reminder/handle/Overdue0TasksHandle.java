@@ -3,12 +3,16 @@ package com.q.reminder.reminder.handle;
 import com.q.reminder.reminder.handle.base.HoldayBase;
 import com.q.reminder.reminder.handle.base.QueryTasksToMemberBase;
 import com.q.reminder.reminder.service.NoneStatusService;
+import com.xxl.job.core.context.XxlJobHelper;
+import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+
+import static java.lang.Integer.*;
 
 /**
  * @author : saiko
@@ -28,15 +32,15 @@ public class Overdue0TasksHandle {
     @Autowired
     private HoldayBase holdayBase;
 
-    @Scheduled(cron = "0 30 17 * * ?")
+    @XxlJob("overdue0TasksHandle")
     public void query() {
         if (holdayBase.queryHoliday()) {
             log.info("节假日放假!!!!");
             return;
         }
-
+        int expiredDay = Integer.parseInt(XxlJobHelper.getJobParam());
         List<String> noneStatusList = noneStatusService.queryUnInStatus(0);
         // 组装数据， 通过人员，获取要发送的内容
-        queryTasksToMemberBase.feiShu(0, noneStatusList, Boolean.FALSE);
+        queryTasksToMemberBase.feiShu(expiredDay, noneStatusList, Boolean.FALSE);
     }
 }

@@ -1,6 +1,8 @@
 package com.q.reminder.reminder.entity;
 
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFilter;
 import lombok.Data;
 
 import java.io.Serial;
@@ -23,26 +25,24 @@ public class WeeklyProjectReport implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    @JSONField(name = "token")
     @TableField("file_token")
     private String fileToken;
 
-    @TableField("folder_token")
-    private String folderToken;
-
+    @JSONField(name = "week_num")
     @TableField("week_num")
-    private String weekNnum;
+    private String weekNum;
 
-    @TableField("year_num")
-    private String yearNum;
-
+    @JSONField(name = "name")
     @TableField("file_name")
     private String fileName;
 
-    @TableField("project_short_name")
-    private String projectShortName;
+    @JSONField(name = "url")
+    @TableField("url")
+    private String url;
 
     @TableField("r_pid")
-    private Integer rPid;
+    private String rPid;
 
     @TableLogic(value = "0", delval = "1")
     @TableField("is_delete")

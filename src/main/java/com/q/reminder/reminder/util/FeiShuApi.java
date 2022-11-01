@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  * @date :  2022.09.23 18:45
  */
 @Log4j2
-public class FeiShuApi {
+public abstract class FeiShuApi {
     private final static String SEND_URL = "https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=open_id";
     private final static String SEND_GROUP_URL = "https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=chat_id";
     private final static String TOKEN_URL = "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal";

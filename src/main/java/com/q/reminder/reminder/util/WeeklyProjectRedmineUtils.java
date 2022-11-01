@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * @Description :
  * @date :  2022.10.31 11:24
  */
-public class WeeklyProjectReportUtils {
+public abstract class WeeklyProjectRedmineUtils {
 
     /**
      * 评审问题数量
