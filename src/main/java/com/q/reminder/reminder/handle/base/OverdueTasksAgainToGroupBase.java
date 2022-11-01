@@ -2,9 +2,11 @@ package com.q.reminder.reminder.handle.base;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
+import com.q.reminder.reminder.service.AdminInfoService;
 import com.q.reminder.reminder.service.OverdueTaskHistoryService;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.UserMemberService;
@@ -40,13 +42,14 @@ public class OverdueTasksAgainToGroupBase {
     @Value("${app.secret}")
     private String appSecret;
 
-
     @Autowired
     private UserMemberService userMemberService;
     @Autowired
     private ProjectInfoService projectInfoService;
     @Autowired
     private OverdueTaskHistoryService overdueTaskHistoryService;
+    @Autowired
+    private AdminInfoService adminInfoService;
 
     /**
      * 无任务提醒
@@ -96,6 +99,7 @@ public class OverdueTasksAgainToGroupBase {
 
         Map<String, SendUserByGroupVo> sendUserByGroupVoMap = sendUserByGroupVoList.stream().collect(Collectors.toMap(SendUserByGroupVo::getChatId, Function.identity(), (v1, v2) -> v1));
 
+        List<AdminInfo> adminInfoList = adminInfoService.list();
         for (Map.Entry<String, SendUserByGroupVo> map : sendUserByGroupVoMap.entrySet()) {
             JSONObject content = new JSONObject();
             SendUserByGroupVo groupInfo = map.getValue();
@@ -112,13 +116,13 @@ public class OverdueTasksAgainToGroupBase {
             try {
                 FeiShuApi.sendGroupByChats(map.getKey(), content.toJSONString(), secret);
             } catch (IOException ex) {
-                log.error("过期任务提醒群组,发送异常");
+                FeiShuApi.sendAdmin(adminInfoList, "过期任务提醒群组,发送异常", secret);
             }
         }
 
         if (!overdueTask) {
             if (!overdueTaskHistoryService.saveOrUpdateBatch(historys)) {
-                log.error("任务保存历史记录失败!");
+                FeiShuApi.sendAdmin(adminInfoList, "任务保存历史记录失败", secret);
                 return;
             }
         }

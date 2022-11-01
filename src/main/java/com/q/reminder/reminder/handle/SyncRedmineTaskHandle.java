@@ -4,8 +4,10 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.entity.RedmineUserInfo;
+import com.q.reminder.reminder.service.AdminInfoService;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RedmineUserInfoService;
 import com.q.reminder.reminder.util.FeiShuApi;
@@ -47,6 +49,8 @@ public class SyncRedmineTaskHandle {
     private ProjectInfoService projectInfoService;
     @Autowired
     private RedmineUserInfoService redmineUserInfoService;
+    @Autowired
+    private AdminInfoService adminInfoService;
 
     @Scheduled(cron = "0 0/10 * * * ?")
     public void syncRedmineTask() {
@@ -55,7 +59,7 @@ public class SyncRedmineTaskHandle {
         lq.isNotNull(ProjectInfo::getFeatureToken);
         List<ProjectInfo> projectInfos = projectInfoService.list(lq);
         Map<String, Integer> redmineUserMap = redmineUserInfoService.list(Wrappers.<RedmineUserInfo>lambdaQuery().isNotNull(RedmineUserInfo::getAssigneeName)).stream().collect(Collectors.toMap(e -> e.getAssigneeName().replace(" ", ""), RedmineUserInfo::getAssigneeId));
-
+        List<AdminInfo> adminInfoList = adminInfoService.list();
         String secret = FeiShuApi.getSecret(appId, appSecret);
         projectInfos.forEach(projectInfo -> {
             String pId = projectInfo.getPId();
@@ -149,7 +153,7 @@ public class SyncRedmineTaskHandle {
                 try {
                     FeiShuApi.sendGroupByChats(sendGroupChatId, content.toJSONString(), secret);
                 } catch (IOException e) {
-                    log.error("发送飞书需求群异常");
+                    FeiShuApi.sendAdmin(adminInfoList, "发送飞书需求群异常!", secret);
                 }
             }
         });

@@ -70,6 +70,7 @@ public class QueryTasksToMemberBase {
 
         // 组装数据， 通过人员，获取要发送的内容
         List<ProjectInfo> projectInfoList = projectInfoService.list();
+        List<AdminInfo> adminInfoList = adminInfoService.list();
 
         QueryVo vo = new QueryVo();
         vo.setNoneStatusList(noneStatusList);
@@ -79,7 +80,7 @@ public class QueryTasksToMemberBase {
         if (CollectionUtils.isEmpty(listMap)) {
             contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append("\r\n");
             contentAll.append("执行完成!");
-            sendAdmin(contentAll.toString(), authorization);
+            FeiShuApi.sendAdmin(adminInfoList, contentAll.toString(), authorization);
             return;
         }
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append(" 查询redmine过期人员集合完成!").append("\r\n");
@@ -168,24 +169,13 @@ public class QueryTasksToMemberBase {
             try {
                 FeiShuApi.sendPost(v, authorization, contentAll);
             } catch (IOException e) {
-                log.error("", e);
+                FeiShuApi.sendAdmin(adminInfoList, "任务保存历史记录失败", authorization);
             }
         });
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("发送飞书任务完成!").append("\r\n");
         overdueTaskHistoryService.saveOrUpdateBatch(historys);
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("执行完成!").append("\r\n");
-        sendAdmin(contentAll.toString(), authorization);
+        FeiShuApi.sendAdmin(adminInfoList, "任务保存历史记录失败", authorization);
         log.info("过期任务提醒个人,执行完成");
-    }
-
-    void sendAdmin(String content, String secret) {
-        List<AdminInfo> adminInfos = adminInfoService.list();
-        adminInfos.forEach(e -> {
-            try {
-                FeiShuApi.sendText(e.getMemberId(), content, secret);
-            } catch (IOException ex) {
-                log.error("管理员任务发送失败 {}", e);
-            }
-        });
     }
 }

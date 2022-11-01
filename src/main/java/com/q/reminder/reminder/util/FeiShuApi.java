@@ -8,6 +8,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONReader;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.GroupInfo;
 import com.q.reminder.reminder.entity.UserGroup;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
@@ -74,9 +75,8 @@ public class FeiShuApi {
      * @param receiveId
      * @param contentStr
      * @param security
-     * @throws IOException
      */
-    public static void sendText(String receiveId, String contentStr, String security) throws IOException {
+    public static void sendText(String receiveId, String contentStr, String security) {
         JSONObject content = new JSONObject();
         JSONObject text = new JSONObject();
         text.put("text", contentStr);
@@ -93,7 +93,21 @@ public class FeiShuApi {
                 .build();
         try (Response response = client.newCall(request).execute();) {
             log.info("消息发送状态:{}, receive_id:{}", response.code(), receiveId);
+        } catch (IOException e) {
+            log.error("消息发送异常, receive_id:{}", receiveId);
         }
+    }
+
+    /**
+     * 发送开发人员
+     * @param adminInfos
+     * @param content
+     * @param secret
+     */
+    public static void sendAdmin(List<AdminInfo> adminInfos, String content, String secret) {
+        adminInfos.forEach(e -> {
+            sendText(e.getMemberId(), content, secret);
+        });
     }
 
     /**
