@@ -3,6 +3,7 @@ package com.q.reminder.reminder.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -16,6 +17,7 @@ import java.io.Serializable;
 @TableName("r_project_info")
 public class ProjectInfo implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 6061440968825915105L;
     private String pId;
     private String pKey;

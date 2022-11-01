@@ -10,7 +10,7 @@ import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
-import com.q.reminder.reminder.vo.QueryRedmineVo;
+import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.QueryVo;
 import com.q.reminder.reminder.vo.SendUserByGroupVo;
 import lombok.extern.log4j.Log4j2;
@@ -73,7 +73,7 @@ public class OverdueTasksAgainToGroupBase {
         String secret = FeiShuApi.getSecret(appId, appSecret);
         // 组装数据， 通过人员，获取要发送的内容
         List<ProjectInfo> projectInfoList = projectInfoService.list();
-        List<QueryRedmineVo> issueUserList = RedmineApi.queryUserByExpiredDayList(vo, projectInfoList);
+        List<RedmineVo> issueUserList = RedmineApi.queryUserByExpiredDayList(vo, projectInfoList);
 
         // 查询要群对应的人员信息
         List<SendUserByGroupVo> sendUserByGroupVoList = userMemberService.queryUserGroupList();
@@ -90,7 +90,7 @@ public class OverdueTasksAgainToGroupBase {
                 log.info("群发送,过期任务人员为空!");
                 overdueTask = true;
             } else {
-                contentJsonArray = extracted(issueUserList.stream().collect(Collectors.groupingBy(QueryRedmineVo::getAssigneeName)), historys);
+                contentJsonArray = extracted(issueUserList.stream().collect(Collectors.groupingBy(RedmineVo::getAssigneeName)), historys);
             }
         }
 
@@ -131,7 +131,7 @@ public class OverdueTasksAgainToGroupBase {
      * @param listMap
      * @param historys
      */
-    private JSONArray extracted(Map<String, List<QueryRedmineVo>> listMap, List<OverdueTaskHistory> historys) {
+    private JSONArray extracted(Map<String, List<RedmineVo>> listMap, List<OverdueTaskHistory> historys) {
         // 通过人员查看对应redmine人员关系，并返回redmine姓名和飞书member_id关系
         List<UserMemgerInfo> list = userMemberService.list();
         Map<String, String> memberIds = list.stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
@@ -151,7 +151,7 @@ public class OverdueTasksAgainToGroupBase {
             atjsonArray.add(taskSizeJson);
             String redmineUrl = "";
             JSONArray subContentJsonArray = new JSONArray();
-            for (QueryRedmineVo issue : issueList) {
+            for (RedmineVo issue : issueList) {
                 String id = issue.getRedmineId();
                 String subject = issue.getSubject();
                 Date updatedOn = issue.getUpdatedOn();

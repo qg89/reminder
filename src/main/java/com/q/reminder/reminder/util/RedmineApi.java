@@ -36,10 +36,10 @@ public class RedmineApi {
      * @param projectInfoList
      * @return 按指派人员返回问题列表
      */
-    public static List<QueryRedmineVo> queryUserByExpiredDayList(QueryVo vo, List<ProjectInfo> projectInfoList) {
+    public static List<RedmineVo> queryUserByExpiredDayList(QueryVo vo, List<ProjectInfo> projectInfoList) {
         List<String> noneStatusList = vo.getNoneStatusList();
         Integer expiredDay = vo.getExpiredDay();
-        List<QueryRedmineVo> allIssueList = new ArrayList<>();
+        List<RedmineVo> allIssueList = new ArrayList<>();
         projectInfoList.forEach(p -> {
             String redmineUrl = p.getRedmineUrl();
             RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, p.getAccessKey());
@@ -54,7 +54,7 @@ public class RedmineApi {
                         return filter && !noneStatusList.contains(e.getStatusName());
                     }
                 }).forEach(e -> {
-                    QueryRedmineVo queryRedmineVo = new QueryRedmineVo();
+                    RedmineVo queryRedmineVo = new RedmineVo();
                     queryRedmineVo.setDueDate(e.getDueDate());
                     queryRedmineVo.setSubject(e.getSubject());
                     queryRedmineVo.setRedmineUrl(redmineUrl);
@@ -79,8 +79,8 @@ public class RedmineApi {
      * @param projectInfoList
      * @return
      */
-    public static List<QueryRedmineVo> queryUpdateIssue(List<ProjectInfo> projectInfoList) {
-        List<QueryRedmineVo> issues = new ArrayList<>();
+    public static List<RedmineVo> queryUpdateIssue(List<ProjectInfo> projectInfoList) {
+        List<RedmineVo> issues = new ArrayList<>();
         for (ProjectInfo project : projectInfoList) {
             RedmineManager mgr = RedmineManagerFactory.createWithApiKey(project.getRedmineUrl(), project.getAccessKey());
             Transport transport = mgr.getTransport();
@@ -91,7 +91,7 @@ public class RedmineApi {
                     new RequestParam("updated_on", DateUtil.today()));
             try {
                 transport.getObjectsList(Issue.class, params).stream().filter(e -> StringUtils.isNotBlank(e.getAssigneeName())).forEach(e -> {
-                    QueryRedmineVo queryRedmineVo = new QueryRedmineVo();
+                    RedmineVo queryRedmineVo = new RedmineVo();
                     queryRedmineVo.setUpdatedOn(e.getUpdatedOn());
                     queryRedmineVo.setSubject(e.getSubject());
                     queryRedmineVo.setRedmineId(e.getId() + "");

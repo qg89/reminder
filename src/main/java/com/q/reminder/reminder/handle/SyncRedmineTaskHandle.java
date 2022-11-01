@@ -12,7 +12,7 @@ import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.vo.DefinitionVo;
 import com.q.reminder.reminder.vo.FeatureListVo;
-import com.q.reminder.reminder.vo.QueryRedmineVo;
+import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.SheetVo;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -104,7 +104,7 @@ public class SyncRedmineTaskHandle {
             // 构建redmine发送任务的实体集合
             RedmineApi.createTask(featureList, definition, redmineUserMap);
 
-            List<QueryRedmineVo> redmineVos = new ArrayList<>();
+            List<RedmineVo> redmineVos = new ArrayList<>();
             featureList.forEach(feature -> {
                 String featureId = feature.getFeatureId();
                 String range = feature.getRange();
@@ -112,7 +112,7 @@ public class SyncRedmineTaskHandle {
                     log.info("该任务已存在,不再重新新增任务");
                     return;
                 }
-                QueryRedmineVo vo = new QueryRedmineVo();
+                RedmineVo vo = new RedmineVo();
                 vo.setRedmineId(feature.getRedmineId());
                 vo.setSubject(feature.getRedmineSubject());
                 redmineVos.add(vo);
@@ -135,7 +135,7 @@ public class SyncRedmineTaskHandle {
                 at.put("user_name", definition.getProduct());
                 subContentJsonArray.add(at);
 
-                for (QueryRedmineVo redmineVo : redmineVos) {
+                for (RedmineVo redmineVo : redmineVos) {
                     JSONObject a = new JSONObject();
                     a.put("tag", "a");
                     a.put("href", redmineUrl + "/issues/" + redmineVo.getRedmineId());

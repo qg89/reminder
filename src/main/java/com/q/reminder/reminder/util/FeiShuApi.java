@@ -308,7 +308,7 @@ public class FeiShuApi {
             ObjectMapper objectMapper = new ObjectMapper();
             FeatureListVo featureListVo = objectMapper.convertValue(map, FeatureListVo.class);
             if ("是".equals(featureListVo.getIsRedmine()) && StringUtils.isBlank(featureListVo.getFeatureId())) {
-                featureListVo.setRange(sheetId + "!B" + (i + 1) + ":B" + (i + 1));
+                featureListVo.setRange(sheetId + "!C" + (i + 1) + ":C" + (i + 1));
                 list.add(featureListVo);
             }
         }

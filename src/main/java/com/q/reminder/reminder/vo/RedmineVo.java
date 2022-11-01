@@ -13,7 +13,7 @@ import java.util.Date;
  * @date :  2022.10.25 08:57
  */
 @Data
-public class QueryRedmineVo implements Serializable {
+public class RedmineVo implements Serializable {
 
     private static final long serialVersionUID = -3624229091490386847L;
     private String redmineId;

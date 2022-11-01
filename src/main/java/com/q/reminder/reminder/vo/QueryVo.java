@@ -2,6 +2,7 @@ package com.q.reminder.reminder.vo;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
@@ -16,6 +17,7 @@ import java.util.Set;
 @Data
 public class QueryVo implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -2299536628917442487L;
     private Set<String> projects;
     private List<String> noneStatusList;

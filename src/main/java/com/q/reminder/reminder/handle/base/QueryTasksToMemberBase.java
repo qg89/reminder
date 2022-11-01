@@ -13,7 +13,7 @@ import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
-import com.q.reminder.reminder.vo.QueryRedmineVo;
+import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.QueryVo;
 import com.q.reminder.reminder.vo.SendVo;
 import lombok.extern.log4j.Log4j2;
@@ -26,7 +26,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 /**
@@ -76,7 +75,7 @@ public class QueryTasksToMemberBase {
         vo.setNoneStatusList(noneStatusList);
         vo.setExpiredDay(expiredDay);
         vo.setContainsStatus(contentStatus);
-        Map<String, List<QueryRedmineVo>> listMap = RedmineApi.queryUserByExpiredDayList(vo, projectInfoList).stream().collect(Collectors.groupingBy(QueryRedmineVo::getAssigneeName));
+        Map<String, List<RedmineVo>> listMap = RedmineApi.queryUserByExpiredDayList(vo, projectInfoList).stream().collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
         if (CollectionUtils.isEmpty(listMap)) {
             contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append("\r\n");
             contentAll.append("执行完成!");
@@ -98,7 +97,7 @@ public class QueryTasksToMemberBase {
             String redmineUrl = "";
 
             String name = assigneeName.replace(" ", "");
-            for (QueryRedmineVo issue : issueList) {
+            for (RedmineVo issue : issueList) {
                 String redmineId = issue.getRedmineId();
                 String issueSubject = issue.getSubject();
                 String statusName = issue.getStatusName();

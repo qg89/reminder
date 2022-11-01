@@ -11,7 +11,7 @@ import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
-import com.q.reminder.reminder.vo.QueryRedmineVo;
+import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.SendVo;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,10 +49,10 @@ public class RedmineUpdateHandle {
     @Scheduled(cron = "0 0/10 * * * ?")
     public void redmineUpdate10() {
         List<ProjectInfo> projectInfoList = projectInfoService.list();
-        List<QueryRedmineVo> issues = RedmineApi.queryUpdateIssue(projectInfoList);
-        Map<String, List<QueryRedmineVo>> issueMap = issues.stream().filter(issue ->
+        List<RedmineVo> issues = RedmineApi.queryUpdateIssue(projectInfoList);
+        Map<String, List<RedmineVo>> issueMap = issues.stream().filter(issue ->
                 DateUtil.between(issue.getUpdatedOn(), new Date(), DateUnit.MINUTE) <= 10
-        ).collect(Collectors.groupingBy(QueryRedmineVo::getAssigneeName));
+        ).collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
 
         LambdaQueryWrapper<UserMemgerInfo> lqw = new LambdaQueryWrapper<>();
         lqw.select(UserMemgerInfo::getName, UserMemgerInfo::getMemberId);
@@ -66,7 +66,7 @@ public class RedmineUpdateHandle {
             all.put("title", "【任务变更提醒 (" + DateUtil.now() + ")】");
             JSONArray contentJsonArray = new JSONArray();
             all.put("content", contentJsonArray);
-            for (QueryRedmineVo issue : issueList) {
+            for (RedmineVo issue : issueList) {
                 JSONArray subContentJsonArray = new JSONArray();
                 JSONObject subject = new JSONObject();
                 subject.put("tag", "text");
