@@ -78,6 +78,17 @@ public class OverdueTasksAgainToGroupBase {
         List<ProjectInfo> projectInfoList = projectInfoService.list();
         List<RedmineVo> issueUserList = RedmineApi.queryUserByExpiredDayList(vo, projectInfoList);
 
+        issueUserList.forEach(e -> {
+            OverdueTaskHistory history = new OverdueTaskHistory();
+            history.setAssigneeName(e.getAssigneeName());
+            history.setProjectName(e.getProjectName());
+            history.setSubjectName(e.getSubject());
+            history.setRedmineId(e.getRedmineId());
+            history.setLastUpdateTime(e.getUpdatedOn());
+            history.setType("1");
+            historys.add(history);
+        });
+
         // 查询要群对应的人员信息
         List<SendUserByGroupVo> sendUserByGroupVoList = userMemberService.queryUserGroupList();
         // 群内人员
@@ -93,7 +104,7 @@ public class OverdueTasksAgainToGroupBase {
                 log.info("群发送,过期任务人员为空!");
                 overdueTask = true;
             } else {
-                contentJsonArray = extracted(issueUserList.stream().collect(Collectors.groupingBy(RedmineVo::getAssigneeName)), historys);
+                contentJsonArray = extracted(issueUserList.stream().collect(Collectors.groupingBy(RedmineVo::getAssigneeName)));
             }
         }
 
@@ -133,9 +144,8 @@ public class OverdueTasksAgainToGroupBase {
      * 发送消息组装数据
      *
      * @param listMap
-     * @param historys
      */
-    private JSONArray extracted(Map<String, List<RedmineVo>> listMap, List<OverdueTaskHistory> historys) {
+    private JSONArray extracted(Map<String, List<RedmineVo>> listMap) {
         // 通过人员查看对应redmine人员关系，并返回redmine姓名和飞书member_id关系
         List<UserMemgerInfo> list = userMemberService.list();
         Map<String, String> memberIds = list.stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
@@ -172,15 +182,6 @@ public class OverdueTasksAgainToGroupBase {
 //                noneLine.put("tag", "text");
 //                noneLine.put("text", "\r\n");
 //                subContentJsonArray.add(noneLine);
-
-                OverdueTaskHistory history = new OverdueTaskHistory();
-                history.setAssigneeName(name);
-                history.setProjectName(projectName);
-                history.setSubjectName(subject);
-                history.setRedmineId(Integer.valueOf(id));
-                history.setLastUpdateTime(updatedOn);
-                history.setType("1");
-                historys.add(history);
             }
 
             contentJsonArray.add(atjsonArray);

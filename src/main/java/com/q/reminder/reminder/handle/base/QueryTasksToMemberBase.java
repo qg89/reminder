@@ -138,7 +138,7 @@ public class QueryTasksToMemberBase {
                 history.setAssigneeName(name);
                 history.setProjectName(projectName);
                 history.setSubjectName(issueSubject);
-                history.setRedmineId(Integer.valueOf(redmineId));
+                history.setRedmineId(redmineId);
                 history.setLastUpdateTime(updatedOn);
                 historys.add(history);
                 contentJsonArray.add(subContentJsonObject);
