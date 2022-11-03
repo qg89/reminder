@@ -16,10 +16,12 @@ import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.SendVo;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.Date;
@@ -50,8 +52,21 @@ public class RedmineUpdateHandle {
         List<ProjectInfo> projectInfoList = projectInfoService.list();
         List<RedmineVo> issues = RedmineApi.queryUpdateIssue(projectInfoList);
         Map<String, List<RedmineVo>> issueMap = issues.stream().filter(issue ->
-                DateUtil.between(issue.getUpdatedOn(), new Date(), DateUnit.MINUTE) <= 10
+                DateUtil.between(issue.getUpdatedOn(), new Date(), DateUnit.MINUTE) <= 10 && StringUtils.isNotBlank(issue.getAssigneeName())
         ).collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
+
+        Map<String, List<RedmineVo>> noneIssueMapByAuthorName = issues.stream().filter(issue ->
+                DateUtil.between(issue.getUpdatedOn(), new Date(), DateUnit.MINUTE) <= 10 && StringUtils.isBlank(issue.getAssigneeName())
+        ).collect(Collectors.groupingBy(RedmineVo::getAuthorName));
+
+        issueMap.forEach((ik, iv) -> noneIssueMapByAuthorName.forEach((k, v) -> {
+            if (ik.equals(k)) {
+                iv.addAll(v);
+            }
+        }));
+        if (CollectionUtils.isEmpty(issueMap)) {
+            issueMap = noneIssueMapByAuthorName;
+        }
 
         LambdaQueryWrapper<UserMemgerInfo> lqw = new LambdaQueryWrapper<>();
         lqw.select(UserMemgerInfo::getName, UserMemgerInfo::getMemberId);
@@ -66,10 +81,16 @@ public class RedmineUpdateHandle {
             JSONArray contentJsonArray = new JSONArray();
             all.put("content", contentJsonArray);
             for (RedmineVo issue : issueList) {
+                String issueAssigneeName = issue.getAssigneeName();
                 JSONArray subContentJsonArray = new JSONArray();
                 JSONObject subject = new JSONObject();
                 subject.put("tag", "text");
-                subject.put("text", "\r\n任务主题: ");
+                if (StringUtils.isBlank(issueAssigneeName)) {
+                    subject.put("text", "\r\n任务指派人为空-请及时更新指派人: ");
+                    assigneeName = assigneeName.replace(" ", "");
+                } else {
+                    subject.put("text", "\r\n任务主题: ");
+                }
                 subContentJsonArray.add(subject);
                 JSONObject a = new JSONObject();
                 a.put("tag", "a");

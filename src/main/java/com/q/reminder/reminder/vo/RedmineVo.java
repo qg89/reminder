@@ -2,6 +2,7 @@ package com.q.reminder.reminder.vo;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -15,6 +16,7 @@ import java.util.Date;
 @Data
 public class RedmineVo implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -3624229091490386847L;
     private String redmineId;
     private String subject;
@@ -24,5 +26,6 @@ public class RedmineVo implements Serializable {
     private Date dueDate;
     private String assigneeId;
     private String assigneeName;
+    private String authorName;
     private String redmineUrl;
 }
