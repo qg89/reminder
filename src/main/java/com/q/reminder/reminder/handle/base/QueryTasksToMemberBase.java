@@ -3,6 +3,7 @@ package com.q.reminder.reminder.handle.base;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
 import com.q.reminder.reminder.entity.ProjectInfo;
@@ -13,14 +14,13 @@ import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
-import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.QueryVo;
+import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.SendVo;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -47,20 +47,17 @@ public class QueryTasksToMemberBase {
     private OverdueTaskHistoryService overdueTaskHistoryService;
     @Autowired
     private AdminInfoService adminInfoService;
-
-    @Value("${app.id}")
-    private String appId;
-    @Value("${app.secret}")
-    private String appSecret;
+    @Autowired
+    private FeishuProperties feishuProperties;
 
 
     /**
-     *  @param expiredDay
+     * @param expiredDay
      * @param noneStatusList
      * @param contentStatus
      */
     public void feiShu(int expiredDay, List<String> noneStatusList, Boolean contentStatus) {
-        String authorization = FeiShuApi.getSecret(appId, appSecret);
+        String authorization = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         StringBuilder contentAll = new StringBuilder();
         contentAll.append("当日执行情况如下(").append(new DateTime().toString("yyyy-MM-dd")).append("):\r\n");
 

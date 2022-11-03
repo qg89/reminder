@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.handle;
 
+import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.GroupInfo;
 import com.q.reminder.reminder.entity.UserGroup;
@@ -37,15 +38,12 @@ public class UpdateFeishuRedmineHandle {
     private UserGroupService userGroupService;
     @Autowired
     private AdminInfoService adminInfoService;
-
-    @Value("${app.id}")
-    private String appId;
-    @Value("${app.secret}")
-    private String appSecret;
+    @Autowired
+    private FeishuProperties feishuProperties;
 
     @XxlJob("everyDaySyncMember")
     public void update() {
-        String secret = FeiShuApi.getSecret(appId, appSecret);
+        String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         List<GroupInfo> groupToChats = FeiShuApi.getGroupToChats(secret);
         List<AdminInfo> adminInfos = adminInfoService.list();
         if (groupToChats == null) {

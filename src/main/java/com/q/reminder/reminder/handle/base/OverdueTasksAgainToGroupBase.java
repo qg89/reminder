@@ -2,6 +2,7 @@ package com.q.reminder.reminder.handle.base;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
 import com.q.reminder.reminder.entity.ProjectInfo;
@@ -37,10 +38,6 @@ import java.util.stream.Collectors;
 @Log4j2
 @Component
 public class OverdueTasksAgainToGroupBase {
-    @Value("${app.id}")
-    private String appId;
-    @Value("${app.secret}")
-    private String appSecret;
 
     @Autowired
     private UserMemberService userMemberService;
@@ -50,6 +47,8 @@ public class OverdueTasksAgainToGroupBase {
     private OverdueTaskHistoryService overdueTaskHistoryService;
     @Autowired
     private AdminInfoService adminInfoService;
+    @Autowired
+    private FeishuProperties feishuProperties;
 
     /**
      * 无任务提醒
@@ -73,7 +72,7 @@ public class OverdueTasksAgainToGroupBase {
     public void overdueTasksAgainToGroup(QueryVo vo) {
         List<OverdueTaskHistory> historys = new ArrayList<>();
         String redminderType = vo.getRedminderType();
-        String secret = FeiShuApi.getSecret(appId, appSecret);
+        String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         // 组装数据， 通过人员，获取要发送的内容
         List<ProjectInfo> projectInfoList = projectInfoService.list();
         List<RedmineVo> issueUserList = RedmineApi.queryUserByExpiredDayList(vo, projectInfoList);

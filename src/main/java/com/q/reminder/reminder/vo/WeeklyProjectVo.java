@@ -1,7 +1,9 @@
 package com.q.reminder.reminder.vo;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -11,10 +13,12 @@ import java.io.Serializable;
  * @Description :
  * @date :  2022.11.01 14:17
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class WeeklyProjectVo implements Serializable {
-    private String appId;
-    private String appSecret;
+public class WeeklyProjectVo extends BaseFeishuVo implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 8912201228540480304L;
     private String fileToken;
     private String folderToken;
     private String projectSshortName;

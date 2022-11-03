@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.entity.RedmineUserInfo;
@@ -20,8 +21,6 @@ import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -41,17 +40,14 @@ import java.util.stream.Collectors;
 @Log4j2
 @Component
 public class SyncRedmineTaskHandle {
-    @Value("${app.id}")
-    private String appId;
-    @Value("${app.secret}")
-    private String appSecret;
-
     @Autowired
     private ProjectInfoService projectInfoService;
     @Autowired
     private RedmineUserInfoService redmineUserInfoService;
     @Autowired
     private AdminInfoService adminInfoService;
+    @Autowired
+    private FeishuProperties feishuProperties;
 
     @XxlJob("syncRedmineTask")
     public void syncRedmineTask() {
@@ -61,7 +57,7 @@ public class SyncRedmineTaskHandle {
         List<ProjectInfo> projectInfos = projectInfoService.list(lq);
         Map<String, Integer> redmineUserMap = redmineUserInfoService.list(Wrappers.<RedmineUserInfo>lambdaQuery().isNotNull(RedmineUserInfo::getAssigneeName)).stream().collect(Collectors.toMap(e -> e.getAssigneeName().replace(" ", ""), RedmineUserInfo::getAssigneeId));
         List<AdminInfo> adminInfoList = adminInfoService.list();
-        String secret = FeiShuApi.getSecret(appId, appSecret);
+        String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         projectInfos.forEach(projectInfo -> {
             String pId = projectInfo.getPId();
             String featureToken = projectInfo.getFeatureToken();

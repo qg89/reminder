@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.service.ProjectInfoService;
@@ -37,15 +38,12 @@ import java.util.stream.Collectors;
 @Component
 public class RedmineUpdateHandle {
 
-    @Value("${app.id}")
-    private String appId;
-    @Value("${app.secret}")
-    private String appSecret;
-
     @Autowired
     private ProjectInfoService projectInfoService;
     @Autowired
     private UserMemberService userMemberService;
+    @Autowired
+    private FeishuProperties feishuProperties;
 
     @XxlJob("redmineUpdate10")
     public void redmineUpdate10() {
@@ -59,7 +57,7 @@ public class RedmineUpdateHandle {
         lqw.select(UserMemgerInfo::getName, UserMemgerInfo::getMemberId);
         Map<String, String> userNameMap = userMemberService.list(lqw).stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
 
-        String authorization = FeiShuApi.getSecret(appId, appSecret);
+        String authorization = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         issueMap.forEach((assigneeName, issueList) -> {
             JSONObject con = new JSONObject();
             JSONObject all = new JSONObject();
