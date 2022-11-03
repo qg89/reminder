@@ -79,7 +79,11 @@ public class OverdueTasksAgainToGroupBase {
 
         issueUserList.forEach(e -> {
             OverdueTaskHistory history = new OverdueTaskHistory();
-            history.setAssigneeName(e.getAssigneeName());
+            String assigneeName = e.getAssigneeName();
+            history.setAssigneeName(assigneeName);
+            if (StringUtils.isBlank(assigneeName)) {
+                history.setAssigneeName(e.getAuthorName());
+            }
             history.setProjectName(e.getProjectName());
             history.setSubjectName(e.getSubject());
             history.setRedmineId(e.getRedmineId());
@@ -103,7 +107,20 @@ public class OverdueTasksAgainToGroupBase {
                 log.info("群发送,过期任务人员为空!");
                 overdueTask = true;
             } else {
-                contentJsonArray = extracted(issueUserList.stream().collect(Collectors.groupingBy(RedmineVo::getAssigneeName)));
+                Map<String, List<RedmineVo>> assigneeMap = issueUserList.stream().collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
+                Map<String, List<RedmineVo>> noneAssigneeMap = issueUserList.stream().collect(Collectors.groupingBy(RedmineVo::getAuthorName));
+                if (CollectionUtils.isEmpty(assigneeMap)) {
+                    assigneeMap = noneAssigneeMap;
+                } else {
+                    assigneeMap.forEach((k, v) -> {
+                        noneAssigneeMap.forEach((k1, v1) -> {
+                            if (k.equals(k1)) {
+                                v.addAll(v1);
+                            }
+                        });
+                    });
+                }
+                contentJsonArray = extracted(assigneeMap);
             }
         }
 
@@ -174,13 +191,11 @@ public class OverdueTasksAgainToGroupBase {
                 JSONObject a = new JSONObject();
                 a.put("tag", "a");
                 a.put("href", redmineUrl + "/issues/" + id);
+                if (StringUtils.isBlank(issue.getAssigneeName())) {
+                    subject = "【未指派人员】-" + subject;
+                }
                 a.put("text", "\r\n\t" + subject);
                 subContentJsonArray.add(a);
-
-//                JSONObject noneLine = new JSONObject();
-//                noneLine.put("tag", "text");
-//                noneLine.put("text", "\r\n");
-//                subContentJsonArray.add(noneLine);
             }
 
             contentJsonArray.add(atjsonArray);

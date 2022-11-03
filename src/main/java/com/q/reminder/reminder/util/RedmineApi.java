@@ -54,13 +54,17 @@ public abstract class RedmineApi {
                         return filter && !noneStatusList.contains(e.getStatusName());
                     }
                 }).forEach(e -> {
+                    String assigneeName = e.getAssigneeName();
                     RedmineVo queryRedmineVo = new RedmineVo();
                     queryRedmineVo.setDueDate(e.getDueDate());
                     queryRedmineVo.setSubject(e.getSubject());
                     queryRedmineVo.setRedmineUrl(redmineUrl);
                     queryRedmineVo.setUpdatedOn(e.getUpdatedOn());
                     queryRedmineVo.setRedmineId(String.valueOf(e.getId()));
-                    queryRedmineVo.setAssigneeName(e.getAssigneeName());
+                    queryRedmineVo.setAuthorName(e.getAuthorName());
+                    if (StringUtils.isNotBlank(assigneeName)) {
+                        queryRedmineVo.setAssigneeName(assigneeName);
+                    }
                     queryRedmineVo.setStatusName(e.getStatusName());
                     queryRedmineVo.setAssigneeId(String.valueOf(e.getAssigneeId()));
                     queryRedmineVo.setProjectName(e.getProjectName());
