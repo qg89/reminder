@@ -2,6 +2,7 @@ package com.q.reminder.reminder.vo;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -14,14 +15,32 @@ import java.io.Serializable;
 @Data
 public class DefinitionVo implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 3180616623542952311L;
+    /**
+     * 产品
+     */
     private String product;
-
-    private String application;
-
-    private String test;
-
+    /**
+     * 前端
+     */
+    private String front;
+    /**
+     * 后端
+     */
+    private String backend;
+    /**
+     * 大数据
+     */
     private String bigData;
+    /**
+     * 算法
+     */
+    private String algorithm;
+    /**
+     * 测试
+     */
+    private String test;
 
     private String redmineUrl;
     private String apiAccessKey;

@@ -531,15 +531,22 @@ public abstract class FeiShuApi {
         map.put("目标版本", "target");
         map.put("转测时间", "testTime");
         map.put("关联需求父ID", "parentFeatureId");
+        map.put("前端", "front");
+        map.put("后端", "backend");
+        map.put("大数据", "bigData");
+        map.put("算法", "algorithm");
+        map.put("测试", "test");
         return map;
     }
 
     private static Map<String, String> fieldsDefinitionMap() {
         Map<String, String> map = new HashMap<>();
         map.put("产品接口人", "product");
-        map.put("应用端接口人", "application");
+        map.put("前端接口人", "front");
+        map.put("应用端接口人", "backend");
         map.put("测试接口人", "test");
         map.put("大数据接口人", "bigData");
+        map.put("算法接口人", "algorithm");
         return map;
     }
 

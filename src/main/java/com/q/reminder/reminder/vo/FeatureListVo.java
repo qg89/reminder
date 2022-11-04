@@ -96,4 +96,24 @@ public class FeatureListVo implements Serializable {
      * 关联需求父ID
      */
     private String parentFeatureId;
+    /**
+     * 前端
+     */
+    private String front;
+    /**
+     * 后端
+     */
+    private String backend;
+    /**
+     * 大数据
+     */
+    private String bigData;
+    /**
+     * 算法
+     */
+    private String algorithm;
+    /**
+     * 测试
+     */
+    private String test;
 }

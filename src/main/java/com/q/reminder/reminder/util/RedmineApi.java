@@ -18,7 +18,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author : saiko
@@ -181,8 +184,10 @@ public abstract class RedmineApi {
         tracker.setName("需求");
         Integer productAssigneeId = redmineUserMap.get(definition.getProduct());
         Integer bigDataAssigneeId = redmineUserMap.get(definition.getBigData());
-        Integer appAssigneeId = redmineUserMap.get(definition.getApplication());
+        Integer backendAssigneeId = redmineUserMap.get(definition.getBackend());
         Integer testAssigneeId = redmineUserMap.get(definition.getTest());
+        Integer algorithmAssigneeId = redmineUserMap.get(definition.getAlgorithm());
+        Integer frontAssigneeId = redmineUserMap.get(definition.getFront());
         Integer projectId = definition.getProjectId();
         Date dueDate = DateTime.now().plusDays(10).toDate();
         featureList.forEach(vo -> {
@@ -234,10 +239,33 @@ public abstract class RedmineApi {
                 log.error("Redmine-创建需求任务异常", e);
                 return;
             }
+            Integer newIssueId = newIssue.getId();
             vo.setRedmineSubject(redmineSubject);
-            vo.setRedmineId(String.valueOf(newIssue.getId()));
+            vo.setRedmineId(String.valueOf(newIssueId));
             vo.setFeatureId(featureId);
-            log.info("Redmine-创建需求任务成功, redmineId: {}, 主题:[{}]", newIssue.getId(), redmineSubject);
+            log.info("Redmine-创建需求任务成功, redmineId: {}, 主题:[{}]", newIssueId, redmineSubject);
+            Tracker dep = new Tracker()
+                    .setId(7)
+                    .setName("开发");
+            if (StringUtils.isNotBlank(vo.getFront()) && frontAssigneeId != null) {
+                createSubTask(newIssue, frontAssigneeId, dep, newIssueId, redmineSubject, "前端");
+            }
+            if (StringUtils.isNotBlank(vo.getBackend()) && backendAssigneeId != null) {
+                createSubTask(newIssue, backendAssigneeId, dep, newIssueId, redmineSubject, "后端");
+            }
+            if (StringUtils.isNotBlank(vo.getBigData()) && bigDataAssigneeId != null) {
+                createSubTask(newIssue, bigDataAssigneeId, dep, newIssueId, redmineSubject, "大数据");
+            }
+            if (StringUtils.isNotBlank(vo.getAlgorithm()) && algorithmAssigneeId != null) {
+                createSubTask(newIssue, algorithmAssigneeId, dep, newIssueId, redmineSubject, "算法");
+            }
+            if (StringUtils.isNotBlank(vo.getTest()) && testAssigneeId != null) {
+                Tracker tra = new Tracker()
+                        .setName("测试")
+                        .setId(8);
+                createSubTask(newIssue, testAssigneeId, tra, newIssueId, redmineSubject, "测试用例");
+                createSubTask(newIssue, testAssigneeId, tra, newIssueId, redmineSubject, "测试执行");
+            }
         });
     }
 
@@ -252,7 +280,7 @@ public abstract class RedmineApi {
         List<RequestParam> params = List.of(new RequestParam("f[]", "subject"),
                 new RequestParam("op[subject]", "~"),
                 new RequestParam("v[subject][]", redmineSubject));
-        List<Issue> issueList = null;
+        List<Issue> issueList;
         try {
             issueList = transport.getObjectsList(Issue.class, params);
         } catch (RedmineException e) {
@@ -267,22 +295,24 @@ public abstract class RedmineApi {
 
     /**
      *
+     * @param issueParent
      * @param assigneeId
      * @param tracker
-     * @param parentIssue
+     * @param parentIssueId
+     * @param subject
      * @param type
      */
-    private void createSubTask(Integer assigneeId, Tracker tracker, Issue parentIssue, String type) {
-        Issue issue = parentIssue
-                .setTracker(tracker)
-                .setAssigneeId(assigneeId)
-                .setSubject(type + "-" + parentIssue.getSubject());
+    private static void createSubTask(Issue issueParent, Integer assigneeId, Tracker tracker, Integer parentIssueId, String subject, String type) {
+        Issue issue;
         try {
-            issue.create();
+            issue = issueParent.setTracker(tracker)
+                    .setAssigneeId(assigneeId)
+                    .setParentId(parentIssueId)
+                    .setSubject(type + "-" + subject).create();
         } catch (RedmineException e) {
             log.error("Redmine-创建{}子需求任务异常", type);
             return;
         }
-        log.info("Redmine-创建{}}任务成功, redmineId: {}, 主题:[{}]", type, issue.getId(), issue.getSubject());
+        log.info("Redmine-创建[{}]任务成功, redmineId: {}, 主题:[{}]", type, issue.getId(), issue.getSubject());
     }
 }
