@@ -2,6 +2,7 @@ package com.q.reminder.reminder.vo;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -15,6 +16,7 @@ import java.io.Serializable;
 public class FeatureListVo implements Serializable {
 
 
+    @Serial
     private static final long serialVersionUID = 7892264413369571086L;
     /**
      * 该单元格sheetId!A1:B2

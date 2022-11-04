@@ -59,6 +59,7 @@ public class SyncRedmineTaskHandle {
         List<AdminInfo> adminInfoList = adminInfoService.list();
         String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         projectInfos.forEach(projectInfo -> {
+            String pKey = projectInfo.getPKey();
             String pId = projectInfo.getPId();
             String featureToken = projectInfo.getFeatureToken();
             String redmineUrl = projectInfo.getRedmineUrl();
@@ -103,7 +104,7 @@ public class SyncRedmineTaskHandle {
                 }
             }
             // 构建redmine发送任务的实体集合
-            RedmineApi.createTask(featureList, definition, redmineUserMap);
+            RedmineApi.createTask(featureList, definition, redmineUserMap, pKey);
 
             List<RedmineVo> redmineVos = new ArrayList<>();
             featureList.forEach(feature -> {

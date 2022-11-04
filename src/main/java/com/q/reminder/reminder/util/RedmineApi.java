@@ -10,6 +10,7 @@ import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.RedmineManagerFactory;
 import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.IssueRelation;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
@@ -18,10 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author : saiko
@@ -174,9 +172,10 @@ public abstract class RedmineApi {
      * @param featureList
      * @param definition
      * @param redmineUserMap
+     * @param pKey
      */
-    public static void createTask(List<FeatureListVo> featureList, DefinitionVo definition, Map<String, Integer> redmineUserMap) {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(definition.getRedmineUrl(), definition.getApiAccessKey());
+    public static void createTask(List<FeatureListVo> featureList, DefinitionVo definition, Map<String, Integer> redmineUserMap, String pKey) {
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(definition.getRedmineUrl() + "/projects/" + pKey, definition.getApiAccessKey());
 
         Transport transport = mgr.getTransport();
         Tracker tracker = new Tracker();
@@ -192,7 +191,7 @@ public abstract class RedmineApi {
         Date dueDate = DateTime.now().plusDays(10).toDate();
         featureList.forEach(vo -> {
             String featureId = IdWorker.get32UUID().substring(22);
-            String redmineSubject = vo.getRedmineSubject();
+            String redmineSubject = vo.getRedmineSubject() + "[" + featureId + "]";
             String menuOne = vo.getMenuOne();
             String menuTwo = vo.getMenuTwo();
             String menuThree = vo.getMenuThree();
@@ -266,6 +265,12 @@ public abstract class RedmineApi {
                 createSubTask(newIssue, testAssigneeId, tra, newIssueId, redmineSubject, "测试用例");
                 createSubTask(newIssue, testAssigneeId, tra, newIssueId, redmineSubject, "测试执行");
             }
+            String featureType = vo.getFeatureType();
+            String parentFeatureId = vo.getParentFeatureId();
+            if (StringUtils.isNotBlank(parentFeatureId) && StringUtils.isNotBlank(featureType) && "变更".equals(featureType)) {
+                Integer parentId = getParentId(transport, parentFeatureId);
+                createParentFeatureId(parentId, newIssueId, definition);
+            }
         });
     }
 
@@ -314,5 +319,54 @@ public abstract class RedmineApi {
             return;
         }
         log.info("Redmine-创建[{}]任务成功, redmineId: {}, 主题:[{}]", type, issue.getId(), issue.getSubject());
+    }
+
+    /**
+     * 创建关联任务
+     *
+     * @param parentId
+     * @param issueId
+     * @param definition
+     */
+    private static void createParentFeatureId(Integer parentId, Integer issueId, DefinitionVo definition) {
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(definition.getRedmineUrl(), definition.getApiAccessKey());
+        Transport transport = mgr.getTransport();
+        List<IssueRelation> relations = List.of(new IssueRelation(transport, issueId, parentId, "relates"));
+        try {
+            Issue issue = mgr.getIssueManager().getIssueById(issueId).addRelations(relations);
+            issue.update();
+        } catch (RedmineException e) {
+            e.printStackTrace();
+        }
+        log.info("更新关联任务成功！");
+    }
+
+    /**
+     * 根据需求ID 查询redmine任务
+     *
+     * @param transport
+     * @param parentFeatureId
+     * @return
+     */
+    private static Integer getParentId(Transport transport, String parentFeatureId) {
+        Collection<RequestParam> list = List.of(
+                new RequestParam("f[]", "cf_5"),
+                new RequestParam("op[cf_5]", "="),
+                new RequestParam("v[cf_5][]", parentFeatureId)
+        );
+        try {
+            Issue issue = transport.getObjectsList(Issue.class, list).stream().filter(e -> (2 == e.getTracker().getId())).toList().stream().findAny().get();
+            return issue.getId();
+        } catch (RedmineException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        DefinitionVo vo = new DefinitionVo();
+        vo.setApiAccessKey("1f905383da4f783bad92e22f430c7db0b15ae258");
+        vo.setRedmineUrl("http://redmine-qa.mxnavi.com");
+        createParentFeatureId(581982, 601058, vo);
     }
 }
