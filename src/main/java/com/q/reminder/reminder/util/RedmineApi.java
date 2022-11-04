@@ -234,6 +234,7 @@ public abstract class RedmineApi {
                 log.error("Redmine-创建需求任务异常", e);
                 return;
             }
+            vo.setRedmineSubject(redmineSubject);
             vo.setRedmineId(String.valueOf(newIssue.getId()));
             vo.setFeatureId(featureId);
             log.info("Redmine-创建需求任务成功, redmineId: {}, 主题:[{}]", newIssue.getId(), redmineSubject);

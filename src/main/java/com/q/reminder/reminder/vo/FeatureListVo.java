@@ -92,4 +92,8 @@ public class FeatureListVo implements Serializable {
      * redmineId
      */
     private String redmineId;
+    /**
+     * 关联需求父ID
+     */
+    private String parentFeatureId;
 }

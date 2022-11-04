@@ -530,6 +530,7 @@ public abstract class FeiShuApi {
         map.put("产品经理", "product");
         map.put("目标版本", "target");
         map.put("转测时间", "testTime");
+        map.put("关联需求父ID", "parentFeatureId");
         return map;
     }
 

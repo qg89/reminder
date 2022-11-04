@@ -1,6 +1,8 @@
 package com.q.reminder.reminder.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -20,24 +22,39 @@ public class ProjectInfo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 6061440968825915105L;
+    @TableId(type = IdType.INPUT)
+    @TableField("p_id")
     private String pId;
+
+    @TableField("p_key")
     private String pKey;
+
+    @TableField("p_name")
     private String pName;
+
+    @TableField("feature_token")
     private String featureToken;
+
+    @TableField("redmine_url")
     private String redmineUrl;
+
+    @TableField("access_key")
     private String accessKey;
     /**
      * 是否发送需求群
      */
+    @TableField("is_send_group")
     private String isSendGroup;
 
     /**
      * 飞书群ID
      */
+    @TableField("send_group_chat_id")
     private String sendGroupChatId;
     /**
      * 产品经理飞书ID
      */
+    @TableField("product_member_id")
     private String productMemberId;
 
     /**

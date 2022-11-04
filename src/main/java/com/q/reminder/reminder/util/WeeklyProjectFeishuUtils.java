@@ -24,7 +24,7 @@ import java.util.Date;
 public abstract class WeeklyProjectFeishuUtils {
 
     public static WeeklyProjectReport copyFile(WeeklyProjectVo vo) {
-        String weekNum = String.valueOf(DateUtil.thisWeekOfYear() - 1);
+        String weekNum = String.valueOf(DateUtil.thisWeekOfYear());
         // 构建client
         Client client = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
 
