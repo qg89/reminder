@@ -191,7 +191,7 @@ public abstract class RedmineApi {
         Date dueDate = DateTime.now().plusDays(10).toDate();
         featureList.forEach(vo -> {
             String featureId = IdWorker.get32UUID().substring(22);
-            String redmineSubject = vo.getRedmineSubject() + "[" + featureId + "]";
+            String redmineSubject = vo.getRedmineSubject();
             String menuOne = vo.getMenuOne();
             String menuTwo = vo.getMenuTwo();
             String menuThree = vo.getMenuThree();
@@ -204,6 +204,8 @@ public abstract class RedmineApi {
             if (StringUtils.isNotBlank(menuThree)) {
                 redmineSubject += "-[" + menuThree + "]";
             }
+            redmineSubject += "-[" + featureId + "]";
+
             boolean check = checkRedmineTask(mgr, redmineSubject);
             if (check) {
                 return;
@@ -363,10 +365,10 @@ public abstract class RedmineApi {
         return null;
     }
 
-    public static void main(String[] args) {
-        DefinitionVo vo = new DefinitionVo();
-        vo.setApiAccessKey("1f905383da4f783bad92e22f430c7db0b15ae258");
-        vo.setRedmineUrl("http://redmine-qa.mxnavi.com");
-        createParentFeatureId(581982, 601058, vo);
-    }
+//    public static void main(String[] args) {
+//        DefinitionVo vo = new DefinitionVo();
+//        vo.setApiAccessKey("1f905383da4f783bad92e22f430c7db0b15ae258");
+//        vo.setRedmineUrl("http://redmine-qa.mxnavi.com");
+//        createParentFeatureId(581982, 601058, vo);
+//    }
 }

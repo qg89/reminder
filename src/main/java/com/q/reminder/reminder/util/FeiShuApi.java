@@ -283,6 +283,9 @@ public abstract class FeiShuApi {
             Response response = client.newCall(request).execute();
             ResponseBody result = response.body();
             JSONObject resultJson = JSONObject.parseObject(result.string());
+            if (resultJson.getInteger("code") != 0) {
+                return new ArrayList<>();
+            }
             return resultJson.getJSONObject("data").getJSONArray("valueRanges").toJavaList(JSONObject.class, JSONReader.Feature.IgnoreNoneSerializable);
         } catch (IOException e) {
             log.error(e);
