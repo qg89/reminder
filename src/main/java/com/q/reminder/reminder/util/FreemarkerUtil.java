@@ -2,10 +2,8 @@ package com.q.reminder.reminder.util;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 import lombok.extern.log4j.Log4j2;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Map;
 
@@ -17,12 +15,12 @@ import java.util.Map;
  * @date :  2022.11.03 10:50
  */
 @Log4j2
-public class FreemarkerUtil {
+public abstract class FreemarkerUtil {
 
     // 类加载器，用于获取项目目录
     private static final ClassLoader CLASS_LOADER = FreemarkerUtil.class.getClassLoader();
     // 模板存放的目录
-    private static final String BASE_PATH = "template/echarts";
+    private static final String BASE_PATH = "templates/echarts";
 
     /**
      * @Description 加载模板并生成ECharts的option数据字符串

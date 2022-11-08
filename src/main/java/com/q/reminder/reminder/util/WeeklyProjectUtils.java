@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * @date :  2022.11.07 17:07
  */
 @Log4j2
-public class WeeklyProjectUtils {
+public abstract class WeeklyProjectUtils {
 
     /**
      * 评审问题创建图片

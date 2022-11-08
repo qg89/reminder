@@ -26,7 +26,7 @@ import java.io.IOException;
  * @date :  2022.11.03 14:45
  */
 @Log4j2
-public class FeishuJavaUtils {
+public abstract class FeishuJavaUtils {
     /**
      * 上传素材
      *

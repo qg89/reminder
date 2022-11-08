@@ -23,7 +23,7 @@ import java.util.Map;
  * @date :  2022.11.03 10:58
  */
 @Log4j2
-public class EchartsUtil {
+public abstract class EchartsUtil {
 
     private static final String URL = "http://localhost:6666";
     private static final String SUCCESS_CODE = "1";
@@ -91,7 +91,7 @@ public class EchartsUtil {
         String base64 = null;
         try {
             base64 = generateEchartsBase64(option);
-            java.net.URL url = WeeklyProjectUtils.class.getClassLoader().getResource("template/file");
+            java.net.URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
             String fileName = url.getPath() + "/" + UUID.fastUUID() + ".png";
             return generateImage(base64, fileName);
         } catch (IOException e) {
