@@ -1,4 +1,5 @@
 {
+    color: ['#d9d9d9', '#00ff00'],
     title: {
         text: '${title}',
         x:'middle',
@@ -11,15 +12,14 @@
     yAxis: {},
     series: [
         {
-            data: ${open},
+            data: ${close},
             stack: 'one',
             type: 'bar',
-            color: '#00ff00',
             itemStyle: {
                 normal: {
                     label: {
                         show: true,
-                        position: 'top',
+                        position: 'inside',
                         textStyle: {
                             color: 'black',
                             fontSize: 18
@@ -29,15 +29,14 @@
             }
         },
         {
-            data: ${close},
+            data: ${open},
             stack: 'one',
             type: 'bar',
-            color: '#d9d9d9',
             itemStyle: {
                 normal: {
                     label: {
                         show: true,
-                        position: 'top',
+                        position: 'inside',
                         textStyle: {
                             color: 'black',
                             fontSize: 18
