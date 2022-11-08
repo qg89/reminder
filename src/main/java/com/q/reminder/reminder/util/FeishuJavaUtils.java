@@ -94,9 +94,12 @@ public class FeishuJavaUtils {
     public static Boolean batchUpdateBlocks(WeeklyProjectVo vo, UpdateBlockRequest[] updateBlockRequests) {
         Client client = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
 
-        BatchUpdateDocumentBlockReq req = BatchUpdateDocumentBlockReq.newBuilder().documentId(vo.getFileToken()).documentRevisionId(-1).userIdType(BatchUpdateDocumentBlockUserIdTypeEnum.USER_ID).batchUpdateDocumentBlockReqBody(
-                BatchUpdateDocumentBlockReqBody.newBuilder().requests(updateBlockRequests).build()
-        ).build();
+        BatchUpdateDocumentBlockReq req = BatchUpdateDocumentBlockReq.newBuilder()
+                .documentId(vo.getFileToken())
+                .documentRevisionId(-1)
+                .userIdType(BatchUpdateDocumentBlockUserIdTypeEnum.USER_ID)
+                .batchUpdateDocumentBlockReqBody(BatchUpdateDocumentBlockReqBody.newBuilder().requests(updateBlockRequests).build())
+                .build();
         try {
             BatchUpdateDocumentBlockResp resp = client.docx().documentBlock().batchUpdate(req);
             if (resp.getCode() == 0) {

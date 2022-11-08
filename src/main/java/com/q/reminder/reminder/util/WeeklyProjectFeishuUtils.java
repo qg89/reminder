@@ -17,6 +17,7 @@ import com.lark.oapi.service.drive.v1.model.CopyFileResp;
 import com.lark.oapi.service.drive.v1.model.Property;
 import com.q.reminder.reminder.entity.WeeklyProjectReport;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.Date;
 
@@ -27,6 +28,7 @@ import java.util.Date;
  * @Description :
  * @date :  2022.11.01 14:15
  */
+@Log4j2
 public abstract class WeeklyProjectFeishuUtils {
 
     /**
@@ -94,27 +96,22 @@ public abstract class WeeklyProjectFeishuUtils {
         try {
             resp = client.docx().documentBlock().list(listDocumentBlockReq);
         } catch (Exception e) {
-            e.printStackTrace();
-        }
-        // 处理服务端错误
-        if (!resp.success()) {
-            System.out.printf("code:%s,msg:%s,reqId:%s%n", resp.getCode(), resp.getMsg(), resp.getRequestId());
-            return null;
+            log.error(e);
         }
         // 业务数据处理
-        JSONObject result = JSONObject.parseObject(Jsons.DEFAULT.toJson(resp.getData()));
-        if (resp.getCode() != 0) {
-            return new JSONArray();
+        if (resp != null && resp.getCode() == 0) {
+            JSONObject result = JSONObject.parseObject(Jsons.DEFAULT.toJson(resp.getData()));
+            return result.getJSONArray("items");
         }
-        return result.getJSONArray("items");
+        return new JSONArray();
     }
 
-    public static void main(String[] args) {
-        WeeklyProjectVo vo = new WeeklyProjectVo();
-        vo.setAppId("cli_a1144b112738d013");
-        vo.setAppSecret("AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx");
-        vo.setFileToken("HOefdW3YdomyO3x2GAOcRsZ9nyb");
-        JSONArray blocks = blocks(vo);
-        System.out.println(blocks);
-    }
+//    public static void main(String[] args) {
+//        WeeklyProjectVo vo = new WeeklyProjectVo();
+//        vo.setAppId("cli_a1144b112738d013");
+//        vo.setAppSecret("AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx");
+//        vo.setFileToken("HOefdW3YdomyO3x2GAOcRsZ9nyb");
+//        JSONArray blocks = blocks(vo);
+//        System.out.println(blocks);
+//    }
 }

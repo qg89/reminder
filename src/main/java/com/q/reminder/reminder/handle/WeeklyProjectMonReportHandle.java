@@ -16,6 +16,7 @@ import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -74,13 +75,11 @@ public class WeeklyProjectMonReportHandle {
                         vo.setBlockId(block.getString("block_id"));
                         // 评审问题
                         File file = WeeklyProjectUtils.reviewQuestions(vo);
-//                        replaceImaage(vo, file);
                         addRequests(vo, file, requests);
                         if (file.isFile()) {
                             file.delete();
                         }
                         i = i + 2;
-                        vo.setBlockId(null);
                     }
                 }
                 if (5 == blockType) {
@@ -90,13 +89,11 @@ public class WeeklyProjectMonReportHandle {
                         // 趋势
                         vo.setBlockId(block.getString("block_id"));
                         File file = WeeklyProjectUtils.trends(vo);
-//                        replaceImaage(vo, file);
                         addRequests(vo, file, requests);
                         if (file.isFile()) {
                             file.delete();
                         }
                         i = i + 1;
-                        vo.setBlockId(null);
                     }
                 }
             }
@@ -118,11 +115,13 @@ public class WeeklyProjectMonReportHandle {
         imageVo.setAppId(vo.getAppId());
         imageVo.setParentNode(vo.getBlockId());
         String fileToken = FeishuJavaUtils.upload(imageVo);
+        if (StringUtils.isBlank(fileToken)) {
+            log.info("飞书上传素材返回为空");
+        }
         UpdateBlockRequest update = UpdateBlockRequest.newBuilder().build();
         update.setReplaceImage(ReplaceImageRequest.newBuilder()
                 .token(fileToken)
                 .build());
-        update.setBlockId(vo.getBlockId());
         requests.add(update);
     }
 
