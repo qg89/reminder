@@ -4,9 +4,7 @@ import cn.hutool.core.codec.Base64;
 import cn.hutool.core.codec.Base64Decoder;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
 import com.q.reminder.reminder.entity.ProjectInfo;
-import com.q.reminder.reminder.test.EchartsUtil;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.taskadapter.redmineapi.bean.Issue;
 
@@ -112,10 +110,5 @@ public class ReviewEcharts {
             }
         }
         return file;
-    }
-
-    public static void main(String[] args) {
-        WeeklyProjectVo vo = new WeeklyProjectVo();
-        File file = createImageFile(vo);
     }
 }
