@@ -76,7 +76,7 @@ public class WeeklyProjectMonReportHandle {
                         // 评审问题
                         File file = WeeklyProjectUtils.reviewQuestions(vo);
                         addRequests(vo, file, requests);
-                        if (file.isFile()) {
+                        if (file != null && file.isFile()) {
                             file.delete();
                         }
                         i = i + 2;
@@ -90,7 +90,18 @@ public class WeeklyProjectMonReportHandle {
                         vo.setBlockId(block.getString("block_id"));
                         File file = WeeklyProjectUtils.trends(vo);
                         addRequests(vo, file, requests);
-                        if (file.isFile()) {
+                        if (file != null && file.isFile()) {
+                            file.delete();
+                        }
+                        i = i + 1;
+                    }
+                    if (WeeklyReportContents.OPEN_BUG.equals(qs)) {
+                        block = JSONObject.parseObject(jsonArray.get(i + 1).toString());
+                        // 趋势
+                        vo.setBlockId(block.getString("block_id"));
+                        File file = WeeklyProjectUtils.openBug(vo);
+                        addRequests(vo, file, requests);
+                        if (file != null && file.isFile()) {
                             file.delete();
                         }
                         i = i + 1;

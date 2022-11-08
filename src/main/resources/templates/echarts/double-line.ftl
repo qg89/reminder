@@ -1,6 +1,7 @@
 {
   tooltip: {
-    trigger: 'axis'
+    trigger: 'axis',
+    alwaysShowContent: true
   },
   title: {
     text: '${title}'

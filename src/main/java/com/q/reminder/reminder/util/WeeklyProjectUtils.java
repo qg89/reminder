@@ -70,7 +70,7 @@ public abstract class WeeklyProjectUtils {
         Map<String, List<Issue>> weekNumMap = sortIssueList(issues);
         List<String> categories = new ArrayList<>();
         // 变量
-        String title = "Open Bug分布";
+        String title = "线上问题每周增加情况";
         List<Integer> data1 = new ArrayList<>();
         List<Integer> data2 = new ArrayList<>();
 
@@ -112,5 +112,9 @@ public abstract class WeeklyProjectUtils {
         weekNumMap = weekNumMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                 (v1, v2) -> v1, LinkedHashMap::new));
         return weekNumMap;
+    }
+
+    public static File openBug(WeeklyProjectVo vo) {
+        return null;
     }
 }
