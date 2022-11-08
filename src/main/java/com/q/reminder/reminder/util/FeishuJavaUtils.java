@@ -104,6 +104,8 @@ public abstract class FeishuJavaUtils {
             BatchUpdateDocumentBlockResp resp = client.docx().documentBlock().batchUpdate(req);
             if (resp.getCode() == 0) {
                 return Boolean.TRUE;
+            } else {
+                log.error("更新飞书周报失败： {}", resp.getError());
             }
         } catch (Exception e) {
             log.error(e);

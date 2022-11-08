@@ -105,6 +105,7 @@ public class WeeklyProjectMonReportHandle {
         if (file == null) {
             return;
         }
+        String blockId = vo.getBlockId();
         // 通过飞书上传图片至对应的block_id下
         FeishuUploadImageVo imageVo = new FeishuUploadImageVo();
         imageVo.setParentType("docx_image");
@@ -113,7 +114,7 @@ public class WeeklyProjectMonReportHandle {
         imageVo.setSize(file.length());
         imageVo.setAppSecret(vo.getAppSecret());
         imageVo.setAppId(vo.getAppId());
-        imageVo.setParentNode(vo.getBlockId());
+        imageVo.setParentNode(blockId);
         String fileToken = FeishuJavaUtils.upload(imageVo);
         if (StringUtils.isBlank(fileToken)) {
             log.info("飞书上传素材返回为空");
@@ -122,6 +123,7 @@ public class WeeklyProjectMonReportHandle {
         update.setReplaceImage(ReplaceImageRequest.newBuilder()
                 .token(fileToken)
                 .build());
+        update.setBlockId(blockId);
         requests.add(update);
     }
 
