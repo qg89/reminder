@@ -19,7 +19,13 @@ public class WeeklyProjectVo extends BaseFeishuVo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 8912201228540480304L;
-    private String fileToken;
+    private String accessKey;
     private String folderToken;
-    private String projectSshortName;
+    private String projectShortName;
+    private String redmineUrl;
+    private String fileName;
+    private String fileToken;
+    private String pKey;
+
+    private String blockId;
 }

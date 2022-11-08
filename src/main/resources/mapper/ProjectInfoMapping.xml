@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.q.reminder.reminder.mapper.ProjectInfoMapping">
+    <select id="getWeeklyDocxList" resultType="com.q.reminder.reminder.vo.WeeklyProjectVo">
+        SELECT
+            p.access_key AS accessKey,
+            p.folder_token AS folder_token,
+            p.project_short_name AS projectShortName,
+            p.redmine_url AS redmineUrl,
+            fw.file_name AS fileName,
+            fw.file_token AS fileToken,
+            p.p_key AS pKey
+        FROM
+            r_project_info p,
+            fs_weekly_project_report fw
+        WHERE
+            p.p_id = fw.r_pid
+            AND fw.file_token IS NOT NULL
+            AND fw.week_num = (WEEKOFYEAR(NOW()) + 1)
+    </select>
 </mapper>

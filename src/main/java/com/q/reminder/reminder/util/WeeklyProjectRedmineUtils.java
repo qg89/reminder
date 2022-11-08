@@ -38,27 +38,20 @@ public abstract class WeeklyProjectRedmineUtils {
 //        OverallBug.bugLevelDistribution(list, vo);
 //        OverallBug.openBugLevelDistribution(list, vo);
 //        copq(list, vo);
-        majorProjectTrackingItems(list, vo);
+//        majorProjectTrackingItems(list, vo);
     }
 
     /**
      * 项目周报，获取评审问题
      *
-     * @param projectInfoList
-     * @param vo
      */
-    public static void reviewQuestion(List<ProjectInfo> projectInfoList, QueryVo vo) {
-        for (ProjectInfo projectInfo : projectInfoList) {
-            List<RequestParam> params = List.of(
-                    new RequestParam("f[]", "tracker_id"),
-                    new RequestParam("op[tracker_id]", "="),
-                    new RequestParam("v[tracker_id][]", "38"),
-                    new RequestParam("group_by", ""),
-                    new RequestParam("c[]", "description")
-            );
-            List<Issue> issues = queryRedmine(projectInfo, vo, params);
-            System.out.println(issues);
-        }
+    public static List<Issue> reviewQuestion(ProjectInfo projectInfo) {
+        List<RequestParam> params = List.of(
+                new RequestParam("f[]", "tracker_id"),
+                new RequestParam("op[tracker_id]", "="),
+                new RequestParam("v[tracker_id][]", "38")
+        );
+        return queryRedmine(projectInfo, new QueryVo(), params);
     }
 
     /**

@@ -3,7 +3,10 @@ package com.q.reminder.reminder.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.q.reminder.reminder.entity.GroupInfo;
 import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
 
 /**
  * @author : saiko
@@ -14,4 +17,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface ProjectInfoMapping extends BaseMapper<ProjectInfo> {
+
+    List<WeeklyProjectVo> getWeeklyDocxList();
 }

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.entity.WeeklyProjectReport;
+import com.q.reminder.reminder.handle.base.HoldayBase;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WeeklyProjectReportService;
 import com.q.reminder.reminder.util.WeeklyProjectFeishuUtils;
@@ -33,9 +34,15 @@ public class WeeklyProjectReportHandle {
     private ProjectInfoService projectInfoService;
     @Autowired
     private FeishuProperties feishuProperties;
+    @Autowired
+    private HoldayBase holdayBase;
 
     @XxlJob("xxlJobWeekly")
     public ReturnT<String> weekly() {
+        if (holdayBase.queryHoliday()) {
+            log.info("节假日放假!!!!");
+            return ReturnT.SUCCESS;
+        }
         String jobParam = XxlJobHelper.getJobParam();
         WeeklyProjectVo vo = new WeeklyProjectVo();
         vo.setAppSecret(feishuProperties.getAppSecret());
@@ -43,7 +50,7 @@ public class WeeklyProjectReportHandle {
         vo.setFileToken("doxcnj0HVWCrYvTW2uzFS4S1hLg");
         LambdaQueryWrapper<ProjectInfo> wrapper = Wrappers.<ProjectInfo>lambdaQuery().isNotNull(ProjectInfo::getFolderToken).isNotNull(ProjectInfo::getProjectShortName);
         projectInfoService.list(wrapper).forEach(projectInfo -> {
-            vo.setProjectSshortName(projectInfo.getProjectShortName());
+            vo.setProjectShortName(projectInfo.getProjectShortName());
             vo.setFolderToken(projectInfo.getFolderToken());
             WeeklyProjectReport projectReport = WeeklyProjectFeishuUtils.copyFile(vo);
             projectReport.setRPid(projectInfo.getPId());

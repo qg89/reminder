@@ -4,7 +4,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.mapper.ProjectInfoMapping;
 import com.q.reminder.reminder.service.ProjectInfoService;
+import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * @author : saiko
@@ -15,4 +18,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, ProjectInfo> implements ProjectInfoService {
+    @Override
+    public List<WeeklyProjectVo> getWeeklyDocxList() {
+        return baseMapper.getWeeklyDocxList();
+    }
 }
