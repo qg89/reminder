@@ -80,6 +80,7 @@ public class WeeklyProjectMonReportHandle {
                             file.delete();
                         }
                         i = i + 2;
+                        log.info("{}项目周报，评审问题执行完成", report.getProjectShortName());
                     }
                 }
                 if (5 == blockType) {
@@ -94,21 +95,24 @@ public class WeeklyProjectMonReportHandle {
                             file.delete();
                         }
                         i = i + 1;
+                        log.info("{}项目周报，趋势执行完成", report.getProjectShortName());
                     }
-                    if (WeeklyReportContents.OPEN_BUG.equals(qs)) {
+                    if (WeeklyReportContents.BUG_LEVEL.equals(qs)) {
                         block = JSONObject.parseObject(jsonArray.get(i + 1).toString());
-                        // 趋势
+                        // bug等级
                         vo.setBlockId(block.getString("block_id"));
-                        File file = WeeklyProjectUtils.openBug(vo);
+                        File file = WeeklyProjectUtils.bugLevel(vo);
                         addRequests(vo, file, requests);
                         if (file != null && file.isFile()) {
                             file.delete();
                         }
                         i = i + 1;
+                        log.info("{}项目周报，bug等级分布执行完成", report.getProjectShortName());
                     }
                 }
             }
             FeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
+            log.info("{}项目周报更新完成", report.getProjectShortName());
         });
     }
 

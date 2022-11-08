@@ -6,7 +6,6 @@ import com.q.reminder.reminder.vo.QueryVo;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.RedmineManagerFactory;
-import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.internal.RequestParam;
@@ -120,16 +119,12 @@ public abstract class WeeklyProjectRedmineUtils {
         /**
          * ALL Bug等级分布
          */
-        public static void bugLevelDistribution(List<ProjectInfo> projectInfoList, QueryVo vo) {
-            for (ProjectInfo projectInfo : projectInfoList) {
-                List<RequestParam> params = List.of(
-                        new RequestParam("tracker_id", "1"),
-                        new RequestParam("created_on", "lw"),
-                        new RequestParam("status_id", "*")
-                );
-                List<Issue> issues = queryRedmine(projectInfo, params);
-                System.out.println(issues);
-            }
+        public static List<Issue> bugLevelDistribution(ProjectInfo projectInfo) {
+            List<RequestParam> params = List.of(
+                    new RequestParam("tracker_id", "1"),
+                    new RequestParam("created_on", "lw"),
+                    new RequestParam("status_id", "*"));
+            return queryRedmine(projectInfo, params);
         }
 
         /**
