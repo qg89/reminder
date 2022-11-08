@@ -62,9 +62,7 @@ public abstract class WeeklyProjectRedmineUtils {
             List<RequestParam> params = List.of(
                     new RequestParam("f[]", "cf_68"),
                     new RequestParam("op[cf_68]", "="),
-                    new RequestParam("v[cf_68][]", "客户反馈"),
-                    new RequestParam("group_by", ""),
-                    new RequestParam("c[]", "description")
+                    new RequestParam("v[cf_68][]", "客户反馈")
             );
             List<Issue> issues = queryRedmine(projectInfo, vo, params);
             System.out.println(issues);

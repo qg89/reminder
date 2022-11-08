@@ -1,7 +1,7 @@
 package com.q.reminder.reminder.util;
 
 import com.lark.oapi.Client;
-import com.lark.oapi.core.utils.Jsons;
+import com.lark.oapi.service.docx.v1.enums.PatchDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.model.PatchDocumentBlockReq;
 import com.lark.oapi.service.docx.v1.model.PatchDocumentBlockResp;
 import com.lark.oapi.service.docx.v1.model.ReplaceImageRequest;
@@ -11,8 +11,13 @@ import com.lark.oapi.service.drive.v1.model.UploadAllMediaReqBody;
 import com.lark.oapi.service.drive.v1.model.UploadAllMediaResp;
 import com.lark.oapi.service.drive.v1.model.UploadAllMediaRespBody;
 import com.q.reminder.reminder.vo.FeishuUploadImageVo;
+import com.q.reminder.reminder.vo.WeeklyProjectVo;
+import lombok.extern.log4j.Log4j2;
 
-import java.io.File;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 
 /**
@@ -22,20 +27,8 @@ import java.io.File;
  * @Description :
  * @date :  2022.11.03 14:45
  */
+@Log4j2
 public class FeishuJavaUtils {
-    public static void main(String[] args) {
-        FeishuUploadImageVo vo = new FeishuUploadImageVo();
-        vo.setFile(new File("d:\\Users\\saiko\\Pictures\\chrome_pPdjQOcMKR.png"));
-        vo.setParentType("docx_image");
-        vo.setFileName("chrome_pPdjQOcMKR");
-        vo.setParentNode("WoeIdKeGAoSoYgxWMzTciySRn3e");
-        vo.setSize(29081);
-        vo.setAppId("cli_a1144b112738d013");
-        vo.setAppSecret("AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx");
-        String upload = upload(vo);
-        System.out.println(upload);
-    }
-
     /**
      * 上传素材
      *
@@ -50,7 +43,7 @@ public class FeishuJavaUtils {
                     UploadAllMediaReq.newBuilder()
                             .uploadAllMediaReqBody(UploadAllMediaReqBody.newBuilder()
                                     .fileName(vo.getFileName())
-                                    .size(vo.getSize())
+                                    .size(Math.toIntExact(vo.getSize()))
                                     .parentNode(vo.getParentNode())
                                     .parentType(vo.getParentType())
                                     .file(vo.getFile())
@@ -69,23 +62,42 @@ public class FeishuJavaUtils {
 
     /**
      * 更新块
+     *
      * @param vo
      */
-    public static void updateBlocks(FeishuUploadImageVo vo) {
+    public static Boolean updateBlocks(WeeklyProjectVo vo) {
         Client client = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
         UpdateBlockRequest update = UpdateBlockRequest.newBuilder().build();
         update.setReplaceImage(ReplaceImageRequest.newBuilder()
-                .token("boxcn62J4gU0QSZRRiYOLMN10pg")
+                .token(vo.getImageToken())
                 .build());
         try {
             PatchDocumentBlockResp patch = client.docx().documentBlock().patch(PatchDocumentBlockReq.newBuilder()
-                    .documentId("EVPzdLhwwosGcExpF3Pc37M6nDb")
-                    .blockId("doxcnCoCO07lGgap7pxrPhwHOwe")
+                    .documentId(vo.getFileToken())
+                    .blockId(vo.getBlockId())
+                    .documentRevisionId(-1)
+                    .userIdType(PatchDocumentBlockUserIdTypeEnum.USER_ID)
                     .updateBlockRequest(update)
                     .build());
-            System.out.println(Jsons.DEFAULT.toJson(patch.getData()));
+            if (patch.getCode() == 0) {
+                return Boolean.TRUE;
+            }
         } catch (Exception e) {
+            log.error(e);
+        }
+        return Boolean.FALSE;
+    }
+
+    public static FeishuUploadImageVo getImage(String file) {
+        FeishuUploadImageVo vo = new FeishuUploadImageVo();
+        try (FileInputStream fi = new FileInputStream(file)) {
+            BufferedImage read = ImageIO.read(fi);
+            int height = read.getHeight();
+            int width = read.getWidth();
+
+        } catch (IOException e) {
             e.printStackTrace();
         }
+        return vo;
     }
 }

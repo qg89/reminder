@@ -3,15 +3,19 @@ package com.q.reminder.reminder.util;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.codec.Base64Decoder;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.UUID;
 import com.alibaba.fastjson2.JSON;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.taskadapter.redmineapi.bean.Issue;
+import lombok.extern.log4j.Log4j2;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -22,6 +26,7 @@ import java.util.stream.Collectors;
  * @Description :
  * @date :  2022.11.07 17:07
  */
+@Log4j2
 public class ReviewEcharts {
 
     public static File createImageFile(WeeklyProjectVo vo) {
@@ -53,62 +58,7 @@ public class ReviewEcharts {
         datas.put("close", JSON.toJSONString(closeList));
         datas.put("title", title);
 
-        // 生成option字符串
-        String option = FreemarkerUtil.generate("reviewQuestions.ftl", datas);
-
-        // 根据option参数
-        String base64 = null;
-        try {
-            base64 = EchartsUtil.generateEchartsBase64(option);
-            return generateImage(base64, "D:\\dev-work\\my-work\\reminder\\src\\main\\resources\\template\\file\\test.png");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static File base64ToFile(String base64) {
-        if (base64 == null || "".equals(base64)) {
-            return null;
-        }
-        byte[] buff = Base64.decode(base64);
-        File file = null;
-        FileOutputStream fout = null;
-        try {
-            file = File.createTempFile("D:\\dev-work\\my-work\\reminder\\src\\main\\resources\\template\\file", "png");
-            fout = new FileOutputStream(file);
-            fout.write(buff);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (fout != null) {
-                try {
-                    fout.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return file;
-    }
-
-    public static File generateImage(String base64, String path) throws IOException {
-        BufferedOutputStream bos = null;
-        java.io.FileOutputStream fos = null;
-        File file = new File(path);
-        try {
-            byte[] b = Base64Decoder.decode(base64);
-            fos = new FileOutputStream(file);
-            bos = new BufferedOutputStream(fos);
-            bos.write(b);
-        } finally {
-            if (bos != null) {
-                bos.close();
-            }
-            if (fos != null) {
-                fos.close();
-            }
-        }
-        return file;
+        File base64 = EchartsUtil.getFile(datas, "reviewQuestions.ftl");
+        return base64;
     }
 }

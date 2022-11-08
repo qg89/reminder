@@ -16,12 +16,11 @@ import java.io.Serializable;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class FeishuUploadImageVo extends BaseFeishuVo implements Serializable {
+public class FeishuUploadImageVo extends WeeklyProjectVo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 5026677480686131016L;
-    private String fileName;
-    private Integer size;
+    private Long size;
     private String parentNode;
     private String parentType;
     private File file;

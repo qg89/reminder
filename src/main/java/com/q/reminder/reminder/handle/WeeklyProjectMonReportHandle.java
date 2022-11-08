@@ -1,14 +1,15 @@
 package com.q.reminder.reminder.handle;
 
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.contents.WeeklyReportContents;
 import com.q.reminder.reminder.handle.base.HoldayBase;
 import com.q.reminder.reminder.service.ProjectInfoService;
+import com.q.reminder.reminder.util.FeishuJavaUtils;
 import com.q.reminder.reminder.util.ReviewEcharts;
 import com.q.reminder.reminder.util.WeeklyProjectFeishuUtils;
+import com.q.reminder.reminder.vo.FeishuUploadImageVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.annotation.XxlJob;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * @author : saiko
@@ -59,29 +59,68 @@ public class WeeklyProjectMonReportHandle {
             vo.setAccessKey(report.getAccessKey());
             vo.setPKey(report.getPKey());
 
-            List<Object> blocks = Objects.requireNonNull(WeeklyProjectFeishuUtils.blocks(vo)).stream().filter(e -> {
-                JSONObject block = JSONObject.parseObject(e.toString());
+            JSONArray jsonArray = WeeklyProjectFeishuUtils.blocks(vo);
+            for (int i = 0; i < Objects.requireNonNull(jsonArray).size(); i++) {
+                JSONObject block = JSONObject.parseObject(jsonArray.get(i).toString());
                 Integer blockType = block.getInteger("block_type");
-                return 14 == blockType;
-            }).toList();
-            blocks.forEach(e -> {
-                JSONObject block = JSONObject.parseObject(e.toString());
-                String content = JSONObject.parseObject(block.getJSONObject("code").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
-                if (WeeklyReportContents.REVIEW_QUESTIONS.equals(content)) {
-                    // 评审问题
-                    String blockId = block.getString("block_id");
-                    vo.setBlockId(blockId);
-                    reviewQuestions(vo);
+                if (4 == blockType) {
+                    String pswt = JSONObject.parseObject(block.getJSONObject("heading2").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
+                    if (WeeklyReportContents.REVIEW_QUESTIONS.equals(pswt)) {
+                        block = JSONObject.parseObject(jsonArray.get(i + 2).toString());
+                        vo.setBlockId(block.getString("block_id"));
+                        // 评审问题
+                        reviewQuestions(vo);
+                        i = i + 2;
+                    }
                 }
-            });
+                if (5 == blockType) {
+                    String qs = JSONObject.parseObject(block.getJSONObject("heading3").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
+                    if (WeeklyReportContents.TRENDS.equals(qs)) {
+                        // 趋势
+
+                    }
+                }
+            }
         });
     }
 
+    private void trends(WeeklyProjectVo vo) {
+
+    }
+
+    /**
+     * 评审问题
+     * @param vo
+     */
     private void reviewQuestions(WeeklyProjectVo vo) {
         // 先通过redmine生成图片
         File file = ReviewEcharts.createImageFile(vo);
+        if (file == null) {
+            return;
+        }
         // 通过飞书上传图片至对应的block_id下
-
+        FeishuUploadImageVo imageVo = new FeishuUploadImageVo();
+        imageVo.setParentType("docx_image");
+        imageVo.setFile(file);
+        imageVo.setFileName(file.getName());
+        imageVo.setSize(file.length());
+        imageVo.setAppSecret(vo.getAppSecret());
+        imageVo.setAppId(vo.getAppId());
+        imageVo.setParentNode(vo.getBlockId());
+        String fileToken = FeishuJavaUtils.upload(imageVo);
+        vo.setImageToken(fileToken);
         // 通过飞书替换图片至block_id
+        Boolean updateBlocks = FeishuJavaUtils.updateBlocks(vo);
+        if (!updateBlocks) {
+            System.out.println();
+        }
+        // 删除图片
+        try {
+
+        } finally {
+            if (file.isFile()) {
+                file.delete();
+            }
+        }
     }
 }

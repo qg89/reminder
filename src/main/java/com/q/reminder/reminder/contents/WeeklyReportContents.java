@@ -11,6 +11,7 @@ public interface WeeklyReportContents {
     /**
      * 评审问题
      */
-    String REVIEW_QUESTIONS = "${ReviewQuestions}";
+    String REVIEW_QUESTIONS = "评审问题数量";
+    String TRENDS = "趋势";
 
 }
