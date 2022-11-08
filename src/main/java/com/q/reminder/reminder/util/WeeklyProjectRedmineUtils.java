@@ -135,16 +135,13 @@ public abstract class WeeklyProjectRedmineUtils {
         /**
          * open Bug等级分布
          */
-        public static void openBugLevelDistribution(List<ProjectInfo> projectInfoList, QueryVo vo) {
-            for (ProjectInfo projectInfo : projectInfoList) {
-                List<RequestParam> params = List.of(
-                        new RequestParam("tracker_id", "1"),
-                        new RequestParam("created_on", "lw"),
-                        new RequestParam("status_id", "o")
-                );
-                List<Issue> issues = queryRedmine(projectInfo, params);
-                System.out.println(issues);
-            }
+        public static List<Issue> openBugLevelDistribution(ProjectInfo projectInfo) {
+            List<RequestParam> params = List.of(
+                    new RequestParam("tracker_id", "1"),
+                    new RequestParam("created_on", "lw"),
+                    new RequestParam("status_id", "o")
+            );
+            return queryRedmine(projectInfo, params);
         }
 
     }

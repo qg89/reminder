@@ -1,5 +1,4 @@
 {
-  color: ['${color1}', '${color2}'],
   tooltip: {
     trigger: 'axis'
   },
@@ -24,7 +23,7 @@
   },
   series: [
     {
-      name: '${name3}',
+      name: '${name1}',
       data: ${data1},
       type: 'bar',
       symbolSize: 0,
@@ -34,7 +33,7 @@
             show: true,
             position: 'inside',
             textStyle: {
-              color: '${color1}',
+              color: 'black',
               fontSize: 12
             }
           }
@@ -52,7 +51,7 @@
             show: true,
             position: 'inside',
             textStyle: {
-              color: '${color2}',
+              color: 'black',
               fontSize: 12
             }
           }

@@ -115,6 +115,39 @@ public abstract class WeeklyProjectUtils {
     }
 
     public static File openBug(WeeklyProjectVo vo) {
-        return null;
+        ProjectInfo projectInfo = new ProjectInfo();
+        projectInfo.setRedmineUrl(vo.getRedmineUrl());
+        projectInfo.setAccessKey(vo.getAccessKey());
+        projectInfo.setPKey(vo.getPKey());
+        List<Issue> issues = WeeklyProjectRedmineUtils.OverallBug.openBugLevelDistribution(projectInfo);
+        Map<String, List<Issue>> weekNumMap = sortIssueList(issues);
+        List<String> categories = new ArrayList<>();
+        // 变量
+        String title = "未关闭Bug等级";
+        List<Integer> data1 = new ArrayList<>();
+        List<Integer> data2 = new ArrayList<>();
+
+        weekNumMap.forEach((k, v) -> {
+            data1.add(v.size());
+            categories.add(DateUtil.thisYear() + "W" + k);
+        });
+
+        AtomicInteger value = new AtomicInteger();
+        weekNumMap.forEach((k, v) -> {
+            value.addAndGet(v.size());
+            data2.add(value.intValue());
+        });
+
+        // 模板参数
+        HashMap<String, Object> datas = new HashMap<>();
+        datas.put("categories", JSON.toJSONString(categories));
+        datas.put("data1", JSON.toJSONString(data1));
+        datas.put("data2", JSON.toJSONString(data2));
+        datas.put("name1", "漏出BUG当周");
+        datas.put("name2", "漏出BUG总");
+        datas.put("title", title);
+        datas.put("color1", "#0000ff");
+        datas.put("color2", "#a4c2f4");
+        return EchartsUtil.getFile(datas, "double-bar.ftl");
     }
 }
