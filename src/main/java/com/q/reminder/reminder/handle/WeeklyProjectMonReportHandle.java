@@ -2,13 +2,15 @@ package com.q.reminder.reminder.handle;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.lark.oapi.service.docx.v1.model.ReplaceImageRequest;
+import com.lark.oapi.service.docx.v1.model.UpdateBlockRequest;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.contents.WeeklyReportContents;
 import com.q.reminder.reminder.handle.base.HoldayBase;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.util.FeishuJavaUtils;
-import com.q.reminder.reminder.util.ReviewEcharts;
 import com.q.reminder.reminder.util.WeeklyProjectFeishuUtils;
+import com.q.reminder.reminder.util.WeeklyProjectUtils;
 import com.q.reminder.reminder.vo.FeishuUploadImageVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.xxl.job.core.biz.model.ReturnT;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -60,6 +63,7 @@ public class WeeklyProjectMonReportHandle {
             vo.setPKey(report.getPKey());
 
             JSONArray jsonArray = WeeklyProjectFeishuUtils.blocks(vo);
+            ArrayList<UpdateBlockRequest> requests = new ArrayList<>();
             for (int i = 0; i < Objects.requireNonNull(jsonArray).size(); i++) {
                 JSONObject block = JSONObject.parseObject(jsonArray.get(i).toString());
                 Integer blockType = block.getInteger("block_type");
@@ -69,32 +73,65 @@ public class WeeklyProjectMonReportHandle {
                         block = JSONObject.parseObject(jsonArray.get(i + 2).toString());
                         vo.setBlockId(block.getString("block_id"));
                         // 评审问题
-                        reviewQuestions(vo);
+                        File file = WeeklyProjectUtils.reviewQuestions(vo);
+//                        replaceImaage(vo, file);
+                        addRequests(vo, file, requests);
+                        if (file.isFile()) {
+                            file.delete();
+                        }
                         i = i + 2;
+                        vo.setBlockId(null);
                     }
                 }
                 if (5 == blockType) {
                     String qs = JSONObject.parseObject(block.getJSONObject("heading3").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
                     if (WeeklyReportContents.TRENDS.equals(qs)) {
+                        block = JSONObject.parseObject(jsonArray.get(i + 1).toString());
                         // 趋势
-
+                        vo.setBlockId(block.getString("block_id"));
+                        File file = WeeklyProjectUtils.trends(vo);
+//                        replaceImaage(vo, file);
+                        addRequests(vo, file, requests);
+                        if (file.isFile()) {
+                            file.delete();
+                        }
+                        i = i + 1;
+                        vo.setBlockId(null);
                     }
                 }
             }
+            FeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
         });
     }
 
-    private void trends(WeeklyProjectVo vo) {
-
+    private void addRequests(WeeklyProjectVo vo, File file, List<UpdateBlockRequest> requests) {
+        if (file == null) {
+            return;
+        }
+        // 通过飞书上传图片至对应的block_id下
+        FeishuUploadImageVo imageVo = new FeishuUploadImageVo();
+        imageVo.setParentType("docx_image");
+        imageVo.setFile(file);
+        imageVo.setFileName(file.getName());
+        imageVo.setSize(file.length());
+        imageVo.setAppSecret(vo.getAppSecret());
+        imageVo.setAppId(vo.getAppId());
+        imageVo.setParentNode(vo.getBlockId());
+        String fileToken = FeishuJavaUtils.upload(imageVo);
+        UpdateBlockRequest update = UpdateBlockRequest.newBuilder().build();
+        update.setReplaceImage(ReplaceImageRequest.newBuilder()
+                .token(fileToken)
+                .build());
+        update.setBlockId(vo.getBlockId());
+        requests.add(update);
     }
 
     /**
-     * 评审问题
+     * 替换图片
+     *
      * @param vo
      */
-    private void reviewQuestions(WeeklyProjectVo vo) {
-        // 先通过redmine生成图片
-        File file = ReviewEcharts.createImageFile(vo);
+    private void replaceImaage(WeeklyProjectVo vo, File file) {
         if (file == null) {
             return;
         }

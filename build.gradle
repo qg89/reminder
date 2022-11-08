@@ -76,4 +76,6 @@ dependencies {
 	implementation 'com.larksuite.oapi:oapi-sdk:2.0.3'
 	implementation 'com.xuxueli:xxl-job-core:2.3.1'
 
+	implementation 'org.freemarker:freemarker:2.3.31'
+
 }

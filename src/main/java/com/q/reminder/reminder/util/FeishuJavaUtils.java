@@ -1,11 +1,9 @@
 package com.q.reminder.reminder.util;
 
 import com.lark.oapi.Client;
+import com.lark.oapi.service.docx.v1.enums.BatchUpdateDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.enums.PatchDocumentBlockUserIdTypeEnum;
-import com.lark.oapi.service.docx.v1.model.PatchDocumentBlockReq;
-import com.lark.oapi.service.docx.v1.model.PatchDocumentBlockResp;
-import com.lark.oapi.service.docx.v1.model.ReplaceImageRequest;
-import com.lark.oapi.service.docx.v1.model.UpdateBlockRequest;
+import com.lark.oapi.service.docx.v1.model.*;
 import com.lark.oapi.service.drive.v1.model.UploadAllMediaReq;
 import com.lark.oapi.service.drive.v1.model.UploadAllMediaReqBody;
 import com.lark.oapi.service.drive.v1.model.UploadAllMediaResp;
@@ -40,14 +38,14 @@ public class FeishuJavaUtils {
         Client client = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
         try {
             UploadAllMediaResp uploadAllMediaResp = client.drive().media().uploadAll(
-                    UploadAllMediaReq.newBuilder()
-                            .uploadAllMediaReqBody(UploadAllMediaReqBody.newBuilder()
+                    UploadAllMediaReq.newBuilder().uploadAllMediaReqBody(UploadAllMediaReqBody.newBuilder()
                                     .fileName(vo.getFileName())
                                     .size(Math.toIntExact(vo.getSize()))
                                     .parentNode(vo.getParentNode())
                                     .parentType(vo.getParentType())
                                     .file(vo.getFile())
-                                    .build()).build()
+                                    .build()
+                    ).build()
             );
             int code = uploadAllMediaResp.getCode();
             if (code == 0) {
@@ -80,6 +78,28 @@ public class FeishuJavaUtils {
                     .updateBlockRequest(update)
                     .build());
             if (patch.getCode() == 0) {
+                return Boolean.TRUE;
+            }
+        } catch (Exception e) {
+            log.error(e);
+        }
+        return Boolean.FALSE;
+    }
+
+    /**
+     * 更新块
+     *
+     * @param vo
+     */
+    public static Boolean batchUpdateBlocks(WeeklyProjectVo vo, UpdateBlockRequest[] updateBlockRequests) {
+        Client client = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
+
+        BatchUpdateDocumentBlockReq req = BatchUpdateDocumentBlockReq.newBuilder().documentId(vo.getFileToken()).documentRevisionId(-1).userIdType(BatchUpdateDocumentBlockUserIdTypeEnum.USER_ID).batchUpdateDocumentBlockReqBody(
+                BatchUpdateDocumentBlockReqBody.newBuilder().requests(updateBlockRequests).build()
+        ).build();
+        try {
+            BatchUpdateDocumentBlockResp resp = client.docx().documentBlock().batchUpdate(req);
+            if (resp.getCode() == 0) {
                 return Boolean.TRUE;
             }
         } catch (Exception e) {

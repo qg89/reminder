@@ -6,14 +6,12 @@ import cn.hutool.http.HttpUtil;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import lombok.extern.log4j.Log4j2;
-import org.apache.http.client.ClientProtocolException;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -93,7 +91,7 @@ public class EchartsUtil {
         String base64 = null;
         try {
             base64 = generateEchartsBase64(option);
-            java.net.URL url = ReviewEcharts.class.getClassLoader().getResource("template/file");
+            java.net.URL url = WeeklyProjectUtils.class.getClassLoader().getResource("template/file");
             String fileName = url.getPath() + "/" + UUID.fastUUID() + ".png";
             return generateImage(base64, fileName);
         } catch (IOException e) {
