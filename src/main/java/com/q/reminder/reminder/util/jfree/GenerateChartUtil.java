@@ -8,10 +8,12 @@ import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
 import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.block.BlockBorder;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.Plot;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.data.xy.XYDataset;
@@ -21,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -181,12 +184,21 @@ public class GenerateChartUtil {
         JFreeChart chart = ChartFactory.createStackedBarChart(chartTitle, xAxisTitle, yAxisTitle, JFreeChartUtil.createDefaultCategoryDataset(legendNameList, xAxisNameList, dataList));
         // 设置抗锯齿，防止字体显示不清楚
         chart.setTextAntiAlias(false);
+        CategoryPlot plot = chart.getCategoryPlot();
         // 对柱子进行渲染
-        JFreeChartUtil.setBarRenderer(chart.getCategoryPlot(), true);
+        JFreeChartUtil.setBarRenderer(plot, true);
         // 设置标注无边框
         chart.getLegend().setFrame(new BlockBorder(Color.WHITE));
         // 标注位于上侧
         chart.getLegend().setPosition(RectangleEdge.TOP);
+        CategoryAxis axis = new IntervalCategoryAxis(1);
+        axis.setAxisLineVisible(false);
+        axis.setTickMarksVisible(false);
+        axis.setUpperMargin(0);
+        axis.setLowerMargin(0);
+        axis.setTickLabelFont(JFreeChartUtil.getDefaultFont(Font.BOLD, 22f));
+        axis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
+        plot.setDomainAxes(new CategoryAxis[]{axis});
         return chart;
     }
 
@@ -261,11 +273,22 @@ public class GenerateChartUtil {
         // 设置抗锯齿，防止字体显示不清楚
         chart.setTextAntiAlias(true);
         // 对折现进行渲染
-        JFreeChartUtil.setLineRender(chart.getCategoryPlot(), true, true);
+        CategoryPlot plot = chart.getCategoryPlot();
+        JFreeChartUtil.setLineRender(plot, true, true);
         // 设置标注无边框
         chart.getLegend().setFrame(new BlockBorder(Color.WHITE));
         // 标注位于上侧
         chart.getLegend().setPosition(RectangleEdge.TOP);
+        CategoryAxis axis = new IntervalCategoryAxis(1);
+        // 设置X轴轴线不显示
+        axis.setAxisLineVisible(false);
+        // 设置X轴刻度是否显示
+        axis.setTickMarksVisible(true);
+        axis.setUpperMargin(0);
+        axis.setLowerMargin(0);
+        axis.setCategoryLabelPositions(CategoryLabelPositions.DOWN_45);
+        axis.setTickLabelFont(JFreeChartUtil.getDefaultFont(Font.BOLD, 22f));
+        plot.setDomainAxes(new CategoryAxis[]{axis});
         return chart;
     }
 

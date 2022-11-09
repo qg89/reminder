@@ -1,5 +1,7 @@
 package com.q.reminder.reminder.util.jfree;
 
+import cn.hutool.core.io.resource.ClassPathResource;
+import com.q.reminder.reminder.ReminderApplication;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -19,6 +21,7 @@ import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.chart.ui.TextAnchor;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
+import org.springframework.boot.system.ApplicationHome;
 
 import java.awt.*;
 import java.io.File;
@@ -55,10 +58,10 @@ public class JFreeChartUtil {
         // 标题
         theme.setExtraLargeFont(getDefaultFont(Font.PLAIN, 30f));
         // xy轴
-        theme.setLargeFont(getDefaultFont(Font.PLAIN, 20f));
+        theme.setLargeFont(getDefaultFont(Font.PLAIN, 25f));
         // X轴
         theme.setRegularFont(getDefaultFont(Font.PLAIN, 25f));
-        theme.setSmallFont(getDefaultFont(Font.PLAIN, 50f));
+        theme.setSmallFont(getDefaultFont(Font.PLAIN, 22f));
         return theme;
     }
 
@@ -72,8 +75,12 @@ public class JFreeChartUtil {
      */
     public static Font getDefaultFont(int style, Float size) throws Exception {
         //获取宋体文件
-        URL resource = JFreeChartUtil.class.getClassLoader().getResource("templates/font/simsun.ttc");
-        File defaultFontFile = new File(resource.getFile());
+        ApplicationHome applicationHome = new ApplicationHome(ReminderApplication.class);
+        String parent = applicationHome.getSource().getParent();
+        //项目打包成jar包所在的根路径
+        String configFilePath = parent + "/resources/templates/font/msyh.ttc";
+        //文件路径
+        File defaultFontFile = new File(configFilePath);
         Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, defaultFontFile);
         defaultFont = defaultFont.deriveFont(style, size);
         return defaultFont;

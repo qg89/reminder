@@ -97,18 +97,18 @@ public class WeeklyProjectMonReportHandle {
                         i = i + 1;
                         log.info("{}项目周报，趋势执行完成", report.getProjectShortName());
                     }
-//                    if (WeeklyReportContents.BUG_LEVEL.equals(qs)) {
-//                        block = JSONObject.parseObject(jsonArray.get(i + 1).toString());
-//                        // bug等级
-//                        vo.setBlockId(block.getString("block_id"));
-//                        File file = WeeklyProjectUtils.bugLevel(vo);
-//                        addRequests(vo, file, requests);
-//                        if (file != null && file.isFile()) {
-//                            file.delete();
-//                        }
-//                        i = i + 1;
-//                        log.info("{}项目周报，bug等级分布执行完成", report.getProjectShortName());
-//                    }
+                    if (WeeklyReportContents.BUG_LEVEL.equals(qs)) {
+                        block = JSONObject.parseObject(jsonArray.get(i + 2).toString());
+                        // bug等级
+                        vo.setBlockId(block.getString("block_id"));
+                        File file = WeeklyProjectUtils.bugLevel(vo);
+                        addRequests(vo, file, requests);
+                        if (file != null && file.isFile()) {
+                            file.delete();
+                        }
+                        i = i + 1;
+                        log.info("{}项目周报，bug等级分布执行完成", report.getProjectShortName());
+                    }
                 }
             }
             FeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
@@ -133,6 +133,7 @@ public class WeeklyProjectMonReportHandle {
         String fileToken = FeishuJavaUtils.upload(imageVo);
         if (StringUtils.isBlank(fileToken)) {
             log.info("飞书上传素材返回为空");
+            return;
         }
         UpdateBlockRequest update = UpdateBlockRequest.newBuilder().build();
         update.setReplaceImage(ReplaceImageRequest.newBuilder()

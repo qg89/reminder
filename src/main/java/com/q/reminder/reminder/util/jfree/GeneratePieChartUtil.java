@@ -33,10 +33,9 @@ public class GeneratePieChartUtil {
      * @param dataList           数据列表
      * @param theme              主题(null代表默认主题)
      * @param legendColorList    图例背景颜色列表（为空，使用默认背景颜色）
-     * @param explodePercentList 偏离百分比数据
      * @return
      */
-    public static JFreeChart createPieChart(String chartTitle, List<String> legendNameList, List<Object> dataList, StandardChartTheme theme, List<Color> legendColorList, List<Double> explodePercentList) throws Exception {
+    public static JFreeChart createPieChart(String chartTitle, List<String> legendNameList, List<Object> dataList, StandardChartTheme theme, List<Color> legendColorList) throws Exception {
         //设置主题，防止中文乱码
         theme = theme == null ? JFreeChartUtil.createChartTheme() : theme;
         ChartFactory.setChartTheme(theme);
@@ -85,13 +84,12 @@ public class GeneratePieChartUtil {
      * @param height             高度
      * @param theme              主题(null代表默认主题)
      * @param legendColorList    图例背景颜色列表（为空，使用默认背景颜色）
-     * @param explodePercentList 偏离百分比数据
      * @return
      */
     public static byte[] createPieChart(String chartTitle, List<String> legendNameList, List<Object> dataList, int width, int height
-            , StandardChartTheme theme, List<Color> legendColorList, List<Double> explodePercentList) throws Exception {
+            , StandardChartTheme theme, List<Color> legendColorList) throws Exception {
         ByteArrayOutputStream bas = new ByteArrayOutputStream();
-        createPieChart(bas, chartTitle, legendNameList, dataList, width, height, theme, legendColorList, explodePercentList);
+        createPieChart(bas, chartTitle, legendNameList, dataList, width, height, theme, legendColorList);
         byte[] byteArray = bas.toByteArray();
         return byteArray;
     }
@@ -107,12 +105,11 @@ public class GeneratePieChartUtil {
      * @param height             高度
      * @param theme              主题(null代表默认主题)
      * @param legendColorList    图例背景颜色列表（为空，使用默认背景颜色）
-     * @param explodePercentList 偏离百分比数据
      * @return
      */
     public static void createPieChart(OutputStream outputStream, String chartTitle, List<String> legendNameList, List<Object> dataList
-            , int width, int height, StandardChartTheme theme, List<Color> legendColorList, List<Double> explodePercentList) throws Exception {
-        JFreeChart chart = createPieChart(chartTitle, legendNameList, dataList, theme, legendColorList, explodePercentList);
+            , int width, int height, StandardChartTheme theme, List<Color> legendColorList) throws Exception {
+        JFreeChart chart = createPieChart(chartTitle, legendNameList, dataList, theme, legendColorList);
         try {
             ChartUtils.writeChartAsJPEG(outputStream, 1.0f, chart, width, height, null);
         } catch (IOException e) {

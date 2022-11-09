@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.UUID;
 import com.alibaba.fastjson2.JSON;
 import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.util.jfree.GenerateChartUtil;
 import com.q.reminder.reminder.util.jfree.GeneratePieChartUtil;
 import com.q.reminder.reminder.util.jfree.JFreeChartUtil;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
@@ -43,26 +44,41 @@ public abstract class WeeklyProjectUtils {
         projectInfo.setPKey(vo.getPKey());
         List<Issue> issues = WeeklyProjectRedmineUtils.reviewQuestion(projectInfo);
         Map<String, List<Issue>> weekNumMap = sortIssueList(issues);
-        Set<String> categories = weekNumMap.keySet();
+        List<String> categories = new ArrayList<>();
         // 变量
         String title = "评审问题数量";
-        List<Integer> openList = new ArrayList<>();
-        List<Integer> closeList = new ArrayList<>();
         weekNumMap.forEach((k, v) -> {
-            closeList.add(v.stream().filter(e -> "Closed".equals(e.getStatusName())).toList().size());
-            openList.add(v.stream().filter(e -> "New".equals(e.getStatusName())).toList().size());
+            categories.add(DateUtil.thisYear() + "W" + k);
         });
 
-        // 模板参数
-        HashMap<String, Object> datas = new HashMap<>(7);
-        datas.put("categories", JSON.toJSONString(categories));
-        datas.put("open", JSON.toJSONString(openList));
-        datas.put("close", JSON.toJSONString(closeList));
-        datas.put("title", title);
-        datas.put("name1", "Closed数量");
-        datas.put("name2", "Open数量");
+        //图例名称列表
+        List<String> legendNameList = List.of("Closed数量", "Open数量");
+        //数据列表
+        List<List<Object>> dataList = new ArrayList<>();
+        AtomicInteger value = new AtomicInteger();
+        List<Object> all = new ArrayList<>();
+        List<Object> week = new ArrayList<>();
+        weekNumMap.forEach((k, v) -> {
+            value.addAndGet(v.size());
+            all.add(value.intValue());
+            week.add(v.size());
+        });
+        dataList.add(all);
+        dataList.add(week);
 
-        return EchartsUtil.getFile(datas, "reviewQuestions.ftl");
+        File file = null;
+        try {
+            URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
+            file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            GenerateChartUtil.createStackedBarChart(fileOutputStream, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 939, 488);
+        } catch (Exception e) {
+            log.error(e);
+        }
+        if (file != null) {
+            return file;
+        }
+        return null;
     }
 
     /**
@@ -81,31 +97,41 @@ public abstract class WeeklyProjectUtils {
         List<String> categories = new ArrayList<>();
         // 变量
         String title = "线上问题每周增加情况";
-        List<Integer> data1 = new ArrayList<>();
-        List<Integer> data2 = new ArrayList<>();
 
         weekNumMap.forEach((k, v) -> {
-            data1.add(v.size());
             categories.add(DateUtil.thisYear() + "W" + k);
         });
 
+
+        //图例名称列表
+        List<String> legendNameList = List.of("漏出BUG总数", "漏出BUG当周数");
+        //数据列表
+        List<List<Object>> dataList = new ArrayList<>();
         AtomicInteger value = new AtomicInteger();
+        List<Object> all = new ArrayList<>();
+        List<Object> week = new ArrayList<>();
         weekNumMap.forEach((k, v) -> {
             value.addAndGet(v.size());
-            data2.add(value.intValue());
+            all.add(value.intValue());
+            week.add(v.size());
         });
+        dataList.add(all);
+        dataList.add(week);
 
-        // 模板参数
-        HashMap<String, Object> datas = new HashMap<>();
-        datas.put("categories", JSON.toJSONString(categories));
-        datas.put("data1", JSON.toJSONString(data1));
-        datas.put("data2", JSON.toJSONString(data2));
-        datas.put("name1", "漏出BUG当周");
-        datas.put("name2", "漏出BUG总");
-        datas.put("title", title);
-        datas.put("color1", "#0000ff");
-        datas.put("color2", "#a4c2f4");
-        return EchartsUtil.getFile(datas, "double-line.ftl");
+        File file = null;
+        try {
+            URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
+            file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            GenerateChartUtil.createLineChart(fileOutputStream, title, legendNameList, categories
+                    , dataList, JFreeChartUtil.createChartTheme(), "", "", 939, 488);
+        } catch (Exception e) {
+            log.error(e);
+        }
+        if (file != null) {
+            return file;
+        }
+        return null;
     }
 
     /**
@@ -134,26 +160,23 @@ public abstract class WeeklyProjectUtils {
         // 变量
         String title = "ALL-Bug等级分布";
 
-        Map<String, List<Issue>> levelMap = issues.stream().collect(Collectors.groupingBy(e -> e.getCustomFieldById(67).getValue()));
-        levelMap.forEach((k, v) -> {
 
-        });
-
-
-        List<String> xAxisNameList = new ArrayList<>(Arrays.asList("S", "A", "B", "C", "D"));
-        //数据列表
-        List<Object> dataList1 = new ArrayList<>(Arrays.asList(1, 3, 5, 6, 2));
+        List<String> xAxisNameList = new ArrayList<>();
         //图例背景颜色列表
         List<Color> legendColorList = new ArrayList<>(Arrays.asList(Color.RED, Color.YELLOW, Color.PINK, Color.GREEN, Color.BLUE));
-        //偏离百分比数据
-        List<Double> explodePercentList = new ArrayList<>(Arrays.asList(0.1, 0.1, 0.1, 0.1, 0.1));
+        Map<String, List<Issue>> levelMap = issues.stream().collect(Collectors.groupingBy(e -> e.getCustomFieldById(67).getValue()));
+        //数据列表
+        List<Object> dataList = new ArrayList<>();
+        levelMap.forEach((k, v) -> {
+            xAxisNameList.add(k);
+            dataList.add(v.size());
+        });
         File file = null;
         try {
             URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
             file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
             FileOutputStream fileOutputStream = new FileOutputStream(file);
-            GeneratePieChartUtil.createPieChart(fileOutputStream, title, xAxisNameList, dataList1
-                    , 939, 488, JFreeChartUtil.createChartTheme(), legendColorList, explodePercentList);
+            GeneratePieChartUtil.createPieChart(fileOutputStream, title, xAxisNameList, dataList, 939, 488, JFreeChartUtil.createChartTheme(), legendColorList);
         } catch (Exception e) {
             log.error(e);
         }
