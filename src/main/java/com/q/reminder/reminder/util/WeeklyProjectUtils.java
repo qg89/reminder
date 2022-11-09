@@ -71,7 +71,7 @@ public abstract class WeeklyProjectUtils {
             URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
             file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
             FileOutputStream fileOutputStream = new FileOutputStream(file);
-            GenerateChartUtil.createStackedBarChart(fileOutputStream, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 939, 488);
+            GenerateChartUtil.createStackedBarChart(fileOutputStream, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
         } catch (Exception e) {
             log.error(e);
         }
@@ -124,7 +124,7 @@ public abstract class WeeklyProjectUtils {
             file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             GenerateChartUtil.createLineChart(fileOutputStream, title, legendNameList, categories
-                    , dataList, JFreeChartUtil.createChartTheme(), "", "", 939, 488);
+                    , dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
         } catch (Exception e) {
             log.error(e);
         }
@@ -176,7 +176,7 @@ public abstract class WeeklyProjectUtils {
             URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
             file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
             FileOutputStream fileOutputStream = new FileOutputStream(file);
-            GeneratePieChartUtil.createPieChart(fileOutputStream, title, xAxisNameList, dataList, 939, 488, JFreeChartUtil.createChartTheme(), legendColorList);
+            GeneratePieChartUtil.createPieChart(fileOutputStream, title, xAxisNameList, dataList, 950, 500, JFreeChartUtil.createChartTheme(), legendColorList);
         } catch (Exception e) {
             log.error(e);
         }
