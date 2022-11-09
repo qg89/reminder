@@ -56,12 +56,12 @@ public class JFreeChartUtil {
             }
         };
         // 标题
-        theme.setExtraLargeFont(getDefaultFont(Font.PLAIN, 30f));
+        theme.setExtraLargeFont(getDefaultFont(Font.PLAIN, 25f));
         // xy轴
-        theme.setLargeFont(getDefaultFont(Font.PLAIN, 25f));
+        theme.setLargeFont(getDefaultFont(Font.PLAIN, 20f));
         // X轴
-        theme.setRegularFont(getDefaultFont(Font.PLAIN, 25f));
-        theme.setSmallFont(getDefaultFont(Font.PLAIN, 22f));
+        theme.setRegularFont(getDefaultFont(Font.PLAIN, 20f));
+        theme.setSmallFont(getDefaultFont(Font.PLAIN, 10f));
         return theme;
     }
 
