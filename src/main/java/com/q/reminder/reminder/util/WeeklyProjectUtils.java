@@ -47,11 +47,13 @@ public abstract class WeeklyProjectUtils {
         });
 
         // 模板参数
-        HashMap<String, Object> datas = new HashMap<>();
+        HashMap<String, Object> datas = new HashMap<>(7);
         datas.put("categories", JSON.toJSONString(categories));
         datas.put("open", JSON.toJSONString(openList));
         datas.put("close", JSON.toJSONString(closeList));
         datas.put("title", title);
+        datas.put("name1", "Closed数量");
+        datas.put("name2", "Open数量");
 
         return EchartsUtil.getFile(datas, "reviewQuestions.ftl");
     }

@@ -1,9 +1,10 @@
 {
     color: ['#d9d9d9', '#00ff00'],
     title: {
-        text: '${title}',
-        x:'middle',
-        textAlign:'center'
+        text: '${title}'
+    },
+    legend:{
+        data: ['${name1}', '${name2}']
     },
     xAxis: {
         type: 'category',
@@ -12,6 +13,7 @@
     yAxis: {},
     series: [
         {
+            name: '${name1}',
             data: ${close},
             stack: 'one',
             type: 'bar',
@@ -29,6 +31,7 @@
             }
         },
         {
+            name: '${name2}',
             data: ${open},
             stack: 'one',
             type: 'bar',

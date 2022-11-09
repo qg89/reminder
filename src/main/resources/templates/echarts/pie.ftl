@@ -9,8 +9,7 @@
   series: [
     {
       radius: '50%',
-      name: '${name1}',
-      data: ${data1},
+      data: ${data},
       type: 'pie',
       avoidLabelOverlap: true,
       emphasis: {
