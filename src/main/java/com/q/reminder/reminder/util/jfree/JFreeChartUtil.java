@@ -13,10 +13,8 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.Plot;
 import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.category.BarPainter;
 import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
-import org.jfree.chart.renderer.category.StandardBarPainter;
 import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.chart.ui.TextAnchor;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -24,6 +22,7 @@ import org.jfree.data.general.DefaultPieDataset;
 
 import java.awt.*;
 import java.io.File;
+import java.net.URL;
 import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -73,7 +72,8 @@ public class JFreeChartUtil {
      */
     public static Font getDefaultFont(int style, Float size) throws Exception {
         //获取宋体文件
-        File defaultFontFile = new File("C:\\Windows\\Fonts\\simsun.ttc");
+        URL resource = JFreeChartUtil.class.getClassLoader().getResource("templates/font/simsun.ttc");
+        File defaultFontFile = new File(resource.getFile());
         Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, defaultFontFile);
         defaultFont = defaultFont.deriveFont(style, size);
         return defaultFont;

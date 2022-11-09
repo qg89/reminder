@@ -1,15 +1,22 @@
 package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.UUID;
 import com.alibaba.fastjson2.JSON;
 import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.util.jfree.GeneratePieChartUtil;
+import com.q.reminder.reminder.util.jfree.JFreeChartUtil;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.Issue;
 import lombok.extern.log4j.Log4j2;
 
+import java.awt.*;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.net.URL;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -126,17 +133,33 @@ public abstract class WeeklyProjectUtils {
 
         // 变量
         String title = "ALL-Bug等级分布";
-        List<Map<String, Object>> dataList = new ArrayList<>();
 
         Map<String, List<Issue>> levelMap = issues.stream().collect(Collectors.groupingBy(e -> e.getCustomFieldById(67).getValue()));
         levelMap.forEach((k, v) -> {
-            dataList.add(Map.of("name", k, "value", v.size()));
+
         });
 
-        // 模板参数
-        HashMap<String, Object> datas = new HashMap<>();
-        datas.put("data", JSON.toJSONString(dataList));
-        datas.put("title", title);
-        return EchartsUtil.getFile(datas, "pie.ftl");
+
+        List<String> xAxisNameList = new ArrayList<>(Arrays.asList("S", "A", "B", "C", "D"));
+        //数据列表
+        List<Object> dataList1 = new ArrayList<>(Arrays.asList(1, 3, 5, 6, 2));
+        //图例背景颜色列表
+        List<Color> legendColorList = new ArrayList<>(Arrays.asList(Color.RED, Color.YELLOW, Color.PINK, Color.GREEN, Color.BLUE));
+        //偏离百分比数据
+        List<Double> explodePercentList = new ArrayList<>(Arrays.asList(0.1, 0.1, 0.1, 0.1, 0.1));
+        File file = null;
+        try {
+            URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
+            file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            GeneratePieChartUtil.createPieChart(fileOutputStream, title, xAxisNameList, dataList1
+                    , 939, 488, JFreeChartUtil.createChartTheme(), legendColorList, explodePercentList);
+        } catch (Exception e) {
+            log.error(e);
+        }
+        if (file != null) {
+            return file;
+        }
+        return null;
     }
 }
