@@ -7,6 +7,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
+import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.ValueAxis;
@@ -14,7 +15,9 @@ import org.jfree.chart.block.BlockBorder;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.Plot;
+import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
+import org.jfree.chart.title.TextTitle;
 import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.data.xy.XYDataset;
 
@@ -191,6 +194,9 @@ public class GenerateChartUtil {
         chart.getLegend().setFrame(new BlockBorder(Color.WHITE));
         // 标注位于上侧
         chart.getLegend().setPosition(RectangleEdge.TOP);
+        TextTitle title = chart.getTitle();
+        title.setMargin(15,0,0,0);
+        chart.setTitle(title);
         CategoryAxis axis = new IntervalCategoryAxis(1);
         axis.setAxisLineVisible(false);
         axis.setTickMarksVisible(false);
@@ -272,6 +278,9 @@ public class GenerateChartUtil {
                 , JFreeChartUtil.createDefaultCategoryDataset(legendNameList, xAxisNameList, dataList));
         // 设置抗锯齿，防止字体显示不清楚
         chart.setTextAntiAlias(true);
+        TextTitle title = chart.getTitle();
+        title.setMargin(15,0,0,0);
+        chart.setTitle(title);
         // 对折现进行渲染
         CategoryPlot plot = chart.getCategoryPlot();
         JFreeChartUtil.setLineRender(plot, true, true);

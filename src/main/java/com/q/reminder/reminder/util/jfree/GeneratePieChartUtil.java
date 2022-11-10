@@ -9,6 +9,7 @@ import org.jfree.chart.block.BlockBorder;
 import org.jfree.chart.plot.PieLabelLinkStyle;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PiePlot3D;
+import org.jfree.chart.title.TextTitle;
 import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.chart.util.Rotation;
 
@@ -41,6 +42,9 @@ public class GeneratePieChartUtil {
         ChartFactory.setChartTheme(theme);
         //创建饼图
         JFreeChart chart = ChartFactory.createPieChart(chartTitle, JFreeChartUtil.createDefaultPieDataset(legendNameList, dataList));
+        TextTitle title = chart.getTitle();
+        title.setMargin(15,0,0,0);
+        chart.setTitle(title);
         // 设置抗锯齿，防止字体显示不清楚
         chart.setTextAntiAlias(false);
         PiePlot piePlot = (PiePlot) chart.getPlot();
