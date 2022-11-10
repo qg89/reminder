@@ -2,6 +2,7 @@ package com.q.reminder.reminder.util.jfree;
 
 import cn.hutool.core.io.resource.ClassPathResource;
 import com.q.reminder.reminder.ReminderApplication;
+import com.q.reminder.reminder.util.ResourceUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -26,6 +27,8 @@ import org.springframework.boot.system.ApplicationHome;
 import java.awt.*;
 import java.io.File;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
@@ -56,11 +59,11 @@ public class JFreeChartUtil {
             }
         };
         // 标题
-        theme.setExtraLargeFont(getDefaultFont(Font.PLAIN, 25f));
+        theme.setExtraLargeFont(getDefaultFont(Font.BOLD, 30f));
         // xy轴
-        theme.setLargeFont(getDefaultFont(Font.PLAIN, 20f));
+        theme.setLargeFont(getDefaultFont(Font.BOLD, 20f));
         // X轴
-        theme.setRegularFont(getDefaultFont(Font.PLAIN, 20f));
+        theme.setRegularFont(getDefaultFont(Font.BOLD, 20f));
         theme.setSmallFont(getDefaultFont(Font.PLAIN, 10f));
         return theme;
     }
@@ -75,15 +78,15 @@ public class JFreeChartUtil {
      */
     public static Font getDefaultFont(int style, Float size) throws Exception {
         //获取宋体文件
-        ApplicationHome applicationHome = new ApplicationHome(ReminderApplication.class);
-        String parent = applicationHome.getSource().getParent();
-        //项目打包成jar包所在的根路径
-        String configFilePath = parent + "/resources/templates/font/msyh.ttc";
+        String filePath = ResourceUtils.path("templates/font/mysh.ttc");
         //文件路径
-        File defaultFontFile = new File(configFilePath);
-        Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, defaultFontFile);
-        defaultFont = defaultFont.deriveFont(style, size);
-        return defaultFont;
+        File defaultFontFile = new File(filePath);
+        Path path = defaultFontFile.toPath();
+        if (Files.isReadable(path) && Files.exists(path) && Files.isRegularFile(path)) {
+            Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, defaultFontFile);
+           return defaultFont.deriveFont(style, size);
+        }
+        return new Font("微软雅黑", Font.PLAIN, 15);
     }
 
     /**

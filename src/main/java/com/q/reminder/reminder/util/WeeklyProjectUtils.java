@@ -11,6 +11,7 @@ import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.Issue;
 import lombok.extern.log4j.Log4j2;
+import org.joda.time.DateTime;
 
 import java.awt.*;
 import java.io.File;
@@ -48,7 +49,7 @@ public abstract class WeeklyProjectUtils {
         // 变量
         String title = "评审问题数量";
         weekNumMap.forEach((k, v) -> {
-            categories.add(DateUtil.thisYear() + "W" + k);
+            categories.add(DateTime.now().toString("yy") + "W" + k);
         });
 
         //图例名称列表
@@ -99,7 +100,7 @@ public abstract class WeeklyProjectUtils {
         String title = "线上问题每周增加情况";
 
         weekNumMap.forEach((k, v) -> {
-            categories.add(DateUtil.thisYear() + "W" + k);
+            categories.add(DateTime.now().toString("yy") + "W" + k);
         });
 
 

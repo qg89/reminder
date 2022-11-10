@@ -18,6 +18,7 @@ import com.lark.oapi.service.drive.v1.model.Property;
 import com.q.reminder.reminder.entity.WeeklyProjectReport;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import lombok.extern.log4j.Log4j2;
+import org.joda.time.DateTime;
 
 import java.util.Date;
 
@@ -45,7 +46,7 @@ public abstract class WeeklyProjectFeishuUtils {
         CopyFileReq req = CopyFileReq.newBuilder()
                 .fileToken(vo.getFileToken())
                 .copyFileReqBody(CopyFileReqBody.newBuilder()
-                        .name("【业务三部】" + vo.getProjectShortName() + "项目周报-" + DateUtil.thisYear() + "W" + weekNum)
+                        .name("【业务三部】" + vo.getProjectShortName() + "项目周报-" + DateTime.now().toString("yy") + "W" + weekNum)
                         .type("docx")
                         .folderToken(vo.getFolderToken())
                         .extra(new Property[]{})

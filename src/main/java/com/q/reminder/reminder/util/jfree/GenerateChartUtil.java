@@ -196,7 +196,7 @@ public class GenerateChartUtil {
         axis.setTickMarksVisible(false);
         axis.setUpperMargin(0);
         axis.setLowerMargin(0);
-        axis.setTickLabelFont(JFreeChartUtil.getDefaultFont(Font.BOLD, 20f));
+        axis.setTickLabelFont(JFreeChartUtil.getDefaultFont(Font.BOLD, 15f));
         axis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
         plot.setDomainAxes(new CategoryAxis[]{axis});
         return chart;
@@ -287,7 +287,7 @@ public class GenerateChartUtil {
         axis.setUpperMargin(0);
         axis.setLowerMargin(0);
         axis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
-        axis.setTickLabelFont(JFreeChartUtil.getDefaultFont(Font.BOLD, 22f));
+        axis.setTickLabelFont(JFreeChartUtil.getDefaultFont(Font.BOLD, 15f));
         plot.setDomainAxes(new CategoryAxis[]{axis});
         return chart;
     }

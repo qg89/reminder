@@ -9,6 +9,7 @@ import com.q.reminder.reminder.contents.WeeklyReportContents;
 import com.q.reminder.reminder.handle.base.HoldayBase;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.util.FeishuJavaUtils;
+import com.q.reminder.reminder.util.ResourceUtils;
 import com.q.reminder.reminder.util.WeeklyProjectFeishuUtils;
 import com.q.reminder.reminder.util.WeeklyProjectUtils;
 import com.q.reminder.reminder.vo.FeishuUploadImageVo;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -114,6 +116,10 @@ public class WeeklyProjectMonReportHandle {
             FeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
             log.info("{}项目周报更新完成", report.getProjectShortName());
         });
+        File file = new File(ResourceUtils.path("templates/file"));
+        for (File f : Objects.requireNonNull(file.listFiles(((dir, name) -> name.endsWith(".png") || new File(name).isDirectory())))) {
+            f.delete();
+        }
     }
 
     private void addRequests(WeeklyProjectVo vo, File file, List<UpdateBlockRequest> requests) {

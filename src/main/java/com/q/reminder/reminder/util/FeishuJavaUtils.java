@@ -105,7 +105,7 @@ public abstract class FeishuJavaUtils {
             if (resp.getCode() == 0) {
                 return Boolean.TRUE;
             } else {
-                log.error("更新飞书周报失败：msg{} error{}", resp.getMsg(), resp.getError());
+                log.error("更新飞书周报失败，msg：{} error：{}", resp.getMsg(), resp.getError());
             }
         } catch (Exception e) {
             log.error(e);
