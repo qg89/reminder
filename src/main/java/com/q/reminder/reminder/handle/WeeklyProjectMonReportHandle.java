@@ -58,8 +58,10 @@ public class WeeklyProjectMonReportHandle {
             String redmineUrl = report.getRedmineUrl();
             String accessKey = report.getAccessKey();
             String pKey = report.getPKey();
+            String pmOu = report.getPmOu();
             WeeklyProjectVo vo = new WeeklyProjectVo();
-            vo.setAppId(feishuProperties.getAppId());
+            String appId = feishuProperties.getAppId();
+            vo.setAppId(appId);
             vo.setAppSecret(feishuProperties.getAppSecret());
             vo.setFileToken(report.getFileToken());
             vo.setRedmineUrl(redmineUrl);
@@ -142,6 +144,9 @@ public class WeeklyProjectMonReportHandle {
             }
             FeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
             log.info("[{}]项目周报更新完成", report.getProjectShortName());
+
+            String secret = FeiShuApi.getSecret(appId, feishuProperties.getAppSecret());
+            FeiShuApi.sendText(pmOu,"", secret);
         });
         File file = new File(ResourceUtils.path("templates/file"));
         for (File f : Objects.requireNonNull(file.listFiles(((dir, name) -> name.endsWith(".png") || new File(name).isDirectory())))) {
