@@ -216,8 +216,8 @@ public abstract class RedmineApi {
             customFieldList.add(customField);
             customField = new CustomField().setId(42).setName("需求类型").setValue("功能");
             customFieldList.add(customField);
-            customField = new CustomField().setId(43).setName("原始需求").setValue(vo.getRfqId());
-            customFieldList.add(customField);
+//            customField = new CustomField().setId(43).setName("原始需求").setValue(vo.getRfqId());
+//            customFieldList.add(customField);
             customField = new CustomField().setId(30).setName("是否需要验证").setValue("是");
             customFieldList.add(customField);
 

@@ -1,6 +1,5 @@
 package com.q.reminder.reminder.util;
 
-import cn.hutool.core.date.DateTime;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.vo.QueryVo;
 import com.taskadapter.redmineapi.RedmineException;
@@ -11,8 +10,8 @@ import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author : saiko
@@ -24,16 +23,18 @@ import java.util.stream.Collectors;
 public abstract class WeeklyProjectRedmineUtils {
 
 
-//    public static void main(String[] args) {
-//        ProjectInfo projectInfo = new ProjectInfo();
-//        projectInfo.setRedmineUrl("http://redmine-qa.mxnavi.com/");
-//        projectInfo.setPKey("dcsp-2");
-//        projectInfo.setAccessKey("1f905383da4f783bad92e22f430c7db0b15ae258");
-//        externalBugs(projectInfo);
-//    }
+    public static void main(String[] args) {
+        ProjectInfo projectInfo = new ProjectInfo();
+        projectInfo.setRedmineUrl("http://redmine-qa.mxnavi.com/");
+        projectInfo.setPKey("dcsp-2");
+        projectInfo.setAccessKey("1f905383da4f783bad92e22f430c7db0b15ae258");
+//        List<TimeEntry> copq = wprojectTimesBugs(projectInfo, "2022-11-04");
+        List<Issue> issues = OverallBug.allBug(projectInfo);
+        System.out.println(issues);
+    }
+
     /**
      * 项目周报，获取评审问题
-     *
      */
     public static List<Issue> reviewQuestion(ProjectInfo projectInfo) {
         List<RequestParam> params = List.of(
@@ -76,20 +77,36 @@ public abstract class WeeklyProjectRedmineUtils {
         }
     }
 
-    public static void copq(List<ProjectInfo> projectInfoList, QueryVo vo) {
-        for (ProjectInfo projectInfo : projectInfoList) {
-            RedmineManager mgr = RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl() + "/projects/" + projectInfo.getPKey(), projectInfo.getAccessKey());
-            Transport transport = mgr.getTransport();
-            List<RequestParam> params = List.of();
-            try {
-                List<TimeEntry> timeEntryList = transport.getObjectsList(TimeEntry.class, params);
-                double allHourse = timeEntryList.stream().collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
-                double sum = timeEntryList.stream().filter(e -> new DateTime("2022-08-01").before(e.getCreatedOn())).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
-                System.out.println(timeEntryList);
-            } catch (RedmineException e) {
-
-            }
+    public static List<TimeEntry> wprojectTimes(ProjectInfo projectInfo) {
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl() + "/projects/" + projectInfo.getPKey(), projectInfo.getAccessKey());
+        Transport transport = mgr.getTransport();
+        List<RequestParam> params = new ArrayList<>();
+        try {
+            return transport.getObjectsList(TimeEntry.class, params);
+        } catch (RedmineException e) {
+            e.printStackTrace();
         }
+        return null;
+    }
+
+    public static List<TimeEntry> wprojectTimesBugs(ProjectInfo projectInfo, String custType) {
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl() + "/projects/" + projectInfo.getPKey(), projectInfo.getAccessKey());
+        Transport transport = mgr.getTransport();
+        List<RequestParam> params = List.of(
+                new RequestParam("f[]", "issue.cf_72"),
+                new RequestParam("op[issue.cf_72]", "="),
+                new RequestParam("v[issue.cf_72][]", custType)
+        );
+        try {
+//            List<TimeEntry> timeEntryList = transport.getObjectsList(TimeEntry.class, params);
+//            double allHourse = timeEntryList.stream().collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
+//            double sum = timeEntryList.stream().filter(e -> new DateTime("2022-08-01").before(e.getCreatedOn())).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
+
+            return transport.getObjectsList(TimeEntry.class, params);
+        } catch (RedmineException e) {
+
+        }
+        return null;
     }
 
     /**
@@ -115,29 +132,20 @@ public abstract class WeeklyProjectRedmineUtils {
      * 整体BUG（上周）
      */
     public static class OverallBug {
-
         /**
-         * ALL Bug等级分布
+         * 全量BUG
+         * @param projectInfo
+         * @return
          */
-        public static List<Issue> bugLevelDistribution(ProjectInfo projectInfo) {
+        public static List<Issue> allBug(ProjectInfo projectInfo) {
             List<RequestParam> params = List.of(
-                    new RequestParam("tracker_id", "1"),
-                    new RequestParam("created_on", "lw"),
-                    new RequestParam("status_id", "*"));
-            return queryRedmine(projectInfo, params);
-        }
-
-        /**
-         * open Bug等级分布
-         */
-        public static List<Issue> openBugLevelDistribution(ProjectInfo projectInfo) {
-            List<RequestParam> params = List.of(
-                    new RequestParam("tracker_id", "1"),
-                    new RequestParam("created_on", "lw"),
-                    new RequestParam("status_id", "o")
+                    new RequestParam("f[]", "tracker_id"),
+                    new RequestParam("op[tracker_id]", "="),
+                    new RequestParam("v[tracker_id][]", "1")
             );
-            return queryRedmine(projectInfo, params);
+            List<String> bugType = List.of("Bug", "长期改善");
+            // BUG分类
+            return queryRedmine(projectInfo, params).stream().filter(e -> bugType.contains(e.getCustomFieldById(72).getValue())).toList();
         }
-
     }
 }
