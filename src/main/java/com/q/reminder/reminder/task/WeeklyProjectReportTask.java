@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Log4j2
-public class WeeklyProjectReportHandle {
+public class WeeklyProjectReportTask {
 
     @Autowired
     private WeeklyProjectReportService weeklyProjectReportService;

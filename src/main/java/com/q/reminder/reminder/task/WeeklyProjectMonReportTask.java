@@ -34,7 +34,7 @@ import java.util.Objects;
  */
 @Component
 @Log4j2
-public class WeeklyProjectMonReportHandle {
+public class WeeklyProjectMonReportTask {
     @Autowired
     private HoldayBase holdayBase;
     @Autowired

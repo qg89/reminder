@@ -13,8 +13,6 @@ import com.q.reminder.reminder.util.FeiShuApi;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -29,7 +27,7 @@ import java.util.List;
  */
 @Log4j2
 @Component
-public class UpdateFeishuRedmineHandle {
+public class UpdateFeishuRedmineTask {
     @Autowired
     private GroupInfoService groupInfoService;
     @Autowired

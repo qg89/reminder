@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  */
 @Log4j2
 @Component
-public class OverdueTasksAgain1ToGroupHandle {
+public class OverdueTasksAgain1ToGroupTask {
 
     @Autowired
     private OverdueTasksAgainToGroupBase overdueTasksAgainToGroupBase;

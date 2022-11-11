@@ -18,8 +18,6 @@ import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -38,7 +36,7 @@ import java.util.stream.Collectors;
  */
 @Log4j2
 @Component
-public class RedmineUpdateHandle {
+public class RedmineUpdateTask {
 
     @Autowired
     private ProjectInfoService projectInfoService;
