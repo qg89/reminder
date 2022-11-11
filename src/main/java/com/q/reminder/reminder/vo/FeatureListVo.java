@@ -43,10 +43,6 @@ public class FeatureListVo implements Serializable {
      */
     private String milestone;
     /**
-     * Redmine主题
-     */
-    private String redmineSubject;
-    /**
      * 一级菜单
      */
     private String menuOne;
@@ -118,4 +114,17 @@ public class FeatureListVo implements Serializable {
      * 测试
      */
     private String test;
+    /**
+     * 生产发布时间
+     */
+    private String prodTime;
+    /**
+     * 生产发布时间
+     */
+    private String devTime;
+
+    /**
+     * 需求管理不体现此字段
+     */
+    private String redmineSubject;
 }

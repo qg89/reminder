@@ -346,9 +346,11 @@ public abstract class FeiShuApi {
         }
         Map<String, String> fieldsMap = fieldsDefinitionMap();
         Map<String, String> map = new HashMap<>();
-        for (int i = 1; i < cellList.size(); i++) {
-            for (int j = 0; j < cellList.get(1).size(); j++) {
-                Object key = cellList.get(0).get(j);
+        for (int i = 2; i < cellList.size(); i++) {
+            List list3Line = cellList.get(2);
+            List titleList = cellList.get(0);
+            for (int j = 0; j < list3Line.size(); j++) {
+                Object key = titleList.get(j);
                 if (key == null) {
                     continue;
                 }
@@ -356,7 +358,7 @@ public abstract class FeiShuApi {
                 if (StringUtils.isBlank(fileKey)) {
                     continue;
                 }
-                map.put(fileKey, Optional.ofNullable(cellList.get(1).get(j)).orElse("").toString());
+                map.put(fileKey, Optional.ofNullable(list3Line.get(j)).orElse("").toString());
             }
         }
         ObjectMapper objectMapper = new ObjectMapper();
@@ -521,7 +523,6 @@ public abstract class FeiShuApi {
         map.put("需求ID", "featureId");
         map.put("模块", "module");
         map.put("里程碑", "milestone");
-        map.put("RedmineID/链接", "redmineSubject");
         map.put("一级", "menuOne");
         map.put("二级", "menuTwo");
         map.put("三级", "menuThree");
@@ -539,6 +540,8 @@ public abstract class FeiShuApi {
         map.put("大数据", "bigData");
         map.put("算法", "algorithm");
         map.put("测试", "test");
+        map.put("生产发布时间", "prodTime");
+        map.put("开发提测版本", "devTime");
         return map;
     }
 

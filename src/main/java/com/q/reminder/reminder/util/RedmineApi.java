@@ -17,6 +17,7 @@ import com.taskadapter.redmineapi.internal.Transport;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
@@ -188,15 +189,40 @@ public abstract class RedmineApi {
         Integer algorithmAssigneeId = redmineUserMap.get(definition.getAlgorithm());
         Integer frontAssigneeId = redmineUserMap.get(definition.getFront());
         Integer projectId = definition.getProjectId();
-        Date dueDate = DateTime.now().plusDays(10).toDate();
-        featureList.forEach(vo -> {
+
+        for (FeatureListVo vo : featureList) {
+            String devT = vo.getDevTime();
+            String prodT = vo.getProdTime();
+            Date devTime = DateTime.now().plusDays(10).toDate();
+            Date prodTime = devTime;
+            Date today = DateTime.parse(DateUtil.today()).toDate();
+            if (StringUtils.isNotBlank(devT)) {
+                devTime = DateTime.parse(devT.split("-")[0], DateTimeFormat.forPattern("yyMMdd")).toDate();
+            }
+            if (StringUtils.isNotBlank(prodT)) {
+                prodTime = DateTime.parse(prodT.split("-")[0], DateTimeFormat.forPattern("yyMMdd")).toDate();
+            }
+            if (prodTime.before(today)) {
+                prodTime = devTime;
+            }
+            if (devTime.after(prodTime)) {
+                devTime = prodTime;
+            }
             String featureId = IdWorker.get32UUID().substring(22);
-            String redmineSubject = vo.getRedmineSubject();
+            String redmineSubject = "";
             String menuOne = vo.getMenuOne();
             String menuTwo = vo.getMenuTwo();
             String menuThree = vo.getMenuThree();
+            String front = vo.getFront();
+            String backend = vo.getBackend();
+            String bigData = vo.getBigData();
+            String algorithm = vo.getAlgorithm();
+            String test = vo.getTest();
+            String desc = vo.getDesc();
+            String featureType = vo.getFeatureType();
+            String parentFeatureId = vo.getParentFeatureId();
             if (StringUtils.isNotBlank(menuOne)) {
-                redmineSubject += "-[" + menuOne + "]";
+                redmineSubject += "[" + menuOne + "]";
             }
             if (StringUtils.isNotBlank(menuTwo)) {
                 redmineSubject += "-[" + menuTwo + "]";
@@ -216,8 +242,6 @@ public abstract class RedmineApi {
             customFieldList.add(customField);
             customField = new CustomField().setId(42).setName("需求类型").setValue("功能");
             customFieldList.add(customField);
-//            customField = new CustomField().setId(43).setName("原始需求").setValue(vo.getRfqId());
-//            customFieldList.add(customField);
             customField = new CustomField().setId(30).setName("是否需要验证").setValue("是");
             customFieldList.add(customField);
 
@@ -225,15 +249,15 @@ public abstract class RedmineApi {
                     .setTracker(tracker)
                     .setAssigneeId(productAssigneeId)
                     .setCreatedOn(new Date())
-                    .setDueDate(dueDate)
+                    .setDueDate(prodTime)
                     .setSubject(redmineSubject)
                     // 状态 NEW
                     .setStatusId(1)
                     .setProjectId(projectId)
                     .addCustomFields(customFieldList)
-                    .setDescription(vo.getDesc());
+                    .setDescription(desc);
             issue.setTransport(transport);
-            Issue newIssue = null;
+            Issue newIssue;
             try {
                 newIssue = issue.create();
             } catch (RedmineException e) {
@@ -241,39 +265,38 @@ public abstract class RedmineApi {
                 return;
             }
             Integer newIssueId = newIssue.getId();
-            vo.setRedmineSubject(redmineSubject);
             vo.setRedmineId(String.valueOf(newIssueId));
             vo.setFeatureId(featureId);
+            vo.setRedmineSubject(redmineSubject);
             log.info("Redmine-创建需求任务成功, redmineId: {}, 主题:[{}]", newIssueId, redmineSubject);
-            Tracker dep = new Tracker()
-                    .setId(7)
-                    .setName("开发");
-            if (StringUtils.isNotBlank(vo.getFront()) && frontAssigneeId != null) {
+            Tracker dep = new Tracker().setId(7).setName("开发");
+            newIssue.setDueDate(devTime);
+            if (StringUtils.isNotBlank(front) && frontAssigneeId != null) {
                 createSubTask(newIssue, frontAssigneeId, dep, newIssueId, redmineSubject, "前端");
             }
-            if (StringUtils.isNotBlank(vo.getBackend()) && backendAssigneeId != null) {
+            if (StringUtils.isNotBlank(backend) && backendAssigneeId != null) {
                 createSubTask(newIssue, backendAssigneeId, dep, newIssueId, redmineSubject, "后端");
             }
-            if (StringUtils.isNotBlank(vo.getBigData()) && bigDataAssigneeId != null) {
+            if (StringUtils.isNotBlank(bigData) && bigDataAssigneeId != null) {
                 createSubTask(newIssue, bigDataAssigneeId, dep, newIssueId, redmineSubject, "大数据");
             }
-            if (StringUtils.isNotBlank(vo.getAlgorithm()) && algorithmAssigneeId != null) {
+            if (StringUtils.isNotBlank(algorithm) && algorithmAssigneeId != null) {
                 createSubTask(newIssue, algorithmAssigneeId, dep, newIssueId, redmineSubject, "算法");
             }
-            if (StringUtils.isNotBlank(vo.getTest()) && testAssigneeId != null) {
+            if (StringUtils.isNotBlank(test) && testAssigneeId != null) {
                 Tracker tra = new Tracker()
                         .setName("测试")
                         .setId(8);
+                newIssue.setStartDate(devTime);
+                newIssue.setDueDate(prodTime);
                 createSubTask(newIssue, testAssigneeId, tra, newIssueId, redmineSubject, "测试用例");
                 createSubTask(newIssue, testAssigneeId, tra, newIssueId, redmineSubject, "测试执行");
             }
-            String featureType = vo.getFeatureType();
-            String parentFeatureId = vo.getParentFeatureId();
             if (StringUtils.isNotBlank(parentFeatureId) && StringUtils.isNotBlank(featureType) && "变更".equals(featureType)) {
                 Integer parentId = getParentId(transport, parentFeatureId);
                 createParentFeatureId(parentId, newIssueId, definition);
             }
-        });
+        }
     }
 
     /**
@@ -315,9 +338,10 @@ public abstract class RedmineApi {
             issue = issueParent.setTracker(tracker)
                     .setAssigneeId(assigneeId)
                     .setParentId(parentIssueId)
-                    .setSubject(type + "-" + subject).create();
+                    .setSubject(type + "-" + subject)
+                    .create();
         } catch (RedmineException e) {
-            log.error("Redmine-创建{}子需求任务异常", type);
+            log.error("Redmine-创建{}子任务异常 {}", type, e);
             return;
         }
         log.info("Redmine-创建[{}]任务成功, redmineId: {}, 主题:[{}]", type, issue.getId(), issue.getSubject());
@@ -365,10 +389,8 @@ public abstract class RedmineApi {
         return null;
     }
 
-//    public static void main(String[] args) {
-//        DefinitionVo vo = new DefinitionVo();
-//        vo.setApiAccessKey("1f905383da4f783bad92e22f430c7db0b15ae258");
-//        vo.setRedmineUrl("http://redmine-qa.mxnavi.com");
-//        createParentFeatureId(581982, 601058, vo);
-//    }
+    public static void main(String[] args) {
+        String s = DateTime.parse("221110", DateTimeFormat.forPattern("yyMMdd")).toString("yyyyMMdd");
+        System.out.println(s);
+    }
 }

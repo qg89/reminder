@@ -82,7 +82,7 @@ public class SyncRedmineTaskHandle {
                     continue;
                 }
                 if ("定义".equals(title)) {
-                    definitionRange = (sheetId + "!A1:AZ2");
+                    definitionRange = (sheetId + "!A1:AZ3");
                     ranges.append(definitionRange);
                 }
             }
