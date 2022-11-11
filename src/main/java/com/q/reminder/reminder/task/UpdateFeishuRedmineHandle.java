@@ -1,4 +1,4 @@
-package com.q.reminder.reminder.handle;
+package com.q.reminder.reminder.task;
 
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;

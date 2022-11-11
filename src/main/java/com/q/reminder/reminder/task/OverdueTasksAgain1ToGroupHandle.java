@@ -1,15 +1,14 @@
-package com.q.reminder.reminder.handle;
+package com.q.reminder.reminder.task;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.q.reminder.reminder.entity.NoneStatus;
-import com.q.reminder.reminder.handle.base.HoldayBase;
-import com.q.reminder.reminder.handle.base.OverdueTasksAgainToGroupBase;
+import com.q.reminder.reminder.task.base.HoldayBase;
+import com.q.reminder.reminder.task.base.OverdueTasksAgainToGroupBase;
 import com.q.reminder.reminder.service.NoneStatusService;
 import com.q.reminder.reminder.vo.QueryVo;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 

@@ -1,4 +1,4 @@
-package com.q.reminder.reminder.handle.base;
+package com.q.reminder.reminder.task.base;
 
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;

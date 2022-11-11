@@ -1,4 +1,4 @@
-package com.q.reminder.reminder.handle.base;
+package com.q.reminder.reminder.task.base;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -19,7 +19,6 @@ import com.q.reminder.reminder.vo.SendUserByGroupVo;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
