@@ -48,7 +48,7 @@ public class WeeklyProjectReportTask {
         vo.setAppSecret(feishuProperties.getAppSecret());
         vo.setAppId(feishuProperties.getAppId());
         vo.setFileToken("doxcnj0HVWCrYvTW2uzFS4S1hLg");
-        LambdaQueryWrapper<ProjectInfo> wrapper = Wrappers.<ProjectInfo>lambdaQuery().isNotNull(ProjectInfo::getFolderToken).isNotNull(ProjectInfo::getProjectShortName);
+        LambdaQueryWrapper<ProjectInfo> wrapper = Wrappers.<ProjectInfo>lambdaQuery().isNotNull(ProjectInfo::getFolderToken).isNotNull(ProjectInfo::getProjectShortName).isNotNull(ProjectInfo::getPmKey);
         projectInfoService.list(wrapper).forEach(projectInfo -> {
             vo.setProjectShortName(projectInfo.getProjectShortName());
             vo.setFolderToken(projectInfo.getFolderToken());

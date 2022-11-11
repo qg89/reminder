@@ -3,6 +3,8 @@ package com.q.reminder.reminder.task.base;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
@@ -66,7 +68,9 @@ public class QueryTasksToMemberBase {
         Map<String, String> memberIds = list.stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
 
         // 组装数据， 通过人员，获取要发送的内容
-        List<ProjectInfo> projectInfoList = projectInfoService.list();
+        LambdaQueryWrapper<ProjectInfo> lambdaQueryWrapper = Wrappers.<ProjectInfo>lambdaQuery();
+        lambdaQueryWrapper.isNotNull(ProjectInfo::getPmKey);
+        List<ProjectInfo> projectInfoList = projectInfoService.list(lambdaQueryWrapper);
         List<AdminInfo> adminInfoList = adminInfoService.list();
 
         QueryVo vo = new QueryVo();

@@ -54,6 +54,7 @@ public class SyncRedmineTask {
         // 查询项目对应的需求管理表token
         LambdaQueryWrapper<ProjectInfo> lq = new LambdaQueryWrapper<>();
         lq.isNotNull(ProjectInfo::getFeatureToken);
+        lq.isNotNull(ProjectInfo::getPmKey);
         List<ProjectInfo> projectInfos = projectInfoService.list(lq);
         Map<String, Integer> redmineUserMap = redmineUserInfoService.list(Wrappers.<RedmineUserInfo>lambdaQuery().isNotNull(RedmineUserInfo::getAssigneeName)).stream().collect(Collectors.toMap(e -> e.getAssigneeName().replace(" ", ""), RedmineUserInfo::getAssigneeId));
         List<AdminInfo> adminInfoList = adminInfoService.list();
