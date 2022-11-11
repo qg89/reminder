@@ -38,8 +38,8 @@ public class ProjectInfo implements Serializable {
     @TableField("redmine_url")
     private String redmineUrl;
 
-    @TableField("access_key")
-    private String accessKey;
+    @TableField("pm_key")
+    private String pmKey;
     /**
      * 是否发送需求群
      */
@@ -68,4 +68,7 @@ public class ProjectInfo implements Serializable {
      */
     @TableField("folder_token")
     private String folderToken;
+
+    @TableField("pm_ou")
+    private String pmOu;
 }

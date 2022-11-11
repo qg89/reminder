@@ -112,17 +112,4 @@ public abstract class FeishuJavaUtils {
         }
         return Boolean.FALSE;
     }
-
-    public static FeishuUploadImageVo getImage(String file) {
-        FeishuUploadImageVo vo = new FeishuUploadImageVo();
-        try (FileInputStream fi = new FileInputStream(file)) {
-            BufferedImage read = ImageIO.read(fi);
-            int height = read.getHeight();
-            int width = read.getWidth();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return vo;
-    }
 }

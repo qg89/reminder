@@ -27,7 +27,7 @@ public abstract class WeeklyProjectRedmineUtils {
         ProjectInfo projectInfo = new ProjectInfo();
         projectInfo.setRedmineUrl("http://redmine-qa.mxnavi.com/");
         projectInfo.setPKey("dcsp-2");
-        projectInfo.setAccessKey("1f905383da4f783bad92e22f430c7db0b15ae258");
+        projectInfo.setPmKey("1f905383da4f783bad92e22f430c7db0b15ae258");
 //        List<TimeEntry> copq = wprojectTimesBugs(projectInfo, "2022-11-04");
         List<Issue> issues = OverallBug.allBug(projectInfo);
         System.out.println(issues);
@@ -78,7 +78,7 @@ public abstract class WeeklyProjectRedmineUtils {
     }
 
     public static List<TimeEntry> wprojectTimes(ProjectInfo projectInfo) {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl() + "/projects/" + projectInfo.getPKey(), projectInfo.getAccessKey());
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl() + "/projects/" + projectInfo.getPKey(), projectInfo.getPmKey());
         Transport transport = mgr.getTransport();
         List<RequestParam> params = new ArrayList<>();
         try {
@@ -90,7 +90,7 @@ public abstract class WeeklyProjectRedmineUtils {
     }
 
     public static List<TimeEntry> wprojectTimesBugs(ProjectInfo projectInfo, String custType) {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl() + "/projects/" + projectInfo.getPKey(), projectInfo.getAccessKey());
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl() + "/projects/" + projectInfo.getPKey(), projectInfo.getPmKey());
         Transport transport = mgr.getTransport();
         List<RequestParam> params = List.of(
                 new RequestParam("f[]", "issue.cf_72"),
@@ -118,7 +118,7 @@ public abstract class WeeklyProjectRedmineUtils {
      */
     private static List<Issue> queryRedmine(ProjectInfo projectInfo, List<RequestParam> params) {
         List<Issue> objectsList = null;
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl() + "/projects/" + projectInfo.getPKey(), projectInfo.getAccessKey());
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl() + "/projects/" + projectInfo.getPKey(), projectInfo.getPmKey());
         Transport transport = mgr.getTransport();
         try {
             objectsList = transport.getObjectsList(Issue.class, params);

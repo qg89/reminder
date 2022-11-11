@@ -63,14 +63,14 @@ public class SyncRedmineTask {
             String pId = projectInfo.getPId();
             String featureToken = projectInfo.getFeatureToken();
             String redmineUrl = projectInfo.getRedmineUrl();
-            String apiAccessKey = projectInfo.getAccessKey();
+            String pmKey = projectInfo.getPmKey();
             // 获取各项目中需求管理表中sheetId和sheet名称
             List<SheetVo> sheetList = FeiShuApi.getSpredsheets(featureToken, secret);
             StringBuilder ranges = new StringBuilder();
             String featureRange = "";
             String definitionRange = "";
             DefinitionVo definition = new DefinitionVo();
-            definition.setApiAccessKey(apiAccessKey);
+            definition.setApiAccessKey(pmKey);
             definition.setRedmineUrl(redmineUrl);
             definition.setProjectId(Integer.valueOf(pId));
             for (SheetVo sheetVo : sheetList) {

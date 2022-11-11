@@ -3,12 +3,13 @@
 <mapper namespace="com.q.reminder.reminder.mapper.ProjectInfoMapping">
     <select id="getWeeklyDocxList" resultType="com.q.reminder.reminder.vo.WeeklyProjectVo">
         SELECT
-            p.access_key AS accessKey,
+            p.pm_key AS pmKey,
             p.folder_token AS folder_token,
             p.project_short_name AS projectShortName,
             p.redmine_url AS redmineUrl,
             fw.file_name AS fileName,
             fw.file_token AS fileToken,
+            p.pm_ou AS pmOu,
             p.p_key AS pKey
         FROM
             r_project_info p,

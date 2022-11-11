@@ -50,7 +50,7 @@ public abstract class WeeklyProjectUtils {
     public static File reviewQuestions(WeeklyProjectVo vo) {
         ProjectInfo projectInfo = new ProjectInfo();
         projectInfo.setRedmineUrl(vo.getRedmineUrl());
-        projectInfo.setAccessKey(vo.getAccessKey());
+        projectInfo.setPmKey(vo.getPmKey());
         projectInfo.setPKey(vo.getPKey());
         List<Issue> issues = WeeklyProjectRedmineUtils.reviewQuestion(projectInfo);
         Map<String, List<Issue>> weekNumMap = sortIssueMapByCreateOn(issues);
@@ -100,7 +100,7 @@ public abstract class WeeklyProjectUtils {
     public static File trends(WeeklyProjectVo vo) {
         ProjectInfo projectInfo = new ProjectInfo();
         projectInfo.setRedmineUrl(vo.getRedmineUrl());
-        projectInfo.setAccessKey(vo.getAccessKey());
+        projectInfo.setPmKey(vo.getPmKey());
         projectInfo.setPKey(vo.getPKey());
         List<Issue> issues = WeeklyProjectRedmineUtils.externalBugs(projectInfo);
         Map<String, List<Issue>> weekNumMap = sortIssueMapByCreateOn(issues);
@@ -359,7 +359,7 @@ public abstract class WeeklyProjectUtils {
         final int beginWeekNum = 36;
         ProjectInfo projectInfo = new ProjectInfo();
         projectInfo.setRedmineUrl(vo.getRedmineUrl());
-        projectInfo.setAccessKey(vo.getAccessKey());
+        projectInfo.setPmKey(vo.getPmKey());
         projectInfo.setPKey(vo.getPKey());
         Date sunday = getWeekNumToSunday(DateUtil.thisWeekOfYear() - 2);
         List<TimeEntry> timeEntryList = Objects.requireNonNull(WeeklyProjectRedmineUtils.wprojectTimes(projectInfo)).stream().filter(e -> e.getCreatedOn().before(sunday)).toList();

@@ -56,7 +56,7 @@ public class WeeklyProjectMonReportTask {
     private void writeReport(List<WeeklyProjectVo> list) {
         list.forEach(report -> {
             String redmineUrl = report.getRedmineUrl();
-            String accessKey = report.getAccessKey();
+            String accessKey = report.getPmKey();
             String pKey = report.getPKey();
             String pmOu = report.getPmOu();
             WeeklyProjectVo vo = new WeeklyProjectVo();
@@ -65,12 +65,12 @@ public class WeeklyProjectMonReportTask {
             vo.setAppSecret(feishuProperties.getAppSecret());
             vo.setFileToken(report.getFileToken());
             vo.setRedmineUrl(redmineUrl);
-            vo.setAccessKey(accessKey);
+            vo.setPmKey(accessKey);
             vo.setPKey(pKey);
 
             ProjectInfo projectInfo = new ProjectInfo();
             projectInfo.setRedmineUrl(redmineUrl);
-            projectInfo.setAccessKey(accessKey);
+            projectInfo.setPmKey(accessKey);
             projectInfo.setPKey(pKey);
             List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(projectInfo);
 
