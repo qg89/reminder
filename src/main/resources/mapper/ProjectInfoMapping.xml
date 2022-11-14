@@ -17,6 +17,13 @@
         WHERE
             p.p_id = fw.r_pid
             AND fw.file_token IS NOT NULL
-            AND fw.week_num = (WEEKOFYEAR(NOW()) + 1)
+        <choose>
+            <when test="weekNumber > 0">
+                AND fw.week_num = #{weekNumber}
+            </when>
+            <otherwise>
+                AND fw.week_num = WEEKOFYEAR(NOW())
+            </otherwise>
+        </choose>
     </select>
 </mapper>

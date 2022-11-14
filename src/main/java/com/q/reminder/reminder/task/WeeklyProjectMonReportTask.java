@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.task;
 
+import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.docx.v1.model.ReplaceImageRequest;
@@ -14,6 +15,7 @@ import com.q.reminder.reminder.vo.FeishuUploadImageVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.xxl.job.core.biz.model.ReturnT;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -48,7 +50,12 @@ public class WeeklyProjectMonReportTask {
             log.info("节假日放假!!!!");
             return ReturnT.SUCCESS;
         }
-        List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList();
+        String jobParam = XxlJobHelper.getJobParam();
+        int weekNumber = 0;
+        if (StringUtils.isNotBlank(jobParam) && NumberUtil.isInteger(jobParam)) {
+            weekNumber = Integer.parseInt(jobParam);
+        }
+        List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNumber);
         this.writeReport(list);
         return ReturnT.SUCCESS;
     }

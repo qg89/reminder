@@ -19,7 +19,7 @@ import java.util.List;
 @Service
 public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, ProjectInfo> implements ProjectInfoService {
     @Override
-    public List<WeeklyProjectVo> getWeeklyDocxList() {
-        return baseMapper.getWeeklyDocxList();
+    public List<WeeklyProjectVo> getWeeklyDocxList(int weekNumber) {
+        return baseMapper.getWeeklyDocxList(weekNumber);
     }
 }
