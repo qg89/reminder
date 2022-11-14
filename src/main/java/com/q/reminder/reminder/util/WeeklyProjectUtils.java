@@ -194,10 +194,9 @@ public abstract class WeeklyProjectUtils {
      * @return
      */
     private static Map<String, List<TimeEntry>> sortTimeList(List<TimeEntry> timeEntries) {
-        Map<String, List<TimeEntry>> weekNumMap = timeEntries.stream().collect(Collectors.groupingBy(e -> {
-            Date createdOn = e.getCreatedOn();
-            return String.valueOf(DateUtil.weekOfYear(createdOn) - 1);
-        }));
+        Map<String, List<TimeEntry>> weekNumMap = timeEntries.stream().collect(Collectors.groupingBy(e ->
+                DateTime.now().toString("yy") + "W" + (DateUtil.weekOfYear(e.getSpentOn()) - 1)
+        ));
         weekNumMap = weekNumMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                 (v1, v2) -> v1, LinkedHashMap::new));
         return weekNumMap;
@@ -398,36 +397,48 @@ public abstract class WeeklyProjectUtils {
         List<List<Object>> dataList = new ArrayList<>();
         List<Object> all = new ArrayList<>();
         List<Object> week = new ArrayList<>();
-        weekNumMap.forEach((k, v) -> {
-            int weekNo = Integer.parseInt(k);
-            if (weekNo >= beginWeekNum) {
-                categories.add(DateTime.now().toString("yy") + "W" + k);
-            } else {
-                return;
+        for (int i = 30; i < 52; i++) {
+            String weekNum = DateTime.now().toString("yy") + "W" + i;
+            int weekOfYear = DateUtil.thisWeekOfYear();
+            if (weekOfYear <= i + 1) {
+                break;
             }
-            Date weekNumToSunday = getWeekNumToSunday(weekNo);
-            double allSum = timeEntryList.stream().filter(e -> {
-                Date createdOn = e.getCreatedOn();
-                return createdOn.before(weekNumToSunday);
-            }).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
-            double bugSum = timeEntryBugs.stream().filter(e -> {
-                Date createdOn = e.getCreatedOn();
-                return createdOn.before(weekNumToSunday);
-            }).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
+            categories.add(weekNum);
+        }
+
+        for (String weekNum : categories) {
+            List<TimeEntry> timeEntries = weekNumMap.get(weekNum);
+            if (CollectionUtils.isEmpty(timeEntries)) {
+                continue;
+            }
+            Date weekNumToSunday = getWeekNumToSunday(Integer.parseInt(weekNum.split("W")[1]));
+            double allSum = timeEntryList.stream().filter(e ->
+                    e.getSpentOn().before(weekNumToSunday)
+            ).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
+            double bugSum = timeEntryBugs.stream().filter(e ->
+                    e.getSpentOn().before(weekNumToSunday)
+            ).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
 
             // 8月1日之后的
             double allWeekSum = timeEntryList.stream().filter(e -> {
-                Date createdOn = e.getCreatedOn();
-                return createdOn.before(weekNumToSunday) && new DateTime("2022-08-01").toDate().before(createdOn);
+                Date spentOn = e.getSpentOn();
+                return spentOn.before(weekNumToSunday) && new DateTime("2022-08-01").toDate().before(spentOn);
             }).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
             double bugWeekSum = timeEntryBugs.stream().filter(e -> {
-                Date createdOn = e.getCreatedOn();
-                return createdOn.before(weekNumToSunday) && new DateTime("2022-08-01").toDate().before(createdOn);
+                Date spentOn = e.getSpentOn();
+                return spentOn.before(weekNumToSunday) && new DateTime("2022-08-01").toDate().before(spentOn);
             }).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
 
+            if (allSum == 0) {
+                allSum = 1;
+            }
             all.add(bugSum / allSum * 100);
+            if (allWeekSum == 0) {
+                allWeekSum = 1;
+            }
             week.add(bugWeekSum / allWeekSum * 100);
-        });
+        }
+
         dataList.add(all);
         dataList.add(week);
 
