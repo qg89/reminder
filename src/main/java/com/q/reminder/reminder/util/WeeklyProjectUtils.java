@@ -378,7 +378,7 @@ public abstract class WeeklyProjectUtils {
      * @return
      */
     public static File copq(WeeklyProjectVo vo) {
-        final int beginWeekNum = 36;
+        final int beginWeekNum = 30;
         ProjectInfo projectInfo = new ProjectInfo();
         projectInfo.setRedmineUrl(vo.getRedmineUrl());
         projectInfo.setPmKey(vo.getPmKey());
