@@ -26,5 +26,8 @@
                 AND fw.week_num = WEEKOFYEAR(NOW())
             </otherwise>
         </choose>
+        <if test="pKey != null and pKey != ''">
+            AND p.p_key = #{pKey}
+        </if>
     </select>
 </mapper>

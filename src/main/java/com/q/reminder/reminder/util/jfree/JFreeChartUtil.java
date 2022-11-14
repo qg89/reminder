@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.util.jfree;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.resource.ClassPathResource;
 import cn.hutool.core.net.URLDecoder;
 import com.q.reminder.reminder.ReminderApplication;
@@ -81,9 +82,8 @@ public class JFreeChartUtil {
     public static Font getDefaultFont(int style, Float size) throws Exception {
         //获取宋体文件
         String filePath = ResourceUtils.path("templates/font/mysh.ttc");
-        filePath = URLDecoder.decode(filePath, Charset.defaultCharset());
         //文件路径
-        File defaultFontFile = new File(filePath);
+        File defaultFontFile = FileUtil.file(filePath);
         Path path = defaultFontFile.toPath();
         if (Files.isReadable(path) && Files.exists(path) && Files.isRegularFile(path)) {
             Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, defaultFontFile);

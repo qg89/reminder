@@ -14,6 +14,6 @@ import java.util.List;
  * @date :  2022.09.27 13:23
  */
 public interface ProjectInfoService extends IService<ProjectInfo> {
-    List<WeeklyProjectVo> getWeeklyDocxList(int weekNumber);
+    List<WeeklyProjectVo> getWeeklyDocxList(int weekNumber, String pKey);
 
 }

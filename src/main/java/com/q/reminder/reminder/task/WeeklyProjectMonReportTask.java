@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.task;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.net.URLDecoder;
 import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson2.JSONArray;
@@ -56,10 +57,18 @@ public class WeeklyProjectMonReportTask {
         }
         String jobParam = XxlJobHelper.getJobParam();
         int weekNumber = 0;
-        if (StringUtils.isNotBlank(jobParam) && NumberUtil.isInteger(jobParam)) {
-            weekNumber = Integer.parseInt(jobParam);
+        String pKey = null;
+        if (StringUtils.isNotBlank(jobParam)) {
+            String[] param = jobParam.split(",");
+            String weekNum = param[0];
+            if (StringUtils.isNotBlank(weekNum) && NumberUtil.isInteger(weekNum)) {
+                weekNumber = Integer.parseInt(weekNum);
+            }
+            if (param.length > 1 && StringUtils.isNotBlank(param[1])) {
+                pKey = param[1];
+            }
         }
-        List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNumber);
+        List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNumber, pKey);
         this.writeReport(list);
         return ReturnT.SUCCESS;
     }
@@ -67,7 +76,7 @@ public class WeeklyProjectMonReportTask {
     private void writeReport(List<WeeklyProjectVo> list) {
         String path = ResourceUtils.path("templates/file");
         path = URLDecoder.decode(path, Charset.defaultCharset());
-        File logoFile = new File(path + "/logo.jpg");
+        File logoFile = FileUtil.file(path + "/logo.jpg");
         list.forEach(report -> {
             String redmineUrl = report.getRedmineUrl();
             String accessKey = report.getPmKey();
