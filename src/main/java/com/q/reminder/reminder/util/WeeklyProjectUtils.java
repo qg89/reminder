@@ -144,7 +144,7 @@ public abstract class WeeklyProjectUtils {
                 continue;
             }
             int size = issueList.size();
-            all.add(size + value);
+            all.add(value = (size + value));
             week.add(size);
         }
         dataList.add(all);
