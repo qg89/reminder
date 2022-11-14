@@ -10,7 +10,8 @@
             fw.file_name AS fileName,
             fw.file_token AS fileToken,
             p.pm_ou AS pmOu,
-            p.p_key AS pKey
+            p.p_key AS pKey,
+            fw.url AS weeklyReportUrl
         FROM
             r_project_info p,
             fs_weekly_project_report fw

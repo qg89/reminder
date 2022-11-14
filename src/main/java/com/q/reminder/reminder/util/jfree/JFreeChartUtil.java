@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.util.jfree;
 
 import cn.hutool.core.io.resource.ClassPathResource;
+import cn.hutool.core.net.URLDecoder;
 import com.q.reminder.reminder.ReminderApplication;
 import com.q.reminder.reminder.util.ResourceUtils;
 import org.jfree.chart.ChartFactory;
@@ -27,6 +28,7 @@ import org.springframework.boot.system.ApplicationHome;
 import java.awt.*;
 import java.io.File;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.NumberFormat;
@@ -79,6 +81,7 @@ public class JFreeChartUtil {
     public static Font getDefaultFont(int style, Float size) throws Exception {
         //获取宋体文件
         String filePath = ResourceUtils.path("templates/font/mysh.ttc");
+        filePath = URLDecoder.decode(filePath, Charset.defaultCharset());
         //文件路径
         File defaultFontFile = new File(filePath);
         Path path = defaultFontFile.toPath();

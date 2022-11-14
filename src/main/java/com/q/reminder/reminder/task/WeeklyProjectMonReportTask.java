@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.task;
 
+import cn.hutool.core.net.URLDecoder;
 import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -64,6 +66,7 @@ public class WeeklyProjectMonReportTask {
 
     private void writeReport(List<WeeklyProjectVo> list) {
         String path = ResourceUtils.path("templates/file");
+        path = URLDecoder.decode(path, Charset.defaultCharset());
         File logoFile = new File(path + "/logo.jpg");
         list.forEach(report -> {
             String redmineUrl = report.getRedmineUrl();
