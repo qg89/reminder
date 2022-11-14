@@ -60,6 +60,11 @@ public abstract class WeeklyProjectUtils {
         String title = "评审问题数量";
         for (int i = 36; i < 52; i++) {
             String week = DateTime.now().toString("yy") + "W" + i;
+            int weekOfYear = DateUtil.thisWeekOfYear();
+            if (weekOfYear <= i) {
+                i = weekOfYear;
+                continue;
+            }
             categories.add(week);
         }
 
@@ -116,8 +121,13 @@ public abstract class WeeklyProjectUtils {
         // 变量
         String title = "线上问题每周增加情况";
 
-        for (int i = 36; i < 52; i++) {
+        for (int i = 21; i < 52; i++) {
             String week = DateTime.now().toString("yy") + "W" + i;
+            int weekOfYear = DateUtil.thisWeekOfYear();
+            if (weekOfYear <= i) {
+                i = weekOfYear;
+                continue;
+            }
             categories.add(week);
         }
 
@@ -132,12 +142,13 @@ public abstract class WeeklyProjectUtils {
             List<Issue> issueList = weekNumMap.get(category);
             if (CollectionUtils.isEmpty(issueList)) {
                 week.add(0);
-                all.add(value);
+                all.add(0);
                 continue;
             }
             int size = issueList.size();
-            all.add(value = (value + size));
-            week.add(size);
+            List<Issue> closedList = issueList.stream().filter(e -> 5 != e.getStatusId()).toList();
+            all.add(size);
+            week.add(size - closedList.size());
         }
         dataList.add(all);
         dataList.add(week);
