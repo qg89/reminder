@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.util;
 
 import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.vo.QueryVo;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
@@ -30,7 +31,8 @@ public abstract class WeeklyProjectRedmineUtils {
         projectInfo.setPmKey("1f905383da4f783bad92e22f430c7db0b15ae258");
 //        List<TimeEntry> copq = wprojectTimesBugs(projectInfo, "2022-11-04");
         List<Issue> issues = OverallBug.allBug(projectInfo);
-        System.out.println(issues);
+        System.out.println(issues.get(0).getCustomFields());
+        System.out.println();
     }
 
     /**
@@ -54,7 +56,7 @@ public abstract class WeeklyProjectRedmineUtils {
                 new RequestParam("op[cf_68]", "="),
                 new RequestParam("v[cf_68][]", "客户反馈")
         );
-        return queryRedmine(projectInfo, params).stream().filter(e -> "Bug".equals(e.getCustomFieldById(72).getValue())).toList();
+        return queryRedmine(projectInfo, params).stream().filter(e -> "Bug".equals(e.getCustomFieldById(CustomFieldsEnum.BUG_TYPE.getId()).getValue())).toList();
     }
 
     public static void majorProjectTrackingItems(List<ProjectInfo> projectInfoList, QueryVo vo) {
@@ -145,7 +147,7 @@ public abstract class WeeklyProjectRedmineUtils {
             );
             List<String> bugType = List.of("Bug", "长期改善");
             // BUG分类
-            return queryRedmine(projectInfo, params).stream().filter(e -> bugType.contains(e.getCustomFieldById(72).getValue())).toList();
+            return queryRedmine(projectInfo, params).stream().filter(e -> bugType.contains(e.getCustomFieldById(CustomFieldsEnum.BUG_TYPE.getId()).getValue())).toList();
         }
     }
 }

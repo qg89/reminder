@@ -3,6 +3,7 @@ package com.q.reminder.reminder.util;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.vo.*;
 import com.taskadapter.redmineapi.IssueManager;
 import com.taskadapter.redmineapi.RedmineException;
@@ -238,11 +239,11 @@ public abstract class RedmineApi {
             }
 
             List<CustomField> customFieldList = new ArrayList<>();
-            CustomField customField = new CustomField().setName("需求ID").setId(5).setValue(featureId);
+            CustomField customField = new CustomField().setName(CustomFieldsEnum.FEATURE_ID.getName()).setId(CustomFieldsEnum.FEATURE_ID.getId()).setValue(featureId);
             customFieldList.add(customField);
-            customField = new CustomField().setId(42).setName("需求类型").setValue("功能");
+            customField = new CustomField().setId(CustomFieldsEnum.FEATURE_TYPE.getId()).setName(CustomFieldsEnum.FEATURE_TYPE.getName()).setValue("功能");
             customFieldList.add(customField);
-            customField = new CustomField().setId(30).setName("是否需要验证").setValue("是");
+            customField = new CustomField().setId(CustomFieldsEnum.REQUIRE_VALIDATION.getId()).setName(CustomFieldsEnum.REQUIRE_VALIDATION.getName()).setValue("是");
             customFieldList.add(customField);
 
             Issue issue = new Issue()

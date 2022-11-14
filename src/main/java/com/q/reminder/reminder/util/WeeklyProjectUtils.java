@@ -3,6 +3,7 @@ package com.q.reminder.reminder.util;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.UUID;
 import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.util.jfree.GenerateChartUtil;
 import com.q.reminder.reminder.util.jfree.GeneratePieChartUtil;
 import com.q.reminder.reminder.util.jfree.JFreeChartUtil;
@@ -159,7 +160,7 @@ public abstract class WeeklyProjectUtils {
     }
 
     private static Map<String, List<Issue>> sortIssueMapByLevel(List<Issue> issues) {
-        Map<String, List<Issue>> weekNumMap = issues.stream().collect(Collectors.groupingBy(e -> e.getCustomFieldById(67).getValue()));
+        Map<String, List<Issue>> weekNumMap = issues.stream().collect(Collectors.groupingBy(e -> e.getCustomFieldById(CustomFieldsEnum.BUG_LEVEL.getId()).getValue()));
         weekNumMap = weekNumMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                 (v1, v2) -> v1, LinkedHashMap::new));
         return weekNumMap;
@@ -191,7 +192,7 @@ public abstract class WeeklyProjectUtils {
         // 变量
         String title = "ALL-Bug等级分布";
 
-        Map<String, List<Issue>> levelMap = allBug.stream().collect(Collectors.groupingBy(e -> e.getCustomFieldById(67).getValue()));
+        Map<String, List<Issue>> levelMap = allBug.stream().collect(Collectors.groupingBy(e -> e.getCustomFieldById(CustomFieldsEnum.BUG_LEVEL.getId()).getValue()));
         //数据列表
         List<Object> dataList = new ArrayList<>();
         List<String> categories = new ArrayList<>();
@@ -228,7 +229,7 @@ public abstract class WeeklyProjectUtils {
         // 变量
         String title = "Open Bug等级分布";
 
-        Map<String, List<Issue>> levelMap = allBugList.stream().filter(e -> !"Closed".equals(e.getStatusName())).collect(Collectors.groupingBy(e -> e.getCustomFieldById(67).getValue()));
+        Map<String, List<Issue>> levelMap = allBugList.stream().filter(e -> !"Closed".equals(e.getStatusName())).collect(Collectors.groupingBy(e -> e.getCustomFieldById(CustomFieldsEnum.BUG_LEVEL.getId()).getValue()));
         //数据列表
         List<Object> dataList = new ArrayList<>();
         List<String> categories = new ArrayList<>();
@@ -284,7 +285,7 @@ public abstract class WeeklyProjectUtils {
             AtomicInteger cv = new AtomicInteger();
             AtomicInteger dv = new AtomicInteger();
             sortIssueMapByLevel(list).forEach((level, l) -> {
-                Map<String, List<Issue>> levelMap = l.stream().collect(Collectors.groupingBy(e -> e.getCustomFieldById(67).getValue()));
+                Map<String, List<Issue>> levelMap = l.stream().collect(Collectors.groupingBy(e -> e.getCustomFieldById(CustomFieldsEnum.BUG_LEVEL.getId()).getValue()));
                 switch (level) {
                     case "S":
                         List<Issue> ss = levelMap.get(level);
