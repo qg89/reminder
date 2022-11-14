@@ -58,22 +58,29 @@ public abstract class WeeklyProjectUtils {
         List<String> categories = new ArrayList<>();
         // 变量
         String title = "评审问题数量";
-        weekNumMap.forEach((k, v) -> {
-            categories.add(DateTime.now().toString("yy") + "W" + k);
-        });
+        for (int i = 36; i < 52; i++) {
+            String week = DateTime.now().toString("yy") + "W" + i;
+            categories.add(week);
+        }
 
         //图例名称列表
         List<String> legendNameList = List.of("Closed数量", "Open数量");
         //数据列表
         List<List<Object>> dataList = new ArrayList<>();
-        AtomicInteger value = new AtomicInteger();
         List<Object> all = new ArrayList<>();
         List<Object> week = new ArrayList<>();
-        weekNumMap.forEach((k, v) -> {
-            value.addAndGet(v.size());
-            all.add(value.intValue());
-            week.add(v.size());
-        });
+        int value = 0;
+        for (String category : categories) {
+            List<Issue> issueList = weekNumMap.get(category);
+            if (CollectionUtils.isEmpty(issueList)) {
+                week.add(0);
+                all.add(value);
+                continue;
+            }
+            int size = issueList.size();
+            all.add(value = (value + size));
+            week.add(size);
+        }
         dataList.add(all);
         dataList.add(week);
 
@@ -109,22 +116,29 @@ public abstract class WeeklyProjectUtils {
         // 变量
         String title = "线上问题每周增加情况";
 
-        weekNumMap.forEach((k, v) -> {
-            categories.add(DateTime.now().toString("yy") + "W" + k);
-        });
+        for (int i = 36; i < 52; i++) {
+            String week = DateTime.now().toString("yy") + "W" + i;
+            categories.add(week);
+        }
 
         //图例名称列表
         List<String> legendNameList = List.of("漏出BUG总数", "漏出BUG当周数");
         //数据列表
         List<List<Object>> dataList = new ArrayList<>();
-        AtomicInteger value = new AtomicInteger();
         List<Object> all = new ArrayList<>();
         List<Object> week = new ArrayList<>();
-        weekNumMap.forEach((k, v) -> {
-            value.addAndGet(v.size());
-            all.add(value.intValue());
-            week.add(v.size());
-        });
+        int value = 0;
+        for (String category : categories) {
+            List<Issue> issueList = weekNumMap.get(category);
+            if (CollectionUtils.isEmpty(issueList)) {
+                week.add(0);
+                all.add(value);
+                continue;
+            }
+            int size = issueList.size();
+            all.add(value = (value + size));
+            week.add(size);
+        }
         dataList.add(all);
         dataList.add(week);
 
@@ -150,10 +164,9 @@ public abstract class WeeklyProjectUtils {
      * @return
      */
     private static Map<String, List<Issue>> sortIssueMapByCreateOn(List<Issue> issues) {
-        Map<String, List<Issue>> weekNumMap = issues.stream().collect(Collectors.groupingBy(e -> {
-            Date createdOn = e.getCreatedOn();
-            return String.valueOf(DateUtil.weekOfYear(createdOn) - 1);
-        }));
+        Map<String, List<Issue>> weekNumMap = issues.stream().collect(Collectors.groupingBy(e ->
+                DateTime.now().toString("yy") + "W" + (DateUtil.weekOfYear(e.getCreatedOn()) - 1)
+        ));
         weekNumMap = weekNumMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
                 (v1, v2) -> v1, LinkedHashMap::new));
         return weekNumMap;
@@ -369,7 +382,7 @@ public abstract class WeeklyProjectUtils {
         // 变量
         String title = "线上问题每周增加情况";
         Map<String, List<TimeEntry>> weekNumMap = sortTimeList(timeEntryList);
-        Map<String, List<TimeEntry>> weekNumBugsMap = sortTimeList(timeEntryBugs);
+//        Map<String, List<TimeEntry>> weekNumBugsMap = sortTimeList(timeEntryBugs);
 
         //图例名称列表
         List<String> legendNameList = List.of("全部COPQ", "8月1日 COPQ");
