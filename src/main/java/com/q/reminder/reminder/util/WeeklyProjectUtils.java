@@ -61,9 +61,8 @@ public abstract class WeeklyProjectUtils {
         for (int i = 36; i < 52; i++) {
             String week = DateTime.now().toString("yy") + "W" + i;
             int weekOfYear = DateUtil.thisWeekOfYear();
-            if (weekOfYear <= i) {
-                i = weekOfYear;
-                continue;
+            if (weekOfYear <= i + 1) {
+                break;
             }
             categories.add(week);
         }
@@ -72,22 +71,22 @@ public abstract class WeeklyProjectUtils {
         List<String> legendNameList = List.of("Closed数量", "Open数量");
         //数据列表
         List<List<Object>> dataList = new ArrayList<>();
-        List<Object> all = new ArrayList<>();
-        List<Object> week = new ArrayList<>();
-        int value = 0;
+        List<Object> closeList = new ArrayList<>();
+        List<Object> openList = new ArrayList<>();
         for (String category : categories) {
             List<Issue> issueList = weekNumMap.get(category);
             if (CollectionUtils.isEmpty(issueList)) {
-                week.add(0);
-                all.add(value);
+                openList.add(0);
+                closeList.add(0);
                 continue;
             }
-            int size = issueList.size();
-            all.add(value = (value + size));
-            week.add(size);
+            List<Issue> closedList = issueList.stream().filter(e -> 5 != e.getStatusId()).toList();
+            int colseSize = closedList.size();
+            closeList.add(issueList.size() - colseSize);
+            openList.add(colseSize);
         }
-        dataList.add(all);
-        dataList.add(week);
+        dataList.add(closeList);
+        dataList.add(openList);
 
         File file = null;
         try {
@@ -124,9 +123,8 @@ public abstract class WeeklyProjectUtils {
         for (int i = 21; i < 52; i++) {
             String week = DateTime.now().toString("yy") + "W" + i;
             int weekOfYear = DateUtil.thisWeekOfYear();
-            if (weekOfYear <= i) {
-                i = weekOfYear;
-                continue;
+            if (weekOfYear <= i + 1) {
+                break;
             }
             categories.add(week);
         }
@@ -142,13 +140,12 @@ public abstract class WeeklyProjectUtils {
             List<Issue> issueList = weekNumMap.get(category);
             if (CollectionUtils.isEmpty(issueList)) {
                 week.add(0);
-                all.add(0);
+                all.add(value);
                 continue;
             }
             int size = issueList.size();
-            List<Issue> closedList = issueList.stream().filter(e -> 5 != e.getStatusId()).toList();
-            all.add(size);
-            week.add(size - closedList.size());
+            all.add(size + value);
+            week.add(size);
         }
         dataList.add(all);
         dataList.add(week);

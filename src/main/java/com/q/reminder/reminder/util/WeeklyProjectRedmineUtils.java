@@ -26,12 +26,12 @@ public abstract class WeeklyProjectRedmineUtils {
 
     public static void main(String[] args) {
         ProjectInfo projectInfo = new ProjectInfo();
-        projectInfo.setRedmineUrl("http://redmine-qa.mxnavi.com/");
-        projectInfo.setPKey("dcsp-2");
-        projectInfo.setPmKey("1f905383da4f783bad92e22f430c7db0b15ae258");
+        projectInfo.setRedmineUrl("http://redmine-pa.mxnavi.com/");
+        projectInfo.setPKey("510303-gb");
+        projectInfo.setPmKey("e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
 //        List<TimeEntry> copq = wprojectTimesBugs(projectInfo, "2022-11-04");
+        List<Issue> issues1 = queryRedmine(projectInfo, new ArrayList<>());
         List<Issue> issues = OverallBug.allBug(projectInfo);
-        System.out.println(issues.get(0).getCustomFields());
         System.out.println();
     }
 

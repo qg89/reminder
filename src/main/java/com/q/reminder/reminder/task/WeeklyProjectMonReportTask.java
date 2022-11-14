@@ -8,10 +8,11 @@ import com.lark.oapi.service.docx.v1.model.UpdateBlockRequest;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.contents.WeeklyReportContents;
 import com.q.reminder.reminder.entity.ProjectInfo;
-import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.service.ProjectInfoService;
+import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.util.*;
 import com.q.reminder.reminder.vo.FeishuUploadImageVo;
+import com.q.reminder.reminder.vo.SendVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.xxl.job.core.biz.model.ReturnT;
@@ -23,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -61,11 +63,12 @@ public class WeeklyProjectMonReportTask {
     }
 
     private void writeReport(List<WeeklyProjectVo> list) {
+        String path = ResourceUtils.path("templates/file");
+        File logoFile = new File(path + "/logo.jpg");
         list.forEach(report -> {
             String redmineUrl = report.getRedmineUrl();
             String accessKey = report.getPmKey();
             String pKey = report.getPKey();
-            String pmOu = report.getPmOu();
             WeeklyProjectVo vo = new WeeklyProjectVo();
             String appId = feishuProperties.getAppId();
             vo.setAppId(appId);
@@ -142,23 +145,57 @@ public class WeeklyProjectMonReportTask {
                         // open-Bug >15
                         vo.setBlockId(block.getString("block_id"));
                         File openBug15 = WeeklyProjectUtils.openBug15(allBugList);
-                        if (openBug15 != null) {
-                            addRequests(vo, openBug15, requests);
-                            log.info("[{}]项目周报，open-Bug >15 执行完成", report.getProjectShortName());
+                        if (openBug15 == null) {
+                            openBug15 = logoFile;
                         }
+                        addRequests(vo, openBug15, requests);
+                        log.info("[{}]项目周报，open-Bug >15 执行完成", report.getProjectShortName());
                     }
                 }
             }
             FeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
             log.info("[{}]项目周报更新完成", report.getProjectShortName());
 
-            String secret = FeiShuApi.getSecret(appId, feishuProperties.getAppSecret());
-            FeiShuApi.sendText(pmOu,"", secret);
+            sendFeishu(report);
         });
-        File file = new File(ResourceUtils.path("templates/file"));
+        File file = new File(path);
         for (File f : Objects.requireNonNull(file.listFiles(((dir, name) -> name.endsWith(".png") || new File(name).isDirectory())))) {
             f.delete();
         }
+    }
+
+    private void sendFeishu(WeeklyProjectVo vo) {
+        String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
+        String weeklyReportUrl = vo.getWeeklyReportUrl();
+        String fileName = vo.getFileName();
+        JSONObject con = new JSONObject();
+        JSONObject all = new JSONObject();
+        con.put("zh_cn", all);
+        all.put("title", "[" + fileName + "] 周报已更新");
+        JSONArray contentJsonArray = new JSONArray();
+        all.put("content", contentJsonArray);
+        JSONArray subContentJsonArray = new JSONArray();
+        JSONObject subject = new JSONObject();
+        subject.put("tag", "text");
+        subject.put("text", "\r\n点击查看周报==》》 ");
+        subContentJsonArray.add(subject);
+        JSONObject a = new JSONObject();
+        a.put("tag", "a");
+        a.put("href", weeklyReportUrl);
+        a.put("text", fileName);
+        subContentJsonArray.add(a);
+        contentJsonArray.add(subContentJsonArray);
+
+        SendVo sendVo = new SendVo();
+        sendVo.setMemberId(vo.getPmOu());
+        sendVo.setContent(con.toJSONString());
+        try {
+            FeiShuApi.sendPost(sendVo, secret, new StringBuilder());
+        } catch (IOException e) {
+            log.error(e);
+            return;
+        }
+        log.info("[{}]-周报更新已通知PM", fileName);
     }
 
     private void addRequests(WeeklyProjectVo vo, File file, List<UpdateBlockRequest> requests) {

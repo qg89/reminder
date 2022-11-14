@@ -391,7 +391,6 @@ public abstract class RedmineApi {
     }
 
     public static void main(String[] args) {
-        String s = DateTime.parse("221110", DateTimeFormat.forPattern("yyMMdd")).toString("yyyyMMdd");
-        System.out.println(s);
+
     }
 }

@@ -30,4 +30,5 @@ public class WeeklyProjectVo extends BaseFeishuVo implements Serializable {
 
     private String blockId;
     private String imageToken;
+    private String weeklyReportUrl;
 }
