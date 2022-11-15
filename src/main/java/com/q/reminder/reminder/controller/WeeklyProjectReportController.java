@@ -68,11 +68,10 @@ public class WeeklyProjectReportController {
         List<String> list = List.of(
                 "评审问题数量",
                 "趋势",
-                "Open Bug情况",
+                "Open Bug情况（未实现）",
                 "All-Bug等级分布",
                 "Open-Bug等级分布",
-                "COPQ",
-                ""
+                "COPQ"
         );
         return new ReturnT<>(list);
     }
