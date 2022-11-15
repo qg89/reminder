@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.util;
 
+import cn.hutool.core.date.DateUtil;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.vo.QueryVo;
@@ -10,9 +11,14 @@ import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
+import org.joda.time.DateTime;
 
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.WeekFields;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author : saiko
@@ -24,16 +30,18 @@ import java.util.List;
 public abstract class WeeklyProjectRedmineUtils {
 
 
-    public static void main(String[] args) {
-        ProjectInfo projectInfo = new ProjectInfo();
-        projectInfo.setRedmineUrl("http://redmine-pa.mxnavi.com/");
-        projectInfo.setPKey("510303-gb");
-        projectInfo.setPmKey("e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
-//        List<TimeEntry> copq = wprojectTimesBugs(projectInfo, "2022-11-04");
-        List<Issue> issues1 = queryRedmine(projectInfo, new ArrayList<>());
-        List<Issue> issues = OverallBug.allBug(projectInfo);
-        System.out.println();
-    }
+//    public static void main(String[] args) {
+//        ProjectInfo projectInfo = new ProjectInfo();
+//        projectInfo.setRedmineUrl("http://redmine-qa.mxnavi.com/");
+//        projectInfo.setPKey("510302-sell");
+//        projectInfo.setPmKey("1f905383da4f783bad92e22f430c7db0b15ae258");
+////        List<TimeEntry> copq = wprojectTimesBugs(projectInfo, "2022-11-04");
+////        List<Issue> issues1 = queryRedmine(projectInfo, new ArrayList<>());
+////        List<Issue> issues = OverallBug.allBug(projectInfo);
+//        List<TimeEntry> timeEntries = wProjectTimes(projectInfo);
+////        List<TimeEntry> bug = Objects.requireNonNull(WeeklyProjectRedmineUtils.wprojectTimesBugs(projectInfo, "Bug")).stream().filter(e -> e.getCreatedOn().before(new DateTime(getWeekNumToSunday(DateUtil.thisWeekOfYear() - 2)).toDate())).toList();
+//        System.out.println();
+//    }
 
     /**
      * 项目周报，获取评审问题
@@ -79,12 +87,15 @@ public abstract class WeeklyProjectRedmineUtils {
         }
     }
 
-    public static List<TimeEntry> wprojectTimes(ProjectInfo projectInfo) {
+    public static List<TimeEntry> wProjectTimes(ProjectInfo projectInfo) {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl() + "/projects/" + projectInfo.getPKey(), projectInfo.getPmKey());
         Transport transport = mgr.getTransport();
-        List<RequestParam> params = new ArrayList<>();
         try {
-            return transport.getObjectsList(TimeEntry.class, params);
+            return transport.getObjectsList(TimeEntry.class, List.of(
+                    new RequestParam("f[]", "spent_on"),
+                    new RequestParam("op[spent_on]", "<="),
+                    new RequestParam("v[spent_on][]", getWeekNumToSunday(DateUtil.thisWeekOfYear() - 2))
+            ));
         } catch (RedmineException e) {
             e.printStackTrace();
         }
@@ -149,5 +160,12 @@ public abstract class WeeklyProjectRedmineUtils {
             // BUG分类
             return queryRedmine(projectInfo, params).stream().filter(e -> bugType.contains(e.getCustomFieldById(CustomFieldsEnum.BUG_TYPE.getId()).getValue())).toList();
         }
+    }
+
+    private static String getWeekNumToSunday(int weekNum) {
+        WeekFields weekFields = WeekFields.ISO;
+        //输入你想要的年份和周数
+        LocalDate localDate = LocalDate.now().withYear(DateUtil.thisYear()).with(weekFields.weekOfYear(), weekNum);
+        return localDate.with(weekFields.dayOfWeek(), 7L).atStartOfDay().atZone(ZoneId.systemDefault()).format(DateTimeFormatter.ISO_LOCAL_DATE);
     }
 }

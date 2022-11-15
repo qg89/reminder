@@ -24,7 +24,6 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.*;
@@ -381,13 +380,14 @@ public abstract class WeeklyProjectUtils {
      * @return
      */
     public static File copq(WeeklyProjectVo vo) {
+        int weekNum = Integer.parseInt(vo.getFileName().split("W")[1]);
         final int beginWeekNum = 33;
         ProjectInfo projectInfo = new ProjectInfo();
         projectInfo.setRedmineUrl(vo.getRedmineUrl());
         projectInfo.setPmKey(vo.getPmKey());
         projectInfo.setPKey(vo.getPKey());
-        Date sunday = getWeekNumToSunday(DateUtil.thisWeekOfYear() - 2);
-        List<TimeEntry> timeEntryList = Objects.requireNonNull(WeeklyProjectRedmineUtils.wprojectTimes(projectInfo)).stream().filter(e -> e.getCreatedOn().before(sunday)).toList();
+        Date sunday = getWeekNumToSunday(weekNum - 2);
+        List<TimeEntry> timeEntryList = Objects.requireNonNull(WeeklyProjectRedmineUtils.wProjectTimes(projectInfo));
         List<TimeEntry> timeEntryBugs = Objects.requireNonNull(WeeklyProjectRedmineUtils.wprojectTimesBugs(projectInfo, "Bug")).stream().filter(e -> e.getCreatedOn().before(sunday)).toList();
         List<String> categories = new ArrayList<>();
         // 变量
@@ -401,27 +401,19 @@ public abstract class WeeklyProjectUtils {
         List<List<Object>> dataList = new ArrayList<>();
         List<Object> all = new ArrayList<>();
         List<Object> week = new ArrayList<>();
-        for (int i = beginWeekNum; i < 52; i++) {
-            String weekNum = DateTime.now().toString("yy") + "W" + i;
-            int weekOfYear = DateUtil.thisWeekOfYear();
-            if (weekOfYear <= i + 1) {
-                break;
-            }
-            categories.add(weekNum);
+        for (int i = beginWeekNum; i < weekNum; i++) {
+            String weekOfYear = DateTime.now().toString("yy") + "W" + i;
+            categories.add(weekOfYear);
         }
 
-        for (String weekNum : categories) {
-            List<TimeEntry> timeEntries = weekNumMap.get(weekNum);
+        for (String weekOfYear : categories) {
+            List<TimeEntry> timeEntries = weekNumMap.get(weekOfYear);
             if (CollectionUtils.isEmpty(timeEntries)) {
                 continue;
             }
-            Date weekNumToSunday = getWeekNumToSunday(Integer.parseInt(weekNum.split("W")[1]));
-            double allSum = timeEntryList.stream().filter(e ->
-                    e.getSpentOn().before(weekNumToSunday)
-            ).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
-            double bugSum = timeEntryBugs.stream().filter(e ->
-                    e.getSpentOn().before(weekNumToSunday)
-            ).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
+            Date weekNumToSunday = getWeekNumToSunday(Integer.parseInt(weekOfYear.split("W")[1]) - 2);
+            double allSum = timeEntryList.stream().filter(e -> e.getSpentOn().before(weekNumToSunday)).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
+            double bugSum = timeEntryBugs.stream().filter(e -> e.getSpentOn().before(weekNumToSunday)).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
 
             // 8月1日之后的
             double allWeekSum = timeEntryList.stream().filter(e -> {
@@ -472,6 +464,6 @@ public abstract class WeeklyProjectUtils {
         WeekFields weekFields = WeekFields.ISO;
         //输入你想要的年份和周数
         LocalDate localDate = LocalDate.now().withYear(DateUtil.thisYear()).with(weekFields.weekOfYear(), weekNum);
-        return Date.from(localDate.with(weekFields.dayOfWeek(), 7L).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant().plus(1, ChronoUnit.DAYS).minusMillis(1));
+        return Date.from(localDate.with(weekFields.dayOfWeek(), 7L).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
     }
 }
