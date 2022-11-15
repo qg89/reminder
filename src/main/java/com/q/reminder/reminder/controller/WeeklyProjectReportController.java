@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.service.ProjectInfoService;
+import com.q.reminder.reminder.service.WeeklyProjectReportService;
 import com.q.reminder.reminder.task.WeeklyProjectMonReportTask;
 import com.q.reminder.reminder.vo.WeeklyByProjectVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
@@ -33,13 +34,16 @@ public class WeeklyProjectReportController {
     private WeeklyProjectMonReportTask weeklyProjectMonReportTask;
     @Autowired
     private ProjectInfoService projectInfoService;
+    @Autowired
+    private WeeklyProjectReportService weeklyProjectReportService;
 
     /**
      * 重新生成
      */
     @GetMapping("/reset")
     public ReturnT<String> reSet(WeeklyVo vo) {
-        List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(vo.getWeekNum(), vo.getPKey());
+        Integer weekNum = vo.getWeekNum();
+        List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNum, vo.getPKey());
         WeeklyProjectVo projectVo = list.get(0);
         if (projectVo == null) {
             return ReturnT.FAIL;
@@ -49,7 +53,7 @@ public class WeeklyProjectReportController {
                 .setIgnoreCase(true);
         BeanUtil.copyProperties(projectVo, vo, copyOptions);
         weeklyProjectMonReportTask.resetReport(vo);
-        return new ReturnT<>(vo.getWeeklyReportUrl());
+        return new ReturnT<>(projectVo.getWeeklyReportUrl());
     }
 
     @GetMapping("/p_option")
