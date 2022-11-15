@@ -349,31 +349,31 @@ public class WeeklyProjectMonReportTask {
             if (4 == blockType) {
                 String heading2 = JSONObject.parseObject(block.getJSONObject("heading2").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
                 if (WeeklyReportContents.REVIEW_QUESTIONS.equals(heading2) && WeeklyReportContents.REVIEW_QUESTIONS.equals(title)) {
-                    i = reviewQuestions(vo, jsonArray, requests, i);
+                    reviewQuestions(vo, jsonArray, requests, i);
                     break;
                 }
                 if (WeeklyReportContents.COPQ.equals(heading2) && WeeklyReportContents.COPQ.equals(title)) {
-                    i = copq(vo, jsonArray, requests, i);
+                    copq(vo, jsonArray, requests, i);
                     break;
                 }
             }
             if (5 == blockType) {
                 String heading3 = JSONObject.parseObject(block.getJSONObject("heading3").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
                 if (WeeklyReportContents.TRENDS.equals(heading3) && WeeklyReportContents.TRENDS.equals(title)) {
-                    i = tends(vo, jsonArray, requests, i);
+                    tends(vo, jsonArray, requests, i);
                     break;
                 }
                 if (WeeklyReportContents.BUG_LEVEL.equals(heading3)) {
-                    if (title.equals("")) {
-                        i = allBugLevel(vo, jsonArray, requests, i);
+                    if ("All-Bug等级分布".equals(title)) {
+                        allBugLevel(vo, jsonArray, requests, i);
                         break;
                     }
-                    if (title.equals("")) {
-                        i = openBugLevel(vo, jsonArray, requests, i);
+                    if ("Open-Bug等级分布".equals(title)) {
+                        openBugLevel(vo, jsonArray, requests, i);
                         break;
                     }
-                    if (title.equals("")) {
-                        i = openBug15(logoFile, vo, jsonArray, requests, i);
+                    if ("Open-Bug>15".equals(title)) {
+                        openBug15(logoFile, vo, jsonArray, requests, i);
                         break;
                     }
                 }

@@ -71,6 +71,7 @@ public class WeeklyProjectReportController {
                 "Open Bug情况（未实现）",
                 "All-Bug等级分布",
                 "Open-Bug等级分布",
+                "Open-Bug>15",
                 "COPQ"
         );
         return new ReturnT<>(list);
