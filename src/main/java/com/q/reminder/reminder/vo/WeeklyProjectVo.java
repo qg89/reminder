@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -25,6 +26,7 @@ public class WeeklyProjectVo extends BaseFeishuVo implements Serializable {
     private String folderToken;
     private String projectShortName;
     private String redmineUrl;
+    private Date startDay;
     private String fileName;
     private String fileToken;
     private String pmOu;

@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.util.jfree;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.jfree.chart.renderer.category.BarRenderer;
 
 import java.awt.*;
@@ -14,6 +15,7 @@ import java.io.Serializable;
  * @Description :
  * @date :  2022.11.10 10:13
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class CustomRenderer extends BarRenderer implements Serializable {
 

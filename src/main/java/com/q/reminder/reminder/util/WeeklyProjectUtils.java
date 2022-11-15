@@ -23,7 +23,6 @@ import java.math.RoundingMode;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.*;
@@ -386,9 +385,10 @@ public abstract class WeeklyProjectUtils {
         projectInfo.setRedmineUrl(vo.getRedmineUrl());
         projectInfo.setPmKey(vo.getPmKey());
         projectInfo.setPKey(vo.getPKey());
+        Date startDay = vo.getStartDay();
         Date sunday = getWeekNumToSunday(weekNum - 2);
-        List<TimeEntry> timeEntryList = Objects.requireNonNull(WeeklyProjectRedmineUtils.wProjectTimes(projectInfo));
-        List<TimeEntry> timeEntryBugs = Objects.requireNonNull(WeeklyProjectRedmineUtils.wprojectTimesBugs(projectInfo, "Bug")).stream().filter(e -> e.getCreatedOn().before(sunday)).toList();
+        List<TimeEntry> timeEntryList = Objects.requireNonNull(WeeklyProjectRedmineUtils.wProjectTimes(projectInfo)).stream().filter(e -> startDay != null && e.getSpentOn().after(startDay)).toList();
+        List<TimeEntry> timeEntryBugs = Objects.requireNonNull(WeeklyProjectRedmineUtils.wprojectTimesBugs(projectInfo, "Bug")).stream().filter(e -> startDay != null && e.getSpentOn().after(startDay) && e.getCreatedOn().before(sunday)).toList();
         List<String> categories = new ArrayList<>();
         // 变量
         String title = "线上问题每周增加情况";

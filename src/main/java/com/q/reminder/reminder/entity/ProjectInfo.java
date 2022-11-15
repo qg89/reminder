@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author : saiko
@@ -34,6 +35,9 @@ public class ProjectInfo implements Serializable {
 
     @TableField("redmine_url")
     private String redmineUrl;
+
+    @TableField("start_day")
+    private Date startDay;
 
     @TableField("pm_key")
     private String pmKey;
