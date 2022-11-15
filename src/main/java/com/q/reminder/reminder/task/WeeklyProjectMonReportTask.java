@@ -147,7 +147,7 @@ public class WeeklyProjectMonReportTask {
      * @param i
      * @return
      */
-    private int reviewQuestions(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+    public int reviewQuestions(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
         vo.setBlockId(block.getString("block_id"));
         // 评审问题
@@ -169,7 +169,7 @@ public class WeeklyProjectMonReportTask {
      * @param i
      * @return
      */
-    private int openBug15(File logoFile, WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+    public int openBug15(File logoFile, WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
         JSONObject block;
         block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
         // open-Bug >15
@@ -192,7 +192,7 @@ public class WeeklyProjectMonReportTask {
      * @param i
      * @return
      */
-    private int openBugLevel(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+    public int openBugLevel(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
         // Open-Bug等级
         vo.setBlockId(block.getString("block_id"));
@@ -213,7 +213,7 @@ public class WeeklyProjectMonReportTask {
      * @param i
      * @return
      */
-    private int allBugLevel(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+    public int allBugLevel(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
         // All-bug等级
         vo.setBlockId(block.getString("block_id"));
@@ -321,7 +321,7 @@ public class WeeklyProjectMonReportTask {
         }
     }
 
-
+    @Deprecated
     public WeeklyVo resetReport(WeeklyVo vo) {
         String path = ResourceUtils.path("templates/file");
         path = URLDecoder.decode(path, Charset.defaultCharset());
@@ -388,7 +388,7 @@ public class WeeklyProjectMonReportTask {
         return vo;
     }
 
-    private int copq(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+    public int copq(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
         vo.setBlockId(block.getString("block_id"));
         // 评审问题
@@ -409,7 +409,7 @@ public class WeeklyProjectMonReportTask {
      * @param i
      * @return
      */
-    private int tends(WeeklyProjectVo weeklyVo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+    public int tends(WeeklyProjectVo weeklyVo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
         JSONObject block;
         block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
         // 趋势

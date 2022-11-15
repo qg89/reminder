@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WeeklyProjectReportService;
+import com.q.reminder.reminder.service.impl.WeeklyServiceImpl;
 import com.q.reminder.reminder.task.WeeklyProjectMonReportTask;
 import com.q.reminder.reminder.vo.WeeklyByProjectVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
@@ -35,7 +36,7 @@ public class WeeklyProjectReportController {
     @Autowired
     private ProjectInfoService projectInfoService;
     @Autowired
-    private WeeklyProjectReportService weeklyProjectReportService;
+    private WeeklyServiceImpl weeklyService;
 
     /**
      * 重新生成
@@ -52,7 +53,7 @@ public class WeeklyProjectReportController {
                 .setIgnoreNullValue(true)
                 .setIgnoreCase(true);
         BeanUtil.copyProperties(projectVo, vo, copyOptions);
-        weeklyProjectMonReportTask.resetReport(vo);
+        weeklyService.resetReport(vo);
         return new ReturnT<>(projectVo.getWeeklyReportUrl());
     }
 
@@ -76,7 +77,7 @@ public class WeeklyProjectReportController {
                 "All-Bug等级分布",
                 "Open-Bug等级分布",
                 "Open-Bug>15",
-                "COPQ"
+                "COPQ（Cost Of Poor Quality）"
         );
         return new ReturnT<>(list);
     }

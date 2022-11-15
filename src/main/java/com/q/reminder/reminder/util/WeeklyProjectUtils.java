@@ -23,6 +23,8 @@ import java.math.RoundingMode;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.*;
@@ -470,6 +472,6 @@ public abstract class WeeklyProjectUtils {
         WeekFields weekFields = WeekFields.ISO;
         //输入你想要的年份和周数
         LocalDate localDate = LocalDate.now().withYear(DateUtil.thisYear()).with(weekFields.weekOfYear(), weekNum);
-        return Date.from(localDate.with(weekFields.dayOfWeek(), 7L).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        return Date.from(localDate.with(weekFields.dayOfWeek(), 7L).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant().plus(1, ChronoUnit.DAYS).minusMillis(1));
     }
 }
