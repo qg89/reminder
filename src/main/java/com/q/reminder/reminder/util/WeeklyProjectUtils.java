@@ -18,6 +18,8 @@ import org.springframework.util.CollectionUtils;
 import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -377,7 +379,7 @@ public abstract class WeeklyProjectUtils {
      * @return
      */
     public static File copq(WeeklyProjectVo vo) {
-        final int beginWeekNum = 30;
+        final int beginWeekNum = 33;
         ProjectInfo projectInfo = new ProjectInfo();
         projectInfo.setRedmineUrl(vo.getRedmineUrl());
         projectInfo.setPmKey(vo.getPmKey());
@@ -397,7 +399,7 @@ public abstract class WeeklyProjectUtils {
         List<List<Object>> dataList = new ArrayList<>();
         List<Object> all = new ArrayList<>();
         List<Object> week = new ArrayList<>();
-        for (int i = 33; i < 52; i++) {
+        for (int i = beginWeekNum; i < 52; i++) {
             String weekNum = DateTime.now().toString("yy") + "W" + i;
             int weekOfYear = DateUtil.thisWeekOfYear();
             if (weekOfYear <= i + 1) {
@@ -432,11 +434,11 @@ public abstract class WeeklyProjectUtils {
             if (allSum == 0) {
                 allSum = 1;
             }
-            all.add(bugSum / allSum * 100);
+            all.add(BigDecimal.valueOf(bugSum / allSum * 100).setScale(2, RoundingMode.HALF_UP));
             if (allWeekSum == 0) {
                 allWeekSum = 1;
             }
-            week.add(bugWeekSum / allWeekSum * 100);
+            week.add(BigDecimal.valueOf(bugWeekSum / allWeekSum * 100).setScale(2, RoundingMode.UP));
         }
 
         dataList.add(all);
