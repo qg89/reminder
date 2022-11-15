@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.mapper.ProjectInfoMapping;
 import com.q.reminder.reminder.service.ProjectInfoService;
+import com.q.reminder.reminder.vo.WeeklyByProjectVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import org.springframework.stereotype.Service;
 
@@ -21,5 +22,10 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, Proj
     @Override
     public List<WeeklyProjectVo> getWeeklyDocxList(int weekNumber, String pKey) {
         return baseMapper.getWeeklyDocxList(weekNumber, pKey);
+    }
+
+    @Override
+    public List<WeeklyByProjectVo> weeklyByProjectList(String pKey) {
+        return baseMapper.weeklyByProjectList(pKey);
     }
 }

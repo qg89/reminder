@@ -16,6 +16,7 @@ import com.q.reminder.reminder.util.*;
 import com.q.reminder.reminder.vo.FeishuUploadImageVo;
 import com.q.reminder.reminder.vo.SendVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
+import com.q.reminder.reminder.vo.WeeklyVo;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.context.XxlJobHelper;
@@ -81,20 +82,24 @@ public class WeeklyProjectMonReportTask {
             String redmineUrl = report.getRedmineUrl();
             String accessKey = report.getPmKey();
             String pKey = report.getPKey();
+            String projectShortName = report.getProjectShortName();
+            String fileToken = report.getFileToken();
             WeeklyProjectVo vo = new WeeklyProjectVo();
             String appId = feishuProperties.getAppId();
             vo.setAppId(appId);
             vo.setAppSecret(feishuProperties.getAppSecret());
-            vo.setFileToken(report.getFileToken());
+            vo.setFileToken(fileToken);
             vo.setRedmineUrl(redmineUrl);
             vo.setPmKey(accessKey);
             vo.setPKey(pKey);
+            vo.setProjectShortName(projectShortName);
 
             ProjectInfo projectInfo = new ProjectInfo();
             projectInfo.setRedmineUrl(redmineUrl);
             projectInfo.setPmKey(accessKey);
             projectInfo.setPKey(pKey);
             List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(projectInfo);
+            vo.setAllBugList(allBugList);
 
             JSONArray jsonArray = WeeklyProjectFeishuUtils.blocks(vo);
             ArrayList<UpdateBlockRequest> requests = new ArrayList<>();
@@ -104,69 +109,26 @@ public class WeeklyProjectMonReportTask {
                 if (4 == blockType) {
                     String heading2 = JSONObject.parseObject(block.getJSONObject("heading2").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
                     if (WeeklyReportContents.REVIEW_QUESTIONS.equals(heading2)) {
-                        block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
-                        vo.setBlockId(block.getString("block_id"));
-                        // 评审问题
-                        File file = WeeklyProjectUtils.reviewQuestions(vo);
-                        if (file != null) {
-                            addRequests(vo, file, requests);
-                            log.info("[{}]项目周报，评审问题 执行完成", report.getProjectShortName());
-                        }
+                        i = reviewQuestions(vo, jsonArray, requests, i);
                     }
                     if (WeeklyReportContents.COPQ.equals(heading2)) {
-                        block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
-                        vo.setBlockId(block.getString("block_id"));
-                        // 评审问题
-                        File file = WeeklyProjectUtils.copq(vo);
-                        if (file != null) {
-                            addRequests(vo, file, requests);
-                            log.info("{}项目周报，COPQ 执行完成", report.getProjectShortName());
-                        }
+                        i = copq(vo, jsonArray, requests, i);
                     }
                 }
                 if (5 == blockType) {
                     String heading3 = JSONObject.parseObject(block.getJSONObject("heading3").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
                     if (WeeklyReportContents.TRENDS.equals(heading3)) {
-                        block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
-                        // 趋势
-                        vo.setBlockId(block.getString("block_id"));
-                        File file = WeeklyProjectUtils.trends(vo);
-                        if (file != null) {
-                            addRequests(vo, file, requests);
-                            log.info("[{}]项目周报，趋势 执行完成", report.getProjectShortName());
-                        }
+                        i = tends(vo, jsonArray, requests, i);
                     }
                     if (WeeklyReportContents.BUG_LEVEL.equals(heading3)) {
-                        block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
-                        // All-bug等级
-                        vo.setBlockId(block.getString("block_id"));
-                        File bugLevel = WeeklyProjectUtils.AllBugLevel(allBugList);
-                        if (bugLevel != null) {
-                            addRequests(vo, bugLevel, requests);
-                            log.info("[{}]项目周报，All-bug等级分布 执行完成", report.getProjectShortName());
-                        }
-                        block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
-                        // Open-Bug等级
-                        vo.setBlockId(block.getString("block_id"));
-                        File openBug = WeeklyProjectUtils.openBug(allBugList);
-                        if (openBug != null) {
-                            addRequests(vo, openBug, requests);
-                            log.info("[{}]项目周报，Open-Bug等级分布 执行完成", report.getProjectShortName());
-                        }
-                        block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
-                        // open-Bug >15
-                        vo.setBlockId(block.getString("block_id"));
-                        File openBug15 = WeeklyProjectUtils.openBug15(allBugList);
-                        if (openBug15 == null) {
-                            openBug15 = logoFile;
-                        }
-                        addRequests(vo, openBug15, requests);
-                        log.info("[{}]项目周报，open-Bug >15 执行完成", report.getProjectShortName());
+                        i = allBugLevel(vo, jsonArray, requests, i);
+                        i = openBugLevel(vo, jsonArray, requests, i);
+                        i = openBug15(logoFile, vo, jsonArray, requests, i);
                     }
                 }
             }
             FeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
-            log.info("[{}]项目周报更新完成", report.getProjectShortName());
+            log.info("[{}]项目周报更新完成", projectShortName);
 
             sendFeishu(report);
         });
@@ -174,6 +136,93 @@ public class WeeklyProjectMonReportTask {
         for (File f : Objects.requireNonNull(file.listFiles(((dir, name) -> name.endsWith(".png") || new File(name).isDirectory())))) {
             f.delete();
         }
+    }
+
+    /**
+     * 评审问题
+     *
+     * @param vo
+     * @param jsonArray
+     * @param requests
+     * @param i
+     * @return
+     */
+    private int reviewQuestions(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+        JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
+        vo.setBlockId(block.getString("block_id"));
+        // 评审问题
+        File file = WeeklyProjectUtils.reviewQuestions(vo);
+        if (file != null) {
+            addRequests(vo, file, requests);
+            log.info("[{}]项目周报，评审问题 执行完成", vo.getProjectShortName());
+        }
+        return i;
+    }
+
+    /**
+     * open-Bug >15
+     *
+     * @param logoFile
+     * @param vo
+     * @param jsonArray
+     * @param requests
+     * @param i
+     * @return
+     */
+    private int openBug15(File logoFile, WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+        JSONObject block;
+        block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
+        // open-Bug >15
+        vo.setBlockId(block.getString("block_id"));
+        File openBug15 = WeeklyProjectUtils.openBug15(vo.getAllBugList());
+        if (openBug15 == null) {
+            openBug15 = logoFile;
+        }
+        addRequests(vo, openBug15, requests);
+        log.info("[{}]项目周报，open-Bug >15 执行完成", vo.getProjectShortName());
+        return i;
+    }
+
+    /**
+     * Open-Bug等级分布
+     *
+     * @param vo
+     * @param jsonArray
+     * @param requests
+     * @param i
+     * @return
+     */
+    private int openBugLevel(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+        JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
+        // Open-Bug等级
+        vo.setBlockId(block.getString("block_id"));
+        File openBug = WeeklyProjectUtils.openBug(vo.getAllBugList());
+        if (openBug != null) {
+            addRequests(vo, openBug, requests);
+            log.info("[{}]项目周报，Open-Bug等级分布 执行完成", vo.getProjectShortName());
+        }
+        return i;
+    }
+
+    /**
+     * All-bug等级分布
+     *
+     * @param vo
+     * @param jsonArray
+     * @param requests
+     * @param i
+     * @return
+     */
+    private int allBugLevel(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+        JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
+        // All-bug等级
+        vo.setBlockId(block.getString("block_id"));
+        File bugLevel = WeeklyProjectUtils.AllBugLevel(vo.getAllBugList());
+        if (bugLevel != null) {
+            addRequests(vo, bugLevel, requests);
+            log.info("[{}]项目周报，All-bug等级分布 执行完成", vo.getProjectShortName());
+        }
+        return i;
     }
 
     private void sendFeishu(WeeklyProjectVo vo) {
@@ -270,5 +319,106 @@ public class WeeklyProjectMonReportTask {
                 file.delete();
             }
         }
+    }
+
+
+    public WeeklyVo resetReport(WeeklyVo vo) {
+        String path = ResourceUtils.path("templates/file");
+        path = URLDecoder.decode(path, Charset.defaultCharset());
+        File logoFile = FileUtil.file(path + "/logo.jpg");
+        String redmineUrl = vo.getRedmineUrl();
+        String accessKey = vo.getPmKey();
+        String pKey = vo.getPKey();
+        String projectShortName = vo.getProjectShortName();
+        vo.setAppSecret(feishuProperties.getAppSecret());
+        vo.setAppId(feishuProperties.getAppId());
+        String title = vo.getTitle();
+
+        ProjectInfo projectInfo = new ProjectInfo();
+        projectInfo.setRedmineUrl(redmineUrl);
+        projectInfo.setPmKey(accessKey);
+        projectInfo.setPKey(pKey);
+        List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(projectInfo);
+        vo.setAllBugList(allBugList);
+
+        JSONArray jsonArray = WeeklyProjectFeishuUtils.blocks(vo);
+        ArrayList<UpdateBlockRequest> requests = new ArrayList<>();
+        for (int i = 0; i < Objects.requireNonNull(jsonArray).size(); i++) {
+            JSONObject block = JSONObject.parseObject(jsonArray.get(i).toString());
+            Integer blockType = block.getInteger("block_type");
+            if (4 == blockType) {
+                String heading2 = JSONObject.parseObject(block.getJSONObject("heading2").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
+                if (WeeklyReportContents.REVIEW_QUESTIONS.equals(heading2) && WeeklyReportContents.REVIEW_QUESTIONS.equals(title)) {
+                    i = reviewQuestions(vo, jsonArray, requests, i);
+                    break;
+                }
+                if (WeeklyReportContents.COPQ.equals(heading2) && WeeklyReportContents.COPQ.equals(title)) {
+                    i = copq(vo, jsonArray, requests, i);
+                    break;
+                }
+            }
+            if (5 == blockType) {
+                String heading3 = JSONObject.parseObject(block.getJSONObject("heading3").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
+                if (WeeklyReportContents.TRENDS.equals(heading3) && WeeklyReportContents.TRENDS.equals(title)) {
+                    i = tends(vo, jsonArray, requests, i);
+                    break;
+                }
+                if (WeeklyReportContents.BUG_LEVEL.equals(heading3)) {
+                    if (title.equals("")) {
+                        i = allBugLevel(vo, jsonArray, requests, i);
+                        break;
+                    }
+                    if (title.equals("")) {
+                        i = openBugLevel(vo, jsonArray, requests, i);
+                        break;
+                    }
+                    if (title.equals("")) {
+                        i = openBug15(logoFile, vo, jsonArray, requests, i);
+                        break;
+                    }
+                }
+            }
+        }
+        FeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
+        log.info("[{}]项目周报更新完成", projectShortName);
+        File file = new File(path);
+        for (File f : Objects.requireNonNull(file.listFiles(((dir, name) -> name.endsWith(".png") || new File(name).isDirectory())))) {
+            f.delete();
+        }
+        return vo;
+    }
+
+    private int copq(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+        JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
+        vo.setBlockId(block.getString("block_id"));
+        // 评审问题
+        File file = WeeklyProjectUtils.copq(vo);
+        if (file != null) {
+            addRequests(vo, file, requests);
+            log.info("{}项目周报，COPQ 执行完成", vo.getProjectShortName());
+        }
+        return i;
+    }
+
+    /**
+     * 趋势
+     *
+     * @param weeklyVo
+     * @param jsonArray
+     * @param requests
+     * @param i
+     * @return
+     */
+    private int tends(WeeklyProjectVo weeklyVo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+        JSONObject block;
+        block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
+        // 趋势
+        weeklyVo.setBlockId(block.getString("block_id"));
+        File file = WeeklyProjectUtils.trends(weeklyVo);
+        if (file != null) {
+            addRequests(weeklyVo, file, requests);
+            log.info("[{}]项目周报，趋势 执行完成", weeklyVo.getProjectShortName());
+        }
+        return i;
     }
 }

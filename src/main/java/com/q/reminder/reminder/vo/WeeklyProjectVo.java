@@ -1,10 +1,12 @@
 package com.q.reminder.reminder.vo;
 
+import com.taskadapter.redmineapi.bean.Issue;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author : saiko
@@ -31,4 +33,5 @@ public class WeeklyProjectVo extends BaseFeishuVo implements Serializable {
     private String blockId;
     private String imageToken;
     private String weeklyReportUrl;
+    private List<Issue> allBugList;
 }

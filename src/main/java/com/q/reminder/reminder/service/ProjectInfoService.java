@@ -2,6 +2,7 @@ package com.q.reminder.reminder.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.vo.WeeklyByProjectVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 
 import java.util.List;
@@ -16,4 +17,5 @@ import java.util.List;
 public interface ProjectInfoService extends IService<ProjectInfo> {
     List<WeeklyProjectVo> getWeeklyDocxList(int weekNumber, String pKey);
 
+    List<WeeklyByProjectVo> weeklyByProjectList(String pKey);
 }

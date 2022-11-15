@@ -30,4 +30,21 @@
             AND p.p_key = #{pKey}
         </if>
     </select>
+
+    <select id="weeklyByProjectList" resultType="com.q.reminder.reminder.vo.WeeklyByProjectVo">
+        SELECT
+            fw.file_name AS fileName,
+            fw.url AS weeklyReportUrl,
+            fw.week_num AS weekNum
+        FROM
+            r_project_info p,
+            fs_weekly_project_report fw
+        WHERE
+            p.p_id = fw.r_pid
+          AND fw.file_token IS NOT NULL
+          AND p.p_key = #{pKey}
+          AND fw.is_delete = 0
+        ORDER BY
+            week_num DESC
+    </select>
 </mapper>

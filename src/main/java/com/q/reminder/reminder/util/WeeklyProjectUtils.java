@@ -397,7 +397,7 @@ public abstract class WeeklyProjectUtils {
         List<List<Object>> dataList = new ArrayList<>();
         List<Object> all = new ArrayList<>();
         List<Object> week = new ArrayList<>();
-        for (int i = 30; i < 52; i++) {
+        for (int i = 33; i < 52; i++) {
             String weekNum = DateTime.now().toString("yy") + "W" + i;
             int weekOfYear = DateUtil.thisWeekOfYear();
             if (weekOfYear <= i + 1) {
