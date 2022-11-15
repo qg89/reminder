@@ -41,9 +41,12 @@ public class WeeklyProjectReportController {
     public ReturnT<String> reSet(WeeklyVo vo) {
         List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(vo.getWeekNum(), vo.getPKey());
         WeeklyProjectVo projectVo = list.get(0);
-        CopyOptions copyOptions = CopyOptions.create();
-        copyOptions.setIgnoreNullValue(true);
-        copyOptions.setIgnoreCase(true);
+        if (projectVo == null) {
+            return ReturnT.FAIL;
+        }
+        CopyOptions copyOptions = CopyOptions.create()
+                .setIgnoreNullValue(true)
+                .setIgnoreCase(true);
         BeanUtil.copyProperties(projectVo, vo, copyOptions);
         weeklyProjectMonReportTask.resetReport(vo);
         return new ReturnT<>(vo.getWeeklyReportUrl());
@@ -55,9 +58,9 @@ public class WeeklyProjectReportController {
         return new ReturnT<>(projectInfoService.list(lq));
     }
 
-    @GetMapping("/listReport/{pKey}")
-    public ReturnT<List<WeeklyByProjectVo>> listReport(@PathVariable("pKey") String pKey) {
-       return new ReturnT<>(projectInfoService.weeklyByProjectList(pKey));
+    @GetMapping("/listReport")
+    public ReturnT<List<WeeklyByProjectVo>> listReport(WeeklyByProjectVo vo) {
+       return new ReturnT<>(projectInfoService.weeklyByProjectList(vo.getPKey(), vo.getFileName()));
     }
 
     @GetMapping("/listDocx")

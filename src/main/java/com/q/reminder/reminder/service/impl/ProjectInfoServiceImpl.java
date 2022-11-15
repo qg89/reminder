@@ -25,7 +25,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, Proj
     }
 
     @Override
-    public List<WeeklyByProjectVo> weeklyByProjectList(String pKey) {
-        return baseMapper.weeklyByProjectList(pKey);
+    public List<WeeklyByProjectVo> weeklyByProjectList(String pKey, String name) {
+        return baseMapper.weeklyByProjectList(pKey, name);
     }
 }

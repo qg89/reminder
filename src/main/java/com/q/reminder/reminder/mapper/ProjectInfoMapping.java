@@ -21,5 +21,5 @@ public interface ProjectInfoMapping extends BaseMapper<ProjectInfo> {
 
     List<WeeklyProjectVo> getWeeklyDocxList(@Param("weekNumber") int weekNumber, @Param("pKey") String pKey);
 
-    List<WeeklyByProjectVo> weeklyByProjectList(@Param("pKey") String pKey);
+    List<WeeklyByProjectVo> weeklyByProjectList(@Param("pKey") String pKey,  @Param("name") String name);
 }

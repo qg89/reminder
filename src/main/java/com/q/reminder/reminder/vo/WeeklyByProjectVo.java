@@ -20,4 +20,5 @@ public class WeeklyByProjectVo implements Serializable {
     private String fileName;
     private String weeklyReportUrl;
     private Integer weekNum;
+    private String pKey;
 }
