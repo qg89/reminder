@@ -82,4 +82,6 @@ dependencies {
 	implementation 'org.jfree:jfreechart:1.5.3'
 	implementation 'com.guicedee.services:jfreechart:1.2.2.1'
 
+	implementation 'org.apache.poi:poi-ooxml:5.2.2'
+
 }
