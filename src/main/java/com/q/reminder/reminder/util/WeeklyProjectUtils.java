@@ -2,11 +2,14 @@ package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.UUID;
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.ExcelWriter;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.util.jfree.GenerateChartUtil;
 import com.q.reminder.reminder.util.jfree.GeneratePieChartUtil;
 import com.q.reminder.reminder.util.jfree.JFreeChartUtil;
+import com.q.reminder.reminder.vo.ExcelVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.TimeEntry;
@@ -75,6 +78,9 @@ public abstract class WeeklyProjectUtils {
         List<List<Object>> dataList = new ArrayList<>();
         List<Object> closeList = new ArrayList<>();
         List<Object> openList = new ArrayList<>();
+
+        List<ExcelVo> closedIssueList = new ArrayList<>();
+        List<ExcelVo> openIssueList = new ArrayList<>();
         for (String category : categories) {
             List<Issue> issueList = weekNumMap.get(category);
             if (CollectionUtils.isEmpty(issueList)) {
@@ -82,16 +88,43 @@ public abstract class WeeklyProjectUtils {
                 closeList.add(0);
                 continue;
             }
-            List<Issue> closedList = issueList.stream().filter(e -> 5 != e.getStatusId()).toList();
-            int colseSize = closedList.size();
+            List<Issue> oList = issueList.stream().filter(e -> 5 != e.getStatusId()).toList();
+            int colseSize = oList.size();
             closeList.add(issueList.size() - colseSize);
             openList.add(colseSize);
+
+            for (Issue issue : oList) {
+                ExcelVo excelVo = new ExcelVo();
+                excelVo.setAssignee(issue.getAssigneeName());
+                excelVo.setWeekNum(category);
+                excelVo.setSubject(issue.getSubject());
+                excelVo.setStatus(issue.getStatusName());
+                excelVo.setDescription(issue.getDescription());
+                excelVo.setCreateTime(new DateTime(issue.getCreatedOn()).toString("yyyy-MM-dd HH:mm:ss"));
+                excelVo.setEndTime(new DateTime(issue.getClosedOn()).toString("yyyy-MM-dd HH:mm:ss"));
+                openIssueList.add(excelVo);
+            }
+            issues.stream().filter(e -> 5 == e.getStatusId()).forEach(issue -> {
+                ExcelVo excelVo = new ExcelVo();
+                excelVo.setAssignee(issue.getAssigneeName());
+                excelVo.setWeekNum(category);
+                excelVo.setSubject(issue.getSubject());
+                excelVo.setStatus(issue.getStatusName());
+                excelVo.setDescription(issue.getDescription());
+                excelVo.setCreateTime(new DateTime(issue.getCreatedOn()).toString("yyyy-MM-dd HH:mm:ss"));
+                excelVo.setEndTime(new DateTime(issue.getClosedOn()).toString("yyyy-MM-dd HH:mm:ss"));
+                closedIssueList.add(excelVo);
+            });
+
         }
         dataList.add(closeList);
         dataList.add(openList);
-
+        Map<String, List<ExcelVo>> excelMap = new LinkedHashMap<>();
+        excelMap.put("open", openIssueList);
+        excelMap.put("closed", closedIssueList);
         File file = null;
         try {
+            WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, "评审问题数量");
             URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
             file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
             FileOutputStream fileOutputStream = new FileOutputStream(file);

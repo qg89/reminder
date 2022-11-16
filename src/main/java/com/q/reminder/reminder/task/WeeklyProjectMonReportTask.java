@@ -132,10 +132,6 @@ public class WeeklyProjectMonReportTask {
 
             sendFeishu(report);
         });
-        File file = new File(path);
-        for (File f : Objects.requireNonNull(file.listFiles(((dir, name) -> name.endsWith(".png") || new File(name).isDirectory())))) {
-            f.delete();
-        }
     }
 
     /**
@@ -284,6 +280,11 @@ public class WeeklyProjectMonReportTask {
                 .build());
         update.setBlockId(blockId);
         requests.add(update);
+        try {
+
+        } finally {
+            file.delete();
+        }
     }
 
     /**
