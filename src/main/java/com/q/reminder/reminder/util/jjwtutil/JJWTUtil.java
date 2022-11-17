@@ -2,6 +2,7 @@ package com.q.reminder.reminder.util.jjwtutil;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -210,9 +211,11 @@ public class JJWTUtil {
         return rest <= 0;
     }
 //
-//    public static void main(String[] args) {
-//        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-//        System.out.println(encoder.encode("12345"));
-//    }
+    public static void main(String[] args) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String encode = encoder.encode("12345");
+        System.out.println(encoder.matches("12345", encode));
+        System.out.println(encoder.upgradeEncoding(encode));
+    }
 
 }

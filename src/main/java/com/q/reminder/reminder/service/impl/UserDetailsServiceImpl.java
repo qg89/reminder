@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -37,7 +38,8 @@ public class UserDetailsServiceImpl extends ServiceImpl<UserInfoMapping, User> i
             throw new UsernameNotFoundException("用户名未发现");
         }
         //查询对应权限信息
-
+        String password = new BCryptPasswordEncoder().encode(user.getPassword());
+        user.setPassword(password);
         //数据封装为UserDetails返回
         return new UserLogin(user);
     }

@@ -9,6 +9,9 @@ import com.q.reminder.reminder.vo.LoginParam;
 import com.q.reminder.reminder.vo.UpdatePasswordVo;
 import com.q.reminder.reminder.vo.base.ResultUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AccountExpiredException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,24 +33,29 @@ public class LoginController {
     private LoginService loginService;
     @Autowired
     private UserInfoMapping userMapper;
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @PostMapping("/login")
-    public ResultUtil login(@RequestBody LoginParam loginParam){
+    public ResultUtil login(@RequestBody LoginParam loginParam) {
         return loginService.login(loginParam);
     }
 
     @PostMapping("/update_p")
-    public ResultUtil update(@RequestBody UpdatePasswordVo vo){
-        LambdaQueryWrapper<User> lq = Wrappers.<User>lambdaQuery();
-        lq.eq(User::getUsername, vo.getUsername());
-        User selectOne = userMapper.selectOne(lq);
-        if (selectOne == null) {
-            return ResultUtil.fail(500, "密码修改失败，未查询到此用户");
-        }
-        String password = vo.getPassword();
+    public ResultUtil update(@RequestBody UpdatePasswordVo vo) {
         BCryptPasswordEncoder en = new BCryptPasswordEncoder();
-        selectOne.setPassword(en.encode(password));
-        userMapper.updateById(selectOne);
+        String username = vo.getUsername();
+        String password = vo.getPassword();
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        String pd = userDetails.getPassword();
+        if (!en.matches(password, pd)) {
+            throw new AccountExpiredException("密码错误");
+        }
+        LambdaQueryWrapper<User> lq = Wrappers.<User>lambdaQuery();
+        lq.eq(User::getUsername, username);
+        User user = userMapper.selectOne(lq);
+        user.setPassword(vo.getNewPd());
+        userMapper.updateById(user);
         return ResultUtil.success("修改成功");
     }
 }
