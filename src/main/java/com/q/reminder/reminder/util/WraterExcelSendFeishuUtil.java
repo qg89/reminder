@@ -54,7 +54,7 @@ public class WraterExcelSendFeishuUtil {
                 .setIgnoreCase(true);
         BeanUtil.copyProperties(weeklyVo, vo, copyOptions);
         ContentVo contentVo = new ContentVo();
-        contentVo.setMsgType("xls");
+        contentVo.setFileType("xls");
         contentVo.setReceiveId(vo.getPmOu());
         contentVo.setAppSecret(appSecret);
         contentVo.setAppId(appId);
@@ -64,6 +64,7 @@ public class WraterExcelSendFeishuUtil {
         json.put("file_key", fileKey);
         contentVo.setContent(json.toJSONString());
         try {
+            contentVo.setMsgType("file");
             FeishuJavaUtils.sendContent(contentVo);
         } finally {
             file.delete();

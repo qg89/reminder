@@ -188,7 +188,7 @@ public abstract class FeishuJavaUtils {
                 .createFileReqBody(CreateFileReqBody.newBuilder()
                         .file(file)
                         .fileName(file.getName())
-                        .fileType(vo.getMsgType())
+                        .fileType(vo.getFileType())
                         .build())
                 .build();
         CreateFileResp resp = client.im().file().create(req);

@@ -22,4 +22,5 @@ public class ContentVo extends BaseFeishuVo implements Serializable {
     private String msgType;
     private String parentNode;
     private File file;
+    private String fileType;
 }

@@ -2,13 +2,11 @@ package com.q.reminder.reminder.config;
 
 import com.q.reminder.reminder.service.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,8 +14,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
-
-import java.net.http.WebSocket;
 
 /**
  * @author : saiko
@@ -40,17 +36,21 @@ public class SecurityConfig  {
     //配置过滤
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        return http.csrf().disable()//关闭csrf
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)//关闭session
+        return http
+                .csrf()
+                .disable()//关闭csrf
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)//关闭session
                 .and()
                 .authorizeRequests(auth ->
                         auth.antMatchers(
-                                "/user/**",
-                                "/static/**",
-                                "/weekly/**"
+                                        "/user/**",
+                                        "/static/**",
+                                        "/weekly/**"
                                 )
                                 .permitAll()
-                                .anyRequest().authenticated()
+                                .anyRequest()
+                                .authenticated()
                 )
                 .userDetailsService(userDetailsService).build();
     }
