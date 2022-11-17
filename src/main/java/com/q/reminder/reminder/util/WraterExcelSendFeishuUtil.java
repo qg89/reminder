@@ -5,11 +5,6 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.alibaba.fastjson2.JSONObject;
-import com.lark.oapi.service.drive.v1.DriveService;
-import com.lark.oapi.service.drive.v1.enums.RequestDocDocTypeEnum;
-import com.lark.oapi.service.drive.v1.model.Meta;
-import com.lark.oapi.service.drive.v1.model.MetaFailed;
-import com.lark.oapi.service.drive.v1.model.RequestDoc;
 import com.q.reminder.reminder.vo.ContentVo;
 import com.q.reminder.reminder.vo.ExcelVo;
 import com.q.reminder.reminder.vo.FeishuUploadImageVo;
@@ -58,21 +53,16 @@ public class WraterExcelSendFeishuUtil {
                 .setIgnoreNullValue(true)
                 .setIgnoreCase(true);
         BeanUtil.copyProperties(weeklyVo, vo, copyOptions);
-        vo.setFile(file);
-        String fileToken = FeishuJavaUtils.uploadFile(vo);
-
         ContentVo contentVo = new ContentVo();
-        contentVo.setMsgType("text");
+        contentVo.setMsgType("xls");
         contentVo.setReceiveId(vo.getPmOu());
-        JSONObject jsonObject = new JSONObject();
         contentVo.setAppSecret(appSecret);
         contentVo.setAppId(appId);
-        Meta docx = FeishuJavaUtils.getDocx(contentVo, new RequestDoc[]{RequestDoc.newBuilder()
-                .docToken(fileToken)
-                .docType(RequestDocDocTypeEnum.FILE)
-                .build()})[0];
-        jsonObject.put("text", docx.getUrl());
-        contentVo.setContent(jsonObject.toJSONString());
+        contentVo.setFile(file);
+        String fileKey = FeishuJavaUtils.imUploadFile(contentVo);
+        JSONObject json = new JSONObject();
+        json.put("file_key", fileKey);
+        contentVo.setContent(json.toJSONString());
         try {
             FeishuJavaUtils.sendContent(contentVo);
         } finally {

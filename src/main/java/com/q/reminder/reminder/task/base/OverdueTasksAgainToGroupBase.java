@@ -15,8 +15,8 @@ import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
-import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.QueryVo;
+import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.SendUserByGroupVo;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -110,19 +110,9 @@ public class OverdueTasksAgainToGroupBase {
                 log.info("群发送,过期任务人员为空!");
                 overdueTask = true;
             } else {
-                Map<String, List<RedmineVo>> assigneeMap = issueUserList.stream().collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
-                Map<String, List<RedmineVo>> noneAssigneeMap = issueUserList.stream().collect(Collectors.groupingBy(RedmineVo::getAuthorName));
-                if (CollectionUtils.isEmpty(assigneeMap)) {
-                    assigneeMap = noneAssigneeMap;
-                } else {
-                    assigneeMap.forEach((k, v) -> {
-                        noneAssigneeMap.forEach((k1, v1) -> {
-                            if (k.equals(k1)) {
-                                v.addAll(v1);
-                            }
-                        });
-                    });
-                }
+                Map<String, List<RedmineVo>> assigneeMap = issueUserList.stream().filter(e -> StringUtils.isNotBlank(e.getAssigneeId())).collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
+                Map<String, List<RedmineVo>> noneAssigneeMap = issueUserList.stream().filter(e -> StringUtils.isBlank(e.getAssigneeId()) && StringUtils.isNotBlank(e.getAuthorName())).collect(Collectors.groupingBy(RedmineVo::getAuthorName));
+                assigneeMap.putAll(noneAssigneeMap);
                 contentJsonArray = extracted(assigneeMap);
             }
         }
@@ -165,11 +155,15 @@ public class OverdueTasksAgainToGroupBase {
      * @param listMap
      */
     private JSONArray extracted(Map<String, List<RedmineVo>> listMap) {
+        JSONArray contentJsonArray = new JSONArray();
+        if (CollectionUtils.isEmpty(listMap)) {
+            return contentJsonArray;
+        }
         // 通过人员查看对应redmine人员关系，并返回redmine姓名和飞书member_id关系
         List<UserMemgerInfo> list = userMemberService.list();
         Map<String, String> memberIds = list.stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
-        JSONArray contentJsonArray = new JSONArray();
-        listMap.forEach((k, issueList) -> {
+        listMap.forEach((k, redmineVoList) -> {
+            List<RedmineVo> issueList = redmineVoList.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(RedmineVo::getRedmineId))), ArrayList::new));
             String name = k.replace(" ", "");
             JSONArray atjsonArray = new JSONArray();
             JSONObject at = new JSONObject();

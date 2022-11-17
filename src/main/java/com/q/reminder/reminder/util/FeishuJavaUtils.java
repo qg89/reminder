@@ -174,4 +174,24 @@ public abstract class FeishuJavaUtils {
         BatchQueryMetaResp resp = client.drive().meta().batchQuery(req);
         return resp.getData().getMetas();
     }
+
+    /**
+     * 消息上传文件
+     * @param vo
+     * @return
+     * @throws Exception
+     */
+    public static String imUploadFile(ContentVo vo) throws Exception {
+        File file = vo.getFile();
+        Client client = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
+        CreateFileReq req = CreateFileReq.newBuilder()
+                .createFileReqBody(CreateFileReqBody.newBuilder()
+                        .file(file)
+                        .fileName(file.getName())
+                        .fileType(vo.getMsgType())
+                        .build())
+                .build();
+        CreateFileResp resp = client.im().file().create(req);
+        return resp.getData().getFileKey();
+    }
 }

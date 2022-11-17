@@ -255,6 +255,12 @@ public class WeeklyProjectMonReportTask {
         log.info("[{}]-周报更新已通知PM", fileName);
     }
 
+    /**
+     * 公共更新块
+     * @param vo
+     * @param file
+     * @param requests
+     */
     private void addRequests(WeeklyProjectVo vo, File file, List<UpdateBlockRequest> requests) {
         if (file == null) {
             return;
@@ -280,11 +286,7 @@ public class WeeklyProjectMonReportTask {
                 .build());
         update.setBlockId(blockId);
         requests.add(update);
-        try {
-
-        } finally {
-            file.delete();
-        }
+        file.delete();
     }
 
     /**
