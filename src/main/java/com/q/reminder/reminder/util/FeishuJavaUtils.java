@@ -7,19 +7,17 @@ import com.lark.oapi.service.docx.v1.model.*;
 import com.lark.oapi.service.drive.v1.enums.BatchQueryMetaUserIdTypeEnum;
 import com.lark.oapi.service.drive.v1.enums.UploadAllFileParentTypeEnum;
 import com.lark.oapi.service.drive.v1.model.*;
-import com.lark.oapi.service.im.v1.enums.CreateFileFileTypeEnum;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.*;
+import com.lark.oapi.service.wiki.v2.model.CopySpaceNodeReq;
+import com.lark.oapi.service.wiki.v2.model.CopySpaceNodeReqBody;
+import com.lark.oapi.service.wiki.v2.model.CopySpaceNodeResp;
 import com.q.reminder.reminder.vo.ContentVo;
 import com.q.reminder.reminder.vo.FeishuUploadImageVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import lombok.extern.log4j.Log4j2;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.UUID;
 
 
@@ -193,5 +191,19 @@ public abstract class FeishuJavaUtils {
                 .build();
         CreateFileResp resp = client.im().file().create(req);
         return resp.getData().getFileKey();
+    }
+
+    public static Boolean syncSpacesWiki(Client client, String projectToken, String title) throws Exception {
+        CopySpaceNodeReq req = CopySpaceNodeReq.newBuilder()
+                .copySpaceNodeReqBody(CopySpaceNodeReqBody.newBuilder()
+                        .targetParentToken(projectToken)
+                        .targetSpaceId("7046680616087126018")
+                        .title(title)
+                        .build())
+                .nodeToken("wikcnXpXCgmL3E7vdbM1TiwXiGc")
+                .spaceId("7046680616087126018")
+                .build();
+        CopySpaceNodeResp resp = client.wiki().spaceNode().copy(req);
+        return resp.getCode() == 0;
     }
 }

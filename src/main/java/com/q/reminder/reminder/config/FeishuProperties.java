@@ -1,7 +1,9 @@
 package com.q.reminder.reminder.config;
 
+import com.lark.oapi.Client;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.Serial;
@@ -23,4 +25,9 @@ public class FeishuProperties implements Serializable {
     private static final long serialVersionUID = 6887391918318443784L;
     private String appId;
     private String appSecret;
+
+    @Bean
+    public Client init() {
+        return Client.newBuilder(this.getAppId(), this.getAppSecret()).build();
+    }
 }
