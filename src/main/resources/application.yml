@@ -31,6 +31,18 @@ spring:
       connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
       db-type: mysql
 
+#  redis:
+#    database: 0
+#    host: localhost
+#    port: 6379
+#    password:
+#    jedis:
+#      pool:
+#        max-active: 8
+#        max-idle: 8
+#        max-wait: -1ms
+#        min-idle: 0
+
 mybatis-plus:
   mapper-locations: classpath:mapper/*Mapping.xml
   configuration:
@@ -44,11 +56,11 @@ feishu-config:
 xxl:
   job:
     admin:
-      addresses: http://localhost:8080/xxl-job-admin
+      addresses: http://192.168.3.46:11233/xxl-job-admin
     executor:
       appname: business-III-Robot #xxljob配置的执行器名称，
       ip:             #执行器IP，默认为空表示自动获取IP
-      port: 9999 #xxljob配置的端口号，默认为9999
+      port: 1233 #xxljob配置的端口号，默认为9999
       logpath: ./data/xxl-job/jobhandler  #执行器运行日志文件存储磁盘路径
       logretentiondays: -1  #调度中心日志表数据保存天数，过期日志自动清理；限制大于等于7时生效，否则, 如-1，关闭自动清理功能
     accessToken: default_token

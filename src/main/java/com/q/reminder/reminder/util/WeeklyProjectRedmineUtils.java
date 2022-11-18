@@ -102,13 +102,13 @@ public abstract class WeeklyProjectRedmineUtils {
         return null;
     }
 
-    public static List<TimeEntry> wprojectTimesBugs(ProjectInfo projectInfo, String custType) {
+    public static List<TimeEntry> wprojectTimesBugs(ProjectInfo projectInfo) {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl() + "/projects/" + projectInfo.getPKey(), projectInfo.getPmKey());
         Transport transport = mgr.getTransport();
         List<RequestParam> params = List.of(
                 new RequestParam("f[]", "issue.cf_72"),
                 new RequestParam("op[issue.cf_72]", "="),
-                new RequestParam("v[issue.cf_72][]", custType)
+                new RequestParam("v[issue.cf_72][]", "*")
         );
         try {
 //            List<TimeEntry> timeEntryList = transport.getObjectsList(TimeEntry.class, params);

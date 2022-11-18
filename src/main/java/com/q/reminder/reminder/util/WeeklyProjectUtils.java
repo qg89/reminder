@@ -421,7 +421,7 @@ public abstract class WeeklyProjectUtils {
         Date startDay = vo.getStartDay();
         Date sunday = getWeekNumToSunday(weekNum - 2);
         List<TimeEntry> timeEntryList = Objects.requireNonNull(WeeklyProjectRedmineUtils.wProjectTimes(projectInfo)).stream().filter(e -> startDay != null && e.getSpentOn().after(startDay)).toList();
-        List<TimeEntry> timeEntryBugs = Objects.requireNonNull(WeeklyProjectRedmineUtils.wprojectTimesBugs(projectInfo, "Bug")).stream().filter(e -> startDay != null && e.getSpentOn().after(startDay) && e.getCreatedOn().before(sunday)).toList();
+        List<TimeEntry> timeEntryBugs = Objects.requireNonNull(WeeklyProjectRedmineUtils.wprojectTimesBugs(projectInfo)).stream().filter(e -> startDay != null && e.getSpentOn().after(startDay) && e.getCreatedOn().before(sunday)).toList();
         List<String> categories = new ArrayList<>();
         // 变量
         String title = "线上问题每周增加情况";
