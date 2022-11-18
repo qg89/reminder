@@ -45,7 +45,6 @@ public class SecurityConfig  {
                 .authorizeRequests(auth ->
                         auth.antMatchers(
                                         "/user/**",
-                                        "/static/**",
                                         "/weekly/**"
                                 )
                                 .permitAll()
@@ -61,11 +60,4 @@ public class SecurityConfig  {
         return new BCryptPasswordEncoder();
     }
 
-    //配置跨源访问(CORS)
-    @Bean
-    CorsConfigurationSource corsConfigurationSource(){
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**",new CorsConfiguration().applyPermitDefaultValues());
-        return source;
-    }
 }

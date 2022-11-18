@@ -21,6 +21,8 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.util.CollectionUtils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -197,7 +199,7 @@ public abstract class RedmineApi {
             Date devTime = DateTime.now().plusDays(10).toDate();
             Date prodTime = devTime;
             Date today = DateTime.parse(DateUtil.today()).toDate();
-            if (StringUtils.isNotBlank(devT)) {
+            if (StringUtils.isNotBlank(devT) && isValidDate(devT, "yyyyMMdd")) {
                 devTime = DateTime.parse(devT.split("-")[0], DateTimeFormat.forPattern("yyMMdd")).toDate();
             }
             if (StringUtils.isNotBlank(prodT)) {
@@ -390,7 +392,23 @@ public abstract class RedmineApi {
         return null;
     }
 
-    public static void main(String[] args) {
-
+    public static boolean isValidDate(String str, String format) {
+        if (format == null) {
+            format = "yyyy-MM-dd HH:mm:ss";
+        }
+        boolean convertSuccess = true;
+        // 指定日期格式
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        try {
+            sdf.setLenient(false);
+            sdf.parse(str);
+            if (str.length() != format.length()) {
+                convertSuccess = false;
+            }
+        } catch (ParseException e) {
+            // 如果throw java.text.ParseException或者NullPointerException，就说明格式不对
+            convertSuccess = false;
+        }
+        return convertSuccess;
     }
 }

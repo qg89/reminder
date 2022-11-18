@@ -46,15 +46,19 @@ public class LoginController {
         BCryptPasswordEncoder en = new BCryptPasswordEncoder();
         String username = vo.getUsername();
         String password = vo.getPassword();
+        String newPd = vo.getNewPd();
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         String pd = userDetails.getPassword();
         if (!en.matches(password, pd)) {
             throw new AccountExpiredException("密码错误");
         }
+        if (newPd.length() >= 20) {
+            return ResultUtil.fail("密码长度不能大于20！");
+        }
         LambdaQueryWrapper<User> lq = Wrappers.<User>lambdaQuery();
         lq.eq(User::getUsername, username);
         User user = userMapper.selectOne(lq);
-        user.setPassword(vo.getNewPd());
+        user.setPassword(newPd);
         userMapper.updateById(user);
         return ResultUtil.success("修改成功");
     }

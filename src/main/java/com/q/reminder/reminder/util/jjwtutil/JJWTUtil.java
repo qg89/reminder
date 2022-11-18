@@ -210,12 +210,5 @@ public class JJWTUtil {
         Long rest = getTokenExpirationTime(token);
         return rest <= 0;
     }
-//
-    public static void main(String[] args) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        String encode = encoder.encode("12345");
-        System.out.println(encoder.matches("12345", encode));
-        System.out.println(encoder.upgradeEncoding(encode));
-    }
 
 }

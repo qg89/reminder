@@ -58,4 +58,12 @@ public class ResultUtil {
     public static ResultUtil fail() {
         return success(404, null, null);
     }
+
+    public static ResultUtil fail(String msg) {
+        return success(500, msg, null);
+    }
+
+    public static ResultUtil fail(String msg, Object data) {
+        return success(500, msg, data);
+    }
 }

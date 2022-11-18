@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.service.ProjectInfoService;
-import com.q.reminder.reminder.service.WeeklyProjectReportService;
 import com.q.reminder.reminder.service.impl.WeeklyServiceImpl;
 import com.q.reminder.reminder.task.WeeklyProjectMonReportTask;
 import com.q.reminder.reminder.vo.WeeklyByProjectVo;
@@ -14,11 +13,11 @@ import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.q.reminder.reminder.vo.WeeklyVo;
 import com.xxl.job.core.biz.model.ReturnT;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author : saiko
