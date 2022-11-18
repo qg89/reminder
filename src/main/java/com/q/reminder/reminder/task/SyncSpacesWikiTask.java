@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.task;
 
+import cn.hutool.core.date.DateUtil;
 import com.lark.oapi.Client;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.service.ProjectInfoService;
@@ -7,6 +8,7 @@ import com.q.reminder.reminder.service.SpaceWikoService;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +36,7 @@ public class SyncSpacesWikiTask {
         try {
             List<ProjectInfo> list = projectInfoService.list();
             for (ProjectInfo info : list) {
-                spaceWikoService.syncSpacesWiki(client, info.getWikiToken(), info.getWikiToken());
+                spaceWikoService.syncSpacesWiki(client, info.getWikiToken(), info.getWikiTitle() + DateTime.now().toString("yy") + "W" + DateUtil.thisWeekOfYear());
             }
         } catch (Exception e) {
             e.printStackTrace();
