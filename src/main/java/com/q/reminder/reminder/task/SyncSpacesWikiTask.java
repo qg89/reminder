@@ -36,7 +36,7 @@ public class SyncSpacesWikiTask {
         try {
             List<ProjectInfo> list = projectInfoService.list();
             for (ProjectInfo info : list) {
-                spaceWikoService.syncSpacesWiki(client, info.getWikiToken(), info.getWikiTitle() + DateTime.now().toString("yy") + "W" + DateUtil.thisWeekOfYear());
+                spaceWikoService.syncSpacesWiki(client, info.getWikiToken(), info.getWikiTitle() + "-" + DateTime.now().toString("yy") + "W" + DateUtil.thisWeekOfYear());
             }
         } catch (Exception e) {
             e.printStackTrace();
