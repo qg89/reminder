@@ -1,10 +1,13 @@
 package com.q.reminder.reminder.task;
 
 import cn.hutool.core.date.DateUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.Client;
 import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.WikiSpace;
 import com.q.reminder.reminder.service.ProjectInfoService;
-import com.q.reminder.reminder.service.SpaceWikoService;
+import com.q.reminder.reminder.service.WikiSpaceService;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
@@ -12,6 +15,7 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,7 +29,7 @@ import java.util.List;
 @Component
 public class SyncSpacesWikiTask {
     @Autowired
-    private SpaceWikoService spaceWikoService;
+    private WikiSpaceService spaceWikoService;
     @Autowired
     private Client client;
     @Autowired
@@ -33,11 +37,19 @@ public class SyncSpacesWikiTask {
 
     @XxlJob("syncSpacesWiki")
     public ReturnT<String> syncSpacesWiki() {
+        List<WikiSpace> wikiSpaceList = new ArrayList<>();
         try {
-            List<ProjectInfo> list = projectInfoService.list();
+            LambdaQueryWrapper<ProjectInfo> lq = Wrappers.<ProjectInfo>lambdaQuery().select(ProjectInfo::getWikiToken, ProjectInfo::getWikiTitle, ProjectInfo::getPId).isNotNull(ProjectInfo::getWikiToken);
+            List<ProjectInfo> list = projectInfoService.list(lq);
+            int weekOfYear = DateUtil.thisWeekOfYear() - 1;
             for (ProjectInfo info : list) {
-                spaceWikoService.syncSpacesWiki(client, info.getWikiToken(), info.getWikiTitle() + "-" + DateTime.now().toString("yy") + "W" + DateUtil.thisWeekOfYear());
+                String title  = info.getWikiTitle() + "-" + DateTime.now().toString("yy") + "W" + weekOfYear;
+                WikiSpace space = spaceWikoService.syncSpacesWiki(client, info.getWikiToken(), title);
+                space.setPId(Integer.valueOf(info.getPId()));
+                space.setWeekNum(weekOfYear);
+                wikiSpaceList.add(space);
             }
+            spaceWikoService.saveOrUpdateBatch(wikiSpaceList);
         } catch (Exception e) {
             e.printStackTrace();
         }

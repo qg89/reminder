@@ -12,6 +12,7 @@ import com.lark.oapi.service.im.v1.model.*;
 import com.lark.oapi.service.wiki.v2.model.CopySpaceNodeReq;
 import com.lark.oapi.service.wiki.v2.model.CopySpaceNodeReqBody;
 import com.lark.oapi.service.wiki.v2.model.CopySpaceNodeResp;
+import com.lark.oapi.service.wiki.v2.model.Node;
 import com.q.reminder.reminder.vo.ContentVo;
 import com.q.reminder.reminder.vo.FeishuUploadImageVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
@@ -193,7 +194,7 @@ public abstract class FeishuJavaUtils {
         return resp.getData().getFileKey();
     }
 
-    public static Boolean syncSpacesWiki(Client client, String projectToken, String title) throws Exception {
+    public static Node syncSpacesWiki(Client client, String projectToken, String title) throws Exception {
         CopySpaceNodeReq req = CopySpaceNodeReq.newBuilder()
                 .copySpaceNodeReqBody(CopySpaceNodeReqBody.newBuilder()
                         .targetParentToken(projectToken)
@@ -204,6 +205,6 @@ public abstract class FeishuJavaUtils {
                 .spaceId("7046680616087126018")
                 .build();
         CopySpaceNodeResp resp = client.wiki().spaceNode().copy(req);
-        return resp.getCode() == 0;
+        return resp.getData().getNode();
     }
 }
