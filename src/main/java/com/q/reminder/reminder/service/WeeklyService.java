@@ -11,5 +11,5 @@ import com.q.reminder.reminder.vo.WeeklyVo;
  */
 public interface WeeklyService {
 
-    void resetReport(WeeklyVo vo);
+    void resetReport(WeeklyVo vo) throws Exception;
 }

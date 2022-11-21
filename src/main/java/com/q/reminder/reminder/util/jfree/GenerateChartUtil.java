@@ -7,15 +7,12 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
-import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.block.BlockBorder;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.Plot;
-import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.CategoryItemRenderer;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.chart.ui.RectangleEdge;
@@ -23,10 +20,8 @@ import org.jfree.data.xy.XYDataset;
 
 import java.awt.*;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -130,11 +125,7 @@ public class GenerateChartUtil {
             , Double yAxisMinValue, Double yAxisMaxValue, List<Color> legendColorList, Boolean barLabelVisible, String barLabelFormat) throws Exception {
         JFreeChart chart = createBarChart(chartTitle, legendNameList, xAxisNameList, dataList, theme, yAxisTitle, xAxisTitle
                 , yAxisMinValue, yAxisMaxValue, legendColorList, barLabelVisible, barLabelFormat);
-        try {
-            ChartUtils.writeChartAsJPEG(outputStream, 1.0f, chart, width, height, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ChartUtils.writeChartAsJPEG(outputStream, 1.0f, chart, width, height, null);
     }
 
     /**
@@ -162,8 +153,7 @@ public class GenerateChartUtil {
         ByteArrayOutputStream bas = new ByteArrayOutputStream();
         createBarChart(bas, chartTitle, legendNameList, xAxisNameList, dataList, theme, yAxisTitle, xAxisTitle, width, height
                 , yAxisMinValue, yAxisMaxValue, legendColorList, barLabelVisible, barLabelFormat);
-        byte[] byteArray = bas.toByteArray();
-        return byteArray;
+        return bas.toByteArray();
     }
 
     /**
@@ -195,7 +185,7 @@ public class GenerateChartUtil {
         // 标注位于上侧
         chart.getLegend().setPosition(RectangleEdge.TOP);
         TextTitle title = chart.getTitle();
-        title.setMargin(15,0,0,0);
+        title.setMargin(15, 0, 0, 0);
         chart.setTitle(title);
         CategoryAxis axis = new IntervalCategoryAxis(1);
         axis.setAxisLineVisible(false);
@@ -227,11 +217,7 @@ public class GenerateChartUtil {
             , List<List<Object>> dataList, StandardChartTheme theme, String yAxisTitle, String xAxisTitle, int width, int height
     ) throws Exception {
         JFreeChart chart = createStackedBarChart(chartTitle, legendNameList, xAxisNameList, dataList, theme, yAxisTitle, xAxisTitle);
-        try {
-            ChartUtils.writeChartAsJPEG(outputStream, 1.0f, chart, width, height, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ChartUtils.writeChartAsJPEG(outputStream, 1.0f, chart, width, height, null);
     }
 
     /**
@@ -252,8 +238,7 @@ public class GenerateChartUtil {
             , List<List<Object>> dataList, StandardChartTheme theme, String yAxisTitle, String xAxisTitle, int width, int height) throws Exception {
         ByteArrayOutputStream bas = new ByteArrayOutputStream();
         createStackedBarChart(bas, chartTitle, legendNameList, xAxisNameList, dataList, theme, yAxisTitle, xAxisTitle, width, height);
-        byte[] byteArray = bas.toByteArray();
-        return byteArray;
+        return bas.toByteArray();
     }
 
     /**
@@ -279,7 +264,7 @@ public class GenerateChartUtil {
         // 设置抗锯齿，防止字体显示不清楚
         chart.setTextAntiAlias(true);
         TextTitle title = chart.getTitle();
-        title.setMargin(15,0,0,0);
+        title.setMargin(15, 0, 0, 0);
         chart.setTitle(title);
         // 对折现进行渲染
         CategoryPlot plot = chart.getCategoryPlot();
@@ -320,11 +305,7 @@ public class GenerateChartUtil {
             , List<List<Object>> dataList, StandardChartTheme theme, String yAxisTitle, String xAxisTitle, int width, int height
     ) throws Exception {
         JFreeChart chart = createLineChart(chartTitle, legendNameList, xAxisNameList, dataList, theme, yAxisTitle, xAxisTitle);
-        try {
-            ChartUtils.writeChartAsJPEG(outputStream, 1.0f, chart, width, height, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ChartUtils.writeChartAsJPEG(outputStream, 1.0f, chart, width, height, null);
     }
 
     /**
@@ -345,8 +326,7 @@ public class GenerateChartUtil {
             , List<List<Object>> dataList, StandardChartTheme theme, String yAxisTitle, String xAxisTitle, int width, int height) throws Exception {
         ByteArrayOutputStream bas = new ByteArrayOutputStream();
         createLineChart(bas, chartTitle, legendNameList, xAxisNameList, dataList, theme, yAxisTitle, xAxisTitle, width, height);
-        byte[] byteArray = bas.toByteArray();
-        return byteArray;
+        return bas.toByteArray();
     }
 
     /**
@@ -395,11 +375,7 @@ public class GenerateChartUtil {
             , String yAxisTitle, String xAxisTitle, int width, int height
     ) throws Exception {
         JFreeChart chart = createScatterPlot(chartTitle, dataset, theme, yAxisTitle, xAxisTitle);
-        try {
-            ChartUtils.writeChartAsJPEG(outputStream, 1.0f, chart, width, height, null);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        ChartUtils.writeChartAsJPEG(outputStream, 1.0f, chart, width, height, null);
     }
 
     /**
@@ -418,7 +394,6 @@ public class GenerateChartUtil {
             , String xAxisTitle, int width, int height) throws Exception {
         ByteArrayOutputStream bas = new ByteArrayOutputStream();
         createScatterPlot(bas, chartTitle, dataset, theme, yAxisTitle, xAxisTitle, width, height);
-        byte[] byteArray = bas.toByteArray();
-        return byteArray;
+        return bas.toByteArray();
     }
 }

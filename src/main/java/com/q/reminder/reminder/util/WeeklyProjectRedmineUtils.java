@@ -33,12 +33,12 @@ public abstract class WeeklyProjectRedmineUtils {
 //    public static void main(String[] args) {
 //        ProjectInfo projectInfo = new ProjectInfo();
 //        projectInfo.setRedmineUrl("http://redmine-qa.mxnavi.com/");
-//        projectInfo.setPKey("510302-sell");
+//        projectInfo.setPKey("dcsp-2");
 //        projectInfo.setPmKey("1f905383da4f783bad92e22f430c7db0b15ae258");
 ////        List<TimeEntry> copq = wprojectTimesBugs(projectInfo, "2022-11-04");
 ////        List<Issue> issues1 = queryRedmine(projectInfo, new ArrayList<>());
 ////        List<Issue> issues = OverallBug.allBug(projectInfo);
-//        List<TimeEntry> timeEntries = wProjectTimes(projectInfo);
+//        List<TimeEntry> timeEntries = wprojectTimesBugs(projectInfo);
 ////        List<TimeEntry> bug = Objects.requireNonNull(WeeklyProjectRedmineUtils.wprojectTimesBugs(projectInfo, "Bug")).stream().filter(e -> e.getCreatedOn().before(new DateTime(getWeekNumToSunday(DateUtil.thisWeekOfYear() - 2)).toDate())).toList();
 //        System.out.println();
 //    }
@@ -107,17 +107,12 @@ public abstract class WeeklyProjectRedmineUtils {
         Transport transport = mgr.getTransport();
         List<RequestParam> params = List.of(
                 new RequestParam("f[]", "issue.cf_72"),
-                new RequestParam("op[issue.cf_72]", "="),
-                new RequestParam("v[issue.cf_72][]", "*")
+                new RequestParam("op[issue.cf_72]", "*")
         );
         try {
-//            List<TimeEntry> timeEntryList = transport.getObjectsList(TimeEntry.class, params);
-//            double allHourse = timeEntryList.stream().collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
-//            double sum = timeEntryList.stream().filter(e -> new DateTime("2022-08-01").before(e.getCreatedOn())).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
-
             return transport.getObjectsList(TimeEntry.class, params);
         } catch (RedmineException e) {
-
+            e.printStackTrace();
         }
         return null;
     }

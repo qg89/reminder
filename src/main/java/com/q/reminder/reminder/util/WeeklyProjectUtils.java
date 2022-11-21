@@ -18,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.awt.*;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -51,7 +52,7 @@ public abstract class WeeklyProjectUtils {
      * @param vo
      * @return
      */
-    public static File reviewQuestions(WeeklyProjectVo vo) {
+    public static File reviewQuestions(WeeklyProjectVo vo) throws Exception {
         ProjectInfo projectInfo = new ProjectInfo();
         projectInfo.setRedmineUrl(vo.getRedmineUrl());
         projectInfo.setPmKey(vo.getPmKey());
@@ -121,19 +122,13 @@ public abstract class WeeklyProjectUtils {
         excelMap.put("open", openIssueList);
         excelMap.put("closed", closedIssueList);
         File file = null;
-        try {
-            WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, "评审问题数量");
-            URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-            file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            GenerateChartUtil.createStackedBarChart(fileOutputStream, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
-        } catch (Exception e) {
-            log.error(e);
-        }
-        if (file != null) {
-            return file;
-        }
-        return null;
+        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, "评审问题数量");
+        URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
+        file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        GenerateChartUtil.createStackedBarChart(fileOutputStream, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
+
+        return file;
     }
 
     /**
@@ -142,7 +137,7 @@ public abstract class WeeklyProjectUtils {
      * @param vo
      * @return
      */
-    public static File trends(WeeklyProjectVo vo) {
+    public static File trends(WeeklyProjectVo vo) throws Exception {
         ProjectInfo projectInfo = new ProjectInfo();
         projectInfo.setRedmineUrl(vo.getRedmineUrl());
         projectInfo.setPmKey(vo.getPmKey());
@@ -184,18 +179,13 @@ public abstract class WeeklyProjectUtils {
         dataList.add(week);
 
         File file = null;
-        try {
-            URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-            file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            GenerateChartUtil.createLineChart(fileOutputStream, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
-        } catch (Exception e) {
-            log.error(e);
-        }
-        if (file != null) {
-            return file;
-        }
-        return null;
+
+        URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
+        file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        GenerateChartUtil.createLineChart(fileOutputStream, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
+
+        return file;
     }
 
     /**
@@ -241,7 +231,7 @@ public abstract class WeeklyProjectUtils {
      * @param allBug
      * @return
      */
-    public static File AllBugLevel(List<Issue> allBug) {
+    public static File AllBugLevel(List<Issue> allBug) throws Exception {
         // 变量
         String title = "ALL-Bug等级分布";
 
@@ -258,18 +248,13 @@ public abstract class WeeklyProjectUtils {
             categories.add(level);
         });
         File file = null;
-        try {
-            URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-            file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, JFreeChartUtil.createChartTheme(), COLOR_ARRAY_LIST);
-        } catch (Exception e) {
-            log.error(e);
-        }
-        if (file != null) {
-            return file;
-        }
-        return null;
+
+        URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
+        file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, JFreeChartUtil.createChartTheme(), COLOR_ARRAY_LIST);
+
+        return file;
     }
 
     /**
@@ -278,7 +263,7 @@ public abstract class WeeklyProjectUtils {
      * @param allBugList
      * @return
      */
-    public static File openBug(List<Issue> allBugList) {
+    public static File openBug(List<Issue> allBugList) throws Exception {
         // 变量
         String title = "Open Bug等级分布";
 
@@ -295,18 +280,13 @@ public abstract class WeeklyProjectUtils {
             categories.add(level);
         });
         File file = null;
-        try {
-            URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-            file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, JFreeChartUtil.createChartTheme(), COLOR_ARRAY_LIST);
-        } catch (Exception e) {
-            log.error(e);
-        }
-        if (file != null) {
-            return file;
-        }
-        return null;
+
+        URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
+        file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, JFreeChartUtil.createChartTheme(), COLOR_ARRAY_LIST);
+
+        return file;
     }
 
     /**
@@ -315,7 +295,7 @@ public abstract class WeeklyProjectUtils {
      * @param allBugList
      * @return
      */
-    public static File openBug15(List<Issue> allBugList) {
+    public static File openBug15(List<Issue> allBugList) throws Exception {
         // 变量
         String title = "Open bug数量>15";
 
@@ -346,25 +326,25 @@ public abstract class WeeklyProjectUtils {
                             sv.addAndGet(ss.size());
                         }
                         break;
-                    case "A" :
+                    case "A":
                         List<Issue> as = levelMap.get(level);
                         if (as != null) {
                             av.addAndGet(as.size());
                         }
                         break;
-                    case "B" :
+                    case "B":
                         List<Issue> bs = levelMap.get(level);
                         if (bs != null) {
                             bv.addAndGet(bs.size());
                         }
                         break;
-                    case "C" :
+                    case "C":
                         List<Issue> cs = levelMap.get(level);
                         if (cs != null) {
                             cv.addAndGet(cs.size());
                         }
                         break;
-                    case "D" :
+                    case "D":
                         List<Issue> ds = levelMap.get(level);
                         if (ds != null) {
                             dv.addAndGet(ds.size());
@@ -388,19 +368,11 @@ public abstract class WeeklyProjectUtils {
         dataList.add(d);
         //数据列表
         File file = null;
-        try {
-            URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-            file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            GenerateChartUtil.createStackedBarChart(fileOutputStream, title, BUG_LEVEL, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
-        } catch (Exception e) {
-            log.error(e);
-        }
-        if (file != null) {
-            return file;
-        }
-
-        return null;
+        URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
+        file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        GenerateChartUtil.createStackedBarChart(fileOutputStream, title, BUG_LEVEL, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
+        return file;
     }
 
     /**
@@ -409,7 +381,7 @@ public abstract class WeeklyProjectUtils {
      * @param vo
      * @return
      */
-    public static File copq(WeeklyProjectVo vo) {
+    public static File copq(WeeklyProjectVo vo) throws Exception {
         int weekNum = vo.getWeekNum();
         final int beginWeekNum = 33;
         ProjectInfo projectInfo = new ProjectInfo();
@@ -425,7 +397,8 @@ public abstract class WeeklyProjectUtils {
                 return e.getSpentOn().after(startDay) && e.getSpentOn().before(sunday);
             }
         }).toList();
-        List<TimeEntry> timeEntryBugs = Objects.requireNonNull(WeeklyProjectRedmineUtils.wprojectTimesBugs(projectInfo)).stream().filter(e -> {
+        List<TimeEntry> timeEntryBugsList = WeeklyProjectRedmineUtils.wprojectTimesBugs(projectInfo);
+        List<TimeEntry> timeEntryBugs = Objects.requireNonNull(timeEntryBugsList).stream().filter(e -> {
             if (startDay == null) {
                 return true;
             } else {
@@ -452,6 +425,8 @@ public abstract class WeeklyProjectUtils {
         for (String weekOfYear : categories) {
             List<TimeEntry> timeEntries = weekNumMap.get(weekOfYear);
             if (CollectionUtils.isEmpty(timeEntries)) {
+                all.add("0.00");
+                week.add("0.00");
                 continue;
             }
             Date weekNumToSunday = getWeekNumToSunday(Integer.parseInt(weekOfYear.split("W")[1]) - 2);
@@ -482,19 +457,12 @@ public abstract class WeeklyProjectUtils {
         dataList.add(week);
 
         File file = null;
-        try {
-            URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-            file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
-            GenerateChartUtil.createLineChart(fileOutputStream, title, legendNameList, categories
-                    , dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
-        } catch (Exception e) {
-            log.error(e);
-        }
-        if (file != null) {
-            return file;
-        }
-        return null;
+        URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
+        file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        FileOutputStream fileOutputStream = new FileOutputStream(file);
+        GenerateChartUtil.createLineChart(fileOutputStream, title, legendNameList, categories
+                , dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
+        return file;
     }
 
     /**

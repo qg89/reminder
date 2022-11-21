@@ -51,7 +51,7 @@ public class WeeklyProjectMonReportTask {
     private FeishuProperties feishuProperties;
 
     @XxlJob("weekProjectMonReport")
-    public ReturnT<String> weekProjectMonReport() {
+    public ReturnT<String> weekProjectMonReport() throws Exception {
         if (holdayBase.queryHoliday()) {
             log.info("节假日放假!!!!");
             return ReturnT.SUCCESS;
@@ -74,7 +74,7 @@ public class WeeklyProjectMonReportTask {
         return ReturnT.SUCCESS;
     }
 
-    private void writeReport(List<WeeklyProjectVo> list) {
+    private void writeReport(List<WeeklyProjectVo> list) throws Exception {
         String path = ResourceUtils.path("templates/file");
         path = URLDecoder.decode(path, Charset.defaultCharset());
         File logoFile = FileUtil.file(path + "/logo.jpg");
@@ -148,15 +148,13 @@ public class WeeklyProjectMonReportTask {
      * @param i
      * @return
      */
-    public int reviewQuestions(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+    public int reviewQuestions(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) throws Exception {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
         vo.setBlockId(block.getString("block_id"));
         // 评审问题
         File file = WeeklyProjectUtils.reviewQuestions(vo);
-        if (file != null) {
-            addRequests(vo, file, requests);
-            log.info("[{}]项目周报，评审问题 执行完成", vo.getProjectShortName());
-        }
+        addRequests(vo, file, requests);
+        log.info("[{}]项目周报，评审问题 执行完成", vo.getProjectShortName());
         return i;
     }
 
@@ -170,7 +168,7 @@ public class WeeklyProjectMonReportTask {
      * @param i
      * @return
      */
-    public int openBug15(File logoFile, WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+    public int openBug15(File logoFile, WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) throws Exception {
         JSONObject block;
         block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
         // open-Bug >15
@@ -193,15 +191,13 @@ public class WeeklyProjectMonReportTask {
      * @param i
      * @return
      */
-    public int openBugLevel(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+    public int openBugLevel(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) throws Exception {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
         // Open-Bug等级
         vo.setBlockId(block.getString("block_id"));
         File openBug = WeeklyProjectUtils.openBug(vo.getAllBugList());
-        if (openBug != null) {
-            addRequests(vo, openBug, requests);
-            log.info("[{}]项目周报，Open-Bug等级分布 执行完成", vo.getProjectShortName());
-        }
+        addRequests(vo, openBug, requests);
+        log.info("[{}]项目周报，Open-Bug等级分布 执行完成", vo.getProjectShortName());
         return i;
     }
 
@@ -214,19 +210,17 @@ public class WeeklyProjectMonReportTask {
      * @param i
      * @return
      */
-    public int allBugLevel(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+    public int allBugLevel(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) throws Exception {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
         // All-bug等级
         vo.setBlockId(block.getString("block_id"));
         File bugLevel = WeeklyProjectUtils.AllBugLevel(vo.getAllBugList());
-        if (bugLevel != null) {
-            addRequests(vo, bugLevel, requests);
-            log.info("[{}]项目周报，All-bug等级分布 执行完成", vo.getProjectShortName());
-        }
+        addRequests(vo, bugLevel, requests);
+        log.info("[{}]项目周报，All-bug等级分布 执行完成", vo.getProjectShortName());
         return i;
     }
 
-    private void sendFeishu(WeeklyProjectVo vo) {
+    private void sendFeishu(WeeklyProjectVo vo) throws IOException {
         String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         String weeklyReportUrl = vo.getWeeklyReportUrl();
         String fileName = vo.getFileName();
@@ -251,17 +245,13 @@ public class WeeklyProjectMonReportTask {
         SendVo sendVo = new SendVo();
         sendVo.setMemberId(vo.getPmOu());
         sendVo.setContent(con.toJSONString());
-        try {
-            FeiShuApi.sendPost(sendVo, secret, new StringBuilder());
-        } catch (IOException e) {
-            log.error(e);
-            return;
-        }
+        FeiShuApi.sendPost(sendVo, secret, new StringBuilder());
         log.info("[{}]-周报更新已通知PM", fileName);
     }
 
     /**
      * 公共更新块
+     *
      * @param vo
      * @param file
      * @param requests
@@ -330,7 +320,7 @@ public class WeeklyProjectMonReportTask {
     }
 
     @Deprecated
-    public WeeklyVo resetReport(WeeklyVo vo) {
+    public WeeklyVo resetReport(WeeklyVo vo) throws Exception {
         String path = ResourceUtils.path("templates/file");
         path = URLDecoder.decode(path, Charset.defaultCharset());
         File logoFile = FileUtil.file(path + "/logo.jpg");
@@ -396,15 +386,13 @@ public class WeeklyProjectMonReportTask {
         return vo;
     }
 
-    public int copq(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+    public int copq(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) throws Exception {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
         vo.setBlockId(block.getString("block_id"));
         // 评审问题
         File file = WeeklyProjectUtils.copq(vo);
-        if (file != null) {
-            addRequests(vo, file, requests);
-            log.info("{}项目周报，COPQ 执行完成", vo.getProjectShortName());
-        }
+        addRequests(vo, file, requests);
+        log.info("{}项目周报，COPQ 执行完成", vo.getProjectShortName());
         return i;
     }
 
@@ -417,16 +405,14 @@ public class WeeklyProjectMonReportTask {
      * @param i
      * @return
      */
-    public int tends(WeeklyProjectVo weeklyVo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) {
+    public int tends(WeeklyProjectVo weeklyVo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) throws Exception {
         JSONObject block;
         block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
         // 趋势
         weeklyVo.setBlockId(block.getString("block_id"));
         File file = WeeklyProjectUtils.trends(weeklyVo);
-        if (file != null) {
-            addRequests(weeklyVo, file, requests);
-            log.info("[{}]项目周报，趋势 执行完成", weeklyVo.getProjectShortName());
-        }
+        addRequests(weeklyVo, file, requests);
+        log.info("[{}]项目周报，趋势 执行完成", weeklyVo.getProjectShortName());
         return i;
     }
 }

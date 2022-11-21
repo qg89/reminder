@@ -42,6 +42,7 @@ public class WeeklyProjectReportController {
      */
     @GetMapping("/reset")
     public ReturnT<String> reSet(WeeklyVo vo) {
+        ReturnT<String> returnT = new ReturnT<>();
         Integer weekNum = vo.getWeekNum();
         List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNum, vo.getPKey());
         WeeklyProjectVo projectVo = list.get(0);
@@ -52,8 +53,14 @@ public class WeeklyProjectReportController {
                 .setIgnoreNullValue(true)
                 .setIgnoreCase(true);
         BeanUtil.copyProperties(projectVo, vo, copyOptions);
-        weeklyService.resetReport(vo);
-        return new ReturnT<>(projectVo.getWeeklyReportUrl());
+        try {
+            weeklyService.resetReport(vo);
+        } catch (Exception e) {
+            returnT.setMsg(e.getMessage());
+            return returnT;
+        }
+        returnT.setContent(projectVo.getWeeklyReportUrl());
+        return returnT;
     }
 
     @GetMapping("/p_option")

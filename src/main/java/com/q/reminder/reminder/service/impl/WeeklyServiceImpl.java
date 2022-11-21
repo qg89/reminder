@@ -41,7 +41,7 @@ public class WeeklyServiceImpl implements WeeklyService {
     private WeeklyProjectMonReportTask weeklyProjectMonReportTask;
 
     @Override
-    public void resetReport(WeeklyVo vo) {
+    public void resetReport(WeeklyVo vo) throws Exception {
         String path = ResourceUtils.path("templates/file");
         path = URLDecoder.decode(path, Charset.defaultCharset());
         File logoFile = FileUtil.file(path + "/logo.jpg");
