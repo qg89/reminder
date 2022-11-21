@@ -295,10 +295,10 @@ public abstract class RedmineApi {
                 createSubTask(newIssue, testAssigneeId, tra, newIssueId, redmineSubject, "测试用例");
                 createSubTask(newIssue, testAssigneeId, tra, newIssueId, redmineSubject, "测试执行");
             }
-            if (StringUtils.isNotBlank(parentFeatureId) && StringUtils.isNotBlank(featureType) && "变更".equals(featureType)) {
-                Integer parentId = getParentId(transport, parentFeatureId);
-                createParentFeatureId(parentId, newIssueId, definition);
-            }
+//            if (StringUtils.isNotBlank(parentFeatureId) && StringUtils.isNotBlank(featureType) && "变更".equals(featureType)) {
+//                Integer parentId = getParentId(transport, parentFeatureId);
+//                createParentFeatureId(parentId, newIssueId, definition);
+//            }
         }
     }
 

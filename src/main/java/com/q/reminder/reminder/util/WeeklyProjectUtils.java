@@ -121,10 +121,13 @@ public abstract class WeeklyProjectUtils {
         Map<String, List<ExcelVo>> excelMap = new LinkedHashMap<>();
         excelMap.put("open", openIssueList);
         excelMap.put("closed", closedIssueList);
-        File file = null;
         WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, "评审问题数量");
         URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-        file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        File f = new File(url.getPath());
+        if (f.isDirectory()) {
+            f.mkdir();
+        }
+        File file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GenerateChartUtil.createStackedBarChart(fileOutputStream, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
 
@@ -178,10 +181,12 @@ public abstract class WeeklyProjectUtils {
         dataList.add(all);
         dataList.add(week);
 
-        File file = null;
-
         URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-        file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        File f = new File(url.getPath());
+        if (f.isDirectory()) {
+            f.mkdir();
+        }
+        File file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GenerateChartUtil.createLineChart(fileOutputStream, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
 
@@ -247,10 +252,12 @@ public abstract class WeeklyProjectUtils {
             dataList.add(issues.size());
             categories.add(level);
         });
-        File file = null;
-
         URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-        file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        File f = new File(url.getPath());
+        if (f.isDirectory()) {
+            f.mkdir();
+        }
+        File file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, JFreeChartUtil.createChartTheme(), COLOR_ARRAY_LIST);
 
@@ -279,10 +286,12 @@ public abstract class WeeklyProjectUtils {
             dataList.add(issues.size());
             categories.add(level);
         });
-        File file = null;
-
         URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-        file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        File f = new File(url.getPath());
+        if (f.isDirectory()) {
+            f.mkdir();
+        }
+        File file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, JFreeChartUtil.createChartTheme(), COLOR_ARRAY_LIST);
 
@@ -367,9 +376,12 @@ public abstract class WeeklyProjectUtils {
         dataList.add(c);
         dataList.add(d);
         //数据列表
-        File file = null;
         URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-        file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        File f = new File(url.getPath());
+        if (f.isDirectory()) {
+            f.mkdir();
+        }
+        File file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GenerateChartUtil.createStackedBarChart(fileOutputStream, title, BUG_LEVEL, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
         return file;
@@ -456,9 +468,12 @@ public abstract class WeeklyProjectUtils {
         dataList.add(all);
         dataList.add(week);
 
-        File file = null;
         URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-        file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        File f = new File(url.getPath());
+        if (f.isDirectory()) {
+            f.mkdir();
+        }
+        File file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GenerateChartUtil.createLineChart(fileOutputStream, title, legendNameList, categories
                 , dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
