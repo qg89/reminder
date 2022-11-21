@@ -18,11 +18,9 @@ import org.springframework.util.CollectionUtils;
 
 import java.awt.*;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.URL;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.WeekFields;
@@ -40,6 +38,9 @@ import java.util.stream.Collectors;
  */
 @Log4j2
 public abstract class WeeklyProjectUtils {
+    private final static String PATH = "/temp/file/";
+    private final static String WIN_PATH = "d:/temp/file/";
+
     /**
      * 图例背景颜色列表
      */
@@ -122,12 +123,7 @@ public abstract class WeeklyProjectUtils {
         excelMap.put("open", openIssueList);
         excelMap.put("closed", closedIssueList);
         WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, "评审问题数量");
-        URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-        File f = new File(url.getPath());
-        if (f.isDirectory()) {
-            f.mkdir();
-        }
-        File file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        File file = new File(createDir() + UUID.fastUUID() + ".png");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GenerateChartUtil.createStackedBarChart(fileOutputStream, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
 
@@ -181,12 +177,9 @@ public abstract class WeeklyProjectUtils {
         dataList.add(all);
         dataList.add(week);
 
-        URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-        File f = new File(url.getPath());
-        if (f.isDirectory()) {
-            f.mkdir();
-        }
-        File file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        String path = createDir();
+
+        File file = new File(path + UUID.fastUUID() + ".png");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GenerateChartUtil.createLineChart(fileOutputStream, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
 
@@ -252,12 +245,7 @@ public abstract class WeeklyProjectUtils {
             dataList.add(issues.size());
             categories.add(level);
         });
-        URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-        File f = new File(url.getPath());
-        if (f.isDirectory()) {
-            f.mkdir();
-        }
-        File file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        File file = new File(createDir() + UUID.fastUUID() + ".png");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, JFreeChartUtil.createChartTheme(), COLOR_ARRAY_LIST);
 
@@ -286,12 +274,7 @@ public abstract class WeeklyProjectUtils {
             dataList.add(issues.size());
             categories.add(level);
         });
-        URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-        File f = new File(url.getPath());
-        if (f.isDirectory()) {
-            f.mkdir();
-        }
-        File file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        File file = new File(createDir() + UUID.fastUUID() + ".png");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, JFreeChartUtil.createChartTheme(), COLOR_ARRAY_LIST);
 
@@ -376,12 +359,7 @@ public abstract class WeeklyProjectUtils {
         dataList.add(c);
         dataList.add(d);
         //数据列表
-        URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-        File f = new File(url.getPath());
-        if (f.isDirectory()) {
-            f.mkdir();
-        }
-        File file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        File file = new File(createDir() + UUID.fastUUID() + ".png");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GenerateChartUtil.createStackedBarChart(fileOutputStream, title, BUG_LEVEL, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
         return file;
@@ -468,12 +446,7 @@ public abstract class WeeklyProjectUtils {
         dataList.add(all);
         dataList.add(week);
 
-        URL url = WeeklyProjectUtils.class.getClassLoader().getResource("templates/file");
-        File f = new File(url.getPath());
-        if (f.isDirectory()) {
-            f.mkdir();
-        }
-        File file = new File(url.getPath() + "/" + UUID.fastUUID() + ".png");
+        File file = new File(createDir() + UUID.fastUUID() + ".png");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GenerateChartUtil.createLineChart(fileOutputStream, title, legendNameList, categories
                 , dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
@@ -491,5 +464,21 @@ public abstract class WeeklyProjectUtils {
         //输入你想要的年份和周数
         LocalDate localDate = LocalDate.now().withYear(DateUtil.thisYear()).with(weekFields.weekOfYear(), weekNum);
         return Date.from(localDate.with(weekFields.dayOfWeek(), 7L).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+    }
+
+    private static String createDir() {
+        String path = WIN_PATH;
+        if (SystemUtils.isLinux()) {
+            path = PATH;
+        }
+        if (SystemUtils.isWindows()) {
+            path = WIN_PATH;
+        }
+
+        File f = new File(path);
+        if (!f.isDirectory()) {
+            f.mkdirs();
+        }
+        return path;
     }
 }
