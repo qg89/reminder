@@ -1,7 +1,9 @@
 package com.q.reminder.reminder.task;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.Client;
 import com.q.reminder.reminder.entity.ProjectInfo;
@@ -9,6 +11,7 @@ import com.q.reminder.reminder.entity.WikiSpace;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WikiSpaceService;
 import com.xxl.job.core.biz.model.ReturnT;
+import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
@@ -37,11 +40,15 @@ public class SyncSpacesWikiTask {
 
     @XxlJob("syncSpacesWiki")
     public ReturnT<String> syncSpacesWiki() {
+        String jobParam = XxlJobHelper.getJobParam();
         List<WikiSpace> wikiSpaceList = new ArrayList<>();
         try {
             LambdaQueryWrapper<ProjectInfo> lq = Wrappers.<ProjectInfo>lambdaQuery().select(ProjectInfo::getWikiToken, ProjectInfo::getWikiTitle, ProjectInfo::getPId).isNotNull(ProjectInfo::getWikiToken);
             List<ProjectInfo> list = projectInfoService.list(lq);
-            int weekOfYear = DateUtil.thisWeekOfYear() - 1;
+            int weekOfYear = DateUtil.thisWeekOfYear();
+            if (StringUtils.isNotBlank(jobParam) && NumberUtil.isInteger(jobParam) && Integer.parseInt(jobParam) < 52) {
+                weekOfYear = Integer.parseInt(jobParam);
+            }
             for (ProjectInfo info : list) {
                 String title  = info.getWikiTitle() + "-" + DateTime.now().toString("yy") + "W" + weekOfYear;
                 WikiSpace space = spaceWikoService.syncSpacesWiki(client, info.getWikiToken(), title);

@@ -9,9 +9,6 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-#      url: jdbc:mysql://127.0.0.1/reminder?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8&allowMultiQueries=true&allowPublicKeyRetrieval=true
-#      username: root
-#      password: root
       url: mpw:YAU7VUQTQlBTP/D7DYdMI5A5u1zqyh85JI/hVpPjrLzCpZnihi+gruSUQTzq8hl9p8mY2czOCrvHMrNNn5hE2869zSbitJStXAKwXQKs6yzl2JhuHSDinw5IyD2v7td4WFtaEQNW8VYwfi1CT17S4/Zf44Yht4Y0Pm/gaRPgSokkAa2s5qe1tu3m1oF4nCFiWsPOwe2hWdR6b6hI5L1Dca0CZCVTVW4dBM+ceuRmoEHR68ILnwSrc+jk7STgvjU+aQ3O/dFxmN7D2qLattxa5wEJjr9Xg5hxczIrC75/SBfst0IOmzqpQdgOyplnL6VGc7KZmcqxKunLwVhdNZqpCQ==
       username: mpw:Jrfx9m/vVYtI1PLKUIeYlA==
       password: mpw:tZLGHiKWlhtIyjhAlDJgQw==
@@ -62,5 +59,5 @@ xxl:
       ip:             #执行器IP，默认为空表示自动获取IP
       port: 1233 #xxljob配置的端口号，默认为9999
       logpath: ./data/xxl-job/jobhandler  #执行器运行日志文件存储磁盘路径
-      logretentiondays: -1  #调度中心日志表数据保存天数，过期日志自动清理；限制大于等于7时生效，否则, 如-1，关闭自动清理功能
+      logretentiondays: 14  #调度中心日志表数据保存天数，过期日志自动清理；限制大于等于7时生效，否则, 如-1，关闭自动清理功能
     accessToken: default_token
