@@ -11,7 +11,9 @@
             fw.file_token AS fileToken,
             p.pm_ou AS pmOu,
             p.p_key AS pKey,
-            fw.url AS weeklyReportUrl
+            fw.url AS weeklyReportUrl,
+            fw.week_num,
+            p.start_day AS startDay
         FROM
             r_project_info p,
             fs_weekly_project_report fw

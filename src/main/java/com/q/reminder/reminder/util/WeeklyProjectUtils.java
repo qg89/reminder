@@ -2,8 +2,6 @@ package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.UUID;
-import cn.hutool.poi.excel.ExcelUtil;
-import cn.hutool.poi.excel.ExcelWriter;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.util.jfree.GenerateChartUtil;
@@ -412,16 +410,28 @@ public abstract class WeeklyProjectUtils {
      * @return
      */
     public static File copq(WeeklyProjectVo vo) {
-        int weekNum = Integer.parseInt(vo.getFileName().split("W")[1]);
+        int weekNum = vo.getWeekNum();
         final int beginWeekNum = 33;
         ProjectInfo projectInfo = new ProjectInfo();
         projectInfo.setRedmineUrl(vo.getRedmineUrl());
         projectInfo.setPmKey(vo.getPmKey());
         projectInfo.setPKey(vo.getPKey());
         Date startDay = vo.getStartDay();
-        Date sunday = getWeekNumToSunday(weekNum - 2);
-        List<TimeEntry> timeEntryList = Objects.requireNonNull(WeeklyProjectRedmineUtils.wProjectTimes(projectInfo)).stream().filter(e -> startDay != null && e.getSpentOn().after(startDay)).toList();
-        List<TimeEntry> timeEntryBugs = Objects.requireNonNull(WeeklyProjectRedmineUtils.wprojectTimesBugs(projectInfo)).stream().filter(e -> startDay != null && e.getSpentOn().after(startDay) && e.getCreatedOn().before(sunday)).toList();
+        Date sunday = getWeekNumToSunday(weekNum - 1);
+        List<TimeEntry> timeEntryList = Objects.requireNonNull(WeeklyProjectRedmineUtils.wProjectTimes(projectInfo)).stream().filter(e -> {
+            if (startDay == null) {
+                return true;
+            } else {
+                return e.getSpentOn().after(startDay) && e.getSpentOn().before(sunday);
+            }
+        }).toList();
+        List<TimeEntry> timeEntryBugs = Objects.requireNonNull(WeeklyProjectRedmineUtils.wprojectTimesBugs(projectInfo)).stream().filter(e -> {
+            if (startDay == null) {
+                return true;
+            } else {
+                return e.getSpentOn().after(startDay) && e.getSpentOn().before(sunday);
+            }
+        }).toList();
         List<String> categories = new ArrayList<>();
         // 变量
         String title = "线上问题每周增加情况";

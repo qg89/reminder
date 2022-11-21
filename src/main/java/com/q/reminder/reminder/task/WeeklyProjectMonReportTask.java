@@ -78,12 +78,14 @@ public class WeeklyProjectMonReportTask {
         String path = ResourceUtils.path("templates/file");
         path = URLDecoder.decode(path, Charset.defaultCharset());
         File logoFile = FileUtil.file(path + "/logo.jpg");
-        list.forEach(report -> {
+        for (WeeklyProjectVo report : list) {
             String redmineUrl = report.getRedmineUrl();
             String accessKey = report.getPmKey();
             String pKey = report.getPKey();
             String projectShortName = report.getProjectShortName();
             String fileToken = report.getFileToken();
+            String fileName = report.getFileName();
+            Integer weekNum = report.getWeekNum();
             WeeklyProjectVo vo = new WeeklyProjectVo();
             String appId = feishuProperties.getAppId();
             vo.setAppId(appId);
@@ -93,6 +95,9 @@ public class WeeklyProjectMonReportTask {
             vo.setPmKey(accessKey);
             vo.setPKey(pKey);
             vo.setProjectShortName(projectShortName);
+            vo.setFileName(fileName);
+            vo.setWeekNum(weekNum);
+            vo.setStartDay(report.getStartDay());
 
             ProjectInfo projectInfo = new ProjectInfo();
             projectInfo.setRedmineUrl(redmineUrl);
@@ -131,7 +136,7 @@ public class WeeklyProjectMonReportTask {
             log.info("[{}]项目周报更新完成", projectShortName);
 
             sendFeishu(report);
-        });
+        }
     }
 
     /**
