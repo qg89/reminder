@@ -373,6 +373,7 @@ public abstract class WeeklyProjectUtils {
      */
     public static File copq(WeeklyProjectVo vo) throws Exception {
         int weekNum = vo.getWeekNum();
+        String fileName = vo.getFileName();
         final int beginWeekNum = 33;
         ProjectInfo projectInfo = new ProjectInfo();
         projectInfo.setRedmineUrl(vo.getRedmineUrl());
@@ -397,7 +398,7 @@ public abstract class WeeklyProjectUtils {
         }).toList();
         List<String> categories = new ArrayList<>();
         // 变量
-        String title = "线上问题每周增加情况";
+        String title = "COPQ（Cost Of Poor Quality）";
         Map<String, List<TimeEntry>> weekNumMap = sortTimeList(timeEntryList);
 //        Map<String, List<TimeEntry>> weekNumBugsMap = sortTimeList(timeEntryBugs);
 
@@ -436,17 +437,17 @@ public abstract class WeeklyProjectUtils {
             if (allSum == 0) {
                 allSum = 1;
             }
-            all.add(BigDecimal.valueOf(bugSum / allSum * 100).setScale(2, RoundingMode.HALF_UP));
+            all.add(BigDecimal.valueOf(bugSum / allSum * 100).setScale(2, RoundingMode.HALF_UP).doubleValue());
             if (allWeekSum == 0) {
                 allWeekSum = 1;
             }
-            week.add(BigDecimal.valueOf(bugWeekSum / allWeekSum * 100).setScale(2, RoundingMode.UP));
+            week.add(BigDecimal.valueOf(bugWeekSum / allWeekSum * 100).setScale(2, RoundingMode.UP).doubleValue());
         }
 
         dataList.add(all);
         dataList.add(week);
 
-        File file = new File(createDir() + UUID.fastUUID() + ".png");
+        File file = new File(createDir() + fileName + "-" + title + ".png");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GenerateChartUtil.createLineChart(fileOutputStream, title, legendNameList, categories
                 , dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
@@ -468,6 +469,7 @@ public abstract class WeeklyProjectUtils {
 
     /**
      * 创建文件夹
+     *
      * @return
      */
     public static String createDir() {
