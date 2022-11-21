@@ -466,7 +466,11 @@ public abstract class WeeklyProjectUtils {
         return Date.from(localDate.with(weekFields.dayOfWeek(), 7L).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    private static String createDir() {
+    /**
+     * 创建文件夹
+     * @return
+     */
+    public static String createDir() {
         String path = WIN_PATH;
         if (SystemUtils.isLinux()) {
             path = PATH;

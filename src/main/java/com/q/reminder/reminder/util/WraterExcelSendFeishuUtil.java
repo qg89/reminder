@@ -28,7 +28,7 @@ public class WraterExcelSendFeishuUtil {
     public static void wraterExcelSendFeishu(Map<String, List<ExcelVo>> map, WeeklyProjectVo weeklyVo, String name) throws Exception {
         String appId = weeklyVo.getAppId();
         String appSecret = weeklyVo.getAppSecret();
-        String path = ResourceUtils.path("templates/file/" + weeklyVo.getFileName() + "-" + name + ".xls");
+        String path = ResourceUtils.path(WeeklyProjectUtils.createDir() + weeklyVo.getFileName() + "-" + name + ".xls");
         File file = new File(path);
         ExcelWriter writer = ExcelUtil.getWriter();
         writer.renameSheet(0, map.keySet().stream().findFirst().get());
