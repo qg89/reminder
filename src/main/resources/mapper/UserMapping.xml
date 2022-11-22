@@ -13,7 +13,7 @@
             `fs_user_group` ug,
             fs_group_info gi,
             fs_user_member_info ui,
-            redmine_user_info r
+            r_redmine_user_info r
         WHERE
             gi.chat_id = ug.chat_id
           AND ui.member_id = ug.member_id

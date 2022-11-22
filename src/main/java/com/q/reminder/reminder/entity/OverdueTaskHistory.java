@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -19,9 +20,10 @@ import java.util.Date;
 @Data
 public class OverdueTaskHistory implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -6088421893531262682L;
     @TableId(type = IdType.INPUT)
-    private Integer redmineId;
+    private String redmineId;
     private String projectName;
     private String subjectName;
     private String assigneeName;

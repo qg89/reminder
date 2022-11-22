@@ -9,12 +9,9 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver
-#      url: jdbc:mysql://127.0.0.1/reminder?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8&allowMultiQueries=true&allowPublicKeyRetrieval=true
-#      username: root
-#      password: root
-      url: mpw:jPBHDuoMjNCO2hqejmzo603OeDsMZH/FiReamKKNdUtzqKU1Z08e40JdMX6sl3dg5ukZfWYrartEzxqvRiNG/BzfPKug7Tt9oybgO1WSpXupXKON5oZD616f8d6uOJ3Upb4cR8aY2kIDDP1c5pQ883/IVXPQjqFLVBE9OjH5W+AiP541qXhKm6pfnSNjexZas8ItLbdaFKmwgg1qU/PsGoTrPTVtt/kvwmG6uWqxyWoxEnrFNy8gxOBvS5MhYylw+J4l954s1Xm1ix3gIzcYAspnnGd9J1lRbXlClm/iaDFEU0+Bouuqxz917w0CICzwlWmdaVjo1LeaADtYhi0+jw==
+      url: mpw:YAU7VUQTQlBTP/D7DYdMI5A5u1zqyh85JI/hVpPjrLzCpZnihi+gruSUQTzq8hl9p8mY2czOCrvHMrNNn5hE2869zSbitJStXAKwXQKs6yzl2JhuHSDinw5IyD2v7td4WFtaEQNW8VYwfi1CT17S4/Zf44Yht4Y0Pm/gaRPgSokkAa2s5qe1tu3m1oF4nCFiWsPOwe2hWdR6b6hI5L1Dca0CZCVTVW4dBM+ceuRmoEHR68ILnwSrc+jk7STgvjU+aQ3O/dFxmN7D2qLattxa5wEJjr9Xg5hxczIrC75/SBfst0IOmzqpQdgOyplnL6VGc7KZmcqxKunLwVhdNZqpCQ==
       username: mpw:Jrfx9m/vVYtI1PLKUIeYlA==
-      password: mpw:Jrfx9m/vVYtI1PLKUIeYlA==
+      password: mpw:tZLGHiKWlhtIyjhAlDJgQw==
       initialSize: 5
       minIdle: 5
       maxActive: 20
@@ -31,17 +28,36 @@ spring:
       connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
       db-type: mysql
 
+#  redis:
+#    database: 0
+#    host: localhost
+#    port: 6379
+#    password:
+#    jedis:
+#      pool:
+#        max-active: 8
+#        max-idle: 8
+#        max-wait: -1ms
+#        min-idle: 0
+
 mybatis-plus:
   mapper-locations: classpath:mapper/*Mapping.xml
   configuration:
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
-app:
-  id: mpw:XmOtdJZ/rrM7t+S1c9SV2nyu+ihCGM3sSfkWWWcW/TY=
-  secret: mpw:1HSZ98TVPJZoFZr0aHkbIv+jIxmu1niV5I8bhkDtSe/ENC5S07lLG1LKoKhOAkyr
+feishu-config:
+  app-id: mpw:XmOtdJZ/rrM7t+S1c9SV2nyu+ihCGM3sSfkWWWcW/TY=
+  app-secret: mpw:1HSZ98TVPJZoFZr0aHkbIv+jIxmu1niV5I8bhkDtSe/ENC5S07lLG1LKoKhOAkyr
 
-redmine-config:
-  api-access-key:
-    saiko: 1f905383da4f783bad92e22f430c7db0b15ae258
-  old_url: http://redmine-qa.mxnavi.com
+xxl:
+  job:
+    admin:
+      addresses: http://192.168.3.46:11233/xxl-job-admin
+    executor:
+      appname: business-III-Robot #xxljob配置的执行器名称，
+      ip:             #执行器IP，默认为空表示自动获取IP
+      port: 1233 #xxljob配置的端口号，默认为9999
+      logpath: ./data/xxl-job/jobhandler  #执行器运行日志文件存储磁盘路径
+      logretentiondays: 14  #调度中心日志表数据保存天数，过期日志自动清理；限制大于等于7时生效，否则, 如-1，关闭自动清理功能
+    accessToken: default_token

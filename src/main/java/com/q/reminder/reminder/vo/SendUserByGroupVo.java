@@ -21,7 +21,6 @@ public class SendUserByGroupVo implements Serializable {
     private String chatId;
     private String reminderNone;
     private String assigneeId;
-    private JSONArray reminderContent;
     private String reminderTitle;
 
 }

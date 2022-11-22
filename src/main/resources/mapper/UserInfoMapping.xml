@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.q.reminder.reminder.mapper.UserInfoMapping">
+
+<select id="userInfo" resultType="com.q.reminder.reminder.vo.UserInfoVo">
+    SELECT
+        u.username,
+        p.p_key AS pKey
+    FROM
+        s_user u,
+        s_user_p sp,
+        r_project_info p
+    WHERE
+        u.id = sp.user_id
+        AND sp.p_id = p.p_id
+        AND u.username = #{username}
+    limit 1
+    </select>
+</mapper>
