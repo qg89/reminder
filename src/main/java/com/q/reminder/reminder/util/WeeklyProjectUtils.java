@@ -19,10 +19,8 @@ import org.springframework.util.CollectionUtils;
 import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.channels.FileChannel;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.WeekFields;
@@ -67,7 +65,7 @@ public abstract class WeeklyProjectUtils {
             if (startDay == null) {
                 return true;
             } else {
-                return e.getCreatedOn().after(startDay)&& e.getCreatedOn().before(sunday);
+                return e.getCreatedOn().after(startDay) && e.getCreatedOn().before(sunday);
             }
         }).collect(Collectors.toList());
         Map<String, List<Issue>> weekNumMap = sortIssueMapByCreateOn(issues);
@@ -133,8 +131,8 @@ public abstract class WeeklyProjectUtils {
         Map<String, List<ExcelVo>> excelMap = new LinkedHashMap<>();
         excelMap.put("open", openIssueList);
         excelMap.put("closed", closedIssueList);
-        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, "评审问题数量");
-        File file = new File(createDir() + fileName + "-评审问题数量.jpeg");
+        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title);
+        File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream out = new FileOutputStream(file);
         try {
             GenerateChartUtil.createStackedBarChart(out, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
@@ -163,7 +161,7 @@ public abstract class WeeklyProjectUtils {
             if (startDay == null) {
                 return true;
             } else {
-                return e.getCreatedOn().after(startDay)&& e.getCreatedOn().before(sunday);
+                return e.getCreatedOn().after(startDay) && e.getCreatedOn().before(sunday);
             }
         }).collect(Collectors.toList());
         Map<String, List<Issue>> weekNumMap = sortIssueMapByCreateOn(issues);
@@ -187,6 +185,8 @@ public abstract class WeeklyProjectUtils {
         List<Object> all = new ArrayList<>();
         List<Object> week = new ArrayList<>();
         int value = 0;
+
+        List<ExcelVo> allBugList = new ArrayList<>();
         for (String category : categories) {
             List<Issue> issueList = weekNumMap.get(category);
             if (CollectionUtils.isEmpty(issueList)) {
@@ -197,11 +197,25 @@ public abstract class WeeklyProjectUtils {
             int size = issueList.size();
             all.add(value = (size + value));
             week.add(size);
+            issues.forEach(issue -> {
+                ExcelVo excelVo = new ExcelVo();
+                excelVo.setAssignee(issue.getAssigneeName());
+                excelVo.setWeekNum(category);
+                excelVo.setSubject(issue.getSubject());
+                excelVo.setStatus(issue.getStatusName());
+                excelVo.setDescription(issue.getDescription());
+                excelVo.setCreateTime(new DateTime(issue.getCreatedOn()).toString("yyyy-MM-dd HH:mm:ss"));
+                excelVo.setEndTime(new DateTime(issue.getClosedOn()).toString("yyyy-MM-dd HH:mm:ss"));
+                allBugList.add(excelVo);
+            });
         }
         dataList.add(all);
         dataList.add(week);
+        Map<String, List<ExcelVo>> excelMap = new LinkedHashMap<>();
+        excelMap.put("all", allBugList);
+        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title);
 
-        File file = new File(createDir() + fileName + "-趋势.jpeg");
+        File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream out = new FileOutputStream(file);
         try {
             GenerateChartUtil.createLineChart(out, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
@@ -253,9 +267,11 @@ public abstract class WeeklyProjectUtils {
      * 全部BUG等级分布
      *
      * @param allBug
+     * @param vo
      * @return
      */
-    public static File AllBugLevel(List<Issue> allBug) throws Exception {
+    public static File AllBugLevel(List<Issue> allBug, WeeklyProjectVo vo) throws Exception {
+        String fileName = vo.getFileName();
         // 变量
         String title = "ALL-Bug等级分布";
 
@@ -263,6 +279,12 @@ public abstract class WeeklyProjectUtils {
         //数据列表
         List<Object> dataList = new ArrayList<>();
         List<String> categories = new ArrayList<>();
+
+        List<ExcelVo> sList = new ArrayList<>();
+        List<ExcelVo> aList = new ArrayList<>();
+        List<ExcelVo> bList = new ArrayList<>();
+        List<ExcelVo> cList = new ArrayList<>();
+        List<ExcelVo> dList = new ArrayList<>();
         BUG_LEVEL.forEach(level -> {
             List<Issue> issues = levelMap.get(level);
             if (CollectionUtils.isEmpty(issues)) {
@@ -270,8 +292,42 @@ public abstract class WeeklyProjectUtils {
             }
             dataList.add(issues.size());
             categories.add(level);
+            issues.forEach(issue -> {
+                ExcelVo excelVo = new ExcelVo();
+                excelVo.setAssignee(issue.getAssigneeName());
+                excelVo.setWeekNum(level);
+                excelVo.setSubject(issue.getSubject());
+                excelVo.setStatus(issue.getStatusName());
+                excelVo.setDescription(issue.getDescription());
+                excelVo.setCreateTime(new DateTime(issue.getCreatedOn()).toString("yyyy-MM-dd HH:mm:ss"));
+                excelVo.setEndTime(new DateTime(issue.getClosedOn()).toString("yyyy-MM-dd HH:mm:ss"));
+                if ("S".equals(level)) {
+                    sList.add(excelVo);
+                }
+                if ("A".equals(level)) {
+                    aList.add(excelVo);
+                }
+                if ("B".equals(level)) {
+                    bList.add(excelVo);
+                }
+                if ("C".equals(level)) {
+                    cList.add(excelVo);
+                }
+                if ("D".equals(level)) {
+                    dList.add(excelVo);
+                }
+            });
         });
-        File file = new File(createDir() + UUID.fastUUID() + ".jpeg");
+
+        Map<String, List<ExcelVo>> excelMap = new LinkedHashMap<>();
+        excelMap.put("s", sList);
+        excelMap.put("a", aList);
+        excelMap.put("b", bList);
+        excelMap.put("c", cList);
+        excelMap.put("d", dList);
+        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title);
+
+        File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, JFreeChartUtil.createChartTheme(), COLOR_ARRAY_LIST);
 
@@ -282,9 +338,11 @@ public abstract class WeeklyProjectUtils {
      * openBug等级分布
      *
      * @param allBugList
+     * @param vo
      * @return
      */
-    public static File openBug(List<Issue> allBugList) throws Exception {
+    public static File openBug(List<Issue> allBugList, WeeklyProjectVo vo) throws Exception {
+        String fileName = vo.getFileName();
         // 变量
         String title = "Open Bug等级分布";
 
@@ -292,6 +350,12 @@ public abstract class WeeklyProjectUtils {
         //数据列表
         List<Object> dataList = new ArrayList<>();
         List<String> categories = new ArrayList<>();
+
+        List<ExcelVo> sList = new ArrayList<>();
+        List<ExcelVo> aList = new ArrayList<>();
+        List<ExcelVo> bList = new ArrayList<>();
+        List<ExcelVo> cList = new ArrayList<>();
+        List<ExcelVo> dList = new ArrayList<>();
         BUG_LEVEL.forEach(level -> {
             List<Issue> issues = levelMap.get(level);
             if (CollectionUtils.isEmpty(issues)) {
@@ -299,8 +363,42 @@ public abstract class WeeklyProjectUtils {
             }
             dataList.add(issues.size());
             categories.add(level);
+
+            issues.forEach(issue -> {
+                ExcelVo excelVo = new ExcelVo();
+                excelVo.setAssignee(issue.getAssigneeName());
+                excelVo.setWeekNum(level);
+                excelVo.setSubject(issue.getSubject());
+                excelVo.setStatus(issue.getStatusName());
+                excelVo.setDescription(issue.getDescription());
+                excelVo.setCreateTime(new DateTime(issue.getCreatedOn()).toString("yyyy-MM-dd HH:mm:ss"));
+                excelVo.setEndTime(new DateTime(issue.getClosedOn()).toString("yyyy-MM-dd HH:mm:ss"));
+                if ("S".equals(level)) {
+                    sList.add(excelVo);
+                }
+                if ("A".equals(level)) {
+                    aList.add(excelVo);
+                }
+                if ("B".equals(level)) {
+                    bList.add(excelVo);
+                }
+                if ("C".equals(level)) {
+                    cList.add(excelVo);
+                }
+                if ("D".equals(level)) {
+                    dList.add(excelVo);
+                }
+            });
         });
-        File file = new File(createDir() + UUID.fastUUID() + ".jpeg");
+
+        Map<String, List<ExcelVo>> excelMap = new LinkedHashMap<>();
+        excelMap.put("s", sList);
+        excelMap.put("a", aList);
+        excelMap.put("b", bList);
+        excelMap.put("c", cList);
+        excelMap.put("d", dList);
+        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title);
+        File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, JFreeChartUtil.createChartTheme(), COLOR_ARRAY_LIST);
 

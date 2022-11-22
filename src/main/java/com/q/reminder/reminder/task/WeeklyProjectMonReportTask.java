@@ -207,7 +207,7 @@ public class WeeklyProjectMonReportTask {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
         // Open-Bug等级
         vo.setBlockId(block.getString("block_id"));
-        File openBug = WeeklyProjectUtils.openBug(vo.getAllBugList());
+        File openBug = WeeklyProjectUtils.openBug(vo.getAllBugList(), vo);
         addRequests(vo, openBug, requests);
         log.info("[{}]项目周报，Open-Bug等级分布 执行完成", vo.getProjectShortName());
         return i;
@@ -226,7 +226,7 @@ public class WeeklyProjectMonReportTask {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
         // All-bug等级
         vo.setBlockId(block.getString("block_id"));
-        File bugLevel = WeeklyProjectUtils.AllBugLevel(vo.getAllBugList());
+        File bugLevel = WeeklyProjectUtils.AllBugLevel(vo.getAllBugList(), vo);
         addRequests(vo, bugLevel, requests);
         log.info("[{}]项目周报，All-bug等级分布 执行完成", vo.getProjectShortName());
         return i;
