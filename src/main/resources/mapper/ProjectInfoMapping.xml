@@ -12,7 +12,7 @@
             p.pm_ou AS pmOu,
             p.p_key AS pKey,
             fw.url AS weeklyReportUrl,
-            fw.week_num,
+            fw.week_num weekNum,
             p.start_day AS startDay
         FROM
             r_project_info p,
