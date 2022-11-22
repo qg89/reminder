@@ -27,4 +27,12 @@ public class WikiSpaceServiceImpl extends ServiceImpl<WikiSpaceMapping, WikiSpac
         BeanUtil.copyProperties(node, space);
         return space;
     }
+
+    @Override
+    public WikiSpace getSpacesNode(Client client, String token) throws Exception {
+        Node node = FeishuJavaUtils.getSpacesNode(client, token);
+        WikiSpace space = new WikiSpace();
+        BeanUtil.copyProperties(node, space);
+        return space;
+    }
 }
