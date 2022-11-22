@@ -98,6 +98,7 @@ public class WeeklyProjectMonReportTask {
             vo.setFileName(fileName);
             vo.setWeekNum(weekNum);
             vo.setStartDay(report.getStartDay());
+            vo.setPmOu(report.getPmOu());
 
             ProjectInfo projectInfo = new ProjectInfo();
             projectInfo.setRedmineUrl(redmineUrl);

@@ -59,6 +59,7 @@ public class WraterExcelSendFeishuUtil {
         contentVo.setAppSecret(appSecret);
         contentVo.setAppId(appId);
         contentVo.setFile(file);
+        contentVo.setReceiveId(weeklyVo.getPmOu());
         String fileKey = FeishuJavaUtils.imUploadFile(contentVo);
         JSONObject json = new JSONObject();
         json.put("file_key", fileKey);

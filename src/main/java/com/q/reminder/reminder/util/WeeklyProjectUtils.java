@@ -61,7 +61,15 @@ public abstract class WeeklyProjectUtils {
         projectInfo.setPmKey(vo.getPmKey());
         projectInfo.setPKey(vo.getPKey());
         String fileName = vo.getFileName();
-        List<Issue> issues = WeeklyProjectRedmineUtils.reviewQuestion(projectInfo);
+        Date startDay = vo.getStartDay();
+        Date sunday = getWeekNumToSunday(vo.getWeekNum() - 1);
+        List<Issue> issues = WeeklyProjectRedmineUtils.reviewQuestion(projectInfo).stream().filter(e -> {
+            if (startDay == null) {
+                return true;
+            } else {
+                return e.getCreatedOn().after(startDay)&& e.getCreatedOn().before(sunday);
+            }
+        }).collect(Collectors.toList());
         Map<String, List<Issue>> weekNumMap = sortIssueMapByCreateOn(issues);
         List<String> categories = new ArrayList<>();
         // 变量
@@ -149,7 +157,15 @@ public abstract class WeeklyProjectUtils {
         projectInfo.setRedmineUrl(vo.getRedmineUrl());
         projectInfo.setPmKey(vo.getPmKey());
         projectInfo.setPKey(vo.getPKey());
-        List<Issue> issues = WeeklyProjectRedmineUtils.externalBugs(projectInfo);
+        Date startDay = vo.getStartDay();
+        Date sunday = getWeekNumToSunday(vo.getWeekNum() - 1);
+        List<Issue> issues = WeeklyProjectRedmineUtils.externalBugs(projectInfo).stream().filter(e -> {
+            if (startDay == null) {
+                return true;
+            } else {
+                return e.getCreatedOn().after(startDay)&& e.getCreatedOn().before(sunday);
+            }
+        }).collect(Collectors.toList());
         Map<String, List<Issue>> weekNumMap = sortIssueMapByCreateOn(issues);
         List<String> categories = new ArrayList<>();
         // 变量
@@ -479,7 +495,7 @@ public abstract class WeeklyProjectUtils {
      * @param weekNum
      * @return
      */
-    private static Date getWeekNumToSunday(int weekNum) {
+    public static Date getWeekNumToSunday(int weekNum) {
         WeekFields weekFields = WeekFields.ISO;
         //输入你想要的年份和周数
         LocalDate localDate = LocalDate.now().withYear(DateUtil.thisYear()).with(weekFields.weekOfYear(), weekNum);

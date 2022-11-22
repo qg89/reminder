@@ -22,8 +22,12 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static com.q.reminder.reminder.util.WeeklyProjectUtils.getWeekNumToSunday;
 
 /**
  * @author : saiko
@@ -47,6 +51,8 @@ public class WeeklyServiceImpl implements WeeklyService {
         File logoFile = FileUtil.file(path + "/logo.jpg");
         vo.setAppSecret(feishuProperties.getAppSecret());
         vo.setAppId(feishuProperties.getAppId());
+        Date startDay = vo.getStartDay();
+        Date sunday = getWeekNumToSunday(vo.getWeekNum() - 1);
         String title = vo.getTitle();
         String redmineUrl = vo.getRedmineUrl();
         String accessKey = vo.getPmKey();
@@ -79,7 +85,14 @@ public class WeeklyServiceImpl implements WeeklyService {
                     projectInfo.setRedmineUrl(redmineUrl);
                     projectInfo.setPmKey(accessKey);
                     projectInfo.setPKey(pKey);
-                    List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(projectInfo);
+
+                    List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(projectInfo).stream().filter(e -> {
+                        if (startDay == null) {
+                            return true;
+                        } else {
+                            return e.getCreatedOn().after(startDay)&& e.getCreatedOn().before(sunday);
+                        }
+                    }).collect(Collectors.toList());;;
                     vo.setAllBugList(allBugList);
                     if ("All-Bug等级分布".equals(title)) {
                         weeklyProjectMonReportTask.allBugLevel(vo, jsonArray, requests, i);
