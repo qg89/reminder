@@ -1,7 +1,5 @@
 package com.q.reminder.reminder.task;
 
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.net.URLDecoder;
 import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -24,11 +22,12 @@ import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -79,9 +78,8 @@ public class WeeklyProjectMonReportTask {
     }
 
     private void writeReport(List<WeeklyProjectVo> list) throws Exception {
-        String path = ResourceUtils.path("templates/file");
-        path = URLDecoder.decode(path, Charset.defaultCharset());
-        File logoFile = FileUtil.file(path + "/logo.jpg");
+        Resource resource = new ClassPathResource("templates/file/logo.jpg");
+        File logoFile = resource.getFile();
         for (WeeklyProjectVo report : list) {
             Date sunday = getWeekNumToSunday(report.getWeekNum() - 1);
             String redmineUrl = report.getRedmineUrl();
@@ -114,7 +112,7 @@ public class WeeklyProjectMonReportTask {
                 if (startDay == null) {
                     return true;
                 } else {
-                    return e.getCreatedOn().after(startDay)&& e.getCreatedOn().before(sunday);
+                    return e.getCreatedOn().after(startDay) && e.getCreatedOn().before(sunday);
                 }
             }).collect(Collectors.toList());
             vo.setAllBugList(allBugList);
@@ -334,9 +332,8 @@ public class WeeklyProjectMonReportTask {
 
     @Deprecated
     public WeeklyVo resetReport(WeeklyVo vo) throws Exception {
-        String path = ResourceUtils.path("templates/file");
-        path = URLDecoder.decode(path, Charset.defaultCharset());
-        File logoFile = FileUtil.file(path + "/logo.jpg");
+        ClassPathResource resource = new ClassPathResource("templates/file/logo.jpg");
+        File logoFile = resource.getFile();
         String redmineUrl = vo.getRedmineUrl();
         String accessKey = vo.getPmKey();
         String pKey = vo.getPKey();
@@ -392,10 +389,6 @@ public class WeeklyProjectMonReportTask {
         }
         FeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
         log.info("[{}]项目周报更新完成", projectShortName);
-        File file = new File(path);
-        for (File f : Objects.requireNonNull(file.listFiles(((dir, name) -> name.endsWith(".jpeg") || new File(name).isDirectory())))) {
-            f.delete();
-        }
         return vo;
     }
 

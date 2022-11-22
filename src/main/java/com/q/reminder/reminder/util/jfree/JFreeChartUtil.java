@@ -1,10 +1,5 @@
 package com.q.reminder.reminder.util.jfree;
 
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.io.resource.ClassPathResource;
-import cn.hutool.core.net.URLDecoder;
-import com.q.reminder.reminder.ReminderApplication;
-import com.q.reminder.reminder.util.ResourceUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -24,12 +19,10 @@ import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.chart.ui.TextAnchor;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
-import org.springframework.boot.system.ApplicationHome;
+import org.springframework.core.io.ClassPathResource;
 
 import java.awt.*;
 import java.io.File;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.NumberFormat;
@@ -81,13 +74,13 @@ public class JFreeChartUtil {
      */
     public static Font getDefaultFont(int style, Float size) throws Exception {
         //获取宋体文件
-        String filePath = ResourceUtils.path("templates/font/mysh.ttc");
+        org.springframework.core.io.ClassPathResource resource = new ClassPathResource("templates/font/mysh.ttc");
         //文件路径
-        File defaultFontFile = FileUtil.file(filePath);
+        File defaultFontFile = resource.getFile();
         Path path = defaultFontFile.toPath();
         if (Files.isReadable(path) && Files.exists(path) && Files.isRegularFile(path)) {
             Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, defaultFontFile);
-           return defaultFont.deriveFont(style, size);
+            return defaultFont.deriveFont(style, size);
         }
         return new Font("微软雅黑", Font.PLAIN, 15);
     }
