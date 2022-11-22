@@ -30,8 +30,12 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static com.q.reminder.reminder.util.WeeklyProjectUtils.getWeekNumToSunday;
 
 /**
  * @author : saiko
@@ -79,6 +83,7 @@ public class WeeklyProjectMonReportTask {
         path = URLDecoder.decode(path, Charset.defaultCharset());
         File logoFile = FileUtil.file(path + "/logo.jpg");
         for (WeeklyProjectVo report : list) {
+            Date sunday = getWeekNumToSunday(report.getWeekNum() - 1);
             String redmineUrl = report.getRedmineUrl();
             String accessKey = report.getPmKey();
             String pKey = report.getPKey();
@@ -86,6 +91,7 @@ public class WeeklyProjectMonReportTask {
             String fileToken = report.getFileToken();
             String fileName = report.getFileName();
             Integer weekNum = report.getWeekNum();
+            Date startDay = report.getStartDay();
             WeeklyProjectVo vo = new WeeklyProjectVo();
             String appId = feishuProperties.getAppId();
             vo.setAppId(appId);
@@ -104,7 +110,13 @@ public class WeeklyProjectMonReportTask {
             projectInfo.setRedmineUrl(redmineUrl);
             projectInfo.setPmKey(accessKey);
             projectInfo.setPKey(pKey);
-            List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(projectInfo);
+            List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(projectInfo).stream().filter(e -> {
+                if (startDay == null) {
+                    return true;
+                } else {
+                    return e.getCreatedOn().after(startDay)&& e.getCreatedOn().before(sunday);
+                }
+            }).collect(Collectors.toList());
             vo.setAllBugList(allBugList);
 
             JSONArray jsonArray = WeeklyProjectFeishuUtils.blocks(vo);

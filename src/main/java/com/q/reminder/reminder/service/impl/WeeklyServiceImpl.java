@@ -92,7 +92,7 @@ public class WeeklyServiceImpl implements WeeklyService {
                         } else {
                             return e.getCreatedOn().after(startDay)&& e.getCreatedOn().before(sunday);
                         }
-                    }).collect(Collectors.toList());;;
+                    }).collect(Collectors.toList());
                     vo.setAllBugList(allBugList);
                     if ("All-Bug等级分布".equals(title)) {
                         weeklyProjectMonReportTask.allBugLevel(vo, jsonArray, requests, i);
