@@ -157,7 +157,7 @@ public abstract class FeishuJavaUtils {
                         .parentType(UploadAllFileParentTypeEnum.EXPLORER)
                         .size((int) file.length())
                         .build())
-                .build();;
+                .build();
         UploadAllFileResp resp = client.drive().file().uploadAll(req);
         return resp.getData().getFileToken();
     }

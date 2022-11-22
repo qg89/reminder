@@ -223,7 +223,7 @@ public abstract class FeiShuApi {
         }
         JSONObject data = jsonObject.getJSONObject("data");
         JSONArray itemsJson = data.getJSONArray("items");
-        Integer memberTotal = data.getInteger("member_total");;
+        Integer memberTotal = data.getInteger("member_total");
         if (memberTotal >= (itemsJson.size() + lists.size())) {
             List<UserMemgerInfo> items = JSON.parseArray(itemsJson.toJSONString(), UserMemgerInfo.class);
             items.forEach(e -> {
