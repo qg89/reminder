@@ -19,8 +19,8 @@ import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.data.xy.XYDataset;
 
 import java.awt.*;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.text.NumberFormat;
 import java.util.List;
 
@@ -110,7 +110,7 @@ public class GenerateChartUtil {
      * @param theme           主题(null代表默认主题)
      * @param yAxisTitle      y轴标题
      * @param xAxisTitle      x轴标题
-     * @param outputStream    输出流
+     * @param out            输出流
      * @param width           宽度
      * @param height          高度
      * @param yAxisMinValue   y轴最小值（可以为空）
@@ -120,40 +120,12 @@ public class GenerateChartUtil {
      * @param barLabelFormat  柱体标签格式（可以为空）
      * @return
      */
-    public static void createBarChart(OutputStream outputStream, String chartTitle, List<String> legendNameList, List<String> xAxisNameList
+    public static void createBarChart(FileOutputStream out, String chartTitle, List<String> legendNameList, List<String> xAxisNameList
             , List<List<Object>> dataList, StandardChartTheme theme, String yAxisTitle, String xAxisTitle, int width, int height
             , Double yAxisMinValue, Double yAxisMaxValue, List<Color> legendColorList, Boolean barLabelVisible, String barLabelFormat) throws Exception {
         JFreeChart chart = createBarChart(chartTitle, legendNameList, xAxisNameList, dataList, theme, yAxisTitle, xAxisTitle
                 , yAxisMinValue, yAxisMaxValue, legendColorList, barLabelVisible, barLabelFormat);
-        ChartUtils.writeChartAsJPEG(outputStream, 1.0f, chart, width, height, null);
-    }
-
-    /**
-     * 生成柱状图(返回byte[])
-     *
-     * @param chartTitle      图表标题
-     * @param legendNameList  图例名称列表
-     * @param xAxisNameList   x轴名称列表
-     * @param dataList        数据列表
-     * @param theme           主题(null代表默认主题)
-     * @param yAxisTitle      y轴标题
-     * @param xAxisTitle      x轴标题
-     * @param width           宽度
-     * @param height          高度
-     * @param yAxisMinValue   y轴最小值（可以为空）
-     * @param yAxisMaxValue   y轴最大值（可以为空）
-     * @param legendColorList 图例背景颜色（可以为空）
-     * @param barLabelVisible 是否显示柱体标签（可以为空）
-     * @param barLabelFormat  柱体标签格式（可以为空）
-     * @return
-     */
-    public static byte[] createBarChart(String chartTitle, List<String> legendNameList, List<String> xAxisNameList
-            , List<List<Object>> dataList, StandardChartTheme theme, String yAxisTitle, String xAxisTitle, int width, int height
-            , Double yAxisMinValue, Double yAxisMaxValue, List<Color> legendColorList, Boolean barLabelVisible, String barLabelFormat) throws Exception {
-        ByteArrayOutputStream bas = new ByteArrayOutputStream();
-        createBarChart(bas, chartTitle, legendNameList, xAxisNameList, dataList, theme, yAxisTitle, xAxisTitle, width, height
-                , yAxisMinValue, yAxisMaxValue, legendColorList, barLabelVisible, barLabelFormat);
-        return bas.toByteArray();
+        ChartUtils.writeChartAsJPEG(out, 1.0f, chart, width, height);
     }
 
     /**
@@ -208,37 +180,16 @@ public class GenerateChartUtil {
      * @param theme          主题(null代表默认主题)
      * @param yAxisTitle     y轴标题
      * @param xAxisTitle     x轴标题
-     * @param outputStream   输出流
+     * @param out           输出流
      * @param width          宽度
      * @param height         高度
      * @return
      */
-    public static void createStackedBarChart(OutputStream outputStream, String chartTitle, List<String> legendNameList, List<String> xAxisNameList
+    public static void createStackedBarChart(FileOutputStream out, String chartTitle, List<String> legendNameList, List<String> xAxisNameList
             , List<List<Object>> dataList, StandardChartTheme theme, String yAxisTitle, String xAxisTitle, int width, int height
     ) throws Exception {
         JFreeChart chart = createStackedBarChart(chartTitle, legendNameList, xAxisNameList, dataList, theme, yAxisTitle, xAxisTitle);
-        ChartUtils.writeChartAsJPEG(outputStream, 1.0f, chart, width, height, null);
-    }
-
-    /**
-     * 生成堆叠柱状图(返回byte[])
-     *
-     * @param chartTitle     图表标题
-     * @param legendNameList 图例名称列表
-     * @param xAxisNameList  x轴名称列表
-     * @param dataList       数据列表
-     * @param theme          主题(null代表默认主题)
-     * @param yAxisTitle     y轴标题
-     * @param xAxisTitle     x轴标题
-     * @param width          宽度
-     * @param height         高度
-     * @return
-     */
-    public static byte[] createStackedBarChart(String chartTitle, List<String> legendNameList, List<String> xAxisNameList
-            , List<List<Object>> dataList, StandardChartTheme theme, String yAxisTitle, String xAxisTitle, int width, int height) throws Exception {
-        ByteArrayOutputStream bas = new ByteArrayOutputStream();
-        createStackedBarChart(bas, chartTitle, legendNameList, xAxisNameList, dataList, theme, yAxisTitle, xAxisTitle, width, height);
-        return bas.toByteArray();
+        ChartUtils.writeChartAsJPEG(out, 1.0f, chart, width, height);
     }
 
     /**
@@ -296,37 +247,16 @@ public class GenerateChartUtil {
      * @param theme          主题(null代表默认主题)
      * @param yAxisTitle     y轴标题
      * @param xAxisTitle     x轴标题
-     * @param outputStream   输出流
+     * @param out           输出流
      * @param width          宽度
      * @param height         高度
      * @return
      */
-    public static void createLineChart(OutputStream outputStream, String chartTitle, List<String> legendNameList, List<String> xAxisNameList
+    public static void createLineChart(FileOutputStream out, String chartTitle, List<String> legendNameList, List<String> xAxisNameList
             , List<List<Object>> dataList, StandardChartTheme theme, String yAxisTitle, String xAxisTitle, int width, int height
     ) throws Exception {
         JFreeChart chart = createLineChart(chartTitle, legendNameList, xAxisNameList, dataList, theme, yAxisTitle, xAxisTitle);
-        ChartUtils.writeChartAsJPEG(outputStream, 1.0f, chart, width, height, null);
-    }
-
-    /**
-     * 生成折线图(返回byte[])
-     *
-     * @param chartTitle     图表标题
-     * @param legendNameList 图例名称列表
-     * @param xAxisNameList  x轴名称列表
-     * @param dataList       数据列表
-     * @param theme          主题(null代表默认主题)
-     * @param yAxisTitle     y轴标题
-     * @param xAxisTitle     x轴标题
-     * @param width          宽度
-     * @param height         高度
-     * @return
-     */
-    public static byte[] createLineChart(String chartTitle, List<String> legendNameList, List<String> xAxisNameList
-            , List<List<Object>> dataList, StandardChartTheme theme, String yAxisTitle, String xAxisTitle, int width, int height) throws Exception {
-        ByteArrayOutputStream bas = new ByteArrayOutputStream();
-        createLineChart(bas, chartTitle, legendNameList, xAxisNameList, dataList, theme, yAxisTitle, xAxisTitle, width, height);
-        return bas.toByteArray();
+        ChartUtils.writeChartAsJPEG(out, 1.0f, chart, width, height);
     }
 
     /**
@@ -361,39 +291,20 @@ public class GenerateChartUtil {
     /**
      * 生成散点图(返回outputStream)
      *
-     * @param chartTitle   图表标题
-     * @param dataset      数据集
-     * @param theme        主题(null代表默认主题)
-     * @param yAxisTitle   y轴标题
-     * @param xAxisTitle   x轴标题
-     * @param outputStream 输出流
-     * @param width        宽度
-     * @param height       高度
-     * @return
-     */
-    public static void createScatterPlot(OutputStream outputStream, String chartTitle, XYDataset dataset, StandardChartTheme theme
-            , String yAxisTitle, String xAxisTitle, int width, int height
-    ) throws Exception {
-        JFreeChart chart = createScatterPlot(chartTitle, dataset, theme, yAxisTitle, xAxisTitle);
-        ChartUtils.writeChartAsJPEG(outputStream, 1.0f, chart, width, height, null);
-    }
-
-    /**
-     * 生成散点图(返回byte[])
-     *
      * @param chartTitle 图表标题
      * @param dataset    数据集
      * @param theme      主题(null代表默认主题)
      * @param yAxisTitle y轴标题
      * @param xAxisTitle x轴标题
+     * @param out       输出流
      * @param width      宽度
      * @param height     高度
      * @return
      */
-    public static byte[] createScatterPlot(String chartTitle, XYDataset dataset, StandardChartTheme theme, String yAxisTitle
-            , String xAxisTitle, int width, int height) throws Exception {
-        ByteArrayOutputStream bas = new ByteArrayOutputStream();
-        createScatterPlot(bas, chartTitle, dataset, theme, yAxisTitle, xAxisTitle, width, height);
-        return bas.toByteArray();
+    public static void createScatterPlot(FileOutputStream out, String chartTitle, XYDataset dataset, StandardChartTheme theme
+            , String yAxisTitle, String xAxisTitle, int width, int height
+    ) throws Exception {
+        JFreeChart chart = createScatterPlot(chartTitle, dataset, theme, yAxisTitle, xAxisTitle);
+        ChartUtils.writeChartAsJPEG(out, 1.0f, chart, width, height);
     }
 }

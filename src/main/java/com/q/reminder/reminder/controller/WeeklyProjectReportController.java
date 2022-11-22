@@ -57,6 +57,7 @@ public class WeeklyProjectReportController {
             weeklyService.resetReport(vo);
         } catch (Exception e) {
             returnT.setMsg(e.getMessage());
+            returnT.setCode(500);
             return returnT;
         }
         returnT.setContent(projectVo.getWeeklyReportUrl());

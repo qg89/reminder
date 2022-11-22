@@ -28,7 +28,7 @@ public class WraterExcelSendFeishuUtil {
     public static void wraterExcelSendFeishu(Map<String, List<ExcelVo>> map, WeeklyProjectVo weeklyVo, String name) throws Exception {
         String appId = weeklyVo.getAppId();
         String appSecret = weeklyVo.getAppSecret();
-        String path = ResourceUtils.path(WeeklyProjectUtils.createDir() + weeklyVo.getFileName() + "-" + name + ".xls");
+        String path = WeeklyProjectUtils.createDir() + weeklyVo.getFileName() + "-" + name + ".xls";
         File file = new File(path);
         ExcelWriter writer = ExcelUtil.getWriter();
         writer.renameSheet(0, map.keySet().stream().findFirst().get());
@@ -63,11 +63,8 @@ public class WraterExcelSendFeishuUtil {
         JSONObject json = new JSONObject();
         json.put("file_key", fileKey);
         contentVo.setContent(json.toJSONString());
-        try {
-            contentVo.setMsgType("file");
-            FeishuJavaUtils.sendContent(contentVo);
-        } finally {
-            file.delete();
-        }
+        contentVo.setMsgType("file");
+        FeishuJavaUtils.sendContent(contentVo);
+        file.delete();
     }
 }

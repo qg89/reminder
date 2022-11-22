@@ -380,7 +380,7 @@ public class WeeklyProjectMonReportTask {
         FeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
         log.info("[{}]项目周报更新完成", projectShortName);
         File file = new File(path);
-        for (File f : Objects.requireNonNull(file.listFiles(((dir, name) -> name.endsWith(".png") || new File(name).isDirectory())))) {
+        for (File f : Objects.requireNonNull(file.listFiles(((dir, name) -> name.endsWith(".jpeg") || new File(name).isDirectory())))) {
             f.delete();
         }
         return vo;

@@ -19,8 +19,10 @@ import org.springframework.util.CollectionUtils;
 import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.channels.FileChannel;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.WeekFields;
@@ -58,6 +60,7 @@ public abstract class WeeklyProjectUtils {
         projectInfo.setRedmineUrl(vo.getRedmineUrl());
         projectInfo.setPmKey(vo.getPmKey());
         projectInfo.setPKey(vo.getPKey());
+        String fileName = vo.getFileName();
         List<Issue> issues = WeeklyProjectRedmineUtils.reviewQuestion(projectInfo);
         Map<String, List<Issue>> weekNumMap = sortIssueMapByCreateOn(issues);
         List<String> categories = new ArrayList<>();
@@ -123,10 +126,14 @@ public abstract class WeeklyProjectUtils {
         excelMap.put("open", openIssueList);
         excelMap.put("closed", closedIssueList);
         WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, "评审问题数量");
-        File file = new File(createDir() + UUID.fastUUID() + ".png");
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
-        GenerateChartUtil.createStackedBarChart(fileOutputStream, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
-
+        File file = new File(createDir() + fileName + "-评审问题数量.jpeg");
+        FileOutputStream out = new FileOutputStream(file);
+        try {
+            GenerateChartUtil.createStackedBarChart(out, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
+        } finally {
+            out.flush();
+            out.close();
+        }
         return file;
     }
 
@@ -137,6 +144,7 @@ public abstract class WeeklyProjectUtils {
      * @return
      */
     public static File trends(WeeklyProjectVo vo) throws Exception {
+        String fileName = vo.getFileName();
         ProjectInfo projectInfo = new ProjectInfo();
         projectInfo.setRedmineUrl(vo.getRedmineUrl());
         projectInfo.setPmKey(vo.getPmKey());
@@ -177,12 +185,14 @@ public abstract class WeeklyProjectUtils {
         dataList.add(all);
         dataList.add(week);
 
-        String path = createDir();
-
-        File file = new File(path + UUID.fastUUID() + ".png");
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
-        GenerateChartUtil.createLineChart(fileOutputStream, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
-
+        File file = new File(createDir() + fileName + "-趋势.jpeg");
+        FileOutputStream out = new FileOutputStream(file);
+        try {
+            GenerateChartUtil.createLineChart(out, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
+        } finally {
+            out.flush();
+            out.close();
+        }
         return file;
     }
 
@@ -245,7 +255,7 @@ public abstract class WeeklyProjectUtils {
             dataList.add(issues.size());
             categories.add(level);
         });
-        File file = new File(createDir() + UUID.fastUUID() + ".png");
+        File file = new File(createDir() + UUID.fastUUID() + ".jpeg");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, JFreeChartUtil.createChartTheme(), COLOR_ARRAY_LIST);
 
@@ -274,7 +284,7 @@ public abstract class WeeklyProjectUtils {
             dataList.add(issues.size());
             categories.add(level);
         });
-        File file = new File(createDir() + UUID.fastUUID() + ".png");
+        File file = new File(createDir() + UUID.fastUUID() + ".jpeg");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, JFreeChartUtil.createChartTheme(), COLOR_ARRAY_LIST);
 
@@ -359,9 +369,14 @@ public abstract class WeeklyProjectUtils {
         dataList.add(c);
         dataList.add(d);
         //数据列表
-        File file = new File(createDir() + UUID.fastUUID() + ".png");
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
-        GenerateChartUtil.createStackedBarChart(fileOutputStream, title, BUG_LEVEL, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
+        File file = new File(createDir() + UUID.fastUUID() + ".jpeg");
+        FileOutputStream out = new FileOutputStream(file);
+        try {
+            GenerateChartUtil.createStackedBarChart(out, title, BUG_LEVEL, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
+        } finally {
+            out.flush();
+            out.close();
+        }
         return file;
     }
 
@@ -416,8 +431,8 @@ public abstract class WeeklyProjectUtils {
         for (String weekOfYear : categories) {
             List<TimeEntry> timeEntries = weekNumMap.get(weekOfYear);
             if (CollectionUtils.isEmpty(timeEntries)) {
-                all.add("0.00");
-                week.add("0.00");
+                all.add(0.00D);
+                week.add(0.00D);
                 continue;
             }
             Date weekNumToSunday = getWeekNumToSunday(Integer.parseInt(weekOfYear.split("W")[1]) - 2);
@@ -441,16 +456,20 @@ public abstract class WeeklyProjectUtils {
             if (allWeekSum == 0) {
                 allWeekSum = 1;
             }
-            week.add(BigDecimal.valueOf(bugWeekSum / allWeekSum * 100).setScale(2, RoundingMode.UP).doubleValue());
+            week.add(BigDecimal.valueOf(bugWeekSum / allWeekSum * 100).setScale(2, RoundingMode.HALF_UP).doubleValue());
         }
 
         dataList.add(all);
         dataList.add(week);
 
-        File file = new File(createDir() + fileName + "-" + title + ".png");
-        FileOutputStream fileOutputStream = new FileOutputStream(file);
-        GenerateChartUtil.createLineChart(fileOutputStream, title, legendNameList, categories
-                , dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
+        File file = new File(createDir() + fileName + "-" + title + ".jpeg");
+        FileOutputStream out = new FileOutputStream(file);
+        try {
+            GenerateChartUtil.createLineChart(out, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
+        } finally {
+            out.flush();
+            out.close();
+        }
         return file;
     }
 

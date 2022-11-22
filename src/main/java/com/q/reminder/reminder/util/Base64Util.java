@@ -36,7 +36,7 @@ public class Base64Util {
                 }
             }
             // 对文件重命名，设定为当前系统时间的毫秒数加UUID
-            String newFileName = System.currentTimeMillis() + "-" + UUID.randomUUID() + ".png";
+            String newFileName = System.currentTimeMillis() + "-" + UUID.randomUUID() + ".jpeg";
             // 放在本地临时文件目录
             String localFilePath = String.format("%stemp%s%s", File.separator, File.separator, DateUtil.today());
             File filePath = new File(localFilePath);
