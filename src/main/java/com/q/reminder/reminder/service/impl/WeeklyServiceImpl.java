@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.service.impl;
 
+import cn.hutool.core.io.resource.ResourceUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.docx.v1.model.UpdateBlockRequest;
@@ -18,6 +19,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,8 +45,8 @@ public class WeeklyServiceImpl implements WeeklyService {
 
     @Override
     public void resetReport(WeeklyVo vo) throws Exception {
-        ClassPathResource resource = new ClassPathResource("templates/file/logo.jpg");
-        File logoFile = resource.getFile();
+        URL url = this.getClass().getClassLoader().getResource("templates/file/logo.jpg");
+        File logoFile = new File(url.getFile());
         vo.setAppSecret(feishuProperties.getAppSecret());
         vo.setAppId(feishuProperties.getAppId());
         Date startDay = vo.getStartDay();

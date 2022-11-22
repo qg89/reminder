@@ -23,6 +23,7 @@ import org.springframework.core.io.ClassPathResource;
 
 import java.awt.*;
 import java.io.File;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.NumberFormat;
@@ -74,9 +75,9 @@ public class JFreeChartUtil {
      */
     public static Font getDefaultFont(int style, Float size) throws Exception {
         //获取宋体文件
-        org.springframework.core.io.ClassPathResource resource = new ClassPathResource("templates/font/mysh.ttc");
+        URL url = JFreeChartUtil.class.getClassLoader().getResource("templates/file/logo.jpg");
         //文件路径
-        File defaultFontFile = resource.getFile();
+        File defaultFontFile = new File(url.getFile());
         Path path = defaultFontFile.toPath();
         if (Files.isReadable(path) && Files.exists(path) && Files.isRegularFile(path)) {
             Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, defaultFontFile);

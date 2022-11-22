@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -78,8 +79,8 @@ public class WeeklyProjectMonReportTask {
     }
 
     private void writeReport(List<WeeklyProjectVo> list) throws Exception {
-        Resource resource = new ClassPathResource("templates/file/logo.jpg");
-        File logoFile = resource.getFile();
+        URL resource = this.getClass().getClassLoader().getResource("templates/file/logo.jpg");
+        File logoFile = new File(resource.getFile());
         for (WeeklyProjectVo report : list) {
             Date sunday = getWeekNumToSunday(report.getWeekNum() - 1);
             String redmineUrl = report.getRedmineUrl();
@@ -332,8 +333,8 @@ public class WeeklyProjectMonReportTask {
 
     @Deprecated
     public WeeklyVo resetReport(WeeklyVo vo) throws Exception {
-        ClassPathResource resource = new ClassPathResource("templates/file/logo.jpg");
-        File logoFile = resource.getFile();
+        URL url = this.getClass().getClassLoader().getResource("templates/file/logo.jpg");
+        File logoFile = new File(url.getFile());
         String redmineUrl = vo.getRedmineUrl();
         String accessKey = vo.getPmKey();
         String pKey = vo.getPKey();
