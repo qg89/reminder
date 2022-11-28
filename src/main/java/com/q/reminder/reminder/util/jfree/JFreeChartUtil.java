@@ -83,7 +83,7 @@ public class JFreeChartUtil {
             Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, defaultFontFile);
             return defaultFont.deriveFont(style, size);
         }
-        return new Font("微软雅黑", Font.PLAIN, 15);
+        return new Font("微软雅黑", Font.PLAIN, 15).deriveFont(style, size);
     }
 
     /**
