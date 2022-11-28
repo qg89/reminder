@@ -83,7 +83,7 @@ public class JFreeChartUtil {
             Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, defaultFontFile);
             return defaultFont.deriveFont(style, size);
         }
-        return new Font("ukai", style, size.intValue()).deriveFont(style, size);
+        return new Font(Font.DIALOG, style, size.intValue()).deriveFont(style, size);
     }
 
     /**
