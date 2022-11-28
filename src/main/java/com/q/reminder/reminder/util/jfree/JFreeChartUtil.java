@@ -75,15 +75,15 @@ public class JFreeChartUtil {
      */
     public static Font getDefaultFont(int style, Float size) throws Exception {
         //获取宋体文件
-        URL url = JFreeChartUtil.class.getClassLoader().getResource("templates/font/msyh.ttc");
-        //文件路径
-        File defaultFontFile = new File(url.getFile());
-        Path path = defaultFontFile.toPath();
-        if (Files.isReadable(path) && Files.exists(path) && Files.isRegularFile(path)) {
-            Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, defaultFontFile);
-            return defaultFont.deriveFont(style, size);
-        }
-        return new Font("微软雅黑", Font.PLAIN, 15);
+//        URL url = JFreeChartUtil.class.getClassLoader().getResource("templates/font/msyh.ttc");
+//        //文件路径
+//        File defaultFontFile = new File(url.getFile());
+//        Path path = defaultFontFile.toPath();
+//        if (Files.isReadable(path) && Files.exists(path) && Files.isRegularFile(path)) {
+//            Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, defaultFontFile);
+//            return defaultFont.deriveFont(style, size);
+//        }
+        return new Font("微软雅黑", style, size.intValue()).deriveFont(style, size);
     }
 
     /**
