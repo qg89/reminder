@@ -14,4 +14,6 @@ import com.q.reminder.reminder.entity.WikiSpace;
  */
 public interface WikiSpaceService extends IService<WikiSpace> {
     WikiSpace syncSpacesWiki(Client client, String projectToken, String title) throws Exception;
+
+    WikiSpace getSpacesNode(Client client, String token) throws Exception;
 }

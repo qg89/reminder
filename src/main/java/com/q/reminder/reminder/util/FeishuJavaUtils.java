@@ -9,10 +9,7 @@ import com.lark.oapi.service.drive.v1.enums.UploadAllFileParentTypeEnum;
 import com.lark.oapi.service.drive.v1.model.*;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.*;
-import com.lark.oapi.service.wiki.v2.model.CopySpaceNodeReq;
-import com.lark.oapi.service.wiki.v2.model.CopySpaceNodeReqBody;
-import com.lark.oapi.service.wiki.v2.model.CopySpaceNodeResp;
-import com.lark.oapi.service.wiki.v2.model.Node;
+import com.lark.oapi.service.wiki.v2.model.*;
 import com.q.reminder.reminder.vo.ContentVo;
 import com.q.reminder.reminder.vo.FeishuUploadImageVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
@@ -194,6 +191,14 @@ public abstract class FeishuJavaUtils {
         return resp.getData().getFileKey();
     }
 
+    /**
+     * 复制知识空间节点
+     * @param client
+     * @param projectToken
+     * @param title
+     * @return
+     * @throws Exception
+     */
     public static Node syncSpacesWiki(Client client, String projectToken, String title) throws Exception {
         CopySpaceNodeReq req = CopySpaceNodeReq.newBuilder()
                 .copySpaceNodeReqBody(CopySpaceNodeReqBody.newBuilder()
@@ -205,6 +210,21 @@ public abstract class FeishuJavaUtils {
                 .spaceId("7046680616087126018")
                 .build();
         CopySpaceNodeResp resp = client.wiki().spaceNode().copy(req);
+        return resp.getData().getNode();
+    }
+
+    /**
+     * 获取知识空间节点信息
+     * @param client
+     * @param token
+     * @return
+     * @throws Exception
+     */
+    public static Node getSpacesNode(Client client, String token) throws Exception {
+        GetNodeSpaceReq req = GetNodeSpaceReq.newBuilder()
+                .token(token)
+                .build();
+        GetNodeSpaceResp resp = client.wiki().space().getNode(req);
         return resp.getData().getNode();
     }
 }
