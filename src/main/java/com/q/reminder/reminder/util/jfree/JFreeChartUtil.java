@@ -75,7 +75,7 @@ public class JFreeChartUtil {
      */
     public static Font getDefaultFont(int style, Float size) throws Exception {
         //获取宋体文件
-        URL url = JFreeChartUtil.class.getClassLoader().getResource("templates/file/logo.jpg");
+        URL url = JFreeChartUtil.class.getClassLoader().getResource("templates/font/msyh.ttc");
         //文件路径
         File defaultFontFile = new File(url.getFile());
         Path path = defaultFontFile.toPath();
