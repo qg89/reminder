@@ -40,14 +40,22 @@ public class SyncSpacesWikiTask {
 
     @XxlJob("syncSpacesWiki")
     public ReturnT<String> syncSpacesWiki() {
+        int weekOfYear = DateUtil.thisWeekOfYear() - 1;
+        ReturnT<String> returnT = new ReturnT<>(null);
         String jobParam = XxlJobHelper.getJobParam();
         List<WikiSpace> wikiSpaceList = new ArrayList<>();
         try {
+            LambdaQueryWrapper<WikiSpace> wikiLq =  Wrappers.lambdaQuery();
+            wikiLq.eq(WikiSpace::getWeekNum, weekOfYear);
+            long count = spaceWikoService.count(wikiLq);
+            if (count > 0) {
+                returnT.setMsg("当前周已复制");
+                return returnT;
+            }
             WikiSpace wikiSpace = spaceWikoService.getSpacesNode(client, "wikcnXpXCgmL3E7vdbM1TiwXiGc");
             String parentTitle = wikiSpace.getTitle();
             LambdaQueryWrapper<ProjectInfo> lq = Wrappers.<ProjectInfo>lambdaQuery().select(ProjectInfo::getWikiToken, ProjectInfo::getWikiTitle, ProjectInfo::getPId).isNotNull(ProjectInfo::getWikiToken);
             List<ProjectInfo> list = projectInfoService.list(lq);
-            int weekOfYear = DateUtil.thisWeekOfYear() - 1;
             if (StringUtils.isNotBlank(jobParam) && NumberUtil.isInteger(jobParam) && Integer.parseInt(jobParam) < 52) {
                 weekOfYear = Integer.parseInt(jobParam);
             }
@@ -60,8 +68,9 @@ public class SyncSpacesWikiTask {
             }
             spaceWikoService.saveOrUpdateBatch(wikiSpaceList);
         } catch (Exception e) {
-            e.printStackTrace();
+            returnT.setCode(500);
+            returnT.setContent(e.getMessage());
         }
-        return ReturnT.SUCCESS;
+        return returnT;
     }
 }
