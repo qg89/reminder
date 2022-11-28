@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.lark.oapi.Client;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.ProjectInfo;
@@ -12,6 +13,7 @@ import com.q.reminder.reminder.service.AdminInfoService;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RedmineUserInfoService;
 import com.q.reminder.reminder.util.FeiShuApi;
+import com.q.reminder.reminder.util.FeishuJavaUtils;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.vo.DefinitionVo;
 import com.q.reminder.reminder.vo.FeatureListVo;
@@ -48,6 +50,8 @@ public class SyncRedmineTask {
     private AdminInfoService adminInfoService;
     @Autowired
     private FeishuProperties feishuProperties;
+    @Autowired
+    private Client client;
 
     @XxlJob("syncRedmineTask")
     public void syncRedmineTask() {
@@ -66,7 +70,12 @@ public class SyncRedmineTask {
             String redmineUrl = projectInfo.getRedmineUrl();
             String pmKey = projectInfo.getPmKey();
             // 获取各项目中需求管理表中sheetId和sheet名称
-            List<SheetVo> sheetList = FeiShuApi.getSpredsheets(featureToken, secret);
+            List<SheetVo> sheetList = null;
+            try {
+                sheetList = FeishuJavaUtils.getSpredsheets(client, featureToken);
+            } catch (Exception e) {
+                log.error(e);
+            }
             StringBuilder ranges = new StringBuilder();
             String featureRange = "";
             String definitionRange = "";

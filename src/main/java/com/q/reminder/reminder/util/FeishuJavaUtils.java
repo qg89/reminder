@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.util;
 
 import com.lark.oapi.Client;
+import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.docx.v1.enums.BatchUpdateDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.enums.PatchDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.model.*;
@@ -9,13 +10,19 @@ import com.lark.oapi.service.drive.v1.enums.UploadAllFileParentTypeEnum;
 import com.lark.oapi.service.drive.v1.model.*;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.*;
+import com.lark.oapi.service.sheets.v3.model.QuerySpreadsheetSheetReq;
+import com.lark.oapi.service.sheets.v3.model.QuerySpreadsheetSheetResp;
+import com.lark.oapi.service.sheets.v3.model.Sheet;
 import com.lark.oapi.service.wiki.v2.model.*;
 import com.q.reminder.reminder.vo.ContentVo;
 import com.q.reminder.reminder.vo.FeishuUploadImageVo;
+import com.q.reminder.reminder.vo.SheetVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -40,12 +47,12 @@ public abstract class FeishuJavaUtils {
         try {
             UploadAllMediaResp uploadAllMediaResp = client.drive().media().uploadAll(
                     UploadAllMediaReq.newBuilder().uploadAllMediaReqBody(UploadAllMediaReqBody.newBuilder()
-                                    .fileName(vo.getFileName())
-                                    .size(Math.toIntExact(vo.getSize()))
-                                    .parentNode(vo.getParentNode())
-                                    .parentType(vo.getParentType())
-                                    .file(vo.getFile())
-                                    .build()
+                            .fileName(vo.getFileName())
+                            .size(Math.toIntExact(vo.getSize()))
+                            .parentNode(vo.getParentNode())
+                            .parentType(vo.getParentType())
+                            .file(vo.getFile())
+                            .build()
                     ).build()
             );
             int code = uploadAllMediaResp.getCode();
@@ -116,6 +123,7 @@ public abstract class FeishuJavaUtils {
 
     /**
      * 发送飞书消息
+     *
      * @param vo
      * @return
      * @throws Exception
@@ -139,6 +147,7 @@ public abstract class FeishuJavaUtils {
 
     /**
      * 上传文件
+     *
      * @param vo
      * @return
      * @throws Exception
@@ -173,6 +182,7 @@ public abstract class FeishuJavaUtils {
 
     /**
      * 消息上传文件
+     *
      * @param vo
      * @return
      * @throws Exception
@@ -193,6 +203,7 @@ public abstract class FeishuJavaUtils {
 
     /**
      * 复制知识空间节点
+     *
      * @param client
      * @param projectToken
      * @param title
@@ -214,7 +225,33 @@ public abstract class FeishuJavaUtils {
     }
 
     /**
+     * 获取电子表格sheets
+     *
+     * @param spreadsheetToken
+     * @return
+     */
+    public static List<SheetVo> getSpredsheets(Client client, String spreadsheetToken) throws Exception {
+        // 创建请求对象
+        QuerySpreadsheetSheetReq req = QuerySpreadsheetSheetReq.newBuilder()
+                .spreadsheetToken(spreadsheetToken)
+                .build();
+        // 发起请求
+        QuerySpreadsheetSheetResp resp = client.sheets().spreadsheetSheet().query(req, RequestOptions.newBuilder().build());
+        List<SheetVo> list = new ArrayList<>();
+        Sheet[] sheets = resp.getData().getSheets();
+        for (Sheet sheet : sheets) {
+            SheetVo vo = new SheetVo();
+            vo.setTitle(sheet.getTitle());
+            vo.setSheetId(sheet.getSheetId());
+            list.add(vo);
+        }
+        return list;
+    }
+
+
+    /**
      * 获取知识空间节点信息
+     *
      * @param client
      * @param token
      * @return

@@ -192,7 +192,6 @@ public abstract class FeiShuApi {
             List<UserMemgerInfo> items = JSON.parseArray(itemsJson.toJSONString(), UserMemgerInfo.class);
             lists.addAll(items);
             items.forEach(e -> {
-//                e.setUserName(new StringBuilder(e.getName()).insert(1, " ").toString());
                 addUserGroupList(chatId, e, userGroupList);
             });
             Integer memberTotal = data.getInteger("member_total");
@@ -227,7 +226,6 @@ public abstract class FeiShuApi {
         if (memberTotal >= (itemsJson.size() + lists.size())) {
             List<UserMemgerInfo> items = JSON.parseArray(itemsJson.toJSONString(), UserMemgerInfo.class);
             items.forEach(e -> {
-//                e.setUserName(new StringBuilder(e.getName()).insert(1, " ").toString());
                 addUserGroupList(chatId, e, userGroupList);
             });
             lists.addAll(items);
@@ -245,25 +243,6 @@ public abstract class FeiShuApi {
         ug.setMemberId(e.getMemberId());
         userGroupList.add(ug);
     }
-
-    private static String bearer = "t-g104aqgEZ4WWCKWYNJE2H6KGBGXCJO52RVDIYJ4M";
-
-//    public static void main(String[] args) {
-//        String spreadsheetToken = "shtcnKDY4BUliWySLgo0LnDDtme";
-//        String sheetId = "ZBTGux";
-//        String viewsId = "pH9hbVcCXA";
-//        String range = "ZBTGux!A1:AJ2000,GVO53c!A1:O2";
-//        String secret = getSecret("cli_a1144b112738d013", "AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx");
-//
-////        String view = getView(spreadsheetToken, sheetId, viewsId);
-////        createFilter(spreadsheetToken, sheetId, viewsId);
-//        List<JSONObject> list = getRanges(spreadsheetToken, range, secret);
-////        List<FeatureListVo> featureList = getFeatureList(valueRange);
-////        System.out.println(featureList);
-//        List<SheetVo> spredsheets = getSpredsheets(spreadsheetToken, secret);
-//        System.out.println(spredsheets);
-////        updateRange(spreadsheetToken);
-//    }
 
     /**
      * 获取单个范围
@@ -367,114 +346,6 @@ public abstract class FeiShuApi {
         copyOptions.setIgnoreNullValue(true);
         BeanUtil.copyProperties(definitionVo, definition, copyOptions);
         return definition;
-    }
-
-
-    /**
-     * 创建赛选视图
-     */
-    public static String createView(String spreadsheetToken, String sheetId) {
-        String range = null;
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
-        MediaType mediaType = MediaType.parse("application/json");
-        RequestBody body = RequestBody.create("{\"filter_view_id\":\"pH9hbVcCXA\",\"filter_view_name\":\"筛选视图 1\",\"range\":\"ZBTGux!A1:AJ20\"}", mediaType);
-        Request request = new Request.Builder()
-                .url("https://open.feishu.cn/open-apis/sheets/v3/spreadsheets/" + spreadsheetToken + "/sheets/" + sheetId + "/filter_views")
-                .method("POST", body)
-                .addHeader("Content-Type", "application/json")
-                .addHeader("Authorization", "Bearer " + bearer)
-                .build();
-        try {
-            Response response = client.newCall(request).execute();
-            String string = response.body().string();
-            JSONObject jsonObject = JSONObject.parseObject(string).getJSONObject("data").getJSONObject("filter_view");
-            range = jsonObject.getString("range");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return range;
-    }
-
-    /**
-     * 创建过滤器
-     *
-     * @param spreadsheetToken
-     * @param sheetId
-     * @param viewsId
-     */
-    public static void createFilter(String spreadsheetToken, String sheetId, String viewsId) {
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
-        MediaType mediaType = MediaType.parse("application/json");
-        RequestBody body = RequestBody.create("{\"compare_type\":\"contains\",\"condition_id\":\"M\",\"expected\":[\"待开发\"],\"filter_type\":\"text\"}", mediaType);
-        Request request = new Request.Builder()
-                .url("https://open.feishu.cn/open-apis/sheets/v3/spreadsheets/" + spreadsheetToken + "/sheets/" + sheetId + "/filter_views/" + viewsId + "/conditions")
-                .method("POST", body)
-                .addHeader("Authorization", "Bearer " + bearer)
-                .addHeader("Content-Type", "application/json")
-                .build();
-        try {
-            Response response = client.newCall(request).execute();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 获取视图
-     *
-     * @param spreadsheetToken
-     * @param sheetId
-     * @param viewsId
-     * @return
-     */
-    public static String getView(String spreadsheetToken, String sheetId, String viewsId) {
-        String range = null;
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
-        Request request = new Request.Builder()
-                .url("https://open.feishu.cn/open-apis/sheets/v3/spreadsheets/" + spreadsheetToken + "/sheets/" + sheetId + "/filter_views/" + viewsId)
-                .method("GET", null)
-                .addHeader("Authorization", "Bearer " + bearer)
-                .build();
-        try {
-            Response response = client.newCall(request).execute();
-            range = JSONObject.parseObject(response.body().string()).getJSONObject("data").getJSONObject("filter_view").getString("range");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return range;
-    }
-
-    /**
-     * 获取电子表格sheets
-     */
-    public static List<SheetVo> getSpredsheets(String spreadsheetToken, String secret) {
-        List<SheetVo> list = new ArrayList<>();
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
-        Request request = new Request.Builder()
-                .url("https://open.feishu.cn/open-apis/sheets/v3/spreadsheets/" + spreadsheetToken + "/sheets/query")
-                .method("GET", null)
-                .addHeader("Authorization", secret)
-                .build();
-        try {
-            Response response = client.newCall(request).execute();
-            String result = response.body().string();
-            JSONArray sheets = JSONObject.parseObject(result).getJSONObject("data").getJSONArray("sheets");
-            sheets.forEach(e -> {
-                SheetVo vo = new SheetVo();
-                JSONObject jsonObject = (JSONObject) e;
-                vo.setTitle(jsonObject.getString("title"));
-                vo.setSheetId(jsonObject.getString("sheet_id"));
-                list.add(vo);
-            });
-            return list;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return list;
     }
 
     /**
