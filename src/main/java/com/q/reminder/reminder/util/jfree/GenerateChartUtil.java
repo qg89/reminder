@@ -150,8 +150,7 @@ public class GenerateChartUtil {
     private static JFreeChart createScatterPlot(String chartTitle
             , XYDataset dataset, String yAxisTitle, String xAxisTitle) throws Exception {
         //设置主题，防止中文乱码
-        StandardChartTheme theme = JFreeChartUtil.createChartTheme();
-        ChartFactory.setChartTheme(theme);
+        ChartFactory.setChartTheme(JFreeChartUtil.createChartTheme());
         //创建散点图
         JFreeChart chart = ChartFactory.createScatterPlot(chartTitle, xAxisTitle, yAxisTitle
                 , dataset);
@@ -180,8 +179,7 @@ public class GenerateChartUtil {
     private static JFreeChart createLineChart(String chartTitle, List<String> legendNameList, List<String> xAxisNameList
             , List<List<Object>> dataList, String yAxisTitle, String xAxisTitle) throws Exception {
         //设置主题，防止中文乱码
-        StandardChartTheme theme = JFreeChartUtil.createChartTheme();
-        ChartFactory.setChartTheme(theme);
+        ChartFactory.setChartTheme(JFreeChartUtil.createChartTheme());
         //创建折线图
         JFreeChart chart = ChartFactory.createLineChart(chartTitle, xAxisTitle, yAxisTitle
                 , JFreeChartUtil.createDefaultCategoryDataset(legendNameList, xAxisNameList, dataList));
@@ -225,8 +223,7 @@ public class GenerateChartUtil {
     public static JFreeChart createStackedBarChart(String chartTitle, List<String> legendNameList, List<String> xAxisNameList
             , List<List<Object>> dataList, String yAxisTitle, String xAxisTitle) throws Exception {
         //设置主题，防止中文乱码
-        StandardChartTheme theme = JFreeChartUtil.createChartTheme();
-        ChartFactory.setChartTheme(theme);
+        ChartFactory.setChartTheme(JFreeChartUtil.createChartTheme());
         //创建堆叠柱状图
         JFreeChart chart = ChartFactory.createStackedBarChart(chartTitle, xAxisTitle, yAxisTitle, JFreeChartUtil.createDefaultCategoryDataset(legendNameList, xAxisNameList, dataList));
         // 设置抗锯齿，防止字体显示不清楚
@@ -273,8 +270,7 @@ public class GenerateChartUtil {
             , List<List<Object>> dataList, String yAxisTitle, String xAxisTitle, Double yAxisMinValue
             , Double yAxisMaxValue, List<Color> legendColorList, Boolean barLabelVisible, String barLabelFormat) throws Exception {
         //设置主题，防止中文乱码
-        StandardChartTheme theme = JFreeChartUtil.createChartTheme();
-        ChartFactory.setChartTheme(theme);
+        ChartFactory.setChartTheme(JFreeChartUtil.createChartTheme());
         //创建柱状图
         JFreeChart chart = ChartFactory.createBarChart(chartTitle, xAxisTitle, yAxisTitle
                 , JFreeChartUtil.createDefaultCategoryDataset(legendNameList, xAxisNameList, dataList));

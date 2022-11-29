@@ -39,8 +39,7 @@ public class GeneratePieChartUtil {
      */
     public static JFreeChart createPieChart(String chartTitle, List<String> legendNameList, List<Object> dataList, List<Color> legendColorList) throws Exception {
         //设置主题，防止中文乱码
-        StandardChartTheme theme = JFreeChartUtil.createChartTheme();
-        ChartFactory.setChartTheme(theme);
+        ChartFactory.setChartTheme(JFreeChartUtil.createChartTheme());
         //创建饼图
         JFreeChart chart = ChartFactory.createPieChart(chartTitle, JFreeChartUtil.createDefaultPieDataset(legendNameList, dataList));
         TextTitle title = chart.getTitle();
