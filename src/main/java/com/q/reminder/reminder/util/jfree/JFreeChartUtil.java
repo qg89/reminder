@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.util.jfree;
 
+import com.q.reminder.reminder.util.SystemUtils;
 import lombok.extern.log4j.Log4j2;
 import org.jfree.chart.StandardChartTheme;
 import org.jfree.chart.axis.ValueAxis;
@@ -60,8 +61,12 @@ public class JFreeChartUtil {
      * @throws Exception
      */
     public static Font getDefaultFont(int style, Float size) throws Exception {
+        String fontPath = "/font/ukai.ttc";
+        if (SystemUtils.isWindows()) {
+            fontPath = "/font/msyh.ttc";
+        }
         //获取宋体文件
-        InputStream resourceAsStream = JFreeChartUtil.class.getResourceAsStream("/font/msyh.ttc");
+        InputStream resourceAsStream = JFreeChartUtil.class.getResourceAsStream(fontPath);
         //文件路径
         if (resourceAsStream != null) {
             Font font = Font.createFont(Font.TRUETYPE_FONT, resourceAsStream);

@@ -76,7 +76,7 @@ public class WeeklyServiceImpl implements WeeklyService {
                     weeklyProjectMonReportTask.tends(vo, jsonArray, requests, i);
                     break;
                 }
-                if (WeeklyReportContents.BUG_LEVEL.equals(heading3)) {
+                if (WeeklyReportContents.BUG_LEVEL.equals(heading3) && WeeklyReportContents.BUG_LEVEL.equals(title)) {
                     ProjectInfo projectInfo = new ProjectInfo();
                     projectInfo.setRedmineUrl(redmineUrl);
                     projectInfo.setPmKey(accessKey);
