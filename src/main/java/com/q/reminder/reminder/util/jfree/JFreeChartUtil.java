@@ -1,9 +1,6 @@
 package com.q.reminder.reminder.util.jfree;
 
 import lombok.extern.log4j.Log4j2;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartUtils;
-import org.jfree.chart.JFreeChart;
 import org.jfree.chart.StandardChartTheme;
 import org.jfree.chart.axis.ValueAxis;
 import org.jfree.chart.labels.ItemLabelAnchor;
@@ -20,18 +17,11 @@ import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.chart.ui.TextAnchor;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
-import org.springframework.core.io.ClassPathResource;
 
 import java.awt.*;
-import java.io.File;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.InputStream;
 import java.text.NumberFormat;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author : saiko
@@ -53,12 +43,11 @@ public class JFreeChartUtil {
         StandardChartTheme theme = new StandardChartTheme("CN");
         // 标题
         theme.setExtraLargeFont(getDefaultFont(Font.BOLD, 30f));
-        Font xFont = getDefaultFont(Font.BOLD, 20f);
-        // xy轴
+        Font xFont = getDefaultFont(Font.PLAIN, 20f);
+        // 设置轴向的字体
         theme.setLargeFont(xFont);
-        // X轴
+        // 设置图例的字体
         theme.setRegularFont(xFont);
-        theme.setSmallFont(getDefaultFont(Font.PLAIN, 10f));
         return theme;
     }
 
@@ -72,17 +61,17 @@ public class JFreeChartUtil {
      */
     public static Font getDefaultFont(int style, Float size) throws Exception {
         //获取宋体文件
-        URL url = JFreeChartUtil.class.getClassLoader().getResource("templates/font/ukai.ttc");
+        InputStream resourceAsStream = JFreeChartUtil.class.getResourceAsStream("/config/ukai.ttc");
         //文件路径
-        File defaultFontFile = new File(url.getFile());
-        Path path = defaultFontFile.toPath();
-        if (Files.isReadable(path) && Files.exists(path) && Files.isRegularFile(path)) {
-            Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, defaultFontFile);
-            log.info("加载字体~~~~~~~~~  {}",  defaultFont);
-            return defaultFont.deriveFont(style, size);
+        if (resourceAsStream != null) {
+            Font font = Font.createFont(Font.TRUETYPE_FONT, resourceAsStream);
+            font.deriveFont(style, size);
+            log.info("加载自定义字体~~~~~~~~~  {}， 当前系统字体环境 {}", font, System.getProperty("user.language"));
+            return font;
         }
-        Font font = new Font("黑体", style, size.intValue()).deriveFont(style, size);
-        log.info("加载默认字体~~~~~~~~~  {}， 当前系统字体环境 {}",  font, System.getProperty("user.language"));
+
+        Font font = new Font("宋体", style, size.intValue());
+        log.info("加载默认字体~~~~~~~~~  {}， 当前系统字体环境 {}", font, System.getProperty("user.language"));
         return font;
     }
 
@@ -133,40 +122,6 @@ public class JFreeChartUtil {
         piePlot.setShadowPaint(null);
         // 显示标签数据
         piePlot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0} {1} {2}"));
-    }
-
-    /**
-     * 提供静态方法：获取报表图形1：饼状图
-     *
-     * @param title 标题
-     * @param datas 数据
-     * @param url   字体
-     */
-    public static void createPiePort(String title, Map<String, Double> datas, String url) {
-        try {
-            // 如果不使用Font,中文将显示不出来
-            DefaultPieDataset pds = new DefaultPieDataset();
-
-            // 获取迭代器：
-            Set<Map.Entry<String, Double>> set = datas.entrySet();
-            Iterator iterator = set.iterator();
-            Map.Entry entry = null;
-            while (iterator.hasNext()) {
-                entry = (Map.Entry) iterator.next();
-                pds.setValue(entry.getKey().toString(), Double.parseDouble(entry.getValue().toString()));
-            }
-            /**
-             * 生成一个饼图的图表
-             * 分别是:显示图表的标题、需要提供对应图表的DateSet对象、是否显示图例、是否生成贴士以及是否生成URL链接
-             */
-            JFreeChart chart = ChartFactory.createPieChart(title, pds, true, true, true);
-            setPieRender(chart.getPlot());
-
-            //将内存中的图片写到本地硬盘
-            ChartUtils.saveChartAsPNG(new File(url), chart, 800, 500);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     /**
