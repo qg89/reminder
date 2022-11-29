@@ -61,18 +61,18 @@ public class JFreeChartUtil {
      * @throws Exception
      */
     public static Font getDefaultFont(int style, Float size) throws Exception {
-        String fontPath = "/font/ukai.ttc";
-        if (SystemUtils.isWindows()) {
-            fontPath = "/font/msyh.ttc";
-        }
-        //获取宋体文件
-        InputStream resourceAsStream = JFreeChartUtil.class.getResourceAsStream(fontPath);
-        //文件路径
-        if (resourceAsStream != null) {
-            Font font = Font.createFont(Font.TRUETYPE_FONT, resourceAsStream);
-            font.deriveFont(style, size);
-            return font;
-        }
+//        String fontPath = "/font/ukai.ttc";
+//        if (SystemUtils.isWindows()) {
+//            fontPath = "/font/msyh.ttc";
+//        }
+//        //获取宋体文件
+//        InputStream resourceAsStream = JFreeChartUtil.class.getResourceAsStream(fontPath);
+//        //文件路径
+//        if (resourceAsStream != null) {
+//            Font font = Font.createFont(Font.TRUETYPE_FONT, resourceAsStream);
+//            font.deriveFont(style, size);
+//            return font;
+//        }
         Font font = new Font(Font.DIALOG, style, size.intValue());
         return font;
     }
