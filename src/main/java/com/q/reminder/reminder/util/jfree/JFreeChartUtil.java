@@ -50,13 +50,7 @@ public class JFreeChartUtil {
      * @return
      */
     public static StandardChartTheme createChartTheme() throws Exception {
-        StandardChartTheme theme = new StandardChartTheme("unicode") {
-            @Override
-            public void apply(JFreeChart chart) {
-                chart.getRenderingHints().put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-                super.apply(chart);
-            }
-        };
+        StandardChartTheme theme = new StandardChartTheme("CN");
         // 标题
         theme.setExtraLargeFont(getDefaultFont(Font.BOLD, 30f));
         Font xFont = getDefaultFont(Font.BOLD, 20f);

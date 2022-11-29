@@ -6,7 +6,6 @@ import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.util.jfree.GenerateChartUtil;
 import com.q.reminder.reminder.util.jfree.GeneratePieChartUtil;
-import com.q.reminder.reminder.util.jfree.JFreeChartUtil;
 import com.q.reminder.reminder.vo.ExcelVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.taskadapter.redmineapi.bean.Issue;
@@ -134,12 +133,7 @@ public abstract class WeeklyProjectUtils {
         WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title);
         File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream out = new FileOutputStream(file);
-        try {
-            GenerateChartUtil.createStackedBarChart(out, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
-        } finally {
-            out.flush();
-            out.close();
-        }
+        GenerateChartUtil.createStackedBarChart(out, title, legendNameList, categories, dataList, "", "", 950, 500);
         return file;
     }
 
@@ -217,12 +211,7 @@ public abstract class WeeklyProjectUtils {
 
         File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream out = new FileOutputStream(file);
-        try {
-            GenerateChartUtil.createLineChart(out, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
-        } finally {
-            out.flush();
-            out.close();
-        }
+        GenerateChartUtil.createLineChart(out, title, legendNameList, categories, dataList, "", "", 950, 500);
         return file;
     }
 
@@ -329,7 +318,7 @@ public abstract class WeeklyProjectUtils {
 
         File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
-        GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, JFreeChartUtil.createChartTheme(), COLOR_ARRAY_LIST);
+        GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, COLOR_ARRAY_LIST);
 
         return file;
     }
@@ -400,7 +389,7 @@ public abstract class WeeklyProjectUtils {
         WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title);
         File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
-        GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, JFreeChartUtil.createChartTheme(), COLOR_ARRAY_LIST);
+        GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, COLOR_ARRAY_LIST);
 
         return file;
     }
@@ -485,12 +474,7 @@ public abstract class WeeklyProjectUtils {
         //数据列表
         File file = new File(createDir() + UUID.fastUUID() + ".jpeg");
         FileOutputStream out = new FileOutputStream(file);
-        try {
-            GenerateChartUtil.createStackedBarChart(out, title, BUG_LEVEL, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
-        } finally {
-            out.flush();
-            out.close();
-        }
+        GenerateChartUtil.createStackedBarChart(out, title, BUG_LEVEL, categories, dataList, "", "", 950, 500);
         return file;
     }
 
@@ -578,12 +562,7 @@ public abstract class WeeklyProjectUtils {
 
         File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream out = new FileOutputStream(file);
-        try {
-            GenerateChartUtil.createLineChart(out, title, legendNameList, categories, dataList, JFreeChartUtil.createChartTheme(), "", "", 950, 500);
-        } finally {
-            out.flush();
-            out.close();
-        }
+        GenerateChartUtil.createLineChart(out, title, legendNameList, categories, dataList, "", "", 950, 500);
         return file;
     }
 
