@@ -13,6 +13,6 @@ public interface WeeklyReportContents {
     String TRENDS = "趋势";
     String OPEN_BUG = "Open Bug情况";
     String BUG_LEVEL = "Bug等级分布";
-    String COPQ = "COPQ（Cost Of Poor Quality）";
+    String COPQ = "COPQ(Cost Of Poor Quality)";
 
 }

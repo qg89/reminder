@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.q.reminder.reminder.contents.WeeklyReportContents;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.impl.WeeklyServiceImpl;
@@ -84,7 +85,7 @@ public class WeeklyProjectReportController {
                 "All-Bug等级分布",
                 "Open-Bug等级分布",
                 "Open-Bug>15",
-                "COPQ（Cost Of Poor Quality）"
+                WeeklyReportContents.COPQ
         );
         return new ReturnT<>(list);
     }
