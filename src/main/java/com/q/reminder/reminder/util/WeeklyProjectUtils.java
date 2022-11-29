@@ -528,7 +528,9 @@ public abstract class WeeklyProjectUtils {
             String weekOfYear = yy + "W" + i;
             categories.add(weekOfYear);
         }
+        Map<String, List<ExcelVo.ExcelTimeVo>> map = new LinkedHashMap<>();
 
+        List<ExcelVo.ExcelTimeVo> copqList = new ArrayList<>();
         for (String weekOfYear : categories) {
             List<TimeEntry> timeEntries = weekNumMap.get(weekOfYear);
             if (CollectionUtils.isEmpty(timeEntries)) {
@@ -536,7 +538,8 @@ public abstract class WeeklyProjectUtils {
                 week.add(0.00D);
                 continue;
             }
-            Date weekNumToSunday = getWeekNumToSunday(Integer.parseInt(weekOfYear.split("W")[1]) - 2);
+            int thisWeek = Integer.parseInt(weekOfYear.split("W")[1]) - 2;
+            Date weekNumToSunday = getWeekNumToSunday(thisWeek);
             double allSum = timeEntryList.stream().filter(e -> e.getSpentOn().before(weekNumToSunday)).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
             double bugSum = timeEntryBugs.stream().filter(e -> e.getSpentOn().before(weekNumToSunday)).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
 
@@ -553,15 +556,28 @@ public abstract class WeeklyProjectUtils {
             if (allSum == 0) {
                 allSum = 1;
             }
-            all.add(BigDecimal.valueOf(bugSum / allSum * 100).setScale(2, RoundingMode.HALF_UP).doubleValue());
+            double allV = BigDecimal.valueOf(bugSum / allSum * 100).setScale(2, RoundingMode.HALF_UP).doubleValue();
+            all.add(allV);
             if (allWeekSum == 0) {
                 allWeekSum = 1;
             }
-            week.add(BigDecimal.valueOf(bugWeekSum / allWeekSum * 100).setScale(2, RoundingMode.HALF_UP).doubleValue());
+            double weekV = BigDecimal.valueOf(bugWeekSum / allWeekSum * 100).setScale(2, RoundingMode.HALF_UP).doubleValue();
+            week.add(weekV);
+
+            ExcelVo.ExcelTimeVo vAll = new ExcelVo.ExcelTimeVo();
+            vAll.setAll(allSum);
+            vAll.setBug(bugSum);
+            vAll.setAll81(allWeekSum);
+            vAll.setBug81(bugWeekSum);
+            vAll.setWeekNum(String.valueOf(thisWeek));
+            copqList.add(vAll);
         }
 
         dataList.add(all);
         dataList.add(week);
+
+        map.put("copq", copqList);
+        WraterExcelSendFeishuUtil.wraterExcelTimeSendFeishu(map, vo, title);
 
         File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream out = new FileOutputStream(file);

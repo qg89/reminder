@@ -21,4 +21,13 @@ public class ExcelVo implements Serializable {
     private String description;
     private String createTime;
     private String endTime;
+
+    @Data
+    public static class ExcelTimeVo {
+        private String weekNum;
+        private Double all;
+        private Double bug;
+        private Double all81;
+        private Double bug81;
+    }
 }
