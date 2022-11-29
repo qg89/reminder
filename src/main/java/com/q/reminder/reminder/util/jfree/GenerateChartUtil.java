@@ -157,6 +157,7 @@ public class GenerateChartUtil {
         // 标注位于上侧
         chart.getLegend().setPosition(RectangleEdge.TOP);
         TextTitle title = chart.getTitle();
+        title.setFont(JFreeChartUtil.getDefaultFont(Font.BOLD, 20f));
         title.setMargin(15, 0, 0, 0);
         chart.setTitle(title);
         CategoryAxis axis = new IntervalCategoryAxis(1);
@@ -216,6 +217,7 @@ public class GenerateChartUtil {
         chart.setTextAntiAlias(true);
         TextTitle title = chart.getTitle();
         title.setMargin(15, 0, 0, 0);
+        title.setFont(JFreeChartUtil.getDefaultFont(Font.BOLD, 20f));
         chart.setTitle(title);
         // 对折现进行渲染
         CategoryPlot plot = chart.getCategoryPlot();

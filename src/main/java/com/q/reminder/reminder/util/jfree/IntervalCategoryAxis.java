@@ -42,9 +42,10 @@ public class IntervalCategoryAxis extends CategoryAxis {
             int categoryIndex = 0;
             for (Object o : categories) {
                 Comparable<?> category = (Comparable<?>) o;
-                g2.setFont(getTickLabelFont(category));
+                Font tickLabelFont = getTickLabelFont(category);
+                g2.setFont(tickLabelFont);
                 TextBlock label = new TextBlock();
-                label.addLine(category.toString(), getTickLabelFont(category), getTickLabelPaint(category));
+                label.addLine(category.toString(), tickLabelFont, getTickLabelPaint(category));
                 if (edge == RectangleEdge.TOP || edge == RectangleEdge.BOTTOM) {
                     max = Math.max(max, calculateTextBlockHeight(label, position, g2));
                 } else if (edge == RectangleEdge.LEFT || edge == RectangleEdge.RIGHT) {

@@ -44,6 +44,7 @@ public class GeneratePieChartUtil {
         JFreeChart chart = ChartFactory.createPieChart(chartTitle, JFreeChartUtil.createDefaultPieDataset(legendNameList, dataList));
         TextTitle title = chart.getTitle();
         title.setMargin(15,0,0,0);
+        title.setFont(JFreeChartUtil.getDefaultFont(Font.BOLD, 20f));
         chart.setTitle(title);
         // 设置抗锯齿，防止字体显示不清楚
         chart.setTextAntiAlias(false);
