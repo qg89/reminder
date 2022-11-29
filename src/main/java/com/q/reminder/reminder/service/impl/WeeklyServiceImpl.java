@@ -1,6 +1,5 @@
 package com.q.reminder.reminder.service.impl;
 
-import cn.hutool.core.io.resource.ResourceUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.docx.v1.model.UpdateBlockRequest;
@@ -15,7 +14,6 @@ import com.q.reminder.reminder.vo.WeeklyVo;
 import com.taskadapter.redmineapi.bean.Issue;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -45,7 +43,7 @@ public class WeeklyServiceImpl implements WeeklyService {
 
     @Override
     public void resetReport(WeeklyVo vo) throws Exception {
-        URL url = this.getClass().getClassLoader().getResource("templates/file/logo.jpg");
+        URL url = this.getClass().getClassLoader().getResource("file/logo.jpg");
         File logoFile = new File(url.getFile());
         vo.setAppSecret(feishuProperties.getAppSecret());
         vo.setAppId(feishuProperties.getAppId());

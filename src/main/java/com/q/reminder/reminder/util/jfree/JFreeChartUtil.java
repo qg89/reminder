@@ -66,12 +66,12 @@ public class JFreeChartUtil {
         if (resourceAsStream != null) {
             Font font = Font.createFont(Font.TRUETYPE_FONT, resourceAsStream);
             font.deriveFont(style, size);
-            log.info("加载自定义字体~~~~~~~~~  {}， 当前系统字体环境 {}", font, System.getProperty("user.language"));
+            log.info("加载自定义字体~~~~~~~~~  {}", font);
             return font;
         }
+        Font font = new Font(Font.DIALOG, style, size.intValue());
+        log.info("加载默认字体~~~~~~~~~  {}", font);
 
-        Font font = new Font("宋体", style, size.intValue());
-        log.info("加载默认字体~~~~~~~~~  {}， 当前系统字体环境 {}", font, System.getProperty("user.language"));
         return font;
     }
 
