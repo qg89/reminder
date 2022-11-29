@@ -43,7 +43,7 @@ public class WeeklyServiceImpl implements WeeklyService {
 
     @Override
     public void resetReport(WeeklyVo vo) throws Exception {
-        URL url = this.getClass().getClassLoader().getResource("file/logo.jpg");
+        URL url = this.getClass().getResource("/file/logo.jpg");
         File logoFile = new File(url.getFile());
         vo.setAppSecret(feishuProperties.getAppSecret());
         vo.setAppId(feishuProperties.getAppId());

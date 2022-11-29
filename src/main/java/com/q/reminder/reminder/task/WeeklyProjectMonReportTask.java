@@ -77,7 +77,7 @@ public class WeeklyProjectMonReportTask {
     }
 
     private void writeReport(List<WeeklyProjectVo> list) throws Exception {
-        URL resource = this.getClass().getClassLoader().getResource("file/logo.jpg");
+        URL resource = this.getClass().getResource("/file/logo.jpg");
         File logoFile = new File(resource.getFile());
         for (WeeklyProjectVo report : list) {
             Date sunday = getWeekNumToSunday(report.getWeekNum() - 1);
@@ -331,7 +331,7 @@ public class WeeklyProjectMonReportTask {
 
     @Deprecated
     public WeeklyVo resetReport(WeeklyVo vo) throws Exception {
-        URL url = this.getClass().getClassLoader().getResource("file/logo.jpg");
+        URL url = this.getClass().getResource("/file/logo.jpg");
         File logoFile = new File(url.getFile());
         String redmineUrl = vo.getRedmineUrl();
         String accessKey = vo.getPmKey();
