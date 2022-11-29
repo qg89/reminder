@@ -86,7 +86,9 @@ public class JFreeChartUtil {
             log.info("加载字体~~~~~~~~~  {}",  defaultFont);
             return defaultFont.deriveFont(style, size);
         }
-        return new Font(Font.DIALOG, style, size.intValue()).deriveFont(style, size);
+        Font font = new Font("黑体", style, size.intValue()).deriveFont(style, size);
+        log.info("加载默认字体~~~~~~~~~  {}",  font);
+        return font;
     }
 
     /**
