@@ -73,7 +73,7 @@ public class JFreeChartUtil {
 //            font.deriveFont(style, size);
 //            return font;
 //        }
-        Font font = new Font(Font.DIALOG, style, size.intValue());
+        Font font = new Font(Font.SERIF, style, size.intValue());
         return font;
     }
 
@@ -123,7 +123,7 @@ public class JFreeChartUtil {
         piePlot.setLabelOutlinePaint(null);
         piePlot.setShadowPaint(null);
         // 显示标签数据
-        piePlot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0} {1} {2}"));
+        piePlot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0}\n {1}, {2}"));
     }
 
     /**
