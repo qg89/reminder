@@ -54,12 +54,12 @@ public class WeeklyProjectReportController {
         BeanUtil.copyProperties(projectVo, vo, copyOptions);
         try {
             weeklyService.resetReport(vo);
+            returnT.setContent(projectVo.getWeeklyReportUrl());
         } catch (Exception e) {
             returnT.setMsg(e.getMessage());
             returnT.setCode(500);
             return returnT;
         }
-        returnT.setContent(projectVo.getWeeklyReportUrl());
         return returnT;
     }
 
