@@ -94,7 +94,7 @@ dependencies {
 	implementation 'cn.afterturn:easypoi-base:4.4.0'
 	implementation 'com.guicedee.services:jfreechart:1.2.2.1'
 
-	implementation 'org.apache.poi:poi-ooxml:5.2.2'
+//	implementation 'org.apache.poi:poi-ooxml:5.2.2'
 
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
