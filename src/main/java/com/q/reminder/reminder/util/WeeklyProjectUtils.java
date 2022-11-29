@@ -72,7 +72,8 @@ public abstract class WeeklyProjectUtils {
         List<String> categories = new ArrayList<>();
         // 变量
         int thisWeekOfYear = DateUtil.thisWeekOfYear();
-        String title = "评审问题数量";
+//        String title = "评审问题数量";
+        String title = "\u8bc4\u5ba1\u95ee\u9898\u6570\u91cf";
         for (int i = 36; i < 52; i++) {
             String week = DateTime.now().toString("yy") + "W" + i;
             if (thisWeekOfYear <= i + 1) {
@@ -82,7 +83,7 @@ public abstract class WeeklyProjectUtils {
         }
 
         //图例名称列表
-        List<String> legendNameList = List.of("Closed数量", "Open数量");
+        List<String> legendNameList = List.of("Closed\u6570\u91cf", "Open\u6570\u91cf");
         //数据列表
         List<List<Object>> dataList = new ArrayList<>();
         List<Object> closeList = new ArrayList<>();
