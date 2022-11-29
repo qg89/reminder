@@ -61,7 +61,7 @@ public class JFreeChartUtil {
      */
     public static Font getDefaultFont(int style, Float size) throws Exception {
         //获取宋体文件
-        InputStream resourceAsStream = JFreeChartUtil.class.getResourceAsStream("/config/ukai.ttc");
+        InputStream resourceAsStream = JFreeChartUtil.class.getResourceAsStream("/font/ukai.ttc");
         //文件路径
         if (resourceAsStream != null) {
             Font font = Font.createFont(Font.TRUETYPE_FONT, resourceAsStream);
