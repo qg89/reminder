@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.util.jfree;
 
+import lombok.extern.log4j.Log4j2;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtils;
 import org.jfree.chart.JFreeChart;
@@ -39,6 +40,7 @@ import java.util.Set;
  * @Description :
  * @date :  2022.11.09 15:02
  */
+@Log4j2
 public class JFreeChartUtil {
     public static String NO_DATA_MSG = "数据加载失败";
 
@@ -75,14 +77,15 @@ public class JFreeChartUtil {
      */
     public static Font getDefaultFont(int style, Float size) throws Exception {
         //获取宋体文件
-//        URL url = JFreeChartUtil.class.getClassLoader().getResource("templates/font/ukai.ttc");
-//        //文件路径
-//        File defaultFontFile = new File(url.getFile());
-//        Path path = defaultFontFile.toPath();
-//        if (Files.isReadable(path) && Files.exists(path) && Files.isRegularFile(path)) {
-//            Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, defaultFontFile);
-//            return defaultFont.deriveFont(style, size);
-//        }
+        URL url = JFreeChartUtil.class.getClassLoader().getResource("templates/font/ukai.ttc");
+        //文件路径
+        File defaultFontFile = new File(url.getFile());
+        Path path = defaultFontFile.toPath();
+        if (Files.isReadable(path) && Files.exists(path) && Files.isRegularFile(path)) {
+            Font defaultFont = Font.createFont(Font.TRUETYPE_FONT, defaultFontFile);
+            log.info("加载字体~~~~~~~~~  {}",  defaultFont);
+            return defaultFont.deriveFont(style, size);
+        }
         return new Font(Font.DIALOG, style, size.intValue()).deriveFont(style, size);
     }
 
