@@ -73,7 +73,7 @@ public class JFreeChartUtil {
 //            font.deriveFont(style, size);
 //            return font;
 //        }
-        Font font = new Font("Arial", style, size.intValue());
+        Font font = new Font("微软雅黑", style, size.intValue());
         return font;
     }
 
