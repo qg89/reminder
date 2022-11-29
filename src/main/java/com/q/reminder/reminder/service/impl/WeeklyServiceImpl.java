@@ -8,6 +8,7 @@ import com.q.reminder.reminder.contents.WeeklyReportContents;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.service.WeeklyService;
 import com.q.reminder.reminder.task.WeeklyProjectMonReportTask;
+import com.q.reminder.reminder.util.ResourceUtils;
 import com.q.reminder.reminder.util.WeeklyProjectFeishuUtils;
 import com.q.reminder.reminder.util.WeeklyProjectRedmineUtils;
 import com.q.reminder.reminder.vo.WeeklyVo;
@@ -43,8 +44,7 @@ public class WeeklyServiceImpl implements WeeklyService {
 
     @Override
     public void resetReport(WeeklyVo vo) throws Exception {
-        URL url = this.getClass().getResource("/file/logo.jpg");
-        File logoFile = new File(url.getFile());
+        File logoFile = new File(ResourceUtils.path());
         vo.setAppSecret(feishuProperties.getAppSecret());
         vo.setAppId(feishuProperties.getAppId());
         Date startDay = vo.getStartDay();
