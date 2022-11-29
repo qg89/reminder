@@ -511,7 +511,7 @@ public abstract class WeeklyProjectUtils {
         }).toList();
         List<String> categories = new ArrayList<>();
         // 变量
-        String title = "COPQ（Cost Of Poor Quality）";
+        String title = "COPQ(Cost Of Poor Quality)";
         Map<String, List<TimeEntry>> weekNumMap = sortTimeList(timeEntryList);
 //        Map<String, List<TimeEntry>> weekNumBugsMap = sortTimeList(timeEntryBugs);
 
