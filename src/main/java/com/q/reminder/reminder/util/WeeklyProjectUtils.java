@@ -522,8 +522,9 @@ public abstract class WeeklyProjectUtils {
         List<List<Object>> dataList = new ArrayList<>();
         List<Object> all = new ArrayList<>();
         List<Object> week = new ArrayList<>();
+        String yy = DateTime.now().toString("yy");
         for (int i = beginWeekNum; i < weekNum; i++) {
-            String weekOfYear = DateTime.now().toString("yy") + "W" + i;
+            String weekOfYear = yy + "W" + i;
             categories.add(weekOfYear);
         }
 
