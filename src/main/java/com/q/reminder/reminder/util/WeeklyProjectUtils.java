@@ -71,11 +71,11 @@ public abstract class WeeklyProjectUtils {
         Map<String, List<Issue>> weekNumMap = sortIssueMapByCreateOn(issues);
         List<String> categories = new ArrayList<>();
         // 变量
+        int thisWeekOfYear = DateUtil.thisWeekOfYear();
         String title = "评审问题数量";
         for (int i = 36; i < 52; i++) {
             String week = DateTime.now().toString("yy") + "W" + i;
-            int weekOfYear = DateUtil.thisWeekOfYear();
-            if (weekOfYear <= i + 1) {
+            if (thisWeekOfYear <= i + 1) {
                 break;
             }
             categories.add(week);
@@ -164,10 +164,10 @@ public abstract class WeeklyProjectUtils {
         // 变量
         String title = "线上问题每周增加情况";
 
+        int thisWeekOfYear = DateUtil.thisWeekOfYear();
         for (int i = 21; i < 52; i++) {
             String week = DateTime.now().toString("yy") + "W" + i;
-            int weekOfYear = DateUtil.thisWeekOfYear();
-            if (weekOfYear <= i + 1) {
+            if (thisWeekOfYear <= i + 1) {
                 break;
             }
             categories.add(week);
