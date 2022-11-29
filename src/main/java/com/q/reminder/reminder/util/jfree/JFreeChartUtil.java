@@ -82,7 +82,7 @@ public class JFreeChartUtil {
             return defaultFont.deriveFont(style, size);
         }
         Font font = new Font("黑体", style, size.intValue()).deriveFont(style, size);
-        log.info("加载默认字体~~~~~~~~~  {}",  font);
+        log.info("加载默认字体~~~~~~~~~  {}， 当前系统字体环境 {}",  font, System.getProperty("user.language"));
         return font;
     }
 
