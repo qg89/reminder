@@ -36,10 +36,6 @@ public class UserMemgerInfo implements Serializable {
     @JSONField(name = "member_id_type")
     private String memberIdType;
     /**
-     * redmineID
-     */
-    private Integer assigneeId;
-    /**
      * 是否离职，0 在岗
      */
     private String resign;
