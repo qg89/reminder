@@ -1,6 +1,5 @@
 package com.q.reminder.reminder.service.impl;
 
-import cn.hutool.core.io.resource.ResourceUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.docx.v1.model.UpdateBlockRequest;
@@ -9,13 +8,13 @@ import com.q.reminder.reminder.contents.WeeklyReportContents;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.service.WeeklyService;
 import com.q.reminder.reminder.task.WeeklyProjectMonReportTask;
+import com.q.reminder.reminder.util.ResourceUtils;
 import com.q.reminder.reminder.util.WeeklyProjectFeishuUtils;
 import com.q.reminder.reminder.util.WeeklyProjectRedmineUtils;
 import com.q.reminder.reminder.vo.WeeklyVo;
 import com.taskadapter.redmineapi.bean.Issue;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -45,8 +44,7 @@ public class WeeklyServiceImpl implements WeeklyService {
 
     @Override
     public void resetReport(WeeklyVo vo) throws Exception {
-        URL url = this.getClass().getClassLoader().getResource("templates/file/logo.jpg");
-        File logoFile = new File(url.getFile());
+        File logoFile = new File(ResourceUtils.path());
         vo.setAppSecret(feishuProperties.getAppSecret());
         vo.setAppId(feishuProperties.getAppId());
         Date startDay = vo.getStartDay();
@@ -78,7 +76,7 @@ public class WeeklyServiceImpl implements WeeklyService {
                     weeklyProjectMonReportTask.tends(vo, jsonArray, requests, i);
                     break;
                 }
-                if (WeeklyReportContents.BUG_LEVEL.equals(heading3)) {
+                if (WeeklyReportContents.BUG_LEVEL.equals(heading3) && WeeklyReportContents.BUG_LEVEL.equals(title)) {
                     ProjectInfo projectInfo = new ProjectInfo();
                     projectInfo.setRedmineUrl(redmineUrl);
                     projectInfo.setPmKey(accessKey);

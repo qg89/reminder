@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.impl.WeeklyServiceImpl;
-import com.q.reminder.reminder.task.WeeklyProjectMonReportTask;
 import com.q.reminder.reminder.vo.WeeklyByProjectVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.q.reminder.reminder.vo.WeeklyVo;
@@ -18,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
+import static com.q.reminder.reminder.contents.WeeklyReportContents.*;
 
 /**
  * @author : saiko
@@ -30,8 +31,6 @@ import java.util.List;
 @RequestMapping("/weekly")
 public class WeeklyProjectReportController {
 
-    @Autowired
-    private WeeklyProjectMonReportTask weeklyProjectMonReportTask;
     @Autowired
     private ProjectInfoService projectInfoService;
     @Autowired
@@ -55,12 +54,12 @@ public class WeeklyProjectReportController {
         BeanUtil.copyProperties(projectVo, vo, copyOptions);
         try {
             weeklyService.resetReport(vo);
+            returnT.setContent(projectVo.getWeeklyReportUrl());
         } catch (Exception e) {
             returnT.setMsg(e.getMessage());
             returnT.setCode(500);
             return returnT;
         }
-        returnT.setContent(projectVo.getWeeklyReportUrl());
         return returnT;
     }
 
@@ -72,19 +71,19 @@ public class WeeklyProjectReportController {
 
     @GetMapping("/listReport")
     public ReturnT<List<WeeklyByProjectVo>> listReport(WeeklyByProjectVo vo) {
-       return new ReturnT<>(projectInfoService.weeklyByProjectList(vo.getPKey(), vo.getFileName()));
+        return new ReturnT<>(projectInfoService.weeklyByProjectList(vo.getPKey(), vo.getFileName()));
     }
 
     @GetMapping("/listDocx")
     public ReturnT<List<String>> list() {
         List<String> list = List.of(
-                "评审问题数量",
-                "趋势",
+                REVIEW_QUESTIONS,
+                TRENDS,
                 "Open Bug情况（未实现）",
                 "All-Bug等级分布",
                 "Open-Bug等级分布",
                 "Open-Bug>15",
-                "COPQ（Cost Of Poor Quality）"
+                COPQ
         );
         return new ReturnT<>(list);
     }

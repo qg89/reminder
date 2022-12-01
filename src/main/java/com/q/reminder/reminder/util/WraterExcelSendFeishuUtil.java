@@ -68,4 +68,46 @@ public class WraterExcelSendFeishuUtil {
         FeishuJavaUtils.sendContent(contentVo);
         file.delete();
     }
+
+    public static void wraterExcelTimeSendFeishu(Map<String, List<ExcelVo.ExcelTimeVo>> map, WeeklyProjectVo weeklyVo, String name) throws Exception {
+        String appId = weeklyVo.getAppId();
+        String appSecret = weeklyVo.getAppSecret();
+        String path = WeeklyProjectUtils.createDir() + weeklyVo.getFileName() + "-" + name + ".xls";
+        File file = new File(path);
+        ExcelWriter writer = ExcelUtil.getWriter();
+        writer.renameSheet(0, map.keySet().stream().findFirst().get());
+        map.forEach((k, excelVoList) -> {
+            writer.setSheet(k);
+            writer.writeCellValue(0, 0, "周数");
+            writer.writeCellValue(1, 0, "总工时");
+            writer.writeCellValue(2, 0, "BUG工时");
+            writer.writeCellValue(3, 0, "8月1日总工时");
+            writer.writeCellValue(4, 0, "8月1日BUG工时");
+            writer.passRows(1);
+            writer.setFreezePane(1);
+            writer.write(excelVoList, false);
+        });
+        writer.setDestFile(file);
+        writer.close();
+
+        FeishuUploadImageVo vo = new FeishuUploadImageVo();
+        CopyOptions copyOptions = CopyOptions.create()
+                .setIgnoreNullValue(true)
+                .setIgnoreCase(true);
+        BeanUtil.copyProperties(weeklyVo, vo, copyOptions);
+        ContentVo contentVo = new ContentVo();
+        contentVo.setFileType("xls");
+        contentVo.setReceiveId(vo.getPmOu());
+        contentVo.setAppSecret(appSecret);
+        contentVo.setAppId(appId);
+        contentVo.setFile(file);
+        contentVo.setReceiveId(weeklyVo.getPmOu());
+        String fileKey = FeishuJavaUtils.imUploadFile(contentVo);
+        JSONObject json = new JSONObject();
+        json.put("file_key", fileKey);
+        contentVo.setContent(json.toJSONString());
+        contentVo.setMsgType("file");
+        FeishuJavaUtils.sendContent(contentVo);
+        file.delete();
+    }
 }

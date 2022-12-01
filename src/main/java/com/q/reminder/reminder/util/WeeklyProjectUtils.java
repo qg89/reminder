@@ -2,6 +2,7 @@ package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.UUID;
+import com.q.reminder.reminder.contents.WeeklyReportContents;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.util.jfree.GenerateChartUtil;
@@ -70,18 +71,19 @@ public abstract class WeeklyProjectUtils {
         Map<String, List<Issue>> weekNumMap = sortIssueMapByCreateOn(issues);
         List<String> categories = new ArrayList<>();
         // 变量
-        String title = "评审问题数量";
+        int thisWeekOfYear = DateUtil.thisWeekOfYear();
+//        String title = "评审问题数量";
+        String title = "\u8bc4\u5ba1\u95ee\u9898\u6570\u91cf";
         for (int i = 36; i < 52; i++) {
             String week = DateTime.now().toString("yy") + "W" + i;
-            int weekOfYear = DateUtil.thisWeekOfYear();
-            if (weekOfYear <= i + 1) {
+            if (thisWeekOfYear <= i + 1) {
                 break;
             }
             categories.add(week);
         }
 
         //图例名称列表
-        List<String> legendNameList = List.of("Closed数量", "Open数量");
+        List<String> legendNameList = List.of("Closed\u6570\u91cf", "Open\u6570\u91cf");
         //数据列表
         List<List<Object>> dataList = new ArrayList<>();
         List<Object> closeList = new ArrayList<>();
@@ -163,10 +165,10 @@ public abstract class WeeklyProjectUtils {
         // 变量
         String title = "线上问题每周增加情况";
 
+        int thisWeekOfYear = DateUtil.thisWeekOfYear();
         for (int i = 21; i < 52; i++) {
             String week = DateTime.now().toString("yy") + "W" + i;
-            int weekOfYear = DateUtil.thisWeekOfYear();
-            if (weekOfYear <= i + 1) {
+            if (thisWeekOfYear <= i + 1) {
                 break;
             }
             categories.add(week);
@@ -511,7 +513,7 @@ public abstract class WeeklyProjectUtils {
         }).toList();
         List<String> categories = new ArrayList<>();
         // 变量
-        String title = "COPQ（Cost Of Poor Quality）";
+        String title = WeeklyReportContents.COPQ;
         Map<String, List<TimeEntry>> weekNumMap = sortTimeList(timeEntryList);
 //        Map<String, List<TimeEntry>> weekNumBugsMap = sortTimeList(timeEntryBugs);
 
@@ -521,11 +523,14 @@ public abstract class WeeklyProjectUtils {
         List<List<Object>> dataList = new ArrayList<>();
         List<Object> all = new ArrayList<>();
         List<Object> week = new ArrayList<>();
+        String yy = DateTime.now().toString("yy");
         for (int i = beginWeekNum; i < weekNum; i++) {
-            String weekOfYear = DateTime.now().toString("yy") + "W" + i;
+            String weekOfYear = yy + "W" + i;
             categories.add(weekOfYear);
         }
+        Map<String, List<ExcelVo.ExcelTimeVo>> map = new LinkedHashMap<>();
 
+        List<ExcelVo.ExcelTimeVo> copqList = new ArrayList<>();
         for (String weekOfYear : categories) {
             List<TimeEntry> timeEntries = weekNumMap.get(weekOfYear);
             if (CollectionUtils.isEmpty(timeEntries)) {
@@ -533,7 +538,8 @@ public abstract class WeeklyProjectUtils {
                 week.add(0.00D);
                 continue;
             }
-            Date weekNumToSunday = getWeekNumToSunday(Integer.parseInt(weekOfYear.split("W")[1]) - 2);
+            int thisWeek = Integer.parseInt(weekOfYear.split("W")[1]);
+            Date weekNumToSunday = getWeekNumToSunday(thisWeek);
             double allSum = timeEntryList.stream().filter(e -> e.getSpentOn().before(weekNumToSunday)).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
             double bugSum = timeEntryBugs.stream().filter(e -> e.getSpentOn().before(weekNumToSunday)).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
 
@@ -550,15 +556,28 @@ public abstract class WeeklyProjectUtils {
             if (allSum == 0) {
                 allSum = 1;
             }
-            all.add(BigDecimal.valueOf(bugSum / allSum * 100).setScale(2, RoundingMode.HALF_UP).doubleValue());
+            double allV = BigDecimal.valueOf(bugSum / allSum * 100).setScale(2, RoundingMode.HALF_UP).doubleValue();
+            all.add(allV);
             if (allWeekSum == 0) {
                 allWeekSum = 1;
             }
-            week.add(BigDecimal.valueOf(bugWeekSum / allWeekSum * 100).setScale(2, RoundingMode.HALF_UP).doubleValue());
+            double weekV = BigDecimal.valueOf(bugWeekSum / allWeekSum * 100).setScale(2, RoundingMode.HALF_UP).doubleValue();
+            week.add(weekV);
+
+            ExcelVo.ExcelTimeVo vAll = new ExcelVo.ExcelTimeVo();
+            vAll.setAll(allSum);
+            vAll.setBug(bugSum);
+            vAll.setAll81(allWeekSum);
+            vAll.setBug81(bugWeekSum);
+            vAll.setWeekNum(String.valueOf(thisWeek));
+            copqList.add(vAll);
         }
 
         dataList.add(all);
         dataList.add(week);
+
+        map.put("copq", copqList);
+        WraterExcelSendFeishuUtil.wraterExcelTimeSendFeishu(map, vo, title);
 
         File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream out = new FileOutputStream(file);

@@ -22,8 +22,6 @@ import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -79,8 +77,7 @@ public class WeeklyProjectMonReportTask {
     }
 
     private void writeReport(List<WeeklyProjectVo> list) throws Exception {
-        URL resource = this.getClass().getClassLoader().getResource("templates/file/logo.jpg");
-        File logoFile = new File(resource.getFile());
+        File logoFile = new File(ResourceUtils.path());
         for (WeeklyProjectVo report : list) {
             Date sunday = getWeekNumToSunday(report.getWeekNum() - 1);
             String redmineUrl = report.getRedmineUrl();
@@ -333,8 +330,7 @@ public class WeeklyProjectMonReportTask {
 
     @Deprecated
     public WeeklyVo resetReport(WeeklyVo vo) throws Exception {
-        URL url = this.getClass().getClassLoader().getResource("templates/file/logo.jpg");
-        File logoFile = new File(url.getFile());
+        File logoFile = new File(ResourceUtils.path());
         String redmineUrl = vo.getRedmineUrl();
         String accessKey = vo.getPmKey();
         String pKey = vo.getPKey();

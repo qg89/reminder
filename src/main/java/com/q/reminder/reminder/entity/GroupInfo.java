@@ -29,6 +29,10 @@ public class GroupInfo implements Serializable {
 
     @TableField("reminder_none")
     private String reminderNone;
+
+    @TableField("reminder_title")
+    private String reminderTitle;
+
     @TableField(value = "send_type")
     private String sendType;
     @TableLogic(value = "0", delval = "1")

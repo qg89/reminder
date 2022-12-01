@@ -122,40 +122,21 @@ public abstract class RedmineApi {
     /**
      * 通过coverity扫描的问题，保存到redmine任务
      *
-     * @param vo           redmine保存的信息
-     * @param apiAccessKey redmine授权密钥
-     * @param redmineUrl   redmine URL
+     * @param vo redmine保存的信息
      */
-    public static void saveTask(CoverityAndRedmineSaveTaskVo vo, String apiAccessKey, String redmineUrl) {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, apiAccessKey);
+    public static Issue saveTask(CoverityAndRedmineSaveTaskVo vo) throws RedmineException {
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(vo.getRedmineUrl(), vo.getApiAccessKey());
         Transport transport = mgr.getTransport();
-        List<RequestParam> params = List.of(new RequestParam("f[]", "subject"),
-                new RequestParam("op[subject]", "~"),
-                new RequestParam("v[subject][]", "CID:[" + vo.getCid() + "]"));
-        List<Issue> issueList = null;
-        try {
-            issueList = transport.getObjectsList(Issue.class, params);
-        } catch (RedmineException e) {
-            log.error("Redmine-[保存评审问题任务]异常 ", e);
-            return;
-        }
-        if (issueList == null) {
-            log.info("Redmine-[保存评审问题任务] 失败,未查询相关任务");
-            return;
-        }
-        if (!issueList.isEmpty()) {
-            return;
-        }
-
         Tracker tracker = new Tracker();
         // 评审问题
         tracker.setId(38);
         tracker.setName("评审问题");
+        DateTime now = DateTime.now();
         Issue issue = new Issue()
                 .setTracker(tracker)
                 .setAssigneeId(vo.getAssigneeId())
-                .setCreatedOn(new Date())
-                .setDueDate(DateTime.now().plusDays(5).toDate())
+                .setCreatedOn(now.toDate())
+                .setDueDate(now.plusDays(6).toDate())
                 .setSubject(vo.getSubject())
                 // 状态 NEW
                 .setStatusId(1)
@@ -163,11 +144,7 @@ public abstract class RedmineApi {
                 .setDescription(vo.getDescription())
                 .setParentId(vo.getParentId());
         issue.setTransport(transport);
-        try {
-            issue.create();
-        } catch (RedmineException e) {
-            log.error("Redmine-创建评审问题任务异常", e);
-        }
+        return issue.create();
     }
 
     /**
@@ -304,6 +281,7 @@ public abstract class RedmineApi {
 
     /**
      * 检查是否有redmine任务
+     *
      * @param mgr
      * @param redmineSubject
      * @return
@@ -327,7 +305,6 @@ public abstract class RedmineApi {
     }
 
     /**
-     *
      * @param issueParent
      * @param assigneeId
      * @param tracker

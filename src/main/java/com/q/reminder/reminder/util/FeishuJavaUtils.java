@@ -14,10 +14,7 @@ import com.lark.oapi.service.sheets.v3.model.QuerySpreadsheetSheetReq;
 import com.lark.oapi.service.sheets.v3.model.QuerySpreadsheetSheetResp;
 import com.lark.oapi.service.sheets.v3.model.Sheet;
 import com.lark.oapi.service.wiki.v2.model.*;
-import com.q.reminder.reminder.vo.ContentVo;
-import com.q.reminder.reminder.vo.FeishuUploadImageVo;
-import com.q.reminder.reminder.vo.SheetVo;
-import com.q.reminder.reminder.vo.WeeklyProjectVo;
+import com.q.reminder.reminder.vo.*;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.File;
@@ -138,6 +135,22 @@ public abstract class FeishuJavaUtils {
                         .uuid(UUID.randomUUID().toString())
                         .build()).receiveIdType(CreateMessageReceiveIdTypeEnum.OPEN_ID).build();
         CreateMessageResp resp = client.im().message().create(req);
+        if (resp.getCode() == 0) {
+            return Boolean.TRUE;
+        }
+        log.error("发送飞书消息失败，msg：{} ;\r\n\terror：{}", resp.getMsg(), resp.getError());
+        return Boolean.FALSE;
+    }
+
+    public static Boolean sendContent(MessageVo vo) throws Exception {
+        CreateMessageReq req = CreateMessageReq.newBuilder()
+                .createMessageReqBody(CreateMessageReqBody.newBuilder()
+                        .msgType(vo.getMsgType())
+                        .receiveId(vo.getReceiveId())
+                        .content(vo.getContent())
+                        .uuid(UUID.randomUUID().toString())
+                        .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
+        CreateMessageResp resp = vo.getClient().im().message().create(req);
         if (resp.getCode() == 0) {
             return Boolean.TRUE;
         }

@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.util.jfree;
 
+import com.q.reminder.reminder.util.SystemUtils;
 import lombok.extern.log4j.Log4j2;
 import org.jfree.chart.StandardChartTheme;
 import org.jfree.chart.axis.ValueAxis;
@@ -60,18 +61,19 @@ public class JFreeChartUtil {
      * @throws Exception
      */
     public static Font getDefaultFont(int style, Float size) throws Exception {
-        //获取宋体文件
-        InputStream resourceAsStream = JFreeChartUtil.class.getResourceAsStream("/config/ukai.ttc");
-        //文件路径
-        if (resourceAsStream != null) {
-            Font font = Font.createFont(Font.TRUETYPE_FONT, resourceAsStream);
-            font.deriveFont(style, size);
-            log.info("加载自定义字体~~~~~~~~~  {}， 当前系统字体环境 {}", font, System.getProperty("user.language"));
-            return font;
-        }
-
-        Font font = new Font("宋体", style, size.intValue());
-        log.info("加载默认字体~~~~~~~~~  {}， 当前系统字体环境 {}", font, System.getProperty("user.language"));
+//        String fontPath = "/font/ukai.ttc";
+//        if (SystemUtils.isWindows()) {
+//            fontPath = "/font/msyh.ttc";
+//        }
+//        //获取宋体文件
+//        InputStream resourceAsStream = JFreeChartUtil.class.getResourceAsStream(fontPath);
+//        //文件路径
+//        if (resourceAsStream != null) {
+//            Font font = Font.createFont(Font.TRUETYPE_FONT, resourceAsStream);
+//            font.deriveFont(style, size);
+//            return font;
+//        }
+        Font font = new Font("微软雅黑", style, size.intValue());
         return font;
     }
 
@@ -121,7 +123,7 @@ public class JFreeChartUtil {
         piePlot.setLabelOutlinePaint(null);
         piePlot.setShadowPaint(null);
         // 显示标签数据
-        piePlot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0} {1} {2}"));
+        piePlot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0}\n {1}, {2}"));
     }
 
     /**

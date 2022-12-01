@@ -32,28 +32,22 @@ public abstract class CoverityApi {
      *
      * @param vo coverity 所用项目、视图
      */
-    public static List<CoverityAndRedmineSaveTaskVo> readCoverity(CoverityAndRedmineSaveTaskVo vo) {
+    public static CoverityAndRedmineSaveTaskVo readCoverity(CoverityAndRedmineSaveTaskVo vo) {
         OkHttpClient client = login();
         List<CoverityVo> coverityVoList = queryList(client, vo);
         if (coverityVoList.isEmpty()) {
             log.info("【Coverity】-项目名称:{} , 暂无问题！", vo.getRedmineProjectName());
-            return new ArrayList<>(0);
+            return vo;
         }
-        List<CoverityAndRedmineSaveTaskVo> resultList = new ArrayList<>();
+        StringBuilder content = new StringBuilder();
         coverityVoList.forEach(e -> {
             String displayType = e.getDisplayType();
             Integer cId = e.getCid();
-            String content = "类型:" + displayType + "," + "CID:" + cId + "\r\n" +
-                    "类别:" + e.getDisplayCategory() + "\r\n" +
-                    "文件路径:" + e.getDisplayFile() + "\r\n" +
-                    "行数:" + e.getLineNumber();
-            String subject = "CID:[" + cId + "]-" + displayType;
-            vo.setSubject(subject);
-            vo.setDescription(content);
-            vo.setCid(cId);
-            resultList.add(vo);
+            content.append("类型:").append(displayType).append(",").append("CID:").append(cId).append("\r\n").append("类别:").append(e.getDisplayCategory()).append("\r\n").append("文件路径:").append(e.getDisplayFile()).append("\r\n").append("行数:").append(e.getLineNumber()).append("\r\n\t");
         });
-        return resultList;
+        vo.setCoverityNo(coverityVoList.size());
+        vo.setDescription(content.toString());
+        return vo;
     }
 
 
