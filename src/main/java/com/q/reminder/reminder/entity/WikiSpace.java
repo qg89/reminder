@@ -17,7 +17,7 @@ import java.io.Serializable;
  * @Description :
  * @date :  2022.11.18 15:20
  */
-@TableName("f_wiki_space")
+@TableName("fs_wiki_space")
 @Data
 public class WikiSpace implements Serializable {
 
