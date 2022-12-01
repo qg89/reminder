@@ -538,7 +538,7 @@ public abstract class WeeklyProjectUtils {
                 week.add(0.00D);
                 continue;
             }
-            int thisWeek = Integer.parseInt(weekOfYear.split("W")[1]) - 2;
+            int thisWeek = Integer.parseInt(weekOfYear.split("W")[1]);
             Date weekNumToSunday = getWeekNumToSunday(thisWeek);
             double allSum = timeEntryList.stream().filter(e -> e.getSpentOn().before(weekNumToSunday)).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
             double bugSum = timeEntryBugs.stream().filter(e -> e.getSpentOn().before(weekNumToSunday)).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
