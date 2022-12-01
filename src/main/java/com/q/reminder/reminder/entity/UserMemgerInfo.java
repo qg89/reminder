@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -19,6 +20,7 @@ import java.io.Serializable;
 @TableName("fs_user_member_info")
 @Data
 public class UserMemgerInfo implements Serializable {
+    @Serial
     private static final long serialVersionUID = 7510561412354805175L;
 
     /**
