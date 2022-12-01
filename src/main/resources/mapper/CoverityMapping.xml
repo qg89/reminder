@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.q.reminder.reminder.mapper.CoverityMapping">
+    <select id="queryByProject" resultType="com.q.reminder.reminder.vo.CoverityAndRedmineSaveTaskVo">
+        SELECT
+            c.c_project_id AS coverityProjectId,
+            c.c_view_id AS viewId,
+            c.r_project_id AS redmineProjectId,
+            c.r_parent_id AS parentId,
+            c.r_assignee_id AS assigneeId,
+            f.member_id AS receiveId,
+            p.redmine_url AS redmineUrl,
+            p.pm_key AS apiAccessKey,
+            p.project_short_name AS redmineProjectName
+        FROM
+            r_coverity c,
+            r_project_info p,
+            fs_user_member_info f
+        WHERE
+            c.r_project_id = p.p_id
+          AND c.r_assignee_id = f.assignee_id
+          AND c.create_task = '0'
+          AND c.is_delete = '0'
+          AND p.is_delete = '0'
+        <if test="pKey != null and pKey != ''">
+            AND p.p_key = #{pKey}
+        </if>
+    </select>
+</mapper>

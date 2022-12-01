@@ -1,4 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.q.reminder.reminder.mapper.GroupInfoMapping">
+    <select id="listByProject" resultType="com.q.reminder.reminder.vo.ChatProjectVo">
+        SELECT
+            p.p_id pId,
+            f.chat_id chatId,
+            f.reminder_none reminderNone,
+            f.reminder_title reminderTitle,
+            fm.member_id memberId,
+            fm.`name` name
+        FROM
+            `r_project_info` p,
+            group_project gp,
+            fs_group_info f,
+            fs_user_member_info fm,
+            r_coverity c
+        WHERE
+            p.p_id = gp.p_id
+            AND gp.chat_id = f.chat_id
+            AND p.p_id = c.r_project_id
+            AND c.r_assignee_id = fm.assignee_id
+            AND p.is_delete = '0'
+            AND f.is_delete = '0'
+            AND f.send_type = '3'
+        <if test="pKey != null and pKey != ''">
+            AND p.p_key = #{pKey}
+        </if>
+    </select>
 </mapper>

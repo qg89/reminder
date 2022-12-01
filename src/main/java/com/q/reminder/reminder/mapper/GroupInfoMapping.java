@@ -2,7 +2,11 @@ package com.q.reminder.reminder.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.q.reminder.reminder.entity.GroupInfo;
+import com.q.reminder.reminder.vo.ChatProjectVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @author : saiko
@@ -13,4 +17,5 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface GroupInfoMapping extends BaseMapper<GroupInfo> {
+    List<ChatProjectVo> listByProject(@Param("pKey") String pKey);
 }
