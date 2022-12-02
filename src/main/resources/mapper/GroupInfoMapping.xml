@@ -13,13 +13,10 @@
             `r_project_info` p,
             group_project gp,
             fs_group_info f,
-            fs_user_member_info fm,
-            r_coverity c
+            fs_user_member_info fm
         WHERE
             p.p_id = gp.p_id
             AND gp.chat_id = f.chat_id
-            AND p.p_id = c.r_project_id
-            AND c.r_assignee_id = fm.assignee_id
             AND p.is_delete = '0'
             AND f.is_delete = '0'
             AND f.send_type = '3'
