@@ -122,8 +122,12 @@ public class CvoerityTask {
             JSONObject text = new JSONObject();
             text.put("tag", "text");
             text.put("text", "\r\n未处理数量:【" + logList.size() + "】 \r\nCID：" + StringUtils.joinWith(",", logList.stream().map(CoverityLog::getCId).collect(Collectors.toSet())) + "\r\n请检查coverity对应问题进行修复");
+            JSONObject line = new JSONObject();
+            line.put("tag", "text");
+            line.put("text", "\r\n———————————————————————————————————————————————————");
             subContentJsonArray.add(text);
             subContentJsonArray.add(expired);
+            subContentJsonArray.add(line);
 
             MessageVo messageVo = new MessageVo();
             messageVo.setContent(con.toJSONString());
