@@ -24,5 +24,6 @@ public class ChatProjectVo implements Serializable {
     private String reminderTitle;
     private String pKey;
     private String memberId;
+    private String assigneeId;
     private String name;
 }

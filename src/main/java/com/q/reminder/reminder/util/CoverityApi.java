@@ -1,11 +1,15 @@
 package com.q.reminder.reminder.util;
 
+import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONObject;
-import com.q.reminder.reminder.vo.CoverityVo;
+import com.q.reminder.reminder.entity.CoverityLog;
 import com.q.reminder.reminder.vo.CoverityAndRedmineSaveTaskVo;
 import lombok.extern.log4j.Log4j2;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.io.IOException;
 import java.util.*;
@@ -34,18 +38,22 @@ public abstract class CoverityApi {
      */
     public static CoverityAndRedmineSaveTaskVo readCoverity(CoverityAndRedmineSaveTaskVo vo) {
         OkHttpClient client = login();
-        List<CoverityVo> coverityVoList = queryList(client, vo);
-        if (coverityVoList.isEmpty()) {
+        List<CoverityLog> coverityLogList = queryList(client, vo);
+        if (coverityLogList.isEmpty()) {
             log.info("【Coverity】-项目名称:{} , 暂无问题！", vo.getRedmineProjectName());
             return vo;
         }
         StringBuilder content = new StringBuilder();
-        coverityVoList.forEach(e -> {
+        coverityLogList.forEach(e -> {
+            e.setWeekNum(DateUtil.weekOfYear(e.getFirstDate()));
+            e.setAssigneeId(String.valueOf(vo.getAssigneeId()));
+            e.setFirstDate(DateTime.parse(e.getFirstDetected(), DateTimeFormat.forPattern("yyyy 年 MM 月 dd 日")).toDate());
             String displayType = e.getDisplayType();
-            Integer cId = e.getCid();
+            Integer cId = e.getCId();
             content.append("类型:").append(displayType).append(",").append("CID:").append(cId).append("\r\n").append("类别:").append(e.getDisplayCategory()).append("\r\n").append("文件路径:").append(e.getDisplayFile()).append("\r\n").append("行数:").append(e.getLineNumber()).append("\r\n\t");
         });
-        vo.setCoverityNo(coverityVoList.size());
+        vo.setCoverityLogs(coverityLogList);
+        vo.setCoverityNo(coverityLogList.size());
         vo.setDescription(content.toString());
         return vo;
     }
@@ -95,7 +103,7 @@ public abstract class CoverityApi {
         return client;
     }
 
-    static List<CoverityVo> queryList(OkHttpClient client, CoverityAndRedmineSaveTaskVo vo) {
+    static List<CoverityLog> queryList(OkHttpClient client, CoverityAndRedmineSaveTaskVo vo) {
         String cookie = "COVJSESSIONID8080PI=" + COOKIE_STORE.get(DOMAIN).get(0).value();
         Request get = new Request.Builder()
                 .url(String.format(URL, vo.getCoverityProjectId(), vo.getViewId()))
@@ -106,14 +114,22 @@ public abstract class CoverityApi {
         String result = "";
         try (Response response = client.newCall(get).execute();){
             result = Objects.requireNonNull(response.body()).string();
+            response.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
         JSONObject resultJson = JSONObject.parseObject(result).getJSONObject("resultSet");
-        List<CoverityVo> resultList = resultJson.getJSONArray("results").toJavaList(CoverityVo.class, IgnoreNoneSerializable);
+        List<CoverityLog> resultList = resultJson.getJSONArray("results").toJavaList(CoverityLog.class, IgnoreNoneSerializable);
         if (resultList != null) {
             return resultList;
         }
         return new ArrayList<>();
+    }
+
+    public static void main(String[] args) {
+        CoverityAndRedmineSaveTaskVo vo = new CoverityAndRedmineSaveTaskVo();
+        vo.setCoverityProjectId(10072);
+        vo.setViewId(10738);
+        readCoverity(vo);
     }
 }

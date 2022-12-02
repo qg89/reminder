@@ -6,6 +6,8 @@ import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.Client;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.contents.MsgTypeContents;
+import com.q.reminder.reminder.entity.CoverityLog;
+import com.q.reminder.reminder.service.CoverityLogService;
 import com.q.reminder.reminder.service.CoverityService;
 import com.q.reminder.reminder.service.GroupInfoService;
 import com.q.reminder.reminder.util.CoverityApi;
@@ -19,13 +21,13 @@ import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -45,6 +47,8 @@ public class CvoerityTask {
     private GroupInfoService groupInfoService;
     @Autowired
     private Client client;
+    @Autowired
+    private CoverityLogService coverityLogService;
 
     @XxlJob("coverity")
     public ReturnT<String> coverity() {
@@ -57,13 +61,15 @@ public class CvoerityTask {
 
         Map<String, JSONArray> arrayMap = new LinkedHashMap<>();
 
+        List<CoverityLog> coverityLogList = new ArrayList<>();
         list.forEach(vo -> {
             String assigneeId = vo.getAssigneeId().toString();
             Issue issue = null;
             CoverityAndRedmineSaveTaskVo coverityAndRedmineSaveTaskVo = CoverityApi.readCoverity(vo);
+            coverityLogList.addAll(coverityAndRedmineSaveTaskVo.getCoverityLogs());
             try {
                 coverityAndRedmineSaveTaskVo.setSubject(vo.getRedmineProjectName() + "-中、高问题报告-" + weekOfYear + "\r\n");
-                issue = RedmineApi.saveTask(coverityAndRedmineSaveTaskVo);
+//                issue = RedmineApi.saveTask(coverityAndRedmineSaveTaskVo);
             } catch (Exception e) {
                 returnT.setCode(500);
                 returnT.setContent(e.getMessage());
@@ -83,9 +89,44 @@ public class CvoerityTask {
                 arrayMap.put(assigneeId, subContentJsonArray);
             }
         });
+        sendGroups(subContentJsonArray, projectVoMap);
+        expiredTask(projectVoMap, coverityLogList);
+        coverityLogService.saveBatch(coverityLogList);
+        return returnT;
+    }
+
+    private void expiredTask(Map<String, ChatProjectVo> projectVoMap, List<CoverityLog> coverityLogList) {
+        Map<String, List<CoverityLog>> coverityLogs = coverityLogList.stream().filter(e -> DateUtil.betweenDay(e.getFirstDate(), new Date(), true) > 4).
+                collect(Collectors.groupingBy(CoverityLog::getAssigneeId));
+        boolean over = CollectionUtils.isEmpty(coverityLogs);
+        if (over) {
+            return;
+        }
         projectVoMap.forEach((chatId, projectInfo) -> {
+            List<CoverityLog> logList = coverityLogs.get(projectInfo.getAssigneeId());
+            JSONObject con = new JSONObject();
+            JSONObject all = new JSONObject();
+            JSONArray contentJsonArray = new JSONArray();
+            JSONArray subContentJsonArray = new JSONArray();
+            con.put("zh_cn", all);
+            all.put("title", "【警告！！！据上周检查结果至今未修复，通报 (" + DateUtil.today() + ")】");
+            all.put("content", contentJsonArray);
+            createSubContentJson(projectInfo, subContentJsonArray);
+            contentJsonArray.add(subContentJsonArray);
+
+            JSONObject expired = new JSONObject();
+            expired.put("tag", "at");
+            expired.put("user_id", projectInfo.getMemberId());
+            expired.put("user_name", projectInfo.getName());
+
+            JSONObject text = new JSONObject();
+            text.put("tag", "text");
+            text.put("text", "\r\n未处理数量:【" + logList.size() + "】 \r\nCID：" + StringUtils.joinWith(",", logList.stream().map(CoverityLog::getCId).collect(Collectors.toSet())) + "\r\n请检查coverity对应问题进行修复");
+            subContentJsonArray.add(text);
+            subContentJsonArray.add(expired);
+
             MessageVo messageVo = new MessageVo();
-            messageVo.setContent(send(projectInfo, subContentJsonArray));
+            messageVo.setContent(con.toJSONString());
             messageVo.setReceiveId(chatId);
             messageVo.setMsgType(MsgTypeContents.POST);
             messageVo.setClient(client);
@@ -96,17 +137,34 @@ public class CvoerityTask {
                 log.error(e);
             }
         });
-        return returnT;
     }
 
-    private String send(ChatProjectVo groupInfo, JSONArray subContentJsonArray) {
-        JSONObject con = new JSONObject();
-        JSONObject all = new JSONObject();
-        JSONArray contentJsonArray = new JSONArray();
-        con.put("zh_cn", all);
-        all.put("title", "【Coverity 创建中、高问题，提醒 (" + DateUtil.now() + ")】");
-        all.put("content", contentJsonArray);
+    private void sendGroups(JSONArray subContentJsonArray, Map<String, ChatProjectVo> projectVoMap) {
+        projectVoMap.forEach((chatId, projectInfo) -> {
+            JSONObject con = new JSONObject();
+            JSONObject all = new JSONObject();
+            JSONArray contentJsonArray = new JSONArray();
+            con.put("zh_cn", all);
+            all.put("title", "【Coverity 创建中、高问题，提醒 (" + DateUtil.now() + ")】");
+            all.put("content", contentJsonArray);
+            createSubContentJson(projectInfo, subContentJsonArray);
+            contentJsonArray.add(subContentJsonArray);
 
+            MessageVo messageVo = new MessageVo();
+            messageVo.setContent(con.toJSONString());
+            messageVo.setReceiveId(chatId);
+            messageVo.setMsgType(MsgTypeContents.POST);
+            messageVo.setClient(client);
+            messageVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.CHAT_ID);
+            try {
+                FeishuJavaUtils.sendContent(messageVo);
+            } catch (Exception e) {
+                log.error(e);
+            }
+        });
+    }
+
+    private void createSubContentJson(ChatProjectVo groupInfo, JSONArray subContentJsonArray) {
         if (subContentJsonArray.size() > 0) {
             JSONObject line = new JSONObject();
             line.put("tag", "text");
@@ -123,14 +181,11 @@ public class CvoerityTask {
             subContentJsonArray.add(myTask);
             subContentJsonArray.add(at);
             subContentJsonArray.add(line);
-            contentJsonArray.add(subContentJsonArray);
         } else {
             JSONObject none = new JSONObject();
             none.put("tag", "text");
             none.put("text", groupInfo.getReminderNone());
             subContentJsonArray.add(none);
         }
-
-        return con.toJSONString();
     }
 }

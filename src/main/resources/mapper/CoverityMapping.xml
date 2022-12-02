@@ -15,13 +15,15 @@
         FROM
             r_coverity c,
             r_project_info p,
-            fs_user_member_info f
+            fs_user_member_info f,
+            r_redmine_user_info r
         WHERE
             c.r_project_id = p.p_id
-          AND c.r_assignee_id = f.assignee_id
-          AND c.create_task = '0'
-          AND c.is_delete = '0'
-          AND p.is_delete = '0'
+            AND r.assignee_name = f.`name`
+            AND c.r_assignee_id = r.assignee_id
+            AND c.create_task = '0'
+            AND c.is_delete = '0'
+            AND p.is_delete = '0'
         <if test="pKey != null and pKey != ''">
             AND p.p_key = #{pKey}
         </if>
