@@ -77,7 +77,7 @@ public class CvoerityTask {
             if (coverityNo > 0) {
                 JSONObject content = new JSONObject();
                 content.put("tag", "text");
-                content.put("text", "\r\n" + vo.getRedmineProjectName() + "-问题数量：" + coverityNo);
+                content.put("text", "  "+vo.getRedmineProjectName() + "-问题数量：" + coverityNo + "\r\n");
 
                 JSONObject at = new JSONObject();
                 at.put("tag", "at");
