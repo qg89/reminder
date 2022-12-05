@@ -68,7 +68,7 @@ public class CvoerityTask {
             coverityLogList.addAll(coverityAndRedmineSaveTaskVo.getCoverityLogs());
             try {
                 coverityAndRedmineSaveTaskVo.setSubject(vo.getRedmineProjectName() + "-中、高问题报告-" + weekOfYear + "\r\n");
-//                RedmineApi.saveTask(coverityAndRedmineSaveTaskVo);
+                RedmineApi.saveTask(coverityAndRedmineSaveTaskVo);
             } catch (Exception e) {
                 returnT.setCode(500);
                 returnT.setContent(e.getMessage());
