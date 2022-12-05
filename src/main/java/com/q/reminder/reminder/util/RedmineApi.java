@@ -190,9 +190,9 @@ public abstract class RedmineApi {
             }
             String featureId = IdWorker.get32UUID().substring(22);
             String redmineSubject = "";
-            String menuOne = vo.getMenuOne();
-            String menuTwo = vo.getMenuTwo();
-            String menuThree = vo.getMenuThree();
+            String menuOne = vo.getMenuOne().replace("[","【").replace("]", "】");
+            String menuTwo = vo.getMenuTwo().replace("[","【").replace("]", "】");
+            String menuThree = vo.getMenuThree().replace("[","【").replace("]", "】");
             String front = vo.getFront();
             String backend = vo.getBackend();
             String bigData = vo.getBigData();
@@ -242,7 +242,7 @@ public abstract class RedmineApi {
                 newIssue = issue.create();
             } catch (RedmineException e) {
                 log.error("Redmine-创建需求任务异常", e);
-                return;
+                continue;
             }
             Integer newIssueId = newIssue.getId();
             vo.setRedmineId(String.valueOf(newIssueId));

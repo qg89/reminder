@@ -121,7 +121,7 @@ public class SyncRedmineTask {
                 String featureId = feature.getFeatureId();
                 String range = feature.getRange();
                 if (StringUtils.isBlank(featureId)) {
-                    log.info("该任务已存在,不再重新新增任务");
+                    log.info("redmine生成featureId失败");
                     return;
                 }
                 RedmineVo vo = new RedmineVo();
