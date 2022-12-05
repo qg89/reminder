@@ -8,21 +8,21 @@
             f.reminder_none reminderNone,
             f.reminder_title reminderTitle,
             fm.member_id memberId,
-            fm.`name` name
+            fm.`name` NAME,
+            r.assignee_id assigneeId,
+            p.p_key pKey
         FROM
-            `r_project_info` p,
-            group_project gp,
-            fs_group_info f,
-            fs_user_member_info fm,
-            r_coverity c
+            `r_project_info` p
+            LEFT JOIN group_project gp ON p.p_id = gp.p_id
+            LEFT JOIN fs_group_info f ON gp.chat_id = f.chat_id
+            LEFT JOIN r_coverity c ON c.r_project_id = p.p_id
+            LEFT JOIN r_redmine_user_info r ON r.assignee_id = c.r_assignee_id
+            LEFT JOIN fs_user_member_info fm ON fm.`name` = r.assignee_name
         WHERE
-            p.p_id = gp.p_id
-            AND gp.chat_id = f.chat_id
-            AND p.p_id = c.r_project_id
-            AND c.r_assignee_id = fm.assignee_id
-            AND p.is_delete = '0'
+            p.is_delete = '0'
             AND f.is_delete = '0'
             AND f.send_type = '3'
+            AND p.p_key = '510302-sell'
         <if test="pKey != null and pKey != ''">
             AND p.p_key = #{pKey}
         </if>

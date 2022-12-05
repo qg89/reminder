@@ -11,17 +11,18 @@
             f.member_id AS receiveId,
             p.redmine_url AS redmineUrl,
             p.pm_key AS apiAccessKey,
-            p.project_short_name AS redmineProjectName
+            p.project_short_name AS redmineProjectName,
+            f.member_id memberId,
+            f.`name`
         FROM
-            r_coverity c,
-            r_project_info p,
-            fs_user_member_info f
+            r_coverity c
+            LEFT JOIN r_project_info p ON c.r_project_id = p.p_id
+            LEFT JOIN r_redmine_user_info r ON c.r_assignee_id = r.assignee_id
+            LEFT JOIN fs_user_member_info f ON r.assignee_name = f.`name`
         WHERE
-            c.r_project_id = p.p_id
-          AND c.r_assignee_id = f.assignee_id
-          AND c.create_task = '0'
-          AND c.is_delete = '0'
-          AND p.is_delete = '0'
+            c.create_task = '0'
+            AND c.is_delete = '0'
+            AND p.is_delete = '0'
         <if test="pKey != null and pKey != ''">
             AND p.p_key = #{pKey}
         </if>
