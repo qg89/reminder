@@ -59,6 +59,7 @@ public class SyncRedmineTask {
         LambdaQueryWrapper<ProjectInfo> lq = new LambdaQueryWrapper<>();
         lq.isNotNull(ProjectInfo::getFeatureToken);
         lq.isNotNull(ProjectInfo::getPmKey);
+        lq.eq(ProjectInfo::getSyncFeature, "0");
         List<ProjectInfo> projectInfos = projectInfoService.list(lq);
         Map<String, Integer> redmineUserMap = redmineUserInfoService.list(Wrappers.<RedmineUserInfo>lambdaQuery().isNotNull(RedmineUserInfo::getAssigneeName)).stream().collect(Collectors.toMap(e -> e.getAssigneeName().replace(" ", ""), RedmineUserInfo::getAssigneeId));
         List<AdminInfo> adminInfoList = adminInfoService.list();
