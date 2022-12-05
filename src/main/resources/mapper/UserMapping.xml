@@ -10,18 +10,16 @@
             gi.reminder_none AS reminderNone,
             CONCAT( ' (', CURDATE(), '）', gi.reminder_title ) AS reminderTitle
         FROM
-            `fs_user_group` ug,
-            fs_group_info gi,
-            fs_user_member_info ui,
-            r_redmine_user_info r
+            fs_user_member_info ui
+            LEFT JOIN `fs_user_group` ug ON ui.member_id = ug.member_id
+            LEFT JOIN fs_group_info gi ON gi.chat_id = ug.chat_id
+            LEFT JOIN r_redmine_user_info r ON ui.`name` = r.assignee_name
         WHERE
-            gi.chat_id = ug.chat_id
-          AND ui.member_id = ug.member_id
-          AND ui.assignee_id = r.assignee_id
-          AND gi.send_type = 0
+            gi.send_type = 0
           AND gi.is_delete = 0
           AND ui.is_delete = 0
           AND ui.resign = '0'
           AND ui.`name` IS NOT NULL
+          AND r.assignee_id IS NOT NULL
     </select>
 </mapper>
