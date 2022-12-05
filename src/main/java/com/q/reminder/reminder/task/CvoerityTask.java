@@ -64,12 +64,11 @@ public class CvoerityTask {
         List<CoverityLog> coverityLogList = new ArrayList<>();
         list.forEach(vo -> {
             String assigneeId = vo.getAssigneeId().toString();
-            Issue issue = null;
             CoverityAndRedmineSaveTaskVo coverityAndRedmineSaveTaskVo = CoverityApi.readCoverity(vo);
             coverityLogList.addAll(coverityAndRedmineSaveTaskVo.getCoverityLogs());
             try {
                 coverityAndRedmineSaveTaskVo.setSubject(vo.getRedmineProjectName() + "-中、高问题报告-" + weekOfYear + "\r\n");
-//                issue = RedmineApi.saveTask(coverityAndRedmineSaveTaskVo);
+//                RedmineApi.saveTask(coverityAndRedmineSaveTaskVo);
             } catch (Exception e) {
                 returnT.setCode(500);
                 returnT.setContent(e.getMessage());
@@ -78,7 +77,13 @@ public class CvoerityTask {
             if (coverityNo > 0) {
                 JSONObject content = new JSONObject();
                 content.put("tag", "text");
-                content.put("text", vo.getRedmineProjectName() + "-问题数量：" + coverityNo);
+                content.put("text", "\r\n" + vo.getRedmineProjectName() + "-问题数量：" + coverityNo);
+
+                JSONObject at = new JSONObject();
+                at.put("tag", "at");
+                at.put("user_id", vo.getMemberId());
+                at.put("user_name", vo.getName());
+                subContentJsonArray.add(at);
                 subContentJsonArray.add(content);
             }
 
@@ -95,6 +100,11 @@ public class CvoerityTask {
         return returnT;
     }
 
+    /**
+     * 过期任务
+     * @param projectVoMap
+     * @param coverityLogList
+     */
     private void expiredTask(Map<String, ChatProjectVo> projectVoMap, List<CoverityLog> coverityLogList) {
         Map<String, List<CoverityLog>> coverityLogs = coverityLogList.stream().filter(e -> DateUtil.betweenDay(e.getFirstDate(), new Date(), true) > 4).
                 collect(Collectors.groupingBy(CoverityLog::getAssigneeId));
@@ -177,13 +187,7 @@ public class CvoerityTask {
             myTask.put("tag", "a");
             myTask.put("href", "http://redmine-qa.mxnavi.com/issues?assigned_to_id=me&set_filter=1&sort=priority%3Adesc%2Cupdated_on%3Adesc");
             myTask.put("text", "\n\r查看指派给我的任务");
-
-            JSONObject at = new JSONObject();
-            at.put("tag", "at");
-            at.put("user_id", groupInfo.getMemberId());
-            at.put("user_name", groupInfo.getName());
             subContentJsonArray.add(myTask);
-            subContentJsonArray.add(at);
             subContentJsonArray.add(line);
         } else {
             JSONObject none = new JSONObject();

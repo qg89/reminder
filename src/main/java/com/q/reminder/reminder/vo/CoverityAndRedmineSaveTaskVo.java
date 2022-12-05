@@ -59,6 +59,10 @@ public class CoverityAndRedmineSaveTaskVo implements Serializable {
 
     private Integer coverityNo;
 
+    private String memberId;
+
+    private String name;
+
     private List<CoverityLog> coverityLogs;
 
 }
