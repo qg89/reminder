@@ -16,7 +16,6 @@ import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.vo.ChatProjectVo;
 import com.q.reminder.reminder.vo.CoverityAndRedmineSaveTaskVo;
 import com.q.reminder.reminder.vo.MessageVo;
-import com.taskadapter.redmineapi.bean.Issue;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
@@ -65,7 +64,12 @@ public class CvoerityTask {
         list.forEach(vo -> {
             String assigneeId = vo.getAssigneeId().toString();
             CoverityAndRedmineSaveTaskVo coverityAndRedmineSaveTaskVo = CoverityApi.readCoverity(vo);
-            coverityLogList.addAll(coverityAndRedmineSaveTaskVo.getCoverityLogs());
+            List<CoverityLog> coverityLogs = coverityAndRedmineSaveTaskVo.getCoverityLogs();
+            if (CollectionUtils.isEmpty(coverityLogs)) {
+                returnT.setMsg(returnT.getMsg() + vo.getRedmineProjectName() + "-中、高问题报告-为空;    ");
+                return;
+            }
+            coverityLogList.addAll(coverityLogs);
             try {
                 coverityAndRedmineSaveTaskVo.setSubject(vo.getRedmineProjectName() + "-中、高问题报告-" + weekOfYear + "\r\n");
                 RedmineApi.saveTask(coverityAndRedmineSaveTaskVo);
@@ -74,10 +78,10 @@ public class CvoerityTask {
                 returnT.setContent(e.getMessage());
             }
             Integer coverityNo = coverityAndRedmineSaveTaskVo.getCoverityNo();
-            if (coverityNo > 0) {
+            if (coverityNo != null && coverityNo > 0) {
                 JSONObject content = new JSONObject();
                 content.put("tag", "text");
-                content.put("text", "  "+vo.getRedmineProjectName() + "-问题数量：" + coverityNo + "\r\n");
+                content.put("text", "  " + vo.getRedmineProjectName() + "-问题数量：" + coverityNo + "\r\n");
 
                 JSONObject at = new JSONObject();
                 at.put("tag", "at");
@@ -102,6 +106,7 @@ public class CvoerityTask {
 
     /**
      * 过期任务
+     *
      * @param projectVoMap
      * @param coverityLogList
      */
