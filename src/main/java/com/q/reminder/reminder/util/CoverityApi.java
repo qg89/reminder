@@ -50,7 +50,11 @@ public abstract class CoverityApi {
             e.setFirstDate(DateTime.parse(e.getFirstDetected(), DateTimeFormat.forPattern("yyyy 年 MM 月 dd 日")).toDate());
             String displayType = e.getDisplayType();
             Integer cId = e.getCId();
-            content.append("类型:").append(displayType).append(",").append("CID:").append(cId).append("\r\n").append("类别:").append(e.getDisplayCategory()).append("\r\n").append("文件路径:").append(e.getDisplayFile()).append("\r\n").append("行数:").append(e.getLineNumber()).append("\r\n\t");
+            content.append("CID：").append(cId).append("\r\n")
+                    .append("类型：").append(displayType).append("\r\n")
+                    .append("类别：").append(e.getDisplayCategory()).append("\r\n")
+                    .append("文件路径：").append(e.getDisplayFile()).append("\r\n")
+                    .append("所在行数：").append(e.getLineNumber()).append("\r\n\r");
         });
         vo.setCoverityLogs(coverityLogList);
         vo.setCoverityNo(coverityLogList.size());
@@ -126,10 +130,13 @@ public abstract class CoverityApi {
         return new ArrayList<>();
     }
 
-    public static void main(String[] args) {
-        CoverityAndRedmineSaveTaskVo vo = new CoverityAndRedmineSaveTaskVo();
-        vo.setCoverityProjectId(10072);
-        vo.setViewId(10738);
-        readCoverity(vo);
-    }
+//    public static void main(String[] args) {
+//        CoverityAndRedmineSaveTaskVo vo = new CoverityAndRedmineSaveTaskVo();
+//        vo.setViewId(10738);
+////        vo.setCoverityProjectId(10077);
+////        vo.setCoverityProjectId(10088);
+//        vo.setCoverityProjectId(10072);
+//        CoverityAndRedmineSaveTaskVo coverityAndRedmineSaveTaskVo = readCoverity(vo);
+//        System.out.println();
+//    }
 }
