@@ -79,6 +79,9 @@ public class ProjectInfo implements Serializable {
     @TableField("wiki_token")
     private String wikiToken;
 
+    @TableField("sync_feature")
+    private String syncFeature;
+
     @TableLogic(value = "0", delval = "1")
     private String isDelete;
 }

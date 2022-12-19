@@ -59,6 +59,7 @@ public class SyncRedmineTask {
         LambdaQueryWrapper<ProjectInfo> lq = new LambdaQueryWrapper<>();
         lq.isNotNull(ProjectInfo::getFeatureToken);
         lq.isNotNull(ProjectInfo::getPmKey);
+        lq.eq(ProjectInfo::getSyncFeature, "0");
         List<ProjectInfo> projectInfos = projectInfoService.list(lq);
         Map<String, Integer> redmineUserMap = redmineUserInfoService.list(Wrappers.<RedmineUserInfo>lambdaQuery().isNotNull(RedmineUserInfo::getAssigneeName)).stream().collect(Collectors.toMap(e -> e.getAssigneeName().replace(" ", ""), RedmineUserInfo::getAssigneeId));
         List<AdminInfo> adminInfoList = adminInfoService.list();
@@ -121,7 +122,7 @@ public class SyncRedmineTask {
                 String featureId = feature.getFeatureId();
                 String range = feature.getRange();
                 if (StringUtils.isBlank(featureId)) {
-                    log.info("该任务已存在,不再重新新增任务");
+                    log.info("redmine生成featureId失败");
                     return;
                 }
                 RedmineVo vo = new RedmineVo();
