@@ -528,7 +528,7 @@ public abstract class WeeklyProjectUtils {
 
         // 判断开始日期
         if (isStart) {
-            beginWeekNum = DateUtil.weekOfYear(startDay);
+            beginWeekNum = DateUtil.weekOfYear(startDay) - 1;
         }
 
         for (int i = beginWeekNum; i < weekNum; i++) {
