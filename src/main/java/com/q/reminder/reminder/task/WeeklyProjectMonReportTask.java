@@ -54,9 +54,10 @@ public class WeeklyProjectMonReportTask {
 
     @XxlJob("weekProjectMonReport")
     public ReturnT<String> weekProjectMonReport() throws Exception {
+        ReturnT<String> ret = new ReturnT<>(null);
         if (holdayBase.queryHoliday()) {
-            log.info("节假日放假!!!!");
-            return ReturnT.SUCCESS;
+            ret.setMsg("节假日放假!!!!");
+            return ret;
         }
         String jobParam = XxlJobHelper.getJobParam();
         int weekNumber = 0;
@@ -73,7 +74,7 @@ public class WeeklyProjectMonReportTask {
         }
         List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNumber, pKey);
         this.writeReport(list);
-        return ReturnT.SUCCESS;
+        return ret;
     }
 
     private void writeReport(List<WeeklyProjectVo> list) throws Exception {
