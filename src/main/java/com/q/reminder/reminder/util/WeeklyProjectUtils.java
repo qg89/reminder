@@ -497,21 +497,13 @@ public abstract class WeeklyProjectUtils {
         Date startDay = vo.getStartDay();
         boolean isStart = startDay != null;
         Date sunday = getWeekNumToSunday(weekNum - 1);
-        List<TimeEntry> timeEntryList = Objects.requireNonNull(WeeklyProjectRedmineUtils.wProjectTimes(projectInfo)).stream().filter(e -> {
-            if (isStart) {
-                return true;
-            } else {
-                return e.getSpentOn().after(startDay) && e.getSpentOn().before(sunday);
-            }
-        }).toList();
+        List<TimeEntry> timeEntryList = Objects.requireNonNull(WeeklyProjectRedmineUtils.wProjectTimes(projectInfo)).stream().filter(e ->
+                isStart && e.getSpentOn().after(startDay) && e.getSpentOn().before(sunday)
+        ).toList();
         List<TimeEntry> timeEntryBugsList = WeeklyProjectRedmineUtils.wprojectTimesBugs(projectInfo);
-        List<TimeEntry> timeEntryBugs = Objects.requireNonNull(timeEntryBugsList).stream().filter(e -> {
-            if (isStart) {
-                return true;
-            } else {
-                return e.getSpentOn().after(startDay) && e.getSpentOn().before(sunday);
-            }
-        }).toList();
+        List<TimeEntry> timeEntryBugs = Objects.requireNonNull(timeEntryBugsList).stream().filter(e ->
+                isStart && e.getSpentOn().after(startDay) && e.getSpentOn().before(sunday)
+        ).toList();
         List<String> categories = new ArrayList<>();
         // 变量
         String title = WeeklyReportContents.COPQ;
