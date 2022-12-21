@@ -34,6 +34,12 @@ import java.util.*;
  */
 @Log4j2
 public abstract class RedmineApi {
+    public static void main(String[] args) throws RedmineException {
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey("http://redmine-qa.mxnavi.com/", "1f905383da4f783bad92e22f430c7db0b15ae258");
+        IssueManager issueManager = mgr.getIssueManager();
+        Issue issueById = issueManager.getIssueById(609044);
+        System.out.println(issueById);
+    }
 
     /**
      * 通过项目读取redmine过期任务,只包含打开的状态

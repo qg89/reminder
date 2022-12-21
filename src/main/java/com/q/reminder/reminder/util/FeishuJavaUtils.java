@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.util;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.docx.v1.enums.BatchUpdateDocumentBlockUserIdTypeEnum;
@@ -9,16 +10,22 @@ import com.lark.oapi.service.drive.v1.enums.BatchQueryMetaUserIdTypeEnum;
 import com.lark.oapi.service.drive.v1.enums.UploadAllFileParentTypeEnum;
 import com.lark.oapi.service.drive.v1.model.*;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
+import com.lark.oapi.service.im.v1.enums.GetChatMembersMemberIdTypeEnum;
+import com.lark.oapi.service.im.v1.enums.ListChatUserIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.*;
 import com.lark.oapi.service.sheets.v3.model.QuerySpreadsheetSheetReq;
 import com.lark.oapi.service.sheets.v3.model.QuerySpreadsheetSheetResp;
 import com.lark.oapi.service.sheets.v3.model.Sheet;
 import com.lark.oapi.service.wiki.v2.model.*;
+import com.q.reminder.reminder.entity.GroupInfo;
+import com.q.reminder.reminder.entity.UserGroup;
+import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.vo.*;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -276,5 +283,86 @@ public abstract class FeishuJavaUtils {
                 .build();
         GetNodeSpaceResp resp = client.wiki().space().getNode(req);
         return resp.getData().getNode();
+    }
+
+    /**
+     * 获取机器人所在群组
+     *
+     * @param client
+     * @return
+     * @throws Exception
+     */
+    public static List<GroupInfo> getGroupToChats(Client client) throws Exception {
+        ListChatReq req = ListChatReq.newBuilder().userIdType(ListChatUserIdTypeEnum.OPEN_ID).build();
+        ListChatResp resp = client.im().chat().list(req);
+        ListChatRespBody data = resp.getData();
+        ListChat[] items = data.getItems();
+        ArrayList<ListChat> listChats = new ArrayList<>(Arrays.asList(items));
+        List<GroupInfo> list = new ArrayList<>();
+        listChats.forEach(e -> {
+            GroupInfo groupInfo = new GroupInfo();
+            BeanUtil.copyProperties(e, groupInfo);
+            list.add(groupInfo);
+        });
+        return list;
+    }
+
+    public static List<UserMemgerInfo> getMembersByChats(Client client, List<GroupInfo> chats, List<UserGroup> userGroupList) throws Exception {
+        List<UserMemgerInfo> items = new ArrayList<>();
+        for (GroupInfo chat : chats) {
+            String chatId = chat.getChatId();
+            GetChatMembersReq req = GetChatMembersReq.newBuilder()
+                    .chatId(chatId)
+                    .memberIdType(GetChatMembersMemberIdTypeEnum.OPEN_ID)
+                    .pageSize(20)
+                    .build();
+            GetChatMembersResp resp = client.im().chatMembers().get(req, RequestOptions.newBuilder().build());
+            GetChatMembersRespBody data = resp.getData();
+            for (ListMember dataItem : data.getItems()) {
+                UserMemgerInfo userMemgerInfo = new UserMemgerInfo();
+                BeanUtil.copyProperties(dataItem, userMemgerInfo);
+                items.add(userMemgerInfo);
+                addUserGroupList(chatId, userMemgerInfo, userGroupList);
+            }
+            String pageToken = data.getPageToken();
+            if (data.getHasMore()) {
+                query(items, chatId, userGroupList, pageToken, req, client);
+            }
+        }
+        return items.stream().distinct().toList();
+    }
+
+    /**
+     * 分页查询
+     *
+     * @param lists
+     * @param chatId
+     * @param userGroupList
+     * @param pageToken
+     * @param req
+     * @param client
+     */
+    private static void query(List<UserMemgerInfo> lists, String chatId, List<UserGroup> userGroupList, String pageToken, GetChatMembersReq req, Client client) throws Exception {
+        req.setPageToken(pageToken);
+        GetChatMembersResp resp = client.im().chatMembers().get(req, RequestOptions.newBuilder().build());
+        GetChatMembersRespBody data = resp.getData();
+        ListMember[] dataItems = data.getItems();
+        for (ListMember dataItem : dataItems) {
+            UserMemgerInfo userMemgerInfo = new UserMemgerInfo();
+            BeanUtil.copyProperties(dataItem, userMemgerInfo);
+            lists.add(userMemgerInfo);
+            addUserGroupList(chatId, userMemgerInfo, userGroupList);
+        }
+        if (data.getHasMore()) {
+            pageToken = data.getPageToken();
+            query(lists, chatId, userGroupList, pageToken, req, client);
+        }
+    }
+
+    private static void addUserGroupList(String chatId, UserMemgerInfo e, List<UserGroup> userGroupList) {
+        UserGroup ug = new UserGroup();
+        ug.setChatId(chatId);
+        ug.setMemberId(e.getMemberId());
+        userGroupList.add(ug);
     }
 }
