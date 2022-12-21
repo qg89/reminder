@@ -489,32 +489,25 @@ public abstract class WeeklyProjectUtils {
     public static File copq(WeeklyProjectVo vo) throws Exception {
         int weekNum = vo.getWeekNum();
         String fileName = vo.getFileName();
-        final int beginWeekNum = 33;
+        int beginWeekNum = 33;
         ProjectInfo projectInfo = new ProjectInfo();
         projectInfo.setRedmineUrl(vo.getRedmineUrl());
         projectInfo.setPmKey(vo.getPmKey());
         projectInfo.setPKey(vo.getPKey());
         Date startDay = vo.getStartDay();
+        boolean isStart = startDay != null;
         Date sunday = getWeekNumToSunday(weekNum - 1);
-        List<TimeEntry> timeEntryList = Objects.requireNonNull(WeeklyProjectRedmineUtils.wProjectTimes(projectInfo)).stream().filter(e -> {
-            if (startDay == null) {
-                return true;
-            } else {
-                return e.getSpentOn().after(startDay) && e.getSpentOn().before(sunday);
-            }
-        }).toList();
+        List<TimeEntry> timeEntryList = Objects.requireNonNull(WeeklyProjectRedmineUtils.wProjectTimes(projectInfo)).stream().filter(e ->
+                isStart && e.getSpentOn().after(startDay) && e.getSpentOn().before(sunday)
+        ).toList();
         List<TimeEntry> timeEntryBugsList = WeeklyProjectRedmineUtils.wprojectTimesBugs(projectInfo);
-        List<TimeEntry> timeEntryBugs = Objects.requireNonNull(timeEntryBugsList).stream().filter(e -> {
-            if (startDay == null) {
-                return true;
-            } else {
-                return e.getSpentOn().after(startDay) && e.getSpentOn().before(sunday);
-            }
-        }).toList();
+        List<TimeEntry> timeEntryBugs = Objects.requireNonNull(timeEntryBugsList).stream().filter(e ->
+                isStart && e.getSpentOn().after(startDay) && e.getSpentOn().before(sunday)
+        ).toList();
         List<String> categories = new ArrayList<>();
         // 变量
         String title = WeeklyReportContents.COPQ;
-        Map<String, List<TimeEntry>> weekNumMap = sortTimeList(timeEntryList);
+//        Map<String, List<TimeEntry>> weekNumMap = sortTimeList(timeEntryList);
 //        Map<String, List<TimeEntry>> weekNumBugsMap = sortTimeList(timeEntryBugs);
 
         //图例名称列表
@@ -524,6 +517,12 @@ public abstract class WeeklyProjectUtils {
         List<Object> all = new ArrayList<>();
         List<Object> week = new ArrayList<>();
         String yy = DateTime.now().toString("yy");
+
+        // 判断开始日期
+        if (isStart) {
+            beginWeekNum = DateUtil.weekOfYear(startDay) - 1;
+        }
+
         for (int i = beginWeekNum; i < weekNum; i++) {
             String weekOfYear = yy + "W" + i;
             categories.add(weekOfYear);
@@ -532,12 +531,12 @@ public abstract class WeeklyProjectUtils {
 
         List<ExcelVo.ExcelTimeVo> copqList = new ArrayList<>();
         for (String weekOfYear : categories) {
-            List<TimeEntry> timeEntries = weekNumMap.get(weekOfYear);
-            if (CollectionUtils.isEmpty(timeEntries)) {
-                all.add(0.00D);
-                week.add(0.00D);
-                continue;
-            }
+//            List<TimeEntry> timeEntries = weekNumMap.get(weekOfYear);
+//            if (CollectionUtils.isEmpty(timeEntries)) {
+//                all.add(0.00D);
+//                week.add(0.00D);
+//                continue;
+//            }
             int thisWeek = Integer.parseInt(weekOfYear.split("W")[1]);
             Date weekNumToSunday = getWeekNumToSunday(thisWeek);
             double allSum = timeEntryList.stream().filter(e -> e.getSpentOn().before(weekNumToSunday)).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();

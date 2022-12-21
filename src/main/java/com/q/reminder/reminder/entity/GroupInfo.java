@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -16,6 +17,7 @@ import java.io.Serializable;
 @Data
 @TableName("fs_group_info")
 public class GroupInfo implements Serializable {
+    @Serial
     private static final long serialVersionUID = 6352091359792413686L;
 
     @JSONField(name = "chat_id")

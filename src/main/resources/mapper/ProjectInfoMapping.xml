@@ -7,20 +7,20 @@
             p.folder_token AS folder_token,
             p.project_short_name AS projectShortName,
             p.redmine_url AS redmineUrl,
-            fw.file_name AS fileName,
-            fw.file_token AS fileToken,
+            p.start_day AS startDay,
             p.pm_ou AS pmOu,
             p.p_key AS pKey,
             fw.url AS weeklyReportUrl,
             fw.week_num weekNum,
-            p.start_day AS startDay
+            fw.file_name AS fileName,
+            fw.file_token AS fileToken
         FROM
-            r_project_info p,
-            fs_weekly_project_report fw
+            r_project_info p
+            LEFT JOIN fs_weekly_project_report fw ON p.p_id = fw.r_pid
         WHERE
-            p.p_id = fw.r_pid
-            AND fw.file_token IS NOT NULL
+            fw.file_token IS NOT NULL
             AND fw.is_delete = 0
+            AND p.is_delete = 0
         <choose>
             <when test="weekNumber > 0">
                 AND fw.week_num = #{weekNumber}
