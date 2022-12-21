@@ -552,15 +552,10 @@ public abstract class WeeklyProjectUtils {
                 return spentOn.before(weekNumToSunday) && new DateTime("2022-08-01").toDate().before(spentOn);
             }).collect(Collectors.summarizingDouble(TimeEntry::getHours)).getSum();
 
-            if (allSum == 0) {
-                allSum = 1;
-            }
-            double allV = BigDecimal.valueOf(bugSum / allSum * 100).setScale(2, RoundingMode.HALF_UP).doubleValue();
+
+            double allV = BigDecimal.valueOf(bugSum / (allSum == 0 ? 1 : allSum) * 100).setScale(2, RoundingMode.HALF_UP).doubleValue();
             all.add(allV);
-            if (allWeekSum == 0) {
-                allWeekSum = 1;
-            }
-            double weekV = BigDecimal.valueOf(bugWeekSum / allWeekSum * 100).setScale(2, RoundingMode.HALF_UP).doubleValue();
+            double weekV = BigDecimal.valueOf(bugWeekSum / (allWeekSum == 0 ? 1 : allWeekSum) * 100).setScale(2, RoundingMode.HALF_UP).doubleValue();
             week.add(weekV);
 
             ExcelVo.ExcelTimeVo vAll = new ExcelVo.ExcelTimeVo();
