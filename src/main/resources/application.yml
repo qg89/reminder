@@ -2,6 +2,8 @@ server:
   port: 12315
 # 数据源
 spring:
+  jackson:
+    default-property-inclusion: non_null
   task:
     scheduling:
       pool:
