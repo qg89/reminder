@@ -8,6 +8,7 @@ import com.q.reminder.reminder.service.*;
 import com.q.reminder.reminder.vo.ProjectReaVo;
 import com.xxl.job.core.biz.model.ReturnT;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,25 +46,38 @@ public class ProjectController {
     }
 
     @PostMapping("/s")
-    public ReturnT<String> save(@RequestBody ProjectInfo info) {
+    public ReturnT<String> save(@RequestBody ProjectReaVo info) {
         projectInfoService.save(info);
+        if (!saveRea(info)) {
+            return ReturnT.FAIL;
+        }
         return ReturnT.SUCCESS;
     }
 
     @PostMapping("/e")
-    public ReturnT<String> edit(@RequestBody ProjectInfo info) {
+    public ReturnT<String> edit(@RequestBody ProjectReaVo info) {
         projectInfoService.updateById(info);
+        if (!saveRea(info)) {
+            return ReturnT.FAIL;
+        }
         return ReturnT.SUCCESS;
     }
 
     @PostMapping("/r")
     public ReturnT<String> rea(@RequestBody ProjectReaVo vo) {
+        if (!saveRea(vo)) {
+            return ReturnT.FAIL;
+        }
+        return ReturnT.SUCCESS;
+    }
+
+    private Boolean saveRea(ProjectReaVo vo) {
         String pId = vo.getPId();
         String chatId = vo.getChatId();
         String userId = vo.getUserId();
         String cProjectId = vo.getCProjectId();
         if (StringUtils.isBlank(pId) || projectInfoService.getById(pId) == null) {
-            return ReturnT.FAIL;
+            return Boolean.FALSE;
         }
         if (StringUtils.isNotBlank(chatId)) {
             groupProjectService.saveOrUpdateByMultiId(new GroupProject(chatId, pId));
@@ -86,12 +100,12 @@ public class ProjectController {
             coverity.setId(null);
             coverityService.saveOrUpdate(coverity);
         }
-        return ReturnT.SUCCESS;
+        return Boolean.TRUE;
     }
 
     @GetMapping("/o")
     public ReturnT<Map<String, Object>> option() {
-        Map<String, Object> map = new HashMap<>();
+        Map<String, Object> map = new HashMap<>(4);
         LambdaQueryWrapper<GroupInfo> gp = Wrappers.lambdaQuery();
         gp.select(GroupInfo::getChatId, GroupInfo::getName);
         List<GroupInfo> groupInfoList = groupInfoService.list(gp);
