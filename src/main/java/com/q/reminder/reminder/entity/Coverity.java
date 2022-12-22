@@ -1,13 +1,11 @@
 package com.q.reminder.reminder.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * @author : saiko
@@ -17,6 +15,7 @@ import java.io.Serializable;
  * @date :  2022.12.01 10:30
  */
 @Data
+@TableName("r_coverity")
 public class Coverity implements Serializable {
 
 
@@ -41,8 +40,8 @@ public class Coverity implements Serializable {
     @TableField(value = "r_assignee_id")
     private String assigneeId;
 
-    @TableField(value = "r_proent_id")
-    private String rPproentId;
+    @TableField(value = "r_parent_id")
+    private String rParentId;
 
     @TableField(value = "create_task")
     private String createTask;
@@ -50,6 +49,12 @@ public class Coverity implements Serializable {
     @TableField(value = "is_delete")
     @TableLogic(value = "0", delval = "1")
     private String isDelete;
+
+    @TableField(value = "update_time")
+    private Date updateTime;
+
+    @TableField(value = "create_time")
+    private Date createTime;
 
 
 }

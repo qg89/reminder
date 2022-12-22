@@ -1,6 +1,8 @@
 package com.q.reminder.reminder.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -21,6 +23,12 @@ public class UserP implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -6158507322335711440L;
+
+    @MppMultiId
+    @TableField("user_id")
     private String userId;
+
+    @MppMultiId
+    @TableField("p_id")
     private String pId;
 }

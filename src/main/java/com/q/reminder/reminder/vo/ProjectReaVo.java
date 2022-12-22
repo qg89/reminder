@@ -2,6 +2,7 @@ package com.q.reminder.reminder.vo;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -13,7 +14,11 @@ import java.io.Serializable;
  */
 @Data
 public class ProjectReaVo implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -7559515469488244195L;
     private String pId;
     private String chatId;
     private String userId;
+    private String cProjectId;
 }
