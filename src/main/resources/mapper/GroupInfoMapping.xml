@@ -22,7 +22,6 @@
             p.is_delete = '0'
             AND f.is_delete = '0'
             AND f.send_type = '3'
-            AND p.p_key = '510302-sell'
         <if test="pKey != null and pKey != ''">
             AND p.p_key = #{pKey}
         </if>
