@@ -1,6 +1,6 @@
 package com.q.reminder.reminder.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.jeffreyning.mybatisplus.service.IMppService;
 import com.q.reminder.reminder.entity.UserP;
 
 /**
@@ -10,5 +10,5 @@ import com.q.reminder.reminder.entity.UserP;
  * @Description :
  * @date :  2022.12.21 19:27
  */
-public interface UserPService extends IService<UserP> {
+public interface UserPService extends IMppService<UserP> {
 }

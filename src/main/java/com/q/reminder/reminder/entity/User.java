@@ -29,4 +29,6 @@ public class User implements Serializable {
     private String username;
     @TableField("password")
     private String password;
+    @TableField("name")
+    private String name;
 }

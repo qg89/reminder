@@ -1,6 +1,6 @@
 package com.q.reminder.reminder.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.jeffreyning.mybatisplus.base.MppBaseMapper;
 import com.q.reminder.reminder.entity.UserP;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -12,5 +12,5 @@ import org.apache.ibatis.annotations.Mapper;
  * @date :  2022.12.21 19:26
  */
 @Mapper
-public interface UserPMapping extends BaseMapper<UserP> {
+public interface UserPMapping extends MppBaseMapper<UserP> {
 }

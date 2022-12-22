@@ -1,5 +1,7 @@
 package com.q.reminder.reminder.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.q.reminder.reminder.entity.User;
 import com.q.reminder.reminder.vo.LoginParam;
 import com.q.reminder.reminder.vo.base.ResultUtil;
 
@@ -10,6 +12,6 @@ import com.q.reminder.reminder.vo.base.ResultUtil;
  * @Description :
  * @date :  2022.11.17 14:19
  */
-public interface LoginService {
+public interface LoginService extends IService<User> {
     ResultUtil login(LoginParam loginParam);
 }
