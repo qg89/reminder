@@ -11,7 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author : saiko
@@ -88,7 +90,8 @@ public class ProjectController {
     }
 
     @GetMapping("/o")
-    public void option() {
+    public ReturnT<Map<String, Object>> option() {
+        Map<String, Object> map = new HashMap<>();
         LambdaQueryWrapper<GroupInfo> gp = Wrappers.lambdaQuery();
         gp.select(GroupInfo::getChatId, GroupInfo::getName);
         List<GroupInfo> groupInfoList = groupInfoService.list(gp);
@@ -100,6 +103,9 @@ public class ProjectController {
         LambdaQueryWrapper<Coverity> c = Wrappers.lambdaQuery();
         c.select(Coverity::getCProjectId, Coverity::getRProjectName);
         List<Coverity> coverityList = coverityService.list(c);
-
+        map.put("group", groupInfoList);
+        map.put("user", userList);
+        map.put("coverity", coverityList);
+        return new ReturnT<>(map);
     }
 }
