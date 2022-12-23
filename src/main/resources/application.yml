@@ -63,3 +63,13 @@ xxl:
       logpath: ./data/xxl-job/jobhandler  #执行器运行日志文件存储磁盘路径
       logretentiondays: 14  #调度中心日志表数据保存天数，过期日志自动清理；限制大于等于7时生效，否则, 如-1，关闭自动清理功能
     accessToken: default_token
+
+powerjob:
+  worker:
+    enabled: false
+    akka-port: 27777
+    app-name: admin-process
+    server-address: 127.0.0.1:7700
+    store-strategy: disk
+    max-result-length: 4096
+    max-appended-wf-context-length: 4096
