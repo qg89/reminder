@@ -61,7 +61,7 @@ public abstract class WeeklyProjectUtils {
         String fileName = vo.getFileName();
         Date startDay = vo.getStartDay();
         Date sunday = getWeekNumToSunday(vo.getWeekNum() - 1);
-        List<Issue> issues = WeeklyProjectRedmineUtils.reviewQuestion(projectInfo).stream().filter(e -> {
+        List<Issue> issues = WeeklyProjectRedmineUtils.reviewQuestion(vo).stream().filter(e -> {
             if (startDay == null) {
                 return true;
             } else {
@@ -147,13 +147,9 @@ public abstract class WeeklyProjectUtils {
      */
     public static File trends(WeeklyProjectVo vo) throws Exception {
         String fileName = vo.getFileName();
-        ProjectInfo projectInfo = new ProjectInfo();
-        projectInfo.setRedmineUrl(vo.getRedmineUrl());
-        projectInfo.setPmKey(vo.getPmKey());
-        projectInfo.setPKey(vo.getPKey());
         Date startDay = vo.getStartDay();
         Date sunday = getWeekNumToSunday(vo.getWeekNum() - 1);
-        List<Issue> issues = WeeklyProjectRedmineUtils.externalBugs(projectInfo).stream().filter(e -> {
+        List<Issue> issues = WeeklyProjectRedmineUtils.externalBugs(vo).stream().filter(e -> {
             if (startDay == null) {
                 return true;
             } else {
@@ -490,17 +486,13 @@ public abstract class WeeklyProjectUtils {
         int weekNum = vo.getWeekNum();
         String fileName = vo.getFileName();
         int beginWeekNum = 33;
-        ProjectInfo projectInfo = new ProjectInfo();
-        projectInfo.setRedmineUrl(vo.getRedmineUrl());
-        projectInfo.setPmKey(vo.getPmKey());
-        projectInfo.setPKey(vo.getPKey());
         Date startDay = vo.getStartDay();
         boolean isStart = startDay != null;
         Date sunday = getWeekNumToSunday(weekNum - 1);
-        List<TimeEntry> timeEntryList = Objects.requireNonNull(WeeklyProjectRedmineUtils.wProjectTimes(projectInfo)).stream().filter(e ->
+        List<TimeEntry> timeEntryList = Objects.requireNonNull(WeeklyProjectRedmineUtils.wProjectTimes(vo)).stream().filter(e ->
                 isStart && e.getSpentOn().after(startDay) && e.getSpentOn().before(sunday)
         ).toList();
-        List<TimeEntry> timeEntryBugsList = WeeklyProjectRedmineUtils.wprojectTimesBugs(projectInfo);
+        List<TimeEntry> timeEntryBugsList = WeeklyProjectRedmineUtils.wprojectTimesBugs(vo);
         List<TimeEntry> timeEntryBugs = Objects.requireNonNull(timeEntryBugsList).stream().filter(e ->
                 isStart && e.getSpentOn().after(startDay) && e.getSpentOn().before(sunday)
         ).toList();

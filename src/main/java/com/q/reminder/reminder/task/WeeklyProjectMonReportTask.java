@@ -102,12 +102,7 @@ public class WeeklyProjectMonReportTask {
             vo.setWeekNum(weekNum);
             vo.setStartDay(report.getStartDay());
             vo.setPmOu(report.getPmOu());
-
-            ProjectInfo projectInfo = new ProjectInfo();
-            projectInfo.setRedmineUrl(redmineUrl);
-            projectInfo.setPmKey(accessKey);
-            projectInfo.setPKey(pKey);
-            List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(projectInfo).stream().filter(e -> {
+            List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(vo).stream().filter(e -> {
                 if (startDay == null) {
                     return true;
                 } else {
@@ -339,12 +334,7 @@ public class WeeklyProjectMonReportTask {
         vo.setAppSecret(feishuProperties.getAppSecret());
         vo.setAppId(feishuProperties.getAppId());
         String title = vo.getTitle();
-
-        ProjectInfo projectInfo = new ProjectInfo();
-        projectInfo.setRedmineUrl(redmineUrl);
-        projectInfo.setPmKey(accessKey);
-        projectInfo.setPKey(pKey);
-        List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(projectInfo);
+        List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(vo);
         vo.setAllBugList(allBugList);
 
         JSONArray jsonArray = WeeklyProjectFeishuUtils.blocks(vo);
