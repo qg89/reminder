@@ -19,6 +19,7 @@ import com.q.reminder.reminder.vo.DefinitionVo;
 import com.q.reminder.reminder.vo.FeatureListVo;
 import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.SheetVo;
+import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -54,7 +56,8 @@ public class SyncRedmineTask {
     private Client client;
 
     @XxlJob("syncRedmineTask")
-    public void syncRedmineTask() {
+    public ReturnT<String> syncRedmineTask() {
+        ReturnT<String> r = new ReturnT<>(null);
         // 查询项目对应的需求管理表token
         LambdaQueryWrapper<ProjectInfo> lq = new LambdaQueryWrapper<>();
         lq.isNotNull(ProjectInfo::getFeatureToken);
@@ -64,18 +67,25 @@ public class SyncRedmineTask {
         Map<String, Integer> redmineUserMap = redmineUserInfoService.list(Wrappers.<RedmineUserInfo>lambdaQuery().isNotNull(RedmineUserInfo::getAssigneeName)).stream().collect(Collectors.toMap(e -> e.getAssigneeName().replace(" ", ""), RedmineUserInfo::getAssigneeId));
         List<AdminInfo> adminInfoList = adminInfoService.list();
         String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
+        StringBuilder conten = new StringBuilder();
         projectInfos.forEach(projectInfo -> {
             String pKey = projectInfo.getPKey();
             String pId = projectInfo.getPId();
             String featureToken = projectInfo.getFeatureToken();
             String redmineUrl = projectInfo.getRedmineUrl();
             String pmKey = projectInfo.getPmKey();
+            String pName = projectInfo.getPName();
             // 获取各项目中需求管理表中sheetId和sheet名称
             List<SheetVo> sheetList = null;
             try {
                 sheetList = FeishuJavaUtils.getSpredsheets(client, featureToken);
             } catch (Exception e) {
                 log.error(e);
+            }
+            if (CollectionUtils.isEmpty(sheetList)) {
+                conten.append(r.getMsg()).append("|").append(this.getClass().getName()).append(" 获取需求管理表为空").append(" 项目：").append(pName);
+                r.setMsg(conten.toString());
+                return;
             }
             StringBuilder ranges = new StringBuilder();
             String featureRange = "";
@@ -166,5 +176,6 @@ public class SyncRedmineTask {
                 }
             }
         });
+        return r;
     }
 }
