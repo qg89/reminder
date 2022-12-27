@@ -5,7 +5,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.docx.v1.model.UpdateBlockRequest;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.contents.WeeklyReportContents;
-import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.service.WeeklyService;
 import com.q.reminder.reminder.task.WeeklyProjectMonReportTask;
 import com.q.reminder.reminder.util.ResourceUtils;
@@ -18,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -77,18 +75,13 @@ public class WeeklyServiceImpl implements WeeklyService {
                     break;
                 }
                 if (WeeklyReportContents.BUG_LEVEL.equals(heading3) && WeeklyReportContents.BUG_LEVEL.equals(title)) {
-                    ProjectInfo projectInfo = new ProjectInfo();
-                    projectInfo.setRedmineUrl(redmineUrl);
-                    projectInfo.setPmKey(accessKey);
-                    projectInfo.setPKey(pKey);
-
-                    List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(projectInfo).stream().filter(e -> {
-                        if (startDay == null) {
-                            return true;
-                        } else {
-                            return e.getCreatedOn().after(startDay) && e.getCreatedOn().before(sunday);
-                        }
-                    }).collect(Collectors.toList());
+                    List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(vo).stream().filter(e -> {
+                                            if (startDay == null) {
+                                                return true;
+                                            } else {
+                                                return e.getCreatedOn().after(startDay) && e.getCreatedOn().before(sunday);
+                                            }
+                                        }).collect(Collectors.toList());
                     vo.setAllBugList(allBugList);
                     if ("All-Bug等级分布".equals(title)) {
                         weeklyProjectMonReportTask.allBugLevel(vo, jsonArray, requests, i);

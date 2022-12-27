@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.vo.QueryVo;
+import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.RedmineManagerFactory;
@@ -46,7 +47,7 @@ public abstract class WeeklyProjectRedmineUtils {
     /**
      * 项目周报，获取评审问题
      */
-    public static List<Issue> reviewQuestion(ProjectInfo projectInfo) {
+    public static List<Issue> reviewQuestion(WeeklyProjectVo projectInfo) {
         List<RequestParam> params = List.of(
                 new RequestParam("f[]", "tracker_id"),
                 new RequestParam("op[tracker_id]", "="),
@@ -58,7 +59,7 @@ public abstract class WeeklyProjectRedmineUtils {
     /**
      * 外部Bug情况
      */
-    public static List<Issue> externalBugs(ProjectInfo projectInfo) {
+    public static List<Issue> externalBugs(WeeklyProjectVo projectInfo) {
         List<RequestParam> params = List.of(
                 new RequestParam("f[]", "cf_68"),
                 new RequestParam("op[cf_68]", "="),
@@ -67,34 +68,34 @@ public abstract class WeeklyProjectRedmineUtils {
         return queryRedmine(projectInfo, params).stream().filter(e -> "Bug".equals(e.getCustomFieldById(CustomFieldsEnum.BUG_TYPE.getId()).getValue())).toList();
     }
 
-    public static void majorProjectTrackingItems(List<ProjectInfo> projectInfoList, QueryVo vo) {
-        for (ProjectInfo projectInfo : projectInfoList) {
-            List<RequestParam> params = List.of(
-                    // 问题
-//                    new RequestParam("category_id", "2798"),
-//                    // 风险
-//                    new RequestParam("category_id", "2797"),
-//                    // 依赖
-//                    new RequestParam("category_id", "2799")
-                    new RequestParam("f[]", "category_id"),
-                    new RequestParam("op[category_id]", "="),
-                    new RequestParam("v[category_id][]", "2797"),
-                    new RequestParam("v[category_id][]", "2798"),
-                    new RequestParam("v[category_id][]", "2799")
-            );
-            List<Issue> issues = queryRedmine(projectInfo, params);
-            System.out.println(issues);
-        }
-    }
+//    public static void majorProjectTrackingItems(List<ProjectInfo> projectInfoList, QueryVo vo) {
+//        for (ProjectInfo projectInfo : projectInfoList) {
+//            List<RequestParam> params = List.of(
+//                    // 问题
+////                    new RequestParam("category_id", "2798"),
+////                    // 风险
+////                    new RequestParam("category_id", "2797"),
+////                    // 依赖
+////                    new RequestParam("category_id", "2799")
+//                    new RequestParam("f[]", "category_id"),
+//                    new RequestParam("op[category_id]", "="),
+//                    new RequestParam("v[category_id][]", "2797"),
+//                    new RequestParam("v[category_id][]", "2798"),
+//                    new RequestParam("v[category_id][]", "2799")
+//            );
+//            List<Issue> issues = queryRedmine(projectInfo, params);
+//            System.out.println(issues);
+//        }
+//    }
 
-    public static List<TimeEntry> wProjectTimes(ProjectInfo projectInfo) {
+    public static List<TimeEntry> wProjectTimes(WeeklyProjectVo projectInfo) {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl() + "/projects/" + projectInfo.getPKey(), projectInfo.getPmKey());
         Transport transport = mgr.getTransport();
         try {
             return transport.getObjectsList(TimeEntry.class, List.of(
                     new RequestParam("f[]", "spent_on"),
                     new RequestParam("op[spent_on]", "<="),
-                    new RequestParam("v[spent_on][]", getWeekNumToSunday(DateUtil.thisWeekOfYear() - 2))
+                    new RequestParam("v[spent_on][]", getWeekNumToSunday(projectInfo.getWeekNum()))
             ));
         } catch (RedmineException e) {
             e.printStackTrace();
@@ -102,7 +103,7 @@ public abstract class WeeklyProjectRedmineUtils {
         return null;
     }
 
-    public static List<TimeEntry> wprojectTimesBugs(ProjectInfo projectInfo) {
+    public static List<TimeEntry> wprojectTimesBugs(WeeklyProjectVo projectInfo) {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl() + "/projects/" + projectInfo.getPKey(), projectInfo.getPmKey());
         Transport transport = mgr.getTransport();
         List<RequestParam> params = List.of(
@@ -124,7 +125,7 @@ public abstract class WeeklyProjectRedmineUtils {
      * @param params
      * @return
      */
-    private static List<Issue> queryRedmine(ProjectInfo projectInfo, List<RequestParam> params) {
+    private static List<Issue> queryRedmine(WeeklyProjectVo projectInfo, List<RequestParam> params) {
         List<Issue> objectsList = null;
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl() + "/projects/" + projectInfo.getPKey(), projectInfo.getPmKey());
         Transport transport = mgr.getTransport();
@@ -145,7 +146,7 @@ public abstract class WeeklyProjectRedmineUtils {
          * @param projectInfo
          * @return
          */
-        public static List<Issue> allBug(ProjectInfo projectInfo) {
+        public static List<Issue> allBug(WeeklyProjectVo projectInfo) {
             List<RequestParam> params = List.of(
                     new RequestParam("f[]", "tracker_id"),
                     new RequestParam("op[tracker_id]", "="),
