@@ -42,7 +42,7 @@ public class ProjectController {
     @GetMapping("/i")
     public ReturnT<List<ProjectInfo>> list() {
         LambdaQueryWrapper<ProjectInfo> lq = Wrappers.lambdaQuery();
-        lq.orderByDesc(ProjectInfo::getCreateTime);
+        lq.orderByDesc(ProjectInfo::getUpdateTime);
         List<ProjectInfo> list = projectInfoService.list(lq);
         return new ReturnT<>(list);
     }
