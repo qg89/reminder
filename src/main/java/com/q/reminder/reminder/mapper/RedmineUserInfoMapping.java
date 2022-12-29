@@ -2,7 +2,11 @@ package com.q.reminder.reminder.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.q.reminder.reminder.entity.RedmineUserInfo;
+import com.q.reminder.reminder.vo.RoleInvolvementVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * @author : saiko
@@ -13,4 +17,7 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface RedmineUserInfoMapping extends BaseMapper<RedmineUserInfo> {
+    List<RoleInvolvementVo> roleInvolvement(@Param("pId") String pId, @Param("year")  String year);
+
+    List<RoleInvolvementVo> residualWorkload(@Param("pId") String pId, @Param("year")  String year);
 }
