@@ -7,7 +7,7 @@ package com.q.reminder.reminder.constant;
  * @Description :
  * @date :  2022.11.07 15:56
  */
-public interface WeeklyReportContents {
+public interface WeeklyReportConstants {
 
     String REVIEW_QUESTIONS = "评审问题数量";
     String TRENDS = "趋势";

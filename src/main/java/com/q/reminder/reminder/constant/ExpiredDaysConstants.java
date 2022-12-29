@@ -7,7 +7,7 @@ package com.q.reminder.reminder.constant;
  * @Description :
  * @date :  2022.10.18 16:51
  */
-public interface ExpiredDaysContents {
+public interface ExpiredDaysConstants {
 
     String EXPIRED_DAYS_2 = "2";
     String EXPIRED_DAYS_1 = "1";

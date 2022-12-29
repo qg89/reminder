@@ -7,7 +7,7 @@ package com.q.reminder.reminder.constant;
  * @Description :
  * @date :  2022.12.01 11:14
  */
-public interface MsgTypeContents {
+public interface MsgTypeConstants {
 
     String TEXT = "text";
     String POST = "post";
