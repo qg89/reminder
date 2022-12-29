@@ -2,7 +2,7 @@ package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.UUID;
-import com.q.reminder.reminder.contents.WeeklyReportContents;
+import com.q.reminder.reminder.constant.WeeklyReportContents;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.util.jfree.GenerateChartUtil;

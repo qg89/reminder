@@ -1,6 +1,6 @@
 package com.q.reminder.reminder.util;
 
-import com.q.reminder.reminder.contents.Constants;
+import com.q.reminder.reminder.constant.Constants;
 import io.jsonwebtoken.CompressionCodecs;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

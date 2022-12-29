@@ -7,13 +7,11 @@ import com.q.reminder.reminder.service.WConfigService;
 import org.springframework.stereotype.Service;
 
 
-import javax.annotation.Resource;
-
 /**
- * (WConfig)表服务实现类
+ * 工时配置(WConfig)表服务实现类
  *
  * @author makejava
- * @since 2022-12-28 10:30:50
+ * @since 2022-12-29 11:01:58
  */
 @Service
 public class WConfigServiceImpl extends ServiceImpl<WConfigMapping, WConfig> implements WConfigService {

@@ -4,7 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.docx.v1.model.UpdateBlockRequest;
 import com.q.reminder.reminder.config.FeishuProperties;
-import com.q.reminder.reminder.contents.WeeklyReportContents;
+import com.q.reminder.reminder.constant.WeeklyReportContents;
 import com.q.reminder.reminder.service.WeeklyService;
 import com.q.reminder.reminder.task.WeeklyProjectMonReportTask;
 import com.q.reminder.reminder.util.ResourceUtils;

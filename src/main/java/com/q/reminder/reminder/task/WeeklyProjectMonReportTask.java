@@ -6,8 +6,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.docx.v1.model.ReplaceImageRequest;
 import com.lark.oapi.service.docx.v1.model.UpdateBlockRequest;
 import com.q.reminder.reminder.config.FeishuProperties;
-import com.q.reminder.reminder.contents.WeeklyReportContents;
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.constant.WeeklyReportContents;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.util.*;
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

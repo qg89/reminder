@@ -5,10 +5,10 @@ import com.q.reminder.reminder.entity.WConfig;
 import org.apache.ibatis.annotations.Mapper;
 
 /**
- * (WConfig)表数据库访问层
+ * 工时配置(WConfig)表数据库访问层
  *
  * @author makejava
- * @since 2022-12-28 08:55:22
+ * @since 2022-12-29 11:01:59
  */
 @Mapper
 public interface WConfigMapping extends BaseMapper<WConfig> {

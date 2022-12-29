@@ -5,7 +5,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.Client;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
-import com.q.reminder.reminder.contents.MsgTypeContents;
+import com.q.reminder.reminder.constant.MsgTypeContents;
 import com.q.reminder.reminder.entity.CoverityLog;
 import com.q.reminder.reminder.service.CoverityLogService;
 import com.q.reminder.reminder.service.CoverityService;

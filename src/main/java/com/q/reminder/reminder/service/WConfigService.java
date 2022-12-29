@@ -5,10 +5,10 @@ import com.q.reminder.reminder.entity.WConfig;
 
 
 /**
- * (WConfig)表服务接口
+ * 工时配置(WConfig)表服务接口
  *
  * @author makejava
- * @since 2022-12-28 10:30:49
+ * @since 2022-12-29 11:01:57
  */
 public interface WConfigService extends IService<WConfig>{
 

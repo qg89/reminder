@@ -1,4 +1,4 @@
-package com.q.reminder.reminder.contents;
+package com.q.reminder.reminder.constant;
 
 /**
  * @author : saiko
