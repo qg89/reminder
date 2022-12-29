@@ -4,7 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.docx.v1.model.UpdateBlockRequest;
 import com.q.reminder.reminder.config.FeishuProperties;
-import com.q.reminder.reminder.constant.WeeklyReportContents;
+import com.q.reminder.reminder.constant.WeeklyReportConstants;
 import com.q.reminder.reminder.service.WeeklyService;
 import com.q.reminder.reminder.task.WeeklyProjectMonReportTask;
 import com.q.reminder.reminder.util.ResourceUtils;
@@ -59,22 +59,22 @@ public class WeeklyServiceImpl implements WeeklyService {
             Integer blockType = block.getInteger("block_type");
             if (4 == blockType) {
                 String heading2 = JSONObject.parseObject(block.getJSONObject("heading2").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
-                if (WeeklyReportContents.REVIEW_QUESTIONS.equals(heading2) && WeeklyReportContents.REVIEW_QUESTIONS.equals(title)) {
+                if (WeeklyReportConstants.REVIEW_QUESTIONS.equals(heading2) && WeeklyReportConstants.REVIEW_QUESTIONS.equals(title)) {
                     weeklyProjectMonReportTask.reviewQuestions(vo, jsonArray, requests, i);
                     break;
                 }
-                if (WeeklyReportContents.COPQ.equals(heading2) && WeeklyReportContents.COPQ.equals(title)) {
+                if (WeeklyReportConstants.COPQ.equals(heading2) && WeeklyReportConstants.COPQ.equals(title)) {
                     weeklyProjectMonReportTask.copq(vo, jsonArray, requests, i);
                     break;
                 }
             }
             if (5 == blockType) {
                 String heading3 = JSONObject.parseObject(block.getJSONObject("heading3").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
-                if (WeeklyReportContents.TRENDS.equals(heading3) && WeeklyReportContents.TRENDS.equals(title)) {
+                if (WeeklyReportConstants.TRENDS.equals(heading3) && WeeklyReportConstants.TRENDS.equals(title)) {
                     weeklyProjectMonReportTask.tends(vo, jsonArray, requests, i);
                     break;
                 }
-                if (WeeklyReportContents.BUG_LEVEL.equals(heading3) && WeeklyReportContents.BUG_LEVEL.equals(title)) {
+                if (WeeklyReportConstants.BUG_LEVEL.equals(heading3) && WeeklyReportConstants.BUG_LEVEL.equals(title)) {
                     List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(vo).stream().filter(e -> {
                                             if (startDay == null) {
                                                 return true;
