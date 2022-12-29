@@ -10,11 +10,12 @@
             r_redmine_user_info u
             LEFT JOIN w_role_group_user re ON u.assignee_id = re.user_id
             LEFT JOIN w_user_times ut ON re.user_id = ut.user_id
+            LEFT JOIN r_project_info p ON p.p_id = ut.p_id
             LEFT JOIN w_user_time_month um ON um.user_id = u.assignee_id
             LEFT JOIN s_date_config dc ON um.date_id = dc.id
             LEFT JOIN w_config wc ON dc.id = wc.date_id
         WHERE
-            ut.p_id = #{pId}
+            p.p_key = #{pKey}
           AND dc.`year` = #{year}
           AND CONCAT( dc.`year`, dc.`month` ) = DATE_FORMAT( ut.`day`, '%Y%c' )
         GROUP BY
@@ -33,11 +34,12 @@
             r_redmine_user_info u
             LEFT JOIN w_role_group_user re ON u.assignee_id = re.user_id
             LEFT JOIN w_user_times ut ON re.user_id = ut.user_id
+            LEFT JOIN r_project_info p ON p.p_id = ut.p_id
             LEFT JOIN w_user_time_month um ON um.user_id = u.assignee_id
             LEFT JOIN s_date_config dc ON um.date_id = dc.id
             LEFT JOIN w_config wc ON dc.id = wc.date_id
         WHERE
-            ut.p_id = #{pId}
+            p.p_key = #{pKey}
           AND dc.`year` = #{year}
           AND CONCAT( dc.`year`, dc.`month` ) = DATE_FORMAT( ut.`day`, '%Y%c' )
         GROUP BY

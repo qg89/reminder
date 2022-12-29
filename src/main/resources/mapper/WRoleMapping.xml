@@ -21,8 +21,9 @@
             w_role r
             LEFT JOIN w_role_group_user re ON r.id = re.role_id
             LEFT JOIN w_user_times ut ON re.user_id = ut.user_id
+            LEFT JOIN r_project_info p ON p.p_id = ut.p_id
         WHERE
-            ut.p_id = #{pId}
+            p.p_key = #{pKey}
         GROUP BY
             r.role, `months`
     </select>

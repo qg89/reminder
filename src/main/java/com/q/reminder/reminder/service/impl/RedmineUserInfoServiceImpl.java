@@ -20,14 +20,14 @@ import java.util.List;
 @Service
 public class RedmineUserInfoServiceImpl extends ServiceImpl<RedmineUserInfoMapping, RedmineUserInfo> implements RedmineUserInfoService {
     @Override
-    public List<RoleInvolvementVo> roleInvolvement(String pId, String year) {
-        List<RoleInvolvementVo> roleInvolvementVos = baseMapper.roleInvolvement(pId, year);
+    public List<RoleInvolvementVo> roleInvolvement(String pKey, String year) {
+        List<RoleInvolvementVo> roleInvolvementVos = baseMapper.roleInvolvement(pKey, year);
         return RoleInvolvementUtils.getRoleInvolvementVos(roleInvolvementVos);
     }
 
     @Override
-    public List<RoleInvolvementVo> residualWorkload(String pId, String year) {
-        List<RoleInvolvementVo> roleInvolvementVos = baseMapper.residualWorkload(pId, year);
+    public List<RoleInvolvementVo> residualWorkload(String pKey, String year) {
+        List<RoleInvolvementVo> roleInvolvementVos = baseMapper.residualWorkload(pKey, year);
         return RoleInvolvementUtils.getRoleInvolvementVos(roleInvolvementVos);
     }
 }

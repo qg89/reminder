@@ -16,6 +16,6 @@ import java.util.List;
  */
 @Mapper
 public interface WRoleMapping extends BaseMapper<WRole> {
-    List<RoleInvolvementVo> roleInvolvement(@Param("pId") String pId, @Param("year") String year);
+    List<RoleInvolvementVo> roleInvolvement(@Param("pKey") String pKey, @Param("year") String year);
 }
 

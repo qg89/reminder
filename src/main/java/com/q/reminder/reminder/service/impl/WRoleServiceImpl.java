@@ -20,8 +20,8 @@ import java.util.List;
 public class WRoleServiceImpl extends ServiceImpl<WRoleMapping, WRole> implements WRoleService {
 
     @Override
-    public List<RoleInvolvementVo> roleInvolvement(String pId, String year) {
-        List<RoleInvolvementVo> voList = baseMapper.roleInvolvement(pId, year);
+    public List<RoleInvolvementVo> roleInvolvement(String pKey, String year) {
+        List<RoleInvolvementVo> voList = baseMapper.roleInvolvement(pKey, year);
         return RoleInvolvementUtils.getRoleInvolvementVos(voList);
     }
 }

@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Mapper
 public interface RedmineUserInfoMapping extends BaseMapper<RedmineUserInfo> {
-    List<RoleInvolvementVo> roleInvolvement(@Param("pId") String pId, @Param("year")  String year);
+    List<RoleInvolvementVo> roleInvolvement(@Param("pKey") String pKey, @Param("year")  String year);
 
-    List<RoleInvolvementVo> residualWorkload(@Param("pId") String pId, @Param("year")  String year);
+    List<RoleInvolvementVo> residualWorkload(@Param("pKey") String pKey, @Param("year")  String year);
 }

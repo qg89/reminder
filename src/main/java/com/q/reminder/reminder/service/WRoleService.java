@@ -15,5 +15,5 @@ import java.util.List;
  */
 public interface WRoleService extends IService<WRole> {
 
-    List<RoleInvolvementVo> roleInvolvement(String pId, String year);
+    List<RoleInvolvementVo> roleInvolvement(String pKey, String year);
 }

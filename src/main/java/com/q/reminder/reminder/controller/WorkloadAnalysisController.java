@@ -2,15 +2,12 @@ package com.q.reminder.reminder.controller;
 
 import com.q.reminder.reminder.service.RedmineUserInfoService;
 import com.q.reminder.reminder.service.WRoleService;
-import com.q.reminder.reminder.vo.RoleInvolvementVo;
 import com.xxl.job.core.biz.model.ReturnT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * @author : saiko
@@ -30,34 +27,37 @@ public class WorkloadAnalysisController {
 
     /**
      * 角色投入（人/月）
-     * @param pId
+     *
+     * @param pKey
      * @param year
      * @return
      */
-    @GetMapping("/role_involvement/{pId}/{year}")
-    public ReturnT<Object> roleInvolvement(@PathVariable("pId") String pId, @PathVariable("year") String year) {
-        return new ReturnT<>(wRoleService.roleInvolvement(pId, year));
+    @GetMapping("/role_involvement/{pKey}/{year}")
+    public ReturnT<Object> roleInvolvement(@PathVariable("pKey") String pKey, @PathVariable("year") String year) {
+        return new ReturnT<>(wRoleService.roleInvolvement(pKey, year));
     }
 
     /**
      * 年工作强度
-     * @param pId
+     *
+     * @param pKey
      * @param year
      * @return
      */
-    @GetMapping("/working_intensity/{pId}/{year}")
-    public ReturnT<Object> workingIntensity(@PathVariable("pId") String pId, @PathVariable("year") String year) {
-        return new ReturnT<>(redmineUserInfoService.roleInvolvement(pId, year));
+    @GetMapping("/working_intensity/{pKey}/{year}")
+    public ReturnT<Object> workingIntensity(@PathVariable("pKey") String pKey, @PathVariable("year") String year) {
+        return new ReturnT<>(redmineUserInfoService.roleInvolvement(pKey, year));
     }
 
     /**
      * 剩余工作量
-     * @param pId
+     *
+     * @param pKey
      * @param year
      * @return
      */
-    @GetMapping("/residual_workload/{pId}/{year}")
-    public ReturnT<Object> residualWorkload(@PathVariable("pId") String pId, @PathVariable("year") String year) {
-        return new ReturnT<>(redmineUserInfoService.residualWorkload(pId, year));
+    @GetMapping("/residual_workload/{pKey}/{year}")
+    public ReturnT<Object> residualWorkload(@PathVariable("pKey") String pKey, @PathVariable("year") String year) {
+        return new ReturnT<>(redmineUserInfoService.residualWorkload(pKey, year));
     }
 }
