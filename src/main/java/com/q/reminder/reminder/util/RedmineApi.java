@@ -9,10 +9,7 @@ import com.taskadapter.redmineapi.IssueManager;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.RedmineManagerFactory;
-import com.taskadapter.redmineapi.bean.CustomField;
-import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.bean.IssueRelation;
-import com.taskadapter.redmineapi.bean.Tracker;
+import com.taskadapter.redmineapi.bean.*;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
 import lombok.extern.log4j.Log4j2;
@@ -21,9 +18,12 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author : saiko
@@ -35,10 +35,14 @@ import java.util.*;
 @Log4j2
 public abstract class RedmineApi {
     public static void main(String[] args) throws RedmineException {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey("http://redmine-qa.mxnavi.com/", "1f905383da4f783bad92e22f430c7db0b15ae258");
-        IssueManager issueManager = mgr.getIssueManager();
-        Issue issueById = issueManager.getIssueById(609044);
-        System.out.println(issueById);
+        ProjectInfo info = new ProjectInfo();
+        info.setRedmineUrl("http://redmine-qa.mxnavi.com");
+        info.setPKey("511303-dcsp");
+        info.setPmKey("1f905383da4f783bad92e22f430c7db0b15ae258");
+        List<TimeEntry> timeEntries = queryTimes(info);
+        Map<String, Map<String, Double>> collect = timeEntries.stream().collect(Collectors.groupingBy(e -> String.valueOf(e.getUserId()), Collectors.groupingBy(e -> new DateTime(e.getSpentOn()).toString("yyyy-MM-dd"),
+                Collectors.summingDouble(e -> BigDecimal.valueOf(e.getHours()).setScale(2, RoundingMode.HALF_UP).doubleValue()))));
+        System.out.println(collect);
     }
 
     /**
@@ -393,5 +397,26 @@ public abstract class RedmineApi {
             convertSuccess = false;
         }
         return convertSuccess;
+    }
+
+    /**
+     * 查询项目耗时
+     *
+     * @param info
+     * @return
+     * @throws RedmineException
+     */
+    public static List<TimeEntry> queryTimes(ProjectInfo info) throws RedmineException {
+        String redmineUrl = info.getRedmineUrl() + "/projects/" + info.getPKey();
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, info.getPmKey());
+        Transport transport = mgr.getTransport();
+        Collection<RequestParam> params = new ArrayList<>();
+        Date startDay = info.getStartDay();
+        if (startDay != null) {
+            params.add(new RequestParam("f[]", "spent_on"));
+            params.add(new RequestParam("op[spent_on]", ">="));
+            params.add(new RequestParam("v[spent_on][]", new DateTime(startDay).toString("yyyy-MM-dd")));
+        }
+        return transport.getObjectsList(TimeEntry.class, params);
     }
 }
