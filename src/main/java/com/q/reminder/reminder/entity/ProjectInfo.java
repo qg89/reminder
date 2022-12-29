@@ -84,4 +84,10 @@ public class ProjectInfo implements Serializable {
 
     @TableLogic(value = "0", delval = "1")
     private String isDelete;
+
+    @TableField("update_time")
+    private Date updateTime;
+
+    @TableField("create_time")
+    private Date createTime;
 }
