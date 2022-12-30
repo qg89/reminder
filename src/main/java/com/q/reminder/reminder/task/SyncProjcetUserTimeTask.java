@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.task;
 
+import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -15,16 +16,14 @@ import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -44,11 +43,18 @@ public class SyncProjcetUserTimeTask {
 
     @XxlJob("syncProjcetUserTimeTask")
     public ReturnT<String> syncProjcetUserTimeTask() throws RedmineException {
-        Date startDate = DateUtil.beginOfMonth(new Date()).toJdkDate();
-        Date endDate = null;
-        String pKey = "";
         String jobParam = XxlJobHelper.getJobParam();
-        JSONObject json = JSONObject.parseObject(jobParam);
+        JSONObject json = new JSONObject();
+        if (StringUtils.isNotBlank(jobParam)) {
+            json = JSONObject.parseObject(jobParam);
+        }
+        Date startDate = DateUtil.parse(DateUtil.today()).offset(DateField.DAY_OF_MONTH, -1);
+        Date endDate = DateUtil.parse(DateUtil.today()).offset(DateField.SECOND, -1);
+        if (json.containsKey("month")) {
+            startDate = DateUtil.beginOfMonth(new Date()).toJdkDate();
+        }
+
+        String pKey = "";
         if (json.containsKey("startDate")) {
             startDate = json.getDate("startDate");
         }
