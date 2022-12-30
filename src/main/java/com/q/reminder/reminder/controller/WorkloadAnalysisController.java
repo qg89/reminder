@@ -1,13 +1,18 @@
 package com.q.reminder.reminder.controller;
 
 import com.q.reminder.reminder.service.RedmineUserInfoService;
+import com.q.reminder.reminder.service.WGroupService;
 import com.q.reminder.reminder.service.WRoleService;
+import com.q.reminder.reminder.vo.RoleInvolvementVo;
+import com.q.reminder.reminder.vo.WorkloadParamsVo;
 import com.xxl.job.core.biz.model.ReturnT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @author : saiko
@@ -24,40 +29,60 @@ public class WorkloadAnalysisController {
     private WRoleService wRoleService;
     @Autowired
     private RedmineUserInfoService redmineUserInfoService;
+    @Autowired
+    private WGroupService wGroupService;
 
     /**
      * 角色投入（人/月）
      *
-     * @param pKey
-     * @param year
+     * @param params
      * @return
      */
-    @GetMapping("/role_involvement/{pKey}/{year}")
-    public ReturnT<Object> roleInvolvement(@PathVariable("pKey") String pKey, @PathVariable("year") String year) {
-        return new ReturnT<>(wRoleService.roleInvolvement(pKey, year));
+    @GetMapping("/role_involvement")
+    public ReturnT<List<RoleInvolvementVo>> roleInvolvement(WorkloadParamsVo params) {
+        return new ReturnT<>(wRoleService.roleInvolvement(params));
     }
 
     /**
      * 年工作强度
      *
-     * @param pKey
-     * @param year
      * @return
      */
-    @GetMapping("/working_intensity/{pKey}/{year}")
-    public ReturnT<Object> workingIntensity(@PathVariable("pKey") String pKey, @PathVariable("year") String year) {
-        return new ReturnT<>(redmineUserInfoService.roleInvolvement(pKey, year));
+    @GetMapping("/working_intensity")
+    public ReturnT<List<RoleInvolvementVo>> workingIntensity(WorkloadParamsVo params) {
+        return new ReturnT<>(redmineUserInfoService.roleInvolvement(params));
     }
 
     /**
      * 剩余工作量
      *
-     * @param pKey
-     * @param year
+     * @param params
      * @return
      */
-    @GetMapping("/residual_workload/{pKey}/{year}")
-    public ReturnT<Object> residualWorkload(@PathVariable("pKey") String pKey, @PathVariable("year") String year) {
-        return new ReturnT<>(redmineUserInfoService.residualWorkload(pKey, year));
+    @GetMapping("/residual_workload")
+    public ReturnT<List<RoleInvolvementVo>> residualWorkload(WorkloadParamsVo params) {
+        return new ReturnT<>(redmineUserInfoService.residualWorkload(params));
+    }
+
+    /**
+     * 按分组分类
+     *
+     * @param params
+     * @return
+     */
+    @GetMapping("/group_workload")
+    public ReturnT<List<RoleInvolvementVo>> groupWorkload(WorkloadParamsVo params) {
+        return new ReturnT<>(wGroupService.groupWorkload(params));
+    }
+
+    /**
+     * 按角色分类
+     *
+     * @param params
+     * @return
+     */
+    @GetMapping("/group_user_workload")
+    public ReturnT<List<RoleInvolvementVo>> groupUserWorkload(WorkloadParamsVo params) {
+        return new ReturnT<>(redmineUserInfoService.groupUserWorkload(params));
     }
 }

@@ -6,6 +6,7 @@ import com.q.reminder.reminder.mapper.RedmineUserInfoMapping;
 import com.q.reminder.reminder.service.RedmineUserInfoService;
 import com.q.reminder.reminder.util.RoleInvolvementUtils;
 import com.q.reminder.reminder.vo.RoleInvolvementVo;
+import com.q.reminder.reminder.vo.WorkloadParamsVo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,14 +21,20 @@ import java.util.List;
 @Service
 public class RedmineUserInfoServiceImpl extends ServiceImpl<RedmineUserInfoMapping, RedmineUserInfo> implements RedmineUserInfoService {
     @Override
-    public List<RoleInvolvementVo> roleInvolvement(String pKey, String year) {
-        List<RoleInvolvementVo> roleInvolvementVos = baseMapper.roleInvolvement(pKey, year);
+    public List<RoleInvolvementVo> roleInvolvement(WorkloadParamsVo paramsVo) {
+        List<RoleInvolvementVo> roleInvolvementVos = baseMapper.roleInvolvement(paramsVo);
         return RoleInvolvementUtils.getRoleInvolvementVos(roleInvolvementVos);
     }
 
     @Override
-    public List<RoleInvolvementVo> residualWorkload(String pKey, String year) {
-        List<RoleInvolvementVo> roleInvolvementVos = baseMapper.residualWorkload(pKey, year);
+    public List<RoleInvolvementVo> residualWorkload(WorkloadParamsVo paramsVo) {
+        List<RoleInvolvementVo> roleInvolvementVos = baseMapper.residualWorkload(paramsVo);
+        return RoleInvolvementUtils.getRoleInvolvementVos(roleInvolvementVos);
+    }
+
+    @Override
+    public List<RoleInvolvementVo> groupUserWorkload(WorkloadParamsVo paramsVo) {
+        List<RoleInvolvementVo> roleInvolvementVos = baseMapper.groupUserWorkload(paramsVo);
         return RoleInvolvementUtils.getRoleInvolvementVos(roleInvolvementVos);
     }
 }

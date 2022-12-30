@@ -20,6 +20,8 @@ public class RoleInvolvementVo implements Serializable {
     private static final long serialVersionUID = -302010094843565788L;
 
     private String name;
+    private String group;
+    private String role;
     @JSONField(serialize = false)
     private String hours;
     @JSONField(serialize = false)

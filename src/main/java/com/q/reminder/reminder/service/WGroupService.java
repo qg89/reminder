@@ -2,6 +2,10 @@ package com.q.reminder.reminder.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.q.reminder.reminder.entity.WGroup;
+import com.q.reminder.reminder.vo.RoleInvolvementVo;
+import com.q.reminder.reminder.vo.WorkloadParamsVo;
+
+import java.util.List;
 
 
 /**
@@ -12,4 +16,5 @@ import com.q.reminder.reminder.entity.WGroup;
  */
 public interface WGroupService extends IService<WGroup>{
 
+    List<RoleInvolvementVo> groupWorkload(WorkloadParamsVo params);
 }

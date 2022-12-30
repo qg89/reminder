@@ -3,6 +3,7 @@ package com.q.reminder.reminder.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.q.reminder.reminder.entity.WRole;
 import com.q.reminder.reminder.vo.RoleInvolvementVo;
+import com.q.reminder.reminder.vo.WorkloadParamsVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -16,6 +17,6 @@ import java.util.List;
  */
 @Mapper
 public interface WRoleMapping extends BaseMapper<WRole> {
-    List<RoleInvolvementVo> roleInvolvement(@Param("pKey") String pKey, @Param("year") String year);
+    List<RoleInvolvementVo> roleInvolvement(@Param("vo") WorkloadParamsVo params);
 }
 

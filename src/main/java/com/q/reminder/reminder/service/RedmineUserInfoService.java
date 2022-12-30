@@ -3,6 +3,7 @@ package com.q.reminder.reminder.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.q.reminder.reminder.entity.RedmineUserInfo;
 import com.q.reminder.reminder.vo.RoleInvolvementVo;
+import com.q.reminder.reminder.vo.WorkloadParamsVo;
 
 import java.util.List;
 
@@ -14,7 +15,9 @@ import java.util.List;
  * @date :  2022.10.27 16:20
  */
 public interface RedmineUserInfoService extends IService<RedmineUserInfo>{
-    List<RoleInvolvementVo> roleInvolvement(String pId, String year);
+    List<RoleInvolvementVo> roleInvolvement(WorkloadParamsVo paramsVo);
 
-    List<RoleInvolvementVo> residualWorkload(String pId, String year);
+    List<RoleInvolvementVo> residualWorkload(WorkloadParamsVo paramsVo);
+
+    List<RoleInvolvementVo> groupUserWorkload(WorkloadParamsVo paramsVo);
 }

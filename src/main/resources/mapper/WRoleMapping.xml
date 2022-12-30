@@ -14,7 +14,7 @@
                         LEFT JOIN s_date_config d ON d.id = c.date_id
                 WHERE
                    d.`month` = `months`
-                    AND d.`year` = #{year}
+                    AND d.`year` = #{vo.year}
                     ), 2
                 ) hours
         FROM
@@ -23,7 +23,7 @@
             LEFT JOIN w_user_times ut ON re.user_id = ut.user_id
             LEFT JOIN r_project_info p ON p.p_id = ut.p_id
         WHERE
-            p.p_key = #{pKey}
+            p.p_key = #{vo.pKey}
         GROUP BY
             r.role, `months`
     </select>

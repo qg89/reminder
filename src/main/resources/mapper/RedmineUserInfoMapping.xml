@@ -4,6 +4,8 @@
     <select id="roleInvolvement" resultType="com.q.reminder.reminder.vo.RoleInvolvementVo">
         SELECT
             u.assignee_name AS `name`,
+            g.`group`,
+            r.role,
             dc.`month` AS `months`,
             ROUND( SUM( ut.houses )/ 8 / um.times / wc.days, 2 ) AS `hours`
         FROM
@@ -14,11 +16,15 @@
             LEFT JOIN w_user_time_month um ON um.user_id = u.assignee_id
             LEFT JOIN s_date_config dc ON um.date_id = dc.id
             LEFT JOIN w_config wc ON dc.id = wc.date_id
+            LEFT JOIN w_group g ON g.id = re.group_id
+            LEFT JOIN w_role r ON r.id = re.role_id
         WHERE
-            p.p_key = #{pKey}
-          AND dc.`year` = #{year}
+            p.p_key = #{vo.pKey}
+          AND dc.`year` = #{vo.year}
           AND CONCAT( dc.`year`, dc.`month` ) = DATE_FORMAT( ut.`day`, '%Y%c' )
         GROUP BY
+            g.`group`,
+            r.role,
             u.assignee_name,
             dc.`month`,
             um.times,
@@ -39,8 +45,34 @@
             LEFT JOIN s_date_config dc ON um.date_id = dc.id
             LEFT JOIN w_config wc ON dc.id = wc.date_id
         WHERE
-            p.p_key = #{pKey}
-          AND dc.`year` = #{year}
+            p.p_key = #{vo.pKey}
+          AND dc.`year` = #{vo.year}
+          AND CONCAT( dc.`year`, dc.`month` ) = DATE_FORMAT( ut.`day`, '%Y%c' )
+        GROUP BY
+            u.assignee_name,
+            dc.`month`,
+            um.times,
+            wc.days
+    </select>
+
+    <select id="groupUserWorkload" resultType="com.q.reminder.reminder.vo.RoleInvolvementVo">
+        SELECT
+            u.assignee_name AS `name`,
+            dc.`month` AS `months`,
+            ROUND( SUM( ut.houses ) , 2 ) AS `hours`
+        FROM
+            r_redmine_user_info u
+            LEFT JOIN w_role_group_user re ON u.assignee_id = re.user_id
+            LEFT JOIN w_user_times ut ON re.user_id = ut.user_id
+            LEFT JOIN r_project_info p ON p.p_id = ut.p_id
+            LEFT JOIN w_user_time_month um ON um.user_id = u.assignee_id
+            LEFT JOIN s_date_config dc ON um.date_id = dc.id
+            LEFT JOIN w_config wc ON dc.id = wc.date_id
+            LEFT JOIN w_group g ON g.id = re.group_id
+        WHERE
+            p.p_key = #{vo.pKey}
+          AND dc.`year` = #{vo.year}
+          AND g.id = #{vo.groupId}
           AND CONCAT( dc.`year`, dc.`month` ) = DATE_FORMAT( ut.`day`, '%Y%c' )
         GROUP BY
             u.assignee_name,
