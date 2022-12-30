@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.q.reminder.reminder.mapper.WRoleGroupUserMapping">
-
+    <select id="option" resultType="com.q.reminder.reminder.vo.OptionVo">
+        SELECT
+            r.id AS roleId,
+            r.role AS roleName,
+            g.id AS groupId,
+            g.`group` AS groupName,
+            u.assignee_id userId,
+            u.assignee_name userName
+        FROM
+            `w_role_group_user` re
+            LEFT JOIN w_role r ON r.id = re.role_id
+            LEFT JOIN w_group g ON g.id = re.group_id
+            LEFT JOIN r_redmine_user_info u ON u.assignee_id = re.user_id
+        WHERE
+            u.is_delete = 0
+    </select>
 </mapper>
-

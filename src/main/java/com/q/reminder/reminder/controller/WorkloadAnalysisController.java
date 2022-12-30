@@ -2,17 +2,22 @@ package com.q.reminder.reminder.controller;
 
 import com.q.reminder.reminder.service.RedmineUserInfoService;
 import com.q.reminder.reminder.service.WGroupService;
+import com.q.reminder.reminder.service.WRoleGroupUserService;
 import com.q.reminder.reminder.service.WRoleService;
+import com.q.reminder.reminder.vo.OptionVo;
 import com.q.reminder.reminder.vo.RoleInvolvementVo;
 import com.q.reminder.reminder.vo.WorkloadParamsVo;
 import com.xxl.job.core.biz.model.ReturnT;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author : saiko
@@ -31,6 +36,18 @@ public class WorkloadAnalysisController {
     private RedmineUserInfoService redmineUserInfoService;
     @Autowired
     private WGroupService wGroupService;
+    @Autowired
+    private WRoleGroupUserService wRoleGroupUserService;
+
+    @GetMapping("/option")
+    public ReturnT<List<OptionVo>> option(WorkloadParamsVo paramsVo) {
+        String pKey = paramsVo.getPKey();
+        String year = paramsVo.getYear();
+        if (StringUtils.isBlank(pKey) || StringUtils.isBlank(year)) {
+            return new ReturnT<>(new ArrayList<>());
+        }
+        return new ReturnT<>(wRoleGroupUserService.option(paramsVo));
+    }
 
     /**
      * 角色投入（人/月）
