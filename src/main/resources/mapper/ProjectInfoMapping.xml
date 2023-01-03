@@ -43,7 +43,7 @@
             r_project_info p,
             fs_weekly_project_report fw
         WHERE
-            p.p_id = fw.r_pid
+            p.id = fw.r_pid
           AND fw.file_token IS NOT NULL
           AND p.p_key = #{pKey}
         <if test="name != null and name != ''">
