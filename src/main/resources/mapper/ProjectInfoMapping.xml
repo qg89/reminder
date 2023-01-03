@@ -16,7 +16,7 @@
             fw.file_token AS fileToken
         FROM
             r_project_info p
-            LEFT JOIN fs_weekly_project_report fw ON p.p_id = fw.r_pid
+            LEFT JOIN fs_weekly_project_report fw ON p.id = fw.r_pid
         WHERE
             fw.file_token IS NOT NULL
             AND fw.is_delete = 0
