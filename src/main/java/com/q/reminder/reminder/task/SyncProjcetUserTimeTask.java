@@ -69,7 +69,7 @@ public class SyncProjcetUserTimeTask {
         List<ProjectInfo> projectList = projectInfoService.list(lq);
         List<WUserTimes> userTimesData = new ArrayList<>();
         for (ProjectInfo info : projectList) {
-            String pId = info.getPId();
+            Long id = info.getId();
             Date finalStartDate = startDate;
             Date finalEndDate = endDate;
             if (finalEndDate != null) {
@@ -91,13 +91,13 @@ public class SyncProjcetUserTimeTask {
             map.forEach((userId, v) -> {
                 v.forEach((days, h) -> {
                     WUserTimes times = new WUserTimes();
-                    times.setPId(pId);
+                    times.setPId(String.valueOf(id));
                     times.setDay(days);
                     times.setHouses(BigDecimal.valueOf(h));
                     times.setUserId(userId);
                     userTimesData.add(times);
                     LambdaQueryWrapper<WUserTimes> query = Wrappers.lambdaQuery();
-                    query.eq(WUserTimes::getPId, pId);
+                    query.eq(WUserTimes::getPId, id);
                     query.eq(WUserTimes::getUserId, userId);
                     query.eq(true, WUserTimes::getDay, days);
                     wUserTimesService.remove(query);
