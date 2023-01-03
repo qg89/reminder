@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.util;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.docx.v1.enums.BatchUpdateDocumentBlockUserIdTypeEnum;
@@ -17,6 +18,7 @@ import com.lark.oapi.service.sheets.v3.model.QuerySpreadsheetSheetReq;
 import com.lark.oapi.service.sheets.v3.model.QuerySpreadsheetSheetResp;
 import com.lark.oapi.service.sheets.v3.model.Sheet;
 import com.lark.oapi.service.wiki.v2.model.*;
+import com.q.reminder.reminder.constant.MsgTypeConstants;
 import com.q.reminder.reminder.entity.GroupInfo;
 import com.q.reminder.reminder.entity.UserGroup;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
@@ -117,12 +119,38 @@ public abstract class FeishuJavaUtils {
             if (resp.getCode() == 0) {
                 return Boolean.TRUE;
             } else {
-                log.error("更新飞书周报失败，msg：{} error：{}", resp.getMsg(), resp.getError());
+                JSONObject json = new JSONObject();
+                json.put("text", "项目名称： " + vo.getProjectShortName() + "，msg：" + resp.getMsg() + ", error：" + resp.getError());
+                sendAdmin(client, json, List.of("ou_35e03d4d8754dd35fed26c26849c85ab"));
             }
         } catch (Exception e) {
             log.error(e);
         }
         return Boolean.FALSE;
+    }
+
+    /**
+     * 发送管理员
+     *
+     * @param client
+     * @param json
+     * @param adminInfos
+     * @throws Exception
+     */
+    public static void sendAdmin(Client client, JSONObject json, List<String> adminInfos) throws Exception {
+        adminInfos.forEach(memberId -> {
+            MessageVo messageVo = new MessageVo();
+            messageVo.setContent(json.toJSONString());
+            messageVo.setReceiveId(memberId);
+            messageVo.setMsgType(MsgTypeConstants.TEXT);
+            messageVo.setClient(client);
+            messageVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+            try {
+                FeishuJavaUtils.sendContent(messageVo);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     /**

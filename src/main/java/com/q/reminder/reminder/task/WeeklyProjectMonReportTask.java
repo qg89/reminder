@@ -59,7 +59,7 @@ public class WeeklyProjectMonReportTask {
         }
         String jobParam = XxlJobHelper.getJobParam();
         int weekNumber = 0;
-        String pKey = null;
+        String id = null;
         if (StringUtils.isNotBlank(jobParam)) {
             String[] param = jobParam.split(",");
             String weekNum = param[0];
@@ -67,10 +67,10 @@ public class WeeklyProjectMonReportTask {
                 weekNumber = Integer.parseInt(weekNum);
             }
             if (param.length > 1 && StringUtils.isNotBlank(param[1])) {
-                pKey = param[1];
+                id = param[1];
             }
         }
-        List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNumber, pKey);
+        List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNumber, id);
         this.writeReport(list);
         return ret;
     }
@@ -263,12 +263,13 @@ public class WeeklyProjectMonReportTask {
         if (file == null) {
             return;
         }
+        String name = file.getName();
         String blockId = vo.getBlockId();
         // 通过飞书上传图片至对应的block_id下
         FeishuUploadImageVo imageVo = new FeishuUploadImageVo();
         imageVo.setParentType("docx_image");
         imageVo.setFile(file);
-        imageVo.setFileName(file.getName());
+        imageVo.setFileName(name);
         imageVo.setSize(file.length());
         imageVo.setAppSecret(vo.getAppSecret());
         imageVo.setAppId(vo.getAppId());
@@ -284,6 +285,9 @@ public class WeeklyProjectMonReportTask {
                 .build());
         update.setBlockId(blockId);
         requests.add(update);
+        if ("logo.jpg".equals(name)) {
+            return;
+        }
         file.delete();
     }
 
@@ -325,9 +329,6 @@ public class WeeklyProjectMonReportTask {
     @Deprecated
     public WeeklyVo resetReport(WeeklyVo vo) throws Exception {
         File logoFile = new File(ResourceUtils.path());
-        String redmineUrl = vo.getRedmineUrl();
-        String accessKey = vo.getPmKey();
-        String pKey = vo.getPKey();
         String projectShortName = vo.getProjectShortName();
         vo.setAppSecret(feishuProperties.getAppSecret());
         vo.setAppId(feishuProperties.getAppId());

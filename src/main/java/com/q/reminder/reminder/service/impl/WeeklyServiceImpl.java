@@ -48,9 +48,6 @@ public class WeeklyServiceImpl implements WeeklyService {
         Date startDay = vo.getStartDay();
         Date sunday = getWeekNumToSunday(vo.getWeekNum() - 1);
         String title = vo.getTitle();
-        String redmineUrl = vo.getRedmineUrl();
-        String accessKey = vo.getPmKey();
-        String pKey = vo.getPKey();
         JSONArray jsonArray = WeeklyProjectFeishuUtils.blocks(vo);
         ArrayList<UpdateBlockRequest> requests = new ArrayList<>();
 

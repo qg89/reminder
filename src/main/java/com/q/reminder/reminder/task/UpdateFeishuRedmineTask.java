@@ -2,7 +2,6 @@ package com.q.reminder.reminder.task;
 
 import com.lark.oapi.Client;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
-import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.GroupInfo;
 import com.q.reminder.reminder.entity.UserGroup;

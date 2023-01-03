@@ -19,7 +19,7 @@ public class WeeklyVo extends WeeklyProjectVo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -7434225459549482768L;
-    private String pKey;
+    private String id;
     private String title;
     private Integer weekNum;
 }
