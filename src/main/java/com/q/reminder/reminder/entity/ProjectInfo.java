@@ -21,6 +21,8 @@ public class ProjectInfo implements Serializable {
     @Serial
     private static final long serialVersionUID = 6061440968825915105L;
     @TableId(type = IdType.INPUT)
+    private Long id;
+
     @TableField("p_id")
     private String pId;
 
