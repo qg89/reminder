@@ -27,7 +27,7 @@ public class WikiSpace implements Serializable {
     @TableId(type = IdType.AUTO)
     private Long id;
     @TableField("p_id")
-    private Integer pId;
+    private Long pId;
 
     @TableField("week_num")
     private Integer weekNum;
