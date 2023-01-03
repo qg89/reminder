@@ -2,6 +2,7 @@ package com.q.reminder.reminder.mapper;
 
 import com.github.jeffreyning.mybatisplus.base.MppBaseMapper;
 import com.q.reminder.reminder.entity.WRoleGroupUser;
+import com.q.reminder.reminder.vo.GroupRoleUserIdsVo;
 import com.q.reminder.reminder.vo.OptionVo;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -15,6 +16,6 @@ import java.util.List;
  */
 @Mapper
 public interface WRoleGroupUserMapping extends MppBaseMapper<WRoleGroupUser> {
-    List<OptionVo> option();
+    List<GroupRoleUserIdsVo> option();
 }
 

@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author : saiko
@@ -19,7 +20,7 @@ public class WorkloadParamsVo implements Serializable {
 
     private String pKey;
     private String year;
-    private String groupId;
-    private String roleId;
-    private String userId;
+    private List<String> groupId;
+    private List<String> roleId;
+    private List<String> userId;
 }

@@ -5,6 +5,8 @@ import com.q.reminder.reminder.entity.WRole;
 import com.q.reminder.reminder.mapper.WRoleMapping;
 import com.q.reminder.reminder.service.WRoleService;
 import com.q.reminder.reminder.util.RoleInvolvementUtils;
+import com.q.reminder.reminder.vo.OptionVo;
+import com.q.reminder.reminder.vo.RoleGroupIdsVo;
 import com.q.reminder.reminder.vo.RoleInvolvementVo;
 import com.q.reminder.reminder.vo.WorkloadParamsVo;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,11 @@ public class WRoleServiceImpl extends ServiceImpl<WRoleMapping, WRole> implement
     public List<RoleInvolvementVo> roleInvolvement(WorkloadParamsVo params) {
         List<RoleInvolvementVo> voList = baseMapper.roleInvolvement(params);
         return RoleInvolvementUtils.getRoleInvolvementVos(voList);
+    }
+
+    @Override
+    public List<RoleGroupIdsVo> listByGroupIds(List<OptionVo> result) {
+        return baseMapper.listByGroupIds(result);
     }
 }
 

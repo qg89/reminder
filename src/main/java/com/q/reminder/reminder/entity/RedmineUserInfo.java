@@ -1,5 +1,7 @@
 package com.q.reminder.reminder.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -16,6 +18,8 @@ import java.io.Serializable;
 @TableName("r_redmine_user_info")
 @Data
 public class RedmineUserInfo implements Serializable {
+
+    @TableId(type = IdType.INPUT)
     private Integer assigneeId;
     private String assigneeName;
     private String redmineType;

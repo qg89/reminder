@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author : saiko
@@ -17,11 +18,9 @@ public class OptionVo implements Serializable {
     @Serial
     private static final long serialVersionUID = 7482278041918645547L;
 
-    private String roleId;
-    private String roleName;
-    private String groupId;
-    private String groupName;
-    private String userId;
-    private String userName;
+    private String id;
+    private String pId;
+    private String name;
+    List<OptionVo> child;
 
 }
