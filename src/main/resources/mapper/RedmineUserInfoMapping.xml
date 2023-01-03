@@ -22,6 +22,27 @@
             p.p_key = #{vo.pKey}
           AND dc.`year` = #{vo.year}
           AND CONCAT( dc.`year`, dc.`month` ) = DATE_FORMAT( ut.`day`, '%Y%c' )
+        <if test="vo.groupId != null and vo.groupId.size() > 0">
+            AND g.id IN(
+            <foreach collection="vo.groupId" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="vo.roleId != null and vo.roleId.size() > 0">
+            AND r.id IN(
+            <foreach collection="vo.roleId" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="vo.userId != null and vo.userId.size() > 0">
+            AND u.assignee_id IN(
+            <foreach collection="vo.userId" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
         GROUP BY
             g.`group`,
             r.role,
@@ -48,6 +69,27 @@
             p.p_key = #{vo.pKey}
           AND dc.`year` = #{vo.year}
           AND CONCAT( dc.`year`, dc.`month` ) = DATE_FORMAT( ut.`day`, '%Y%c' )
+        <if test="vo.groupId != null and vo.groupId.size() > 0">
+            AND g.id IN(
+            <foreach collection="vo.groupId" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="vo.roleId != null and vo.roleId.size() > 0">
+            AND r.id IN(
+            <foreach collection="vo.roleId" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="vo.userId != null and vo.userId.size() > 0">
+            AND u.assignee_id IN(
+            <foreach collection="vo.userId" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
         GROUP BY
             u.assignee_name,
             dc.`month`,
