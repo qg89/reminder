@@ -53,7 +53,7 @@ public class WeeklyProjectReportTask {
             vo.setProjectShortName(projectInfo.getProjectShortName());
             vo.setFolderToken(projectInfo.getFolderToken());
             WeeklyProjectReport projectReport = WeeklyProjectFeishuUtils.copyFile(vo);
-            projectReport.setRPid(projectInfo.getPId());
+            projectReport.setRPid(projectInfo.getId());
             weeklyProjectReportService.save(projectReport);
         });
         return ReturnT.SUCCESS;

@@ -42,7 +42,7 @@ public class WeeklyProjectReport implements Serializable {
     private String url;
 
     @TableField("r_pid")
-    private String rPid;
+    private Long rPid;
 
     @TableLogic(value = "0", delval = "1")
     @TableField("is_delete")
