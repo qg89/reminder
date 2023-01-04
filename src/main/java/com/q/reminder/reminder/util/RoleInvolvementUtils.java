@@ -23,6 +23,18 @@ public class RoleInvolvementUtils {
         voList.stream().collect(Collectors.groupingBy(RoleInvolvementVo::getName)).forEach((name, l) -> {
             RoleInvolvementVo vo = new RoleInvolvementVo();
             vo.setName(name);
+            vo.setJan("0.00");
+            vo.setFeb("0.00");
+            vo.setMar("0.00");
+            vo.setJun("0.00");
+            vo.setMay("0.00");
+            vo.setJul("0.00");
+            vo.setAug("0.00");
+            vo.setSep("0.00");
+            vo.setOct("0.00");
+            vo.setSep("0.00");
+            vo.setNov("0.00");
+            vo.setDec("0.00");
             for (RoleInvolvementVo v : l) {
                 String months = v.getMonths();
                 String hours = v.getHours();
