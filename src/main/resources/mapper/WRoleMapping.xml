@@ -24,6 +24,7 @@
             LEFT JOIN r_project_info p ON p.id = ut.p_id
         WHERE
             p.p_key = #{vo.pKey}
+          AND DATE_FORMAT( ut.`day`, '%Y' ) = #{vo.year}
         GROUP BY
             r.role, `months`
     </select>

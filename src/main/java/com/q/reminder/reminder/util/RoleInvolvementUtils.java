@@ -26,11 +26,11 @@ public class RoleInvolvementUtils {
             vo.setJan("0.00");
             vo.setFeb("0.00");
             vo.setMar("0.00");
-            vo.setJun("0.00");
+            vo.setArp("0.00");
             vo.setMay("0.00");
+            vo.setJun("0.00");
             vo.setJul("0.00");
             vo.setAug("0.00");
-            vo.setSep("0.00");
             vo.setOct("0.00");
             vo.setSep("0.00");
             vo.setNov("0.00");
