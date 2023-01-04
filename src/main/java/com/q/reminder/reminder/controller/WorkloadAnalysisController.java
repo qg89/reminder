@@ -59,7 +59,7 @@ public class WorkloadAnalysisController {
     }
 
     /**
-     * 年工作强度
+     * 工作强度
      *
      * @return
      */
@@ -91,7 +91,7 @@ public class WorkloadAnalysisController {
     }
 
     /**
-     * 按角色分类
+     * 按角色投入（人/月）
      *
      * @param params
      * @return
