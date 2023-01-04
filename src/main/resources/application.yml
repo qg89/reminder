@@ -2,6 +2,8 @@ server:
   port: 12315
 # 数据源
 spring:
+  main:
+    allow-circular-references: true
   jackson:
     default-property-inclusion: non_null
   task:
