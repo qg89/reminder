@@ -80,7 +80,7 @@ public class WorkloadAnalysisController {
     }
 
     /**
-     * 按分组分类
+     * 按组别分类
      *
      * @param params
      * @return
@@ -91,7 +91,7 @@ public class WorkloadAnalysisController {
     }
 
     /**
-     * 按角色投入（人/月）
+     * 按组别角色分类
      *
      * @param params
      * @return

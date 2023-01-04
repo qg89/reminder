@@ -4,9 +4,9 @@
     <select id="roleInvolvement" resultType="com.q.reminder.reminder.vo.RoleInvolvementVo">
         SELECT
             r.role AS `name`,
-            DATE_FORMAT( ut.`day`, '%c' ) AS `months`,
+            IFNULL( DATE_FORMAT( ut.`day`, '%c' ), 0 ) AS `months`,
             ROUND(
-                SUM( ut.houses )/ 8 /(
+                IFNULL( SUM( ut.houses )/ 8 /(
                 SELECT
                     c.days
                 FROM
@@ -15,7 +15,7 @@
                 WHERE
                    d.`month` = `months`
                     AND d.`year` = #{vo.year}
-                    ), 2
+                    ), 0 ), 2
                 ) hours
         FROM
             w_role r
