@@ -28,6 +28,7 @@ public class WRole extends Model<WRole> implements Serializable {
         
     private String role;
 
+    private Integer sort;
 
 }
 

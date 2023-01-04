@@ -38,6 +38,7 @@ public class RoleInvolvementUtils {
             for (RoleInvolvementVo v : l) {
                 String months = v.getMonths();
                 String hours = v.getHours();
+                vo.setSort(v.getSort());
                 switch (months) {
                     case WmonthConstants.JAN -> vo.setJan(hours);
                     case WmonthConstants.FEB -> vo.setFeb(hours);

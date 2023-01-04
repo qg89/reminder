@@ -11,6 +11,7 @@ import com.q.reminder.reminder.vo.RoleInvolvementVo;
 import com.q.reminder.reminder.vo.WorkloadParamsVo;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -25,7 +26,7 @@ public class WRoleServiceImpl extends ServiceImpl<WRoleMapping, WRole> implement
     @Override
     public List<RoleInvolvementVo> roleInvolvement(WorkloadParamsVo params) {
         List<RoleInvolvementVo> voList = baseMapper.roleInvolvement(params);
-        return RoleInvolvementUtils.getRoleInvolvementVos(voList);
+        return RoleInvolvementUtils.getRoleInvolvementVos(voList).stream().sorted(Comparator.comparing(RoleInvolvementVo::getSort)).toList();
     }
 
     @Override

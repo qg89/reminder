@@ -26,6 +26,8 @@ public class RoleInvolvementVo implements Serializable {
     private String hours;
     @JSONField(serialize = false)
     private String months;
+    @JSONField(serialize = false)
+    private Integer sort;
     private String jan;
     private String feb;
     private String mar;
