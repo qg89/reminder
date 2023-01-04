@@ -21,12 +21,12 @@
             w_role r
             LEFT JOIN w_role_group_user re ON r.id = re.role_id
             LEFT JOIN w_user_times ut ON re.user_id = ut.user_id
-            LEFT JOIN r_project_info p ON p.id = ut.p_id
+            LEFT JOIN r_project_info p ON p.id = ut.p_id AND p.p_key = #{vo.pKey}
         WHERE
-            p.p_key = #{vo.pKey}
-          AND DATE_FORMAT( ut.`day`, '%Y' ) = #{vo.year}
+            DATE_FORMAT( ut.`day`, '%Y' ) = #{vo.year}
         GROUP BY
-            r.role, `months`
+            r.role, r.sort,`months`
+        ORDER BY r.sort ASC
     </select>
 </mapper>
 
