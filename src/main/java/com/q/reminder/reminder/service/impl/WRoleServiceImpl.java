@@ -9,10 +9,15 @@ import com.q.reminder.reminder.vo.OptionVo;
 import com.q.reminder.reminder.vo.RoleGroupIdsVo;
 import com.q.reminder.reminder.vo.RoleInvolvementVo;
 import com.q.reminder.reminder.vo.WorkloadParamsVo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 角色(WRole)表服务实现类
@@ -22,16 +27,39 @@ import java.util.List;
  */
 @Service
 public class WRoleServiceImpl extends ServiceImpl<WRoleMapping, WRole> implements WRoleService {
+    @Autowired
+    private WRoleService wRoleService;
 
     @Override
     public List<RoleInvolvementVo> roleInvolvement(WorkloadParamsVo params) {
         List<RoleInvolvementVo> voList = baseMapper.roleInvolvement(params);
-        return RoleInvolvementUtils.getRoleInvolvementVos(voList).stream().sorted(Comparator.comparing(RoleInvolvementVo::getSort)).toList();
-    }
-
-    @Override
-    public List<RoleGroupIdsVo> listByGroupIds(List<OptionVo> result) {
-        return baseMapper.listByGroupIds(result);
+        List<RoleInvolvementVo> vos = RoleInvolvementUtils.getRoleInvolvementVos(voList).stream().sorted(Comparator.comparing(RoleInvolvementVo::getSort)).toList();
+        Map<String, List<RoleInvolvementVo>> map = vos.stream().collect(Collectors.groupingBy(RoleInvolvementVo::getName));
+        List<String> list = wRoleService.list().stream().map(WRole::getRole).toList();
+        vos = new ArrayList<>();
+        for (String role : list) {
+            List<RoleInvolvementVo> vl = map.get(role);
+            if (!CollectionUtils.isEmpty(vl)) {
+                vos.addAll(vl);
+            } else {
+                RoleInvolvementVo vo = new RoleInvolvementVo();
+                vo.setName(role);
+                vo.setJan("0.00");
+                vo.setFeb("0.00");
+                vo.setMar("0.00");
+                vo.setArp("0.00");
+                vo.setMay("0.00");
+                vo.setJun("0.00");
+                vo.setJul("0.00");
+                vo.setAug("0.00");
+                vo.setOct("0.00");
+                vo.setSep("0.00");
+                vo.setNov("0.00");
+                vo.setDec("0.00");
+                vos.add(vo);
+            }
+        }
+        return vos;
     }
 }
 

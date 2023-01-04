@@ -21,6 +21,5 @@ import java.util.List;
 public interface WRoleMapping extends BaseMapper<WRole> {
     List<RoleInvolvementVo> roleInvolvement(@Param("vo") WorkloadParamsVo params);
 
-    List<RoleGroupIdsVo> listByGroupIds(@Param("list") List<OptionVo> result);
 }
 

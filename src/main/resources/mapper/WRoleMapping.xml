@@ -4,6 +4,7 @@
     <select id="roleInvolvement" resultType="com.q.reminder.reminder.vo.RoleInvolvementVo">
         SELECT
             r.role AS `name`,
+            r.sort,
             IFNULL( DATE_FORMAT( ut.`day`, '%c' ), 0 ) AS `months`,
             ROUND(
                 IFNULL( SUM( ut.houses )/ 8 /(
@@ -26,7 +27,6 @@
             DATE_FORMAT( ut.`day`, '%Y' ) = #{vo.year}
         GROUP BY
             r.role, r.sort,`months`
-        ORDER BY r.sort ASC
     </select>
 </mapper>
 

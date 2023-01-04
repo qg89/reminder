@@ -1,9 +1,11 @@
 package com.q.reminder.reminder.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import com.alibaba.fastjson2.annotation.JSONField;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -16,7 +18,6 @@ import java.io.Serializable;
  * @since 2022-12-28 10:19:37
  */
 @Data
-@AllArgsConstructor
 @TableName("w_role")
 public class WRole extends Model<WRole> implements Serializable {
     @Serial
@@ -25,9 +26,11 @@ public class WRole extends Model<WRole> implements Serializable {
         
     @TableId(type = IdType.AUTO)
     private Integer id;
-        
+
+    @JSONField(name = "role")
     private String role;
 
+    @JSONField(name = "sort")
     private Integer sort;
 
 }
