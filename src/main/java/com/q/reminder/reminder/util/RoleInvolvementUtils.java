@@ -20,12 +20,13 @@ public class RoleInvolvementUtils {
     @NotNull
     public static List<RoleInvolvementVo> getRoleInvolvementVos(List<RoleInvolvementVo> voList) {
         List<RoleInvolvementVo> data = new ArrayList<>();
-        voList.stream().collect(Collectors.groupingBy(RoleInvolvementVo::getMonths)).forEach((m, l) -> {
+        voList.stream().collect(Collectors.groupingBy(RoleInvolvementVo::getName)).forEach((name, l) -> {
+            RoleInvolvementVo vo = new RoleInvolvementVo();
+            vo.setName(name);
             for (RoleInvolvementVo v : l) {
-                RoleInvolvementVo vo = new RoleInvolvementVo();
-                vo.setName(v.getName());
+                String months = v.getMonths();
                 String hours = v.getHours();
-                switch (m) {
+                switch (months) {
                     case WmonthConstants.JAN -> vo.setJan(hours);
                     case WmonthConstants.FEB -> vo.setFeb(hours);
                     case WmonthConstants.MAR -> vo.setMar(hours);
@@ -40,8 +41,8 @@ public class RoleInvolvementUtils {
                     case WmonthConstants.DEC -> vo.setDec(hours);
                     default -> {}
                 }
-                data.add(vo);
             }
+            data.add(vo);
         });
         return data;
     }
