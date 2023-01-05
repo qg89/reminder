@@ -17,7 +17,6 @@ import java.io.Serializable;
  * @since 2022-12-28 10:33:12
  */
 @Data
-@AllArgsConstructor
 @TableName("w_user_time_month")
 public class WUserTimeMonth extends Model<WUserTimeMonth> implements Serializable {
     @Serial
@@ -38,6 +37,10 @@ public class WUserTimeMonth extends Model<WUserTimeMonth> implements Serializabl
      * 投入工时
      */    
     private BigDecimal times;
+    /**
+     * redmine项目表主键
+     */
+    private String pId;
 
 
 }

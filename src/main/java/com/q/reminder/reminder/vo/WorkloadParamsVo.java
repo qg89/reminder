@@ -18,6 +18,7 @@ public class WorkloadParamsVo implements Serializable {
     @Serial
     private static final long serialVersionUID = -289390047236702876L;
 
+    private String pId;
     private String pKey;
     private String year;
     private List<String> groupId;

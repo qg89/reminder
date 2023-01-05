@@ -35,10 +35,13 @@ public class RoleInvolvementUtils {
             vo.setSep("0.00");
             vo.setNov("0.00");
             vo.setDec("0.00");
+            String id = null;
+            Integer sort = null;
             for (RoleInvolvementVo v : l) {
                 String months = v.getMonths();
                 String hours = v.getHours();
-                vo.setSort(v.getSort());
+                sort = v.getSort();
+                id = v.getId();
                 switch (months) {
                     case WmonthConstants.JAN -> vo.setJan(hours);
                     case WmonthConstants.FEB -> vo.setFeb(hours);
@@ -55,6 +58,8 @@ public class RoleInvolvementUtils {
                     default -> {}
                 }
             }
+            vo.setId(id);
+            vo.setSort(sort);
             data.add(vo);
         });
         return data;

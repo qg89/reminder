@@ -19,6 +19,7 @@ public class RoleInvolvementVo implements Serializable {
     @Serial
     private static final long serialVersionUID = -302010094843565788L;
 
+    private String id;
     private String name;
     private String group;
     private String role;

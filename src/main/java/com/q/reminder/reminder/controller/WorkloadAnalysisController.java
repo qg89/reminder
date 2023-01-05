@@ -1,18 +1,19 @@
 package com.q.reminder.reminder.controller;
 
-import com.q.reminder.reminder.service.RedmineUserInfoService;
-import com.q.reminder.reminder.service.WGroupService;
-import com.q.reminder.reminder.service.WRoleGroupUserService;
-import com.q.reminder.reminder.service.WRoleService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RedmineUserInfo;
+import com.q.reminder.reminder.entity.WUserTimeMonth;
+import com.q.reminder.reminder.service.*;
 import com.q.reminder.reminder.vo.OptionVo;
 import com.q.reminder.reminder.vo.RoleInvolvementVo;
+import com.q.reminder.reminder.vo.UserTimeMonthRatioVo;
 import com.q.reminder.reminder.vo.WorkloadParamsVo;
 import com.xxl.job.core.biz.model.ReturnT;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,10 @@ public class WorkloadAnalysisController {
     private WGroupService wGroupService;
     @Autowired
     private WRoleGroupUserService wRoleGroupUserService;
+    @Autowired
+    private WUserTimeMonthService wUserTimeMonthService;
+    @Autowired
+    private ProjectInfoService projectInfoService;
 
     @GetMapping("/option")
     public ReturnT<List<OptionVo>> option(WorkloadParamsVo paramsVo) {
@@ -45,6 +50,28 @@ public class WorkloadAnalysisController {
             return new ReturnT<>(new ArrayList<>());
         }
         return new ReturnT<>(wRoleGroupUserService.option(paramsVo));
+    }
+
+    /**
+     * 项目下拉列表
+     * @return
+     */
+    @GetMapping("/project_option")
+    public ReturnT<List<ProjectInfo>> projectOption() {
+        LambdaQueryWrapper<ProjectInfo> lq = Wrappers.lambdaQuery();
+        lq.select(ProjectInfo::getId, ProjectInfo::getPName);
+        return new ReturnT<>(projectInfoService.list(lq));
+    }
+
+    /**
+     * 人员下拉列表
+     * @return
+     */
+    @GetMapping("/user_option")
+    public ReturnT<List<RedmineUserInfo>> userOption() {
+        LambdaQueryWrapper<RedmineUserInfo> lq = Wrappers.lambdaQuery();
+        lq.select(RedmineUserInfo::getAssigneeId, RedmineUserInfo::getAssigneeName);
+        return new ReturnT<>(redmineUserInfoService.list(lq));
     }
 
     /**
@@ -99,5 +126,25 @@ public class WorkloadAnalysisController {
     @GetMapping("/group_user_workload")
     public ReturnT<List<RoleInvolvementVo>> groupUserWorkload(WorkloadParamsVo params) {
         return new ReturnT<>(redmineUserInfoService.groupUserWorkload(params));
+    }
+
+    /**
+     * 年投入比例
+     * @param params
+     * @return
+     */
+    @GetMapping("/input_ratio")
+    public ReturnT<List<RoleInvolvementVo>> inputRatio(WorkloadParamsVo params) {
+        return new ReturnT<>(wUserTimeMonthService.inputRatio(params));
+    }
+
+    /**
+     * 年投入比例
+     * @param list
+     * @return
+     */
+    @PostMapping("/input_ratio_edit")
+    public ReturnT<Boolean> inputRatioEdit(@RequestBody List<UserTimeMonthRatioVo> list) {
+        return new ReturnT<>(wUserTimeMonthService.inputRatioEdit(list));
     }
 }

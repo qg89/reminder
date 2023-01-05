@@ -2,6 +2,11 @@ package com.q.reminder.reminder.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.q.reminder.reminder.entity.WUserTimeMonth;
+import com.q.reminder.reminder.vo.RoleInvolvementVo;
+import com.q.reminder.reminder.vo.UserTimeMonthRatioVo;
+import com.q.reminder.reminder.vo.WorkloadParamsVo;
+
+import java.util.List;
 
 
 /**
@@ -12,4 +17,7 @@ import com.q.reminder.reminder.entity.WUserTimeMonth;
  */
 public interface WUserTimeMonthService extends IService<WUserTimeMonth>{
 
+    List<RoleInvolvementVo> inputRatio(WorkloadParamsVo params);
+
+    Boolean inputRatioEdit(List<UserTimeMonthRatioVo> enity);
 }
