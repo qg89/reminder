@@ -4,6 +4,10 @@ import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.request.RequestOptions;
+import com.lark.oapi.service.bitable.v1.model.AppTableRecord;
+import com.lark.oapi.service.bitable.v1.model.ListAppTableRecordReq;
+import com.lark.oapi.service.bitable.v1.model.ListAppTableRecordResp;
+import com.lark.oapi.service.bitable.v1.model.ListAppTableRecordRespBody;
 import com.lark.oapi.service.docx.v1.enums.BatchUpdateDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.enums.PatchDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.model.*;
@@ -24,6 +28,7 @@ import com.q.reminder.reminder.entity.UserGroup;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.vo.*;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -392,5 +397,31 @@ public abstract class FeishuJavaUtils {
         ug.setChatId(chatId);
         ug.setMemberId(e.getMemberId());
         userGroupList.add(ug);
+    }
+
+    /**
+     * 多为表格-记录-列出记录
+     * @param client
+     * @return
+     */
+    public static List<AppTableRecord> listTableRecords(Client client) throws Exception {
+        List<AppTableRecord> resList = new ArrayList<>();
+        ListAppTableRecordReq req = ListAppTableRecordReq.newBuilder()
+                .appToken("bascnrkdLGoUftLgM7fvME7ly5c")
+                .tableId("tblctWgFXH5Pa32l")
+                .viewId("vew0XZ0TBn")
+                .build();
+        ListAppTableRecordResp resp;
+        ListAppTableRecordRespBody respData = new ListAppTableRecordRespBody();
+        do {
+            String pageToken = respData.getPageToken();
+            if (StringUtils.isNotBlank(pageToken)) {
+                req.setPageToken(pageToken);
+            }
+            resp = client.bitable().appTableRecord().list(req, RequestOptions.newBuilder().build());
+            respData = resp.getData();
+            resList.addAll(Arrays.stream(respData.getItems()).toList());
+        } while (resp.getCode() == 0 && respData.getHasMore());
+          return resList;
     }
 }
