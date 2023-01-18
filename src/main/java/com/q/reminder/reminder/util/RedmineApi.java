@@ -407,8 +407,9 @@ public abstract class RedmineApi {
      * @throws RedmineException
      */
     public static List<TimeEntry> queryTimes(ProjectInfo info) throws RedmineException {
-        String redmineUrl = info.getRedmineUrl() + "/projects/" + info.getPKey();
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, info.getPmKey());
+        String redmineUrl = info.getRedmineUrl();
+        String url = redmineUrl + "/projects/" + info.getPKey();
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(url, info.getPmKey());
         Transport transport = mgr.getTransport();
         Collection<RequestParam> params = new ArrayList<>();
         Date startDay = info.getStartDay();
@@ -417,6 +418,16 @@ public abstract class RedmineApi {
             params.add(new RequestParam("op[spent_on]", ">="));
             params.add(new RequestParam("v[spent_on][]", new DateTime(startDay).toString("yyyy-MM-dd")));
         }
-        return transport.getObjectsList(TimeEntry.class, params);
+        List<TimeEntry> timeEntries = transport.getObjectsList(TimeEntry.class, params);
+        IssueManager issueManager = RedmineManagerFactory.createWithApiKey(redmineUrl, info.getPmKey()).getIssueManager();
+        for (TimeEntry timeEntry : timeEntries) {
+            Integer issueId = timeEntry.getIssueId();
+            Issue issue = issueManager.getIssueById(issueId);
+            CustomField customField = issue.getCustomFieldById(CustomFieldsEnum.BUG_TYPE.getId());
+            if (customField != null && "Bug".equals(customField.getValue())) {
+                timeEntry.addCustomFields(List.of(customField));
+            }
+        }
+        return timeEntries;
     }
 }

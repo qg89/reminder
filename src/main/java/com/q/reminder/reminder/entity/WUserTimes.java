@@ -15,13 +15,13 @@ import java.io.Serializable;
  * (WUserTimes)实体类
  *
  * @author makejava
- * @since 2022-12-28 11:33:59
+ * @since 2023-01-18 10:40:43
  */
 @Data
 @TableName("w_user_times")
 public class WUserTimes extends Model<WUserTimes> implements Serializable {
     @Serial
-    private static final long serialVersionUID = -56179210358790512L;
+    private static final long serialVersionUID = -95934262243607496L;
     
         
     @TableId(type = IdType.AUTO)
@@ -42,6 +42,14 @@ public class WUserTimes extends Model<WUserTimes> implements Serializable {
      * 耗时
      */    
     private BigDecimal houses;
+    /**
+     * 工时类型：0 正常工时， 1BUG工时
+     */    
+    private String timeType;
+        
+    private Date updateTime;
+        
+    private Date createTime;
 
 
 }

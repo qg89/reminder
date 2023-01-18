@@ -20,10 +20,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -86,25 +90,48 @@ public class SyncProjcetUserTimeTask {
                 }
                 return isDate;
             }).toList();
-            Map<String, Map<String, Double>> map = timeEntries.stream().collect(Collectors.groupingBy(e -> String.valueOf(e.getUserId()), Collectors.groupingBy(e -> new DateTime(e.getSpentOn()).toString("yyyy-MM-dd"),
+
+            // 正常工时
+            String timeType = "0";
+            Map<String, Map<String, Double>> map = timeEntries.stream().filter(e -> CollectionUtils.isEmpty(e.getCustomFields())).collect(Collectors.groupingBy(e -> String.valueOf(e.getUserId()), Collectors.groupingBy(e -> new DateTime(e.getSpentOn()).toString("yyyy-MM-dd"),
                     Collectors.summingDouble(e -> BigDecimal.valueOf(e.getHours()).setScale(2, RoundingMode.HALF_UP).doubleValue()))));
-            map.forEach((userId, v) -> {
-                v.forEach((days, h) -> {
-                    WUserTimes times = new WUserTimes();
-                    times.setPId(String.valueOf(id));
-                    times.setDay(days);
-                    times.setHouses(BigDecimal.valueOf(h));
-                    times.setUserId(userId);
-                    userTimesData.add(times);
-                    LambdaQueryWrapper<WUserTimes> query = Wrappers.lambdaQuery();
-                    query.eq(WUserTimes::getPId, id);
-                    query.eq(WUserTimes::getUserId, userId);
-                    query.eq(true, WUserTimes::getDay, days);
-                    wUserTimesService.remove(query);
-                });
-            });
+            time(userTimesData, id, timeType, map);
+
+            // bug工时
+            String bugTimeType = "1";
+            Map<String, Map<String, Double>> mapBug = timeEntries.stream().filter(e -> !CollectionUtils.isEmpty(e.getCustomFields())).collect(Collectors.groupingBy(e -> String.valueOf(e.getUserId()), Collectors.groupingBy(e -> new DateTime(e.getSpentOn()).toString("yyyy-MM-dd"),
+                    Collectors.summingDouble(e -> BigDecimal.valueOf(e.getHours()).setScale(2, RoundingMode.HALF_UP).doubleValue()))));
+            time(userTimesData, id, bugTimeType, mapBug);
         }
         wUserTimesService.saveOrUpdateBatch(userTimesData);
         return new ReturnT<>(null);
+    }
+
+    /**
+     * 工时处理
+     *
+     * @param userTimesData
+     * @param id
+     * @param bugTimeType
+     * @param mapBug
+     */
+    private void time(List<WUserTimes> userTimesData, Long id, String bugTimeType, Map<String, Map<String, Double>> mapBug) {
+        mapBug.forEach((userId, v) -> {
+            v.forEach((days, h) -> {
+                WUserTimes times = new WUserTimes();
+                times.setPId(String.valueOf(id));
+                times.setDay(days);
+                times.setHouses(BigDecimal.valueOf(h));
+                times.setUserId(userId);
+                times.setTimeType(bugTimeType);
+                userTimesData.add(times);
+                LambdaQueryWrapper<WUserTimes> query = Wrappers.lambdaQuery();
+                query.eq(WUserTimes::getPId, id);
+                query.eq(WUserTimes::getUserId, userId);
+                query.eq(WUserTimes::getTimeType, bugTimeType);
+                query.eq(true, WUserTimes::getDay, days);
+                wUserTimesService.remove(query);
+            });
+        });
     }
 }
