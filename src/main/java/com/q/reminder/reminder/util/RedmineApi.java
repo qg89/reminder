@@ -5,10 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.vo.*;
-import com.taskadapter.redmineapi.IssueManager;
-import com.taskadapter.redmineapi.RedmineException;
-import com.taskadapter.redmineapi.RedmineManager;
-import com.taskadapter.redmineapi.RedmineManagerFactory;
+import com.taskadapter.redmineapi.*;
 import com.taskadapter.redmineapi.bean.*;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
@@ -18,8 +15,6 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.springframework.util.CollectionUtils;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -429,5 +424,24 @@ public abstract class RedmineApi {
             }
         }
         return timeEntries;
+    }
+
+    /**
+     * 查询项目耗时
+     *
+     * @param info
+     * @return
+     * @throws RedmineException
+     */
+    public static List<TimeEntry> queryUserTime(ProjectInfo info) throws RedmineException {
+        String redmineUrl = info.getRedmineUrl();
+        String url = redmineUrl + "/projects/" + info.getPKey();
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(url, info.getPmKey());
+        Transport transport = mgr.getTransport();
+        Collection<RequestParam> params = new ArrayList<>();
+        params.add(new RequestParam("f[]", "spent_on"));
+        params.add(new RequestParam("op[spent_on]", ">="));
+        params.add(new RequestParam("v[spent_on][]", new DateTime().minusDays(7).toString("yyyy-MM-dd")));
+        return transport.getObjectsList(TimeEntry.class, params);
     }
 }
