@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -19,9 +20,10 @@ import java.io.Serializable;
 @Data
 public class RedmineUserInfo implements Serializable {
 
-    @TableId(type = IdType.INPUT)
+    @MppMultiId
     private Integer assigneeId;
     private String assigneeName;
+    @MppMultiId
     private String redmineType;
     @TableLogic(value = "0", delval = "1")
     private String isDelete;

@@ -1,6 +1,6 @@
 package com.q.reminder.reminder.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.jeffreyning.mybatisplus.service.MppServiceImpl;
 import com.q.reminder.reminder.entity.RedmineUserInfo;
 import com.q.reminder.reminder.mapper.RedmineUserInfoMapping;
 import com.q.reminder.reminder.service.RedmineUserInfoService;
@@ -19,7 +19,7 @@ import java.util.List;
  * @date :  2022.10.27 16:20
  */
 @Service
-public class RedmineUserInfoServiceImpl extends ServiceImpl<RedmineUserInfoMapping, RedmineUserInfo> implements RedmineUserInfoService {
+public class RedmineUserInfoServiceImpl extends MppServiceImpl<RedmineUserInfoMapping, RedmineUserInfo> implements RedmineUserInfoService {
     @Override
     public List<RoleInvolvementVo> roleInvolvement(WorkloadParamsVo paramsVo) {
         List<RoleInvolvementVo> roleInvolvementVos = baseMapper.roleInvolvement(paramsVo);
