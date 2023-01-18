@@ -2,10 +2,8 @@ package com.q.reminder.reminder.util;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson2.JSONObject;
-import com.google.gson.Gson;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.request.RequestOptions;
-import com.lark.oapi.core.utils.Jsons;
 import com.lark.oapi.service.bitable.v1.model.*;
 import com.lark.oapi.service.docx.v1.enums.BatchUpdateDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.enums.PatchDocumentBlockUserIdTypeEnum;
@@ -31,13 +29,10 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
-import static net.sf.jsqlparser.util.validation.metadata.NamedObject.user;
 
 
 /**
@@ -436,15 +431,15 @@ public abstract class FeishuJavaUtils {
      * @param vo
      * @throws Exception
      */
-    public static void batchUpdateTableRecords(Client client, TTableInfo vo, AppTableRecord[] records) throws Exception {
-        BatchUpdateAppTableRecordReq req = BatchUpdateAppTableRecordReq.newBuilder()
+    public static void batchCreateTableRecords(Client client, TTableInfo vo, AppTableRecord[] records) throws Exception {
+        BatchCreateAppTableRecordReq req = BatchCreateAppTableRecordReq.newBuilder()
                 .appToken(vo.getAppToken())
                 .tableId(vo.getTableId())
-                .batchUpdateAppTableRecordReqBody(BatchUpdateAppTableRecordReqBody.newBuilder()
+                .batchCreateAppTableRecordReqBody(BatchCreateAppTableRecordReqBody.newBuilder()
                         .records(records)
                         .build())
                 .build();
-        client.bitable().appTableRecord().batchUpdate(req);
+        client.bitable().appTableRecord().batchCreate(req);
     }
 
     /**

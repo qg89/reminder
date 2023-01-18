@@ -2,6 +2,10 @@ package com.q.reminder.reminder.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.q.reminder.reminder.entity.WUserTimes;
+import com.q.reminder.reminder.vo.ProjectUserTimeVo;
+
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -12,4 +16,5 @@ import com.q.reminder.reminder.entity.WUserTimes;
  */
 public interface WUserTimesService extends IService<WUserTimes>{
 
+    List<Map<String, String>> listByTable(String day, String dateType);
 }

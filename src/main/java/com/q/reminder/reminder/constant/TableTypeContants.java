@@ -16,7 +16,7 @@ public interface TableTypeContants {
     // 需求管理表临时表
     String FEATURE_TMP = "3";
 
-    interface ViewType {
+    public interface ViewType {
         // 全部
         String ALL = "0";
         // 上月
