@@ -424,19 +424,37 @@ public abstract class FeishuJavaUtils {
     }
 
     /**
+     * 多为表格-记录-批量更新记录
+     *
+     * @param client
+     * @param vo
+     * @throws Exception
+     */
+    public static void batchUpdateTableRecords(Client client, MultidimensionalTableVo vo, AppTableRecord[] records) throws Exception {
+        BatchUpdateAppTableRecordReq req = BatchUpdateAppTableRecordReq.newBuilder()
+                .appToken(vo.getAppToken())
+                .tableId(vo.getTableId())
+                .batchUpdateAppTableRecordReqBody(BatchUpdateAppTableRecordReqBody.newBuilder()
+                        .records(records)
+                        .build())
+                .build();
+        client.bitable().appTableRecord().batchUpdate(req, RequestOptions.newBuilder().build());
+    }
+
+    /**
      * 多为表格-记录-批量删除记录
      *
      * @param client
      * @param records
      */
-    public static void batchDeleteTableRecords(Client client, String[] records) throws Exception {
+    public static void batchDeleteTableRecords(Client client, MultidimensionalTableVo vo, String[] records) throws Exception {
         // 创建请求对象
         BatchDeleteAppTableRecordReq req = BatchDeleteAppTableRecordReq.newBuilder()
-                .batchDeleteAppTableRecordReqBody(BatchDeleteAppTableRecordReqBody.newBuilder()
-                        .records(records)
-                        .build())
+                .appToken(vo.getAppToken())
+                .tableId(vo.getTableId())
+                .batchDeleteAppTableRecordReqBody(BatchDeleteAppTableRecordReqBody.newBuilder().records(records).build())
                 .build();
-        BatchDeleteAppTableRecordResp resp = client.bitable().appTableRecord().batchDelete(req, RequestOptions.newBuilder()
+        client.bitable().appTableRecord().batchDelete(req, RequestOptions.newBuilder()
                 .build());
     }
 
