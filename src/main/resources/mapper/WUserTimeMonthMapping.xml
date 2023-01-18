@@ -11,7 +11,7 @@
             r_redmine_user_info u
             LEFT JOIN w_user_time_month um ON um.user_id = u.assignee_id
             LEFT JOIN s_date_config sc ON um.date_id = sc.id
-            LEFT JOIN r_project_info p ON p.id = um.p_id
+            LEFT JOIN r_project_info p ON p.id = um.p_id AND u.redmine_type = p.redmine_type
         <where>
             p.id = #{vo.pId}
             <if test="vo.year != null and vo.year != ''">

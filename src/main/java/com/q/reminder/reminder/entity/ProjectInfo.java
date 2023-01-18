@@ -92,4 +92,10 @@ public class ProjectInfo implements Serializable {
 
     @TableField("create_time")
     private Date createTime;
+
+    /**
+     * redmine类型:1旧，2新
+     */
+    @TableField("redmine_type")
+    private String redmineType;
 }
