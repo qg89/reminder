@@ -2,8 +2,10 @@ package com.q.reminder.reminder.util;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson2.JSONObject;
+import com.google.gson.Gson;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.request.RequestOptions;
+import com.lark.oapi.core.utils.Jsons;
 import com.lark.oapi.service.bitable.v1.model.*;
 import com.lark.oapi.service.docx.v1.enums.BatchUpdateDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.enums.PatchDocumentBlockUserIdTypeEnum;
@@ -21,6 +23,7 @@ import com.lark.oapi.service.sheets.v3.model.Sheet;
 import com.lark.oapi.service.wiki.v2.model.*;
 import com.q.reminder.reminder.constant.MsgTypeConstants;
 import com.q.reminder.reminder.entity.GroupInfo;
+import com.q.reminder.reminder.entity.TTableInfo;
 import com.q.reminder.reminder.entity.UserGroup;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.vo.*;
@@ -28,10 +31,13 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
+import static net.sf.jsqlparser.util.validation.metadata.NamedObject.user;
 
 
 /**
@@ -402,7 +408,7 @@ public abstract class FeishuJavaUtils {
      * @param client
      * @return
      */
-    public static List<AppTableRecord> listTableRecords(Client client, MultidimensionalTableVo vo) throws Exception {
+    public static List<AppTableRecord> listTableRecords(Client client, TTableInfo vo) throws Exception {
         List<AppTableRecord> resList = new ArrayList<>();
         ListAppTableRecordReq req = ListAppTableRecordReq.newBuilder()
                 .appToken(vo.getAppToken())
@@ -416,7 +422,7 @@ public abstract class FeishuJavaUtils {
             if (StringUtils.isNotBlank(pageToken)) {
                 req.setPageToken(pageToken);
             }
-            resp = client.bitable().appTableRecord().list(req, RequestOptions.newBuilder().build());
+            resp = client.bitable().appTableRecord().list(req);
             respData = resp.getData();
             resList.addAll(Arrays.stream(respData.getItems()).toList());
         } while (resp.getCode() == 0 && respData.getHasMore());
@@ -430,7 +436,7 @@ public abstract class FeishuJavaUtils {
      * @param vo
      * @throws Exception
      */
-    public static void batchUpdateTableRecords(Client client, MultidimensionalTableVo vo, AppTableRecord[] records) throws Exception {
+    public static void batchUpdateTableRecords(Client client, TTableInfo vo, AppTableRecord[] records) throws Exception {
         BatchUpdateAppTableRecordReq req = BatchUpdateAppTableRecordReq.newBuilder()
                 .appToken(vo.getAppToken())
                 .tableId(vo.getTableId())
@@ -438,7 +444,7 @@ public abstract class FeishuJavaUtils {
                         .records(records)
                         .build())
                 .build();
-        client.bitable().appTableRecord().batchUpdate(req, RequestOptions.newBuilder().build());
+        client.bitable().appTableRecord().batchUpdate(req);
     }
 
     /**
@@ -447,15 +453,14 @@ public abstract class FeishuJavaUtils {
      * @param client
      * @param records
      */
-    public static void batchDeleteTableRecords(Client client, MultidimensionalTableVo vo, String[] records) throws Exception {
+    public static void batchDeleteTableRecords(Client client, TTableInfo vo, String[] records) throws Exception {
         // 创建请求对象
         BatchDeleteAppTableRecordReq req = BatchDeleteAppTableRecordReq.newBuilder()
                 .appToken(vo.getAppToken())
                 .tableId(vo.getTableId())
                 .batchDeleteAppTableRecordReqBody(BatchDeleteAppTableRecordReqBody.newBuilder().records(records).build())
                 .build();
-        client.bitable().appTableRecord().batchDelete(req, RequestOptions.newBuilder()
-                .build());
+        client.bitable().appTableRecord().batchDelete(req);
     }
 
     /**
@@ -466,7 +471,7 @@ public abstract class FeishuJavaUtils {
      * @return
      * @throws Exception
      */
-    public static List<AppTableField> listTableColumn(Client client, MultidimensionalTableVo vo) throws Exception {
+    public static List<AppTableField> listTableColumn(Client client, TTableInfo vo) throws Exception {
         List<AppTableField> appTableFields = new ArrayList<>();
         // 创建请求对象
         ListAppTableFieldReq req = ListAppTableFieldReq.newBuilder()
@@ -481,7 +486,7 @@ public abstract class FeishuJavaUtils {
             if (StringUtils.isNotBlank(pageToken)) {
                 req.setPageToken(pageToken);
             }
-            resp = client.bitable().appTableField().list(req, RequestOptions.newBuilder().build());
+            resp = client.bitable().appTableField().list(req);
             respData = resp.getData();
             appTableFields.addAll(Arrays.stream(respData.getItems()).toList());
         } while (resp.getCode() == 0 && respData.getHasMore());
