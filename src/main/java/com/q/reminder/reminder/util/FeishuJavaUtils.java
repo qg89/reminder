@@ -4,10 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.request.RequestOptions;
-import com.lark.oapi.service.bitable.v1.model.AppTableRecord;
-import com.lark.oapi.service.bitable.v1.model.ListAppTableRecordReq;
-import com.lark.oapi.service.bitable.v1.model.ListAppTableRecordResp;
-import com.lark.oapi.service.bitable.v1.model.ListAppTableRecordRespBody;
+import com.lark.oapi.service.bitable.v1.model.*;
 import com.lark.oapi.service.docx.v1.enums.BatchUpdateDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.enums.PatchDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.model.*;
@@ -400,16 +397,17 @@ public abstract class FeishuJavaUtils {
     }
 
     /**
-     * 多为表格-记录-列出记录
+     * 多为表格-记录-列出视图记录
+     *
      * @param client
      * @return
      */
-    public static List<AppTableRecord> listTableRecords(Client client) throws Exception {
+    public static List<AppTableRecord> listTableRecords(Client client, MultidimensionalTableVo vo) throws Exception {
         List<AppTableRecord> resList = new ArrayList<>();
         ListAppTableRecordReq req = ListAppTableRecordReq.newBuilder()
-                .appToken("bascnrkdLGoUftLgM7fvME7ly5c")
-                .tableId("tblctWgFXH5Pa32l")
-                .viewId("vew0XZ0TBn")
+                .appToken(vo.getAppToken())
+                .tableId(vo.getTableId())
+                .viewId(vo.getViewId())
                 .build();
         ListAppTableRecordResp resp;
         ListAppTableRecordRespBody respData = new ListAppTableRecordRespBody();
@@ -422,6 +420,53 @@ public abstract class FeishuJavaUtils {
             respData = resp.getData();
             resList.addAll(Arrays.stream(respData.getItems()).toList());
         } while (resp.getCode() == 0 && respData.getHasMore());
-          return resList;
+        return resList;
+    }
+
+    /**
+     * 多为表格-记录-批量删除记录
+     *
+     * @param client
+     * @param records
+     */
+    public static void batchDeleteTableRecords(Client client, String[] records) throws Exception {
+        // 创建请求对象
+        BatchDeleteAppTableRecordReq req = BatchDeleteAppTableRecordReq.newBuilder()
+                .batchDeleteAppTableRecordReqBody(BatchDeleteAppTableRecordReqBody.newBuilder()
+                        .records(records)
+                        .build())
+                .build();
+        BatchDeleteAppTableRecordResp resp = client.bitable().appTableRecord().batchDelete(req, RequestOptions.newBuilder()
+                .build());
+    }
+
+    /**
+     * 多为表格-字段-列出字段
+     *
+     * @param client
+     * @param vo
+     * @return
+     * @throws Exception
+     */
+    public static List<AppTableField> listTableColumn(Client client, MultidimensionalTableVo vo) throws Exception {
+        List<AppTableField> appTableFields = new ArrayList<>();
+        // 创建请求对象
+        ListAppTableFieldReq req = ListAppTableFieldReq.newBuilder()
+                .appToken(vo.getAppToken())
+                .tableId(vo.getTableId())
+                .viewId(vo.getViewId())
+                .build();
+        ListAppTableFieldResp resp;
+        ListAppTableFieldRespBody respData = new ListAppTableFieldRespBody();
+        do {
+            String pageToken = respData.getPageToken();
+            if (StringUtils.isNotBlank(pageToken)) {
+                req.setPageToken(pageToken);
+            }
+            resp = client.bitable().appTableField().list(req, RequestOptions.newBuilder().build());
+            respData = resp.getData();
+            appTableFields.addAll(Arrays.stream(respData.getItems()).toList());
+        } while (resp.getCode() == 0 && respData.getHasMore());
+        return appTableFields;
     }
 }
