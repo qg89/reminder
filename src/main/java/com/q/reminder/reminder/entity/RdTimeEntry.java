@@ -1,10 +1,12 @@
 package com.q.reminder.reminder.entity;
 
 import java.util.Date;
-import com.baomidou.mybatisplus.annotation.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
+import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -14,7 +16,7 @@ import java.io.Serializable;
  * (RdTimeEntry)实体类
  *
  * @author makejava
- * @since 2023-01-19 11:29:00
+ * @since 2023-01-19 11:47:39
  */
 @Data
 @TableName("rd_time_entry")
@@ -22,12 +24,14 @@ public class RdTimeEntry extends Model<RdTimeEntry> implements Serializable {
     @Serial
     private static final long serialVersionUID = 711882528067511960L;
 
-    @TableId(type = IdType.INPUT)
+    @MppMultiId
     private Integer id;
 
+    @MppMultiId
     @TableField("issueId")
     private Integer issueId;
 
+    @MppMultiId
     @TableField("projectId")
     private Integer projectId;
 

@@ -64,6 +64,6 @@ public class SyncTimeEntryTask {
             time.setUserName(timeEntry.getUserName());
             data.add(time);
         }
-        rdTimeEntryService.saveOrUpdateBatch(data);
+        rdTimeEntryService.saveOrUpdateBatchByMultiId(data);
     }
 }
