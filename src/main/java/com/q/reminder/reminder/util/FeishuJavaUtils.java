@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.request.RequestOptions;
+import com.lark.oapi.service.bitable.v1.enums.BatchCreateAppTableRecordUserIdTypeEnum;
 import com.lark.oapi.service.bitable.v1.model.*;
 import com.lark.oapi.service.docx.v1.enums.BatchUpdateDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.enums.PatchDocumentBlockUserIdTypeEnum;
@@ -419,7 +420,11 @@ public abstract class FeishuJavaUtils {
             }
             resp = client.bitable().appTableRecord().list(req);
             respData = resp.getData();
-            resList.addAll(Arrays.stream(respData.getItems()).toList());
+            AppTableRecord[] items = respData.getItems();
+            if (items == null) {
+                return resList;
+            }
+            resList.addAll(Arrays.stream(items).toList());
         } while (resp.getCode() == 0 && respData.getHasMore());
         return resList;
     }
@@ -435,11 +440,13 @@ public abstract class FeishuJavaUtils {
         BatchCreateAppTableRecordReq req = BatchCreateAppTableRecordReq.newBuilder()
                 .appToken(vo.getAppToken())
                 .tableId(vo.getTableId())
+                .userIdType(BatchCreateAppTableRecordUserIdTypeEnum.OPEN_ID)
                 .batchCreateAppTableRecordReqBody(BatchCreateAppTableRecordReqBody.newBuilder()
                         .records(records)
                         .build())
                 .build();
-        client.bitable().appTableRecord().batchCreate(req);
+        BatchCreateAppTableRecordResp resp = client.bitable().appTableRecord().batchCreate(req);
+        log.info("[多维表格]-保存数据：[状态] {}， [msg] {}", resp.getCode(), resp.getMsg());
     }
 
     /**

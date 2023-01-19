@@ -23,6 +23,8 @@ public interface TableTypeContants {
         String LAST_MONTH = "1";
         // 昨天
         String YESTDAY = "2";
+        // 本月
+        String THIS_MONTH = "3";
     }
 
 }

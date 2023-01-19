@@ -21,7 +21,7 @@ import java.util.Map;
 public class WUserTimesServiceImpl extends ServiceImpl<WUserTimesMapping, WUserTimes> implements WUserTimesService {
 
     @Override
-    public List<Map<String, String>> listByTable(String day, String dayType) {
+    public List<Map<String, Object>> listByTable(String day, String dayType) {
         return baseMapper.listByTable(day, dayType);
     }
 }

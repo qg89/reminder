@@ -1,11 +1,15 @@
 package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.vo.*;
-import com.taskadapter.redmineapi.*;
+import com.taskadapter.redmineapi.IssueManager;
+import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.RedmineManager;
+import com.taskadapter.redmineapi.RedmineManagerFactory;
 import com.taskadapter.redmineapi.bean.*;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
@@ -18,7 +22,6 @@ import org.springframework.util.CollectionUtils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author : saiko
@@ -30,14 +33,19 @@ import java.util.stream.Collectors;
 @Log4j2
 public abstract class RedmineApi {
     public static void main(String[] args) throws RedmineException {
-        ProjectInfo info = new ProjectInfo();
-        info.setRedmineUrl("http://redmine-qa.mxnavi.com");
-        info.setPKey("511303-dcsp");
-        info.setPmKey("1f905383da4f783bad92e22f430c7db0b15ae258");
-        List<TimeEntry> timeEntries = queryTimes(info);
-        Map<String, Map<String, Double>> collect = timeEntries.stream().collect(Collectors.groupingBy(e -> String.valueOf(e.getUserId()), Collectors.groupingBy(e -> new DateTime(e.getSpentOn()).toString("yyyy-MM-dd"),
-                Collectors.summingDouble(e -> BigDecimal.valueOf(e.getHours()).setScale(2, RoundingMode.HALF_UP).doubleValue()))));
-        System.out.println(collect);
+//        ProjectInfo info = new ProjectInfo();
+//        info.setRedmineUrl("http://redmine-pa.mxnavi.com");
+//        info.setPKey("510303-gb");
+//        info.setPmKey("e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
+//
+//        List<TimeEntry> timeEntries = queryTimes(info);
+//        Map<Integer, String> collect = timeEntries.stream().collect(Collectors.toMap(TimeEntry::getUserId, TimeEntry::getUserName, (v1, v2) -> v1));
+////        List<TimeEntry> timeEntries = queryTimes(info).stream().filter(e -> e.getIssueId() == 609043).toList();
+////        Map<String, Map<String, Double>> collect = timeEntries.stream().collect(Collectors.groupingBy(e -> String.valueOf(e.getUserId()), Collectors.groupingBy(e -> new DateTime(e.getSpentOn()).toString("yyyy-MM-dd"),
+////                Collectors.summingDouble(e -> BigDecimal.valueOf(e.getHours()).setScale(2, RoundingMode.HALF_UP).doubleValue()))));
+//        System.out.println(collect);
+        String name = "12345-1";
+        System.out.println(convertAssid(name, "1"));
     }
 
     /**
@@ -167,12 +175,13 @@ public abstract class RedmineApi {
         Tracker tracker = new Tracker();
         tracker.setId(2);
         tracker.setName("需求");
-        Integer productAssigneeId = redmineUserMap.get(definition.getProduct());
-        Integer bigDataAssigneeId = redmineUserMap.get(definition.getBigData());
-        Integer backendAssigneeId = redmineUserMap.get(definition.getBackend());
-        Integer testAssigneeId = redmineUserMap.get(definition.getTest());
-        Integer algorithmAssigneeId = redmineUserMap.get(definition.getAlgorithm());
-        Integer frontAssigneeId = redmineUserMap.get(definition.getFront());
+        String redmineType = definition.getRedmineType();
+        Integer productAssigneeId = redmineUserMap.get(convertAssid(definition.getProduct(), redmineType));
+        Integer bigDataAssigneeId = redmineUserMap.get(convertAssid(definition.getBigData(), redmineType));
+        Integer backendAssigneeId = redmineUserMap.get(convertAssid(definition.getBackend(), redmineType));
+        Integer testAssigneeId = redmineUserMap.get(convertAssid(definition.getTest(), redmineType));
+        Integer algorithmAssigneeId = redmineUserMap.get(convertAssid(definition.getAlgorithm(), redmineType));
+        Integer frontAssigneeId = redmineUserMap.get(convertAssid(definition.getFront(), redmineType));
         Integer projectId = definition.getProjectId();
 
         for (FeatureListVo vo : featureList) {
@@ -283,6 +292,15 @@ public abstract class RedmineApi {
 //            }
         }
     }
+
+    private static String convertAssid(String name, String redmineType) {
+        String chars = "-" + redmineType;
+        if (name.contains(chars)) {
+            name = name.replace(chars, "");
+        }
+        return name;
+    }
+
 
     /**
      * 检查是否有redmine任务

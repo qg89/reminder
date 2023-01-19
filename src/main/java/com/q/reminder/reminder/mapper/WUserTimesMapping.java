@@ -17,6 +17,6 @@ import java.util.Map;
  */
 @Mapper
 public interface WUserTimesMapping extends BaseMapper<WUserTimes> {
-    List<Map<String, String>> listByTable(@Param("day") String day, @Param("dayType") String dayType);
+    List<Map<String, Object>> listByTable(@Param("day") String day, @Param("dayType") String dayType);
 }
 

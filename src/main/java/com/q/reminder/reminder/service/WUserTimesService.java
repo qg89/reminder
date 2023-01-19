@@ -16,5 +16,5 @@ import java.util.Map;
  */
 public interface WUserTimesService extends IService<WUserTimes>{
 
-    List<Map<String, String>> listByTable(String day, String dateType);
+    List<Map<String, Object>> listByTable(String day, String dateType);
 }
