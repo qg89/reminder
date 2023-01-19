@@ -44,8 +44,11 @@ public abstract class RedmineApi {
 ////        Map<String, Map<String, Double>> collect = timeEntries.stream().collect(Collectors.groupingBy(e -> String.valueOf(e.getUserId()), Collectors.groupingBy(e -> new DateTime(e.getSpentOn()).toString("yyyy-MM-dd"),
 ////                Collectors.summingDouble(e -> BigDecimal.valueOf(e.getHours()).setScale(2, RoundingMode.HALF_UP).doubleValue()))));
 //        System.out.println(collect);
-        String name = "12345-1";
-        System.out.println(convertAssid(name, "1"));
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey("http://redmine-pa.mxnavi.com", "e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
+        IssueManager issueManager = mgr.getIssueManager();
+        Issue issueById = issueManager.getIssueById(2633);
+        PropertyStorage storage = issueById.getStorage();
+        System.out.println(storage.getProperties());
     }
 
     /**
