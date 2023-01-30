@@ -1,4 +1,4 @@
-package com.q.reminder.reminder.task;
+package com.q.reminder.reminder.task.table;
 
 import com.lark.oapi.Client;
 import com.xxl.job.core.handler.annotation.XxlJob;
@@ -10,12 +10,12 @@ import org.springframework.stereotype.Component;
  * @author : saiko
  * @version : v1.0
  * @ClassName : com.q.reminder.reminder.task.SyncTableRecordSampleTask
- * @Description :
+ * @Description : 同步多维度表格记录-需求管理表写入redmine
  * @date :  2023.01.17 11:40
  */
 @Log4j2
 @Component
-public class SyncTableRecordsTask {
+public class SyncTableRecordsWriteRedmineTask {
     @Autowired
     private Client client;
 

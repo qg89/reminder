@@ -1,4 +1,4 @@
-package com.q.reminder.reminder.task;
+package com.q.reminder.reminder.task.table;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -22,7 +22,7 @@ import java.util.List;
  * @author : saiko
  * @version : v1.0
  * @ClassName : com.q.reminder.reminder.task.SyncTableColumnTask
- * @Description :
+ * @Description : 同步多维表格各个表中列到数据库
  * @date :  2023.01.18 14:11
  */
 @Component

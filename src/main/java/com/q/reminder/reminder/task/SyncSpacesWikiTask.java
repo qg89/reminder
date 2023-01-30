@@ -25,7 +25,7 @@ import java.util.List;
  * @author : saiko
  * @version : v1.0
  * @ClassName : com.q.reminder.reminder.task.SyncSpacesWikiTask
- * @Description :
+ * @Description : 同步知识库中标准过程复制
  * @date :  2022.11.18 14:34
  */
 @Log4j2

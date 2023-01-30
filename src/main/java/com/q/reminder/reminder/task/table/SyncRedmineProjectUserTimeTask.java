@@ -1,4 +1,4 @@
-package com.q.reminder.reminder.task;
+package com.q.reminder.reminder.task.table;
 
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
@@ -34,12 +34,12 @@ import java.util.stream.Collectors;
  * @author : saiko
  * @version : v1.0
  * @ClassName : com.q.reminder.reminder.task.SyncProjcetUserTimeTask
- * @Description :
+ * @Description : 同步redmine上工时同步到数据库
  * @date :  2022.12.28 11:34
  */
 @Log4j2
 @Component
-public class SyncProjcetUserTimeTask {
+public class SyncRedmineProjectUserTimeTask {
     @Autowired
     private ProjectInfoService projectInfoService;
     @Autowired

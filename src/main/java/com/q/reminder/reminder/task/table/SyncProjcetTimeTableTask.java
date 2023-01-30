@@ -1,4 +1,4 @@
-package com.q.reminder.reminder.task;
+package com.q.reminder.reminder.task.table;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  * @author : saiko
  * @version : v1.0
  * @ClassName : com.q.reminder.reminder.task.SyncProjcetTimeTableTask
- * @Description : 同步工时到多维表格
+ * @Description : 同步工时到多维表格-将数据库中的数据同步到多维表格中
  * @date :  2023.01.18 11:28
  */
 @Component
