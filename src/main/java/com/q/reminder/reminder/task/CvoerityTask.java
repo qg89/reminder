@@ -118,13 +118,11 @@ public class CvoerityTask {
             return;
         }
         projectVoMap.forEach((chatId, projectInfo) -> {
-            int index = 0;
             List<CoverityLog> logList = coverityLogs.get(projectInfo.getAssigneeId());
-            if (!CollectionUtils.isEmpty(logList)) {
-                index = logList.size();
-            } else {
-                logList = new ArrayList<>();
+            if (CollectionUtils.isEmpty(logList)) {
+                return;
             }
+            int index = logList.size();
             JSONObject con = new JSONObject();
             JSONObject all = new JSONObject();
             JSONArray contentJsonArray = new JSONArray();
