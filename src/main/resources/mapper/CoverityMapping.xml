@@ -16,8 +16,8 @@
             f.`name`
         FROM
             r_coverity c
-            LEFT JOIN r_project_info p ON c.r_project_id = p.p_id
-            LEFT JOIN r_redmine_user_info r ON c.r_assignee_id = r.assignee_id AND u.redmine_type = p.redmine_type
+            LEFT JOIN r_project_info p ON c.r_project_id = p.id
+            LEFT JOIN r_redmine_user_info r ON c.r_assignee_id = r.assignee_id
             LEFT JOIN fs_user_member_info f ON r.assignee_name = f.`name`
         WHERE
             c.create_task = '0'
