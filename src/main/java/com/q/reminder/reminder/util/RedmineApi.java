@@ -465,4 +465,19 @@ public abstract class RedmineApi {
         params.add(new RequestParam("v[spent_on][]", new DateTime().minusDays(7).toString("yyyy-MM-dd")));
         return transport.getObjectsList(TimeEntry.class, params);
     }
+
+    public static Collection<? extends Issue> queryIssues(ProjectInfo info) throws RedmineException {
+        String redmineUrl = info.getRedmineUrl();
+        String url = redmineUrl + "/projects/" + info.getPKey();
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(url, info.getPmKey());
+        Transport transport = mgr.getTransport();
+        Collection<RequestParam> params = new ArrayList<>();
+        Date startDay = info.getStartDay();
+        if (startDay != null) {
+            params.add(new RequestParam("f[]", "updated_on"));
+            params.add(new RequestParam("op[updated_on]", ">="));
+            params.add(new RequestParam("v[updated_on][]", new DateTime(startDay).toString("yyyy-MM-dd")));
+        }
+        return transport.getObjectsList(Issue.class, params);
+    }
 }

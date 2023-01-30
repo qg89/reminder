@@ -1,7 +1,6 @@
 package com.q.reminder.reminder.task.redmine;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.unit.DataUnit;
 import com.q.reminder.reminder.entity.ProjectInfo;
@@ -13,6 +12,7 @@ import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +39,7 @@ public class SyncTimeEntryTask {
         List<ProjectInfo> projectList = projectInfoService.list();
         List<TimeEntry> timeData = new ArrayList<>();
         projectList.forEach(projectInfo -> {
-            projectInfo.setStartDay(DateUtil.beginOfWeek(new DateTime()));
+            projectInfo.setStartDay(DateUtil.beginOfWeek(DateTime.now().minusWeeks(1).toDate()));
             try {
                 timeData.addAll(RedmineApi.queryTimes(projectInfo));
             } catch (RedmineException e) {
