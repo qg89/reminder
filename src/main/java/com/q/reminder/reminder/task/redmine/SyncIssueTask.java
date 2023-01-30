@@ -2,6 +2,7 @@ package com.q.reminder.reminder.task.redmine;
 
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson2.JSONObject;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.entity.RdIssue;
 import com.q.reminder.reminder.entity.RdTimeEntry;
@@ -9,8 +10,7 @@ import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdIssueService;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.taskadapter.redmineapi.RedmineException;
-import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.bean.TimeEntry;
+import com.taskadapter.redmineapi.bean.*;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -50,36 +51,40 @@ public class SyncIssueTask {
         List<RdIssue> data = new ArrayList<>();
         for (Issue i : issueData) {
             RdIssue issue = new RdIssue();
-            issue.setAssigneeid(i.getAssigneeId());
-            issue.setAssigneename(i.getAssigneeName());
-            issue.setAuthorid(i.getAuthorId());
-            issue.setAuthorname(i.getAuthorName());
+            issue.setAssigneeId(i.getAssigneeId());
+            issue.setAssigneeName(i.getAssigneeName());
+            issue.setAuthorId(i.getAuthorId());
+            issue.setAuthorName(i.getAuthorName());
             issue.setId(i.getId());
-            issue.setClosedon(i.getClosedOn());
+            issue.setClosedOn(i.getClosedOn());
             issue.setDescription(i.getDescription());
-            issue.setDuedate(i.getDueDate());
-            issue.setCreatedon(i.getCreatedOn());
-            issue.setUpdatedon(i.getUpdatedOn());
-            issue.setStartdate(i.getStartDate());
+            issue.setDueDate(i.getDueDate());
+            issue.setCreatedOn(i.getCreatedOn());
+            issue.setUpdatedOn(i.getUpdatedOn());
+            issue.setStartDate(i.getStartDate());
             Float estimatedHours = i.getEstimatedHours();
             if (estimatedHours != null) {
-                issue.setEstimatedhours(estimatedHours.doubleValue());
+                issue.setEstimatedHours(estimatedHours.doubleValue());
             }
-            issue.setNotes(i.getNotes());
-            issue.setDoneratio(i.getDoneRatio());
-            issue.setParentid(i.getParentId());
-            issue.setPriorityid(i.getPriorityId());
-            issue.setPrioritytext(i.getPriorityText());
-            issue.setProjectname(i.getProjectName());
+            issue.setDoneRatio(i.getDoneRatio());
+            issue.setParentId(i.getParentId());
+            issue.setPriorityId(i.getPriorityId());
+            issue.setPriorityText(i.getPriorityText());
+            issue.setProjectName(i.getProjectName());
             issue.setProjectid(i.getProjectId());
-            issue.setStatusname(i.getStatusName());
-            issue.setStatusid(i.getStatusId());
+            issue.setStatusName(i.getStatusName());
+            issue.setStatusId(i.getStatusId());
             Float spentHours = i.getSpentHours();
             if (spentHours != null) {
-                issue.setSpenthours(spentHours.doubleValue());
+                issue.setSpentHours(spentHours.doubleValue());
             }
             issue.setSubject(i.getSubject());
-            issue.setPrivateissue(String.valueOf(i.isPrivateIssue()));
+            issue.setPrivateIssue(String.valueOf(i.isPrivateIssue()));
+            Tracker tracker = i.getTracker();
+            String customField = JSONObject.toJSONString(i.getCustomFields());
+            issue.setCustomField(customField);
+            issue.setTracker(tracker.getId());
+            issue.setTrackerName(tracker.getName());
             data.add(issue);
         }
         rdIssueService.saveOrUpdateBatchByMultiId(data);
