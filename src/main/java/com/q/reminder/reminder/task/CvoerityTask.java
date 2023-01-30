@@ -122,6 +122,8 @@ public class CvoerityTask {
             List<CoverityLog> logList = coverityLogs.get(projectInfo.getAssigneeId());
             if (!CollectionUtils.isEmpty(logList)) {
                 index = logList.size();
+            } else {
+                logList = new ArrayList<>();
             }
             JSONObject con = new JSONObject();
             JSONObject all = new JSONObject();
