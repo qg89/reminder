@@ -34,7 +34,7 @@ public class SyncTimeEntryTask {
     @Autowired
     private RdTimeEntryService rdTimeEntryService;
 
-    @XxlJob("SyncTimeEntryTask")
+    @XxlJob("syncTimeEntryTask")
     public void SyncTimeEntryTask() {
         List<ProjectInfo> projectList = projectInfoService.list();
         List<TimeEntry> timeData = new ArrayList<>();
