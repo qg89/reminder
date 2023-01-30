@@ -33,7 +33,6 @@ public class TTableColumn extends Model<TTableColumn> implements Serializable {
     @MppMultiId
     private String columnName;
 
-    @TableLogic(value = "0", delval = "1")
     private String enable;
 }
 
