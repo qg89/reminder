@@ -1,7 +1,6 @@
 package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
@@ -13,6 +12,7 @@ import com.taskadapter.redmineapi.RedmineManagerFactory;
 import com.taskadapter.redmineapi.bean.*;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -331,6 +331,7 @@ public abstract class RedmineApi {
     }
 
     /**
+     * 创建子任务
      * @param issueParent
      * @param assigneeId
      * @param tracker
@@ -479,5 +480,25 @@ public abstract class RedmineApi {
             params.add(new RequestParam("v[updated_on][]", new DateTime(startDay).toString("yyyy-MM-dd")));
         }
         return transport.getObjectsList(Issue.class, params);
+    }
+
+    /**
+     * 创建任务并返回任务详情
+     *
+     * @param data
+     * @return
+     */
+    private static Collection<? extends Issue> createIssue(Collection<? extends Issue> data, @NonNull Transport transport) {
+        List<Issue> resList = new ArrayList<>();
+        data.forEach(issue -> {
+            try {
+                issue.setStatusId(1).setCreatedOn(new Date());
+                issue.setTransport(transport);
+                resList.add(issue.create());
+            } catch (RedmineException e) {
+                e.printStackTrace();
+            }
+        });
+        return resList;
     }
 }

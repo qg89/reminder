@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.bitable.v1.enums.BatchCreateAppTableRecordUserIdTypeEnum;
+import com.lark.oapi.service.bitable.v1.enums.ListAppTableRecordUserIdTypeEnum;
 import com.lark.oapi.service.bitable.v1.model.*;
 import com.lark.oapi.service.docx.v1.enums.BatchUpdateDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.enums.PatchDocumentBlockUserIdTypeEnum;
@@ -408,6 +409,8 @@ public abstract class FeishuJavaUtils {
                 .appToken(vo.getAppToken())
                 .tableId(vo.getTableId())
                 .viewId(vo.getViewId())
+                .filter(vo.getFilter())
+                .userIdType(ListAppTableRecordUserIdTypeEnum.OPEN_ID)
                 .build();
         ListAppTableRecordResp resp;
         ListAppTableRecordRespBody respData = new ListAppTableRecordRespBody();
@@ -517,7 +520,7 @@ public abstract class FeishuJavaUtils {
 
     public static void main(String[] args) throws Exception {
         TTableInfo vo = new TTableInfo();
-        vo.setTableId("tbl6D7riQfHDpUeB");
+        vo.setTableId("tbld61CFebNfZ6M6");
         vo.setAppToken("bascnrkdLGoUftLgM7fvME7ly5c");
         client = Client.newBuilder("cli_a1144b112738d013", "AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx").build();
 //        for (int i = 0; i < 10000; i++) {
@@ -542,8 +545,8 @@ public abstract class FeishuJavaUtils {
 //        }
 //        stopWatch.stop();
 //        System.err.println(stopWatch.prettyPrint());
-        List<AppTableField> appTableFields = listTableColumn(client, vo);
+        Object obj = listTableRecords(client, vo);
 
-        System.out.println(appTableFields);
+        System.out.println(obj);
     }
 }

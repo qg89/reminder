@@ -2,5 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.q.reminder.reminder.mapper.TTableInfoMapping">
 
+<select id="listByTableType" resultType="com.q.reminder.reminder.vo.table.FeatureVo">
+    SELECT
+        t.app_token AS apptoken,
+        t.table_id AS tableId,
+        t.view_id AS viewId,
+        c.column_name AS columnName
+    FROM
+        `t_table_info` t,
+        t_table_column c
+    WHERE
+        t.id = c.table_id
+      AND `enable` = 0
+      AND t.table_type = #{featureTmp}
+    </select>
 </mapper>
 

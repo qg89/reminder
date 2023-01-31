@@ -39,6 +39,8 @@ public class TTableInfo extends Model<TTableInfo> implements Serializable {
      */    
     private String viewType;
 
+    private String filter;
+
 
 }
 
