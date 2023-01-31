@@ -15,6 +15,8 @@ public interface TableTypeContants {
     String FEATURE = "2";
     // 需求管理表临时表
     String FEATURE_TMP = "3";
+    // 需求管理表人员配置表
+    String FEATURE_USER_CONFIG = "4";
 
     public interface ViewType {
         // 全部
