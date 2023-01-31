@@ -417,6 +417,9 @@ public abstract class FeishuJavaUtils {
                 req.setPageToken(pageToken);
             }
             resp = client.bitable().appTableRecord().list(req);
+            if (resp.getCode() != 0) {
+                return resList;
+            }
             respData = resp.getData();
             AppTableRecord[] items = respData.getItems();
             if (items == null) {
@@ -488,7 +491,11 @@ public abstract class FeishuJavaUtils {
             }
             resp = client.bitable().appTableField().list(req);
             respData = resp.getData();
-            appTableFields.addAll(Arrays.stream(respData.getItems()).toList());
+            AppTableField[] items = respData.getItems();
+            if (items == null) {
+                continue;
+            }
+            appTableFields.addAll(Arrays.stream(items).toList());
         } while (resp.getCode() == 0 && respData.getHasMore());
         return appTableFields;
     }
@@ -510,30 +517,33 @@ public abstract class FeishuJavaUtils {
 
     public static void main(String[] args) throws Exception {
         TTableInfo vo = new TTableInfo();
-        vo.setTableId("tbljgzoTc5zyyqqA");
-        vo.setAppToken("bascnQGgCoLur1ipC8BCYiuozzV");
+        vo.setTableId("tbl6D7riQfHDpUeB");
+        vo.setAppToken("bascnrkdLGoUftLgM7fvME7ly5c");
         client = Client.newBuilder("cli_a1144b112738d013", "AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx").build();
 //        for (int i = 0; i < 10000; i++) {
 //            createColumn(client, vo, ("file" + i));
 //        }
-        StopWatch stopWatch = new StopWatch();
-        stopWatch.start("all");
-        for (int i1 = 0; i1 < 18; i1++) {
-            StopWatch s1 = new StopWatch();
-            s1.start(i1 + "");
-            List<AppTableRecord> records = new ArrayList<>();
-            for (int i = 0; i < 100; i++) {
-                Map<String, Object> data = new HashMap<>();
-                for (int j = 0; j < 300; j++) {
-                    data.put(("file" + j), ((i + j) + "本地表格导入为多维表格的文件大小上限是多少"));
-                }
-                records.add(AppTableRecord.newBuilder().fields(data).build());
-            }
-            batchCreateTableRecords(client, vo, records.toArray(new AppTableRecord[records.size()]));
-            s1.stop();
-            System.err.println(s1.prettyPrint());
-        }
-        stopWatch.stop();
-        System.err.println(stopWatch.prettyPrint());
+//        StopWatch stopWatch = new StopWatch();
+//        stopWatch.start("all");
+//        for (int i1 = 0; i1 < 18; i1++) {
+//            StopWatch s1 = new StopWatch();
+//            s1.start(i1 + "");
+//            List<AppTableRecord> records = new ArrayList<>();
+//            for (int i = 0; i < 100; i++) {
+//                Map<String, Object> data = new HashMap<>();
+//                for (int j = 0; j < 300; j++) {
+//                    data.put(("file" + j), ((i + j) + "本地表格导入为多维表格的文件大小上限是多少"));
+//                }
+//                records.add(AppTableRecord.newBuilder().fields(data).build());
+//            }
+//            batchCreateTableRecords(client, vo, records.toArray(new AppTableRecord[records.size()]));
+//            s1.stop();
+//            System.err.println(s1.prettyPrint());
+//        }
+//        stopWatch.stop();
+//        System.err.println(stopWatch.prettyPrint());
+        List<AppTableField> appTableFields = listTableColumn(client, vo);
+
+        System.out.println(appTableFields);
     }
 }

@@ -43,7 +43,8 @@ public class SyncTableColumnTask {
         List<TTableColumn> data = new ArrayList<>();
         for (TTableInfo vo : tTableInfoService.list(qw)) {
             Integer id = vo.getId();
-            FeishuJavaUtils.listTableColumn(client, vo).forEach(e -> {
+            List<AppTableField> appTableFields = FeishuJavaUtils.listTableColumn(client, vo);
+            appTableFields.forEach(e -> {
                 TTableColumn column = new TTableColumn();
                 column.setColumnName(e.getFieldName());
                 column.setTableId(id);
