@@ -58,40 +58,45 @@ public class TTableFeatureTmp extends Model<TTableFeatureTmp> implements Seriali
     @TableField(value = "menu_three", fill = FieldFill.INSERT_UPDATE)
     private String menuThree;
     /**
+     * 三级
+     */
+    @TableField(value = "dscrptn", fill = FieldFill.INSERT_UPDATE)
+    private String dscrptn;
+    /**
      * 产品工时
      */
     @TableField(value = "prdct", fill = FieldFill.INSERT_UPDATE)
-    private Double prdct;
+    private Float prdct;
     /**
      * 前端工时
      */
     @TableField(value = "front", fill = FieldFill.INSERT_UPDATE)
-    private Double front;
+    private Float front;
     /**
      * 后端工时
      */
     @TableField(value = "back", fill = FieldFill.INSERT_UPDATE)
-    private Double back;
+    private Float back;
     /**
      * 大数据工时
      */
     @TableField(value = "bgdt", fill = FieldFill.INSERT_UPDATE)
-    private Double bgdt;
+    private Float bgdt;
     /**
      * 实施工时
      */
     @TableField(value = "implmntton", fill = FieldFill.INSERT_UPDATE)
-    private Double implmntton;
+    private Float implmntton;
     /**
      * 架构工时
      */
     @TableField(value = "archtct", fill = FieldFill.INSERT_UPDATE)
-    private Double archtct;
+    private Float archtct;
     /**
      * 测试工时
      */
     @TableField(value = "test", fill = FieldFill.INSERT_UPDATE)
-    private Double test;
+    private Float test;
     /**
      * 生产发布-时间
      */
@@ -101,21 +106,21 @@ public class TTableFeatureTmp extends Model<TTableFeatureTmp> implements Seriali
      * 移动工时
      */
     @TableField(value = "andrd", fill = FieldFill.INSERT_UPDATE)
-    private Double andrd;
+    private Float andrd;
     /**
      * 算法工时
      */
     @TableField(value = "algrthm", fill = FieldFill.INSERT_UPDATE)
-    private Double algrthm;
+    private Float algrthm;
     /**
      * 运维工时
      */
     @TableField(value = "oprton", fill = FieldFill.INSERT_UPDATE)
-    private Double oprton;
+    private Float oprton;
     /**
      * 是否写入redmine：0未写入，1已写入完成
      */
-    @TableField(value = "write_redmine", fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "write_redmine")
     private String writeRedmine;
 
     @TableField(value = "update_time")

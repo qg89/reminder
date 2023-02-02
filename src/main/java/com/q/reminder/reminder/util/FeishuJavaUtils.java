@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.bitable.v1.enums.BatchCreateAppTableRecordUserIdTypeEnum;
+import com.lark.oapi.service.bitable.v1.enums.BatchUpdateAppTableRecordUserIdTypeEnum;
 import com.lark.oapi.service.bitable.v1.enums.ListAppTableRecordUserIdTypeEnum;
 import com.lark.oapi.service.bitable.v1.model.*;
 import com.lark.oapi.service.docx.v1.enums.BatchUpdateDocumentBlockUserIdTypeEnum;
@@ -29,10 +30,12 @@ import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.vo.*;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.util.StopWatch;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -434,7 +437,7 @@ public abstract class FeishuJavaUtils {
     }
 
     /**
-     * 多为表格-记录-批量更新记录
+     * 多为表格-记录-批量创建记录
      *
      * @param client
      * @param vo
@@ -451,6 +454,26 @@ public abstract class FeishuJavaUtils {
                 .build();
         BatchCreateAppTableRecordResp resp = client.bitable().appTableRecord().batchCreate(req);
         log.info("[多维表格]-保存数据：[状态] {}， [msg] {}", resp.getCode(), resp.getMsg());
+    }
+
+    /**
+     * 多为表格-记录-批量更新记录
+     *
+     * @param client
+     * @param vo
+     * @throws Exception
+     */
+    public static void batchUpdateTableRecords(Client client, TTableInfo vo, AppTableRecord[] records) throws Exception {
+        BatchUpdateAppTableRecordReq req = BatchUpdateAppTableRecordReq.newBuilder()
+                .appToken(vo.getAppToken())
+                .tableId(vo.getTableId())
+                .userIdType(BatchUpdateAppTableRecordUserIdTypeEnum.OPEN_ID)
+                .batchUpdateAppTableRecordReqBody(BatchUpdateAppTableRecordReqBody.newBuilder()
+                        .records(records)
+                        .build())
+                .build();
+        BatchUpdateAppTableRecordResp resp = client.bitable().appTableRecord().batchUpdate(req);
+        log.info("[多维表格]-更新数据：[状态] {}， [msg] {}", resp.getCode(), resp.getMsg());
     }
 
     /**

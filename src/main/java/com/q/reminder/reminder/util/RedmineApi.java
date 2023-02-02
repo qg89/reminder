@@ -485,20 +485,22 @@ public abstract class RedmineApi {
     /**
      * 创建任务并返回任务详情
      *
-     * @param data
+     * @param issue
+     * @param transport
      * @return
      */
-    private static Collection<? extends Issue> createIssue(Collection<? extends Issue> data, @NonNull Transport transport) {
-        List<Issue> resList = new ArrayList<>();
-        data.forEach(issue -> {
-            try {
-                issue.setStatusId(1).setCreatedOn(new Date());
-                issue.setTransport(transport);
-                resList.add(issue.create());
-            } catch (RedmineException e) {
-                e.printStackTrace();
-            }
-        });
-        return resList;
+    public static Issue createIssue(Issue issue, @NonNull Transport transport) {
+        try {
+            issue.setStatusId(1).setCreatedOn(new Date());
+            issue.setTransport(transport);
+            return issue.create();
+        } catch (RedmineException e) {
+            e.printStackTrace();
+        }
+        return issue;
+    }
+
+    public static Transport getTransportByProject(ProjectInfo projectInfo) {
+        return RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl(), projectInfo.getPmKey()).getTransport();
     }
 }
