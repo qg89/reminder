@@ -1,12 +1,8 @@
 package com.q.reminder.reminder.mapper;
 
-import com.q.reminder.reminder.entity.TTableInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.q.reminder.reminder.vo.table.FeatureVo;
+import com.q.reminder.reminder.entity.TTableInfo;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 /**
  * (TTableInfo)表数据库访问层
@@ -16,6 +12,5 @@ import java.util.List;
  */
 @Mapper
 public interface TTableInfoMapping extends BaseMapper<TTableInfo> {
-    List<FeatureVo> listByTableType(@Param("featureTmp") String featureTmp);
 }
 
