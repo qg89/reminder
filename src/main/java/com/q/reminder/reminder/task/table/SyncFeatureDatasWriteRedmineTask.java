@@ -189,8 +189,8 @@ public class SyncFeatureDatasWriteRedmineTask {
             andrdIssue.setSubject(parentIssue.getSubject() + "-安卓");
             andrdIssue.setSpentHours(andrd);
             andrdIssue.setTracker(DEV_TRACKER);
-//            issue.setAssigneeId(config.getAlgrthmId());
-//            andrdIssue.create();
+            issue.setAssigneeId(config.getAndrdId());
+            andrdIssue.create();
         }
         if (archtct != null) {
             Issue archtctIssue = issue;

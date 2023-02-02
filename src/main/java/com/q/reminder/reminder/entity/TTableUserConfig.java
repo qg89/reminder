@@ -76,7 +76,11 @@ public class TTableUserConfig extends Model<TTableUserConfig> implements Seriali
      */
     @TableField(value = "implmntton_id", fill = FieldFill.INSERT_UPDATE)
     private Integer implmnttonId;
-
+    /**
+     * 移动端redmine人员ID
+     */
+    @TableField(value = "andrd_id", fill = FieldFill.INSERT_UPDATE)
+    private Integer andrdId;
 
 }
 
