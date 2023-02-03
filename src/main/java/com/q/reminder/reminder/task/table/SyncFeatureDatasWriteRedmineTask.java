@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
  * @Description : 同步多维度表格记录-需求管理表写入redmine
  * @date :  2023.01.17 11:40
  */
-@Deprecated
 @Log4j2
 @Component
 public class SyncFeatureDatasWriteRedmineTask {
@@ -118,8 +117,10 @@ public class SyncFeatureDatasWriteRedmineTask {
             issue.addCustomFields(CUSTOM_FIELD_LIST);
 
             Issue parentIssue = RedmineApi.createIssue(issue, transport);
-            boolean createIssue = parentIssue.getId() == null && createSubIssue(parentIssue, featureTmp, config, transport);
-            if (!createIssue) {
+            if (parentIssue.getId() == null) {
+                continue;
+            }
+            if (!createSubIssue(parentIssue, featureTmp, config, transport)) {
                 continue;
             }
             // 创建子任务
