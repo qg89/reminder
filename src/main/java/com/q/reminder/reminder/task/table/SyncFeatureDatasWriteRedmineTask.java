@@ -126,7 +126,6 @@ public class SyncFeatureDatasWriteRedmineTask {
             }
             records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(Map.of("需求ID", recordsId)).build());
             featureTmp.setWriteRedmine("1");
-            featureTmp.setFeatureId(recordsId);
             tTableFeatureTmpService.updateById(featureTmp);
         }
 
