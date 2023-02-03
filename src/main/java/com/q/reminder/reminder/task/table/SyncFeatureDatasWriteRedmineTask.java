@@ -2,7 +2,6 @@ package com.q.reminder.reminder.task.table;
 
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.Client;
 import com.lark.oapi.service.bitable.v1.model.AppTableRecord;
@@ -76,7 +75,7 @@ public class SyncFeatureDatasWriteRedmineTask {
         List<AppTableRecord> records = new ArrayList<>();
 
         for (TTableFeatureTmp featureTmp : featureDataList) {
-            String featureId = IdWorker.get32UUID().substring(22);
+            String recordsId = featureTmp.getRecordsId();
             String projectName = featureTmp.getPrjct();
             String mdl = featureTmp.getMdl();
             String menuOne = featureTmp.getMenuOne();
@@ -113,7 +112,7 @@ public class SyncFeatureDatasWriteRedmineTask {
 
             issue.setTracker(FEATURE_TRACKER);
 
-            CUSTOM_FIELD_LIST.add(new CustomField().setName(CustomFieldsEnum.FEATURE_ID.getName()).setId(CustomFieldsEnum.FEATURE_ID.getId()).setValue(featureId));
+            CUSTOM_FIELD_LIST.add(new CustomField().setName(CustomFieldsEnum.FEATURE_ID.getName()).setId(CustomFieldsEnum.FEATURE_ID.getId()).setValue(recordsId));
             issue.addCustomFields(CUSTOM_FIELD_LIST);
 
             Issue parentIssue = RedmineApi.createIssue(issue, transport);
@@ -123,15 +122,11 @@ public class SyncFeatureDatasWriteRedmineTask {
             if (!createSubIssue(parentIssue, featureTmp, config, transport)) {
                 continue;
             }
-            // 创建子任务
-            if (StringUtils.isBlank(featureId)) {
-                continue;
-            }
             Map<String, Object> data = new HashMap<>(2);
-            data.put("需求ID", featureId);
-            records.add(AppTableRecord.newBuilder().recordId(featureTmp.getRecordsId()).fields(data).build());
+            data.put("需求ID", recordsId);
+            records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(data).build());
             featureTmp.setWriteRedmine("1");
-            featureTmp.setFeatureId(featureId);
+            featureTmp.setFeatureId(recordsId);
             tTableFeatureTmpService.updateById(featureTmp);
         }
 
