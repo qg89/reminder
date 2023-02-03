@@ -118,8 +118,11 @@ public class SyncFeatureDatasWriteRedmineTask {
             issue.addCustomFields(CUSTOM_FIELD_LIST);
 
             Issue parentIssue = RedmineApi.createIssue(issue, transport);
+            boolean createIssue = parentIssue.getId() == null && createSubIssue(parentIssue, featureTmp, config, transport);
+            if (!createIssue) {
+                continue;
+            }
             // 创建子任务
-            createSubIssue(parentIssue, featureTmp, config, transport);
             if (StringUtils.isBlank(featureId)) {
                 continue;
             }
@@ -146,13 +149,15 @@ public class SyncFeatureDatasWriteRedmineTask {
 
     /**
      * 创建子任务
+     *
      * @param parentIssue
      * @param featureTmp
      * @param config
      * @param transport
      * @throws RedmineException
      */
-    private void createSubIssue(Issue parentIssue, TTableFeatureTmp featureTmp, TTableUserConfig config, Transport transport) throws RedmineException {
+    private boolean createSubIssue(Issue parentIssue, TTableFeatureTmp featureTmp, TTableUserConfig config, Transport transport) throws RedmineException {
+        boolean createSubIssue = true;
         Integer issueId = parentIssue.getId();
         Issue issue = new Issue();
         issue.setDescription(parentIssue.getDescription());
@@ -169,77 +174,78 @@ public class SyncFeatureDatasWriteRedmineTask {
         Float implmntton = featureTmp.getImplmntton();
         Float oprton = featureTmp.getOprton();
         Float test = featureTmp.getTest();
-        if (front != null) {
+        if (front != null && createSubIssue) {
             Issue frontIssue = issue;
             frontIssue.setSubject(parentIssue.getSubject() + "-前端");
             frontIssue.setSpentHours(front);
             frontIssue.setTracker(DEV_TRACKER);
             frontIssue.setAssigneeId(config.getFrontId());
-            frontIssue.create();
+            createSubIssue = frontIssue.create().getId() != null;
         }
-        if (algrthm != null) {
+        if (algrthm != null && createSubIssue) {
             Issue algrthmIssue = issue;
             algrthmIssue.setSubject(parentIssue.getSubject() + "-算法");
             algrthmIssue.setSpentHours(algrthm);
             algrthmIssue.setTracker(DEV_TRACKER);
             algrthmIssue.setAssigneeId(config.getAlgrthmId());
-            algrthmIssue.create();
+            createSubIssue = algrthmIssue.create().getId() != null;
         }
-        if (andrd != null) {
+        if (andrd != null && createSubIssue) {
             Issue andrdIssue = issue;
             andrdIssue.setSubject(parentIssue.getSubject() + "-安卓");
             andrdIssue.setSpentHours(andrd);
             andrdIssue.setTracker(DEV_TRACKER);
             issue.setAssigneeId(config.getAndrdId());
-            andrdIssue.create();
+            createSubIssue = andrdIssue.create().getId() != null;
         }
-        if (archtct != null) {
+        if (archtct != null && createSubIssue) {
             Issue archtctIssue = issue;
             archtctIssue.setSubject(parentIssue.getSubject() + "-架构");
             archtctIssue.setSpentHours(archtct);
             archtctIssue.setTracker(DEV_TRACKER);
             archtctIssue.setAssigneeId(config.getArchtctId());
-            archtctIssue.create();
+            createSubIssue = archtctIssue.create().getId() != null;
         }
-        if (back != null) {
+        if (back != null && createSubIssue) {
             Issue backIssue = issue;
             backIssue.setSubject(parentIssue.getSubject() + "-后端");
             backIssue.setSpentHours(back);
             backIssue.setTracker(DEV_TRACKER);
             backIssue.setAssigneeId(config.getBackId());
-            backIssue.create();
+            createSubIssue = backIssue.create().getId() != null;
         }
-        if (bgdt != null) {
+        if (bgdt != null && createSubIssue) {
             Issue bgdtIssue = issue;
             bgdtIssue.setSubject(parentIssue.getSubject() + "-大数据");
             bgdtIssue.setSpentHours(bgdt);
             bgdtIssue.setTracker(DEV_TRACKER);
             bgdtIssue.setAssigneeId(config.getBgdtId());
-            bgdtIssue.create();
+            createSubIssue = bgdtIssue.create().getId() != null;
         }
-        if (implmntton != null) {
+        if (implmntton != null && createSubIssue) {
             Issue impIssue = issue;
             impIssue.setSubject(parentIssue.getSubject() + "-实施");
             impIssue.setSpentHours(implmntton);
             impIssue.setTracker(DEV_TRACKER);
             impIssue.setAssigneeId(config.getImplmnttonId());
-            impIssue.create();
+            createSubIssue = impIssue.create().getId() != null;
         }
-        if (oprton != null) {
+        if (oprton != null && createSubIssue) {
             Issue impIssue = issue;
             impIssue.setSubject(parentIssue.getSubject() + "-运维");
             impIssue.setSpentHours(oprton);
             impIssue.setTracker(DEV_TRACKER);
             impIssue.setAssigneeId(config.getOprtonId());
-            impIssue.create();
+            createSubIssue = impIssue.create().getId() != null;
         }
-        if (test != null) {
+        if (test != null && createSubIssue) {
             Issue testIssue = issue;
             testIssue.setSubject(parentIssue.getSubject() + "-测试");
             testIssue.setSpentHours(test);
             testIssue.setTracker(TEST_TRACKER);
             testIssue.setAssigneeId(config.getTestId());
-            testIssue.create();
+            createSubIssue = testIssue.create().getId() != null;
         }
+        return createSubIssue;
     }
 }

@@ -489,15 +489,10 @@ public abstract class RedmineApi {
      * @param transport
      * @return
      */
-    public static Issue createIssue(Issue issue, @NonNull Transport transport) {
-        try {
-            issue.setStatusId(1).setCreatedOn(new Date());
-            issue.setTransport(transport);
-            return issue.create();
-        } catch (RedmineException e) {
-            e.printStackTrace();
-        }
-        return issue;
+    public static Issue createIssue(Issue issue, @NonNull Transport transport) throws RedmineException {
+        issue.setStatusId(1).setCreatedOn(new Date());
+        issue.setTransport(transport);
+        return issue.create();
     }
 
     public static Transport getTransportByProject(ProjectInfo projectInfo) {
