@@ -63,6 +63,7 @@ public class SyncFeatureDatasWriteRedmineTask {
     private Tracker FEATURE_TRACKER = new Tracker().setId(2).setName("需求");
     private Tracker DEV_TRACKER = new Tracker().setId(7).setName("开发");
     private Tracker TEST_TRACKER = new Tracker().setId(8).setName("测试");
+    private Date dueDate = DateTime.now().plusDays(7).toDate();
 
     @XxlJob("syncTableRecordTask")
     public void syncTableRecordTask() throws Exception {
@@ -107,7 +108,7 @@ public class SyncFeatureDatasWriteRedmineTask {
             issue.setSubject(subject.toString());
             issue.setDescription(dscrptn);
             issue.setAssigneeId(config.getPrdctId());
-            issue.setDueDate(new Date());
+            issue.setDueDate(dueDate);
             issue.setSpentHours(prdct);
             issue.setProjectId(pId);
 
@@ -155,10 +156,10 @@ public class SyncFeatureDatasWriteRedmineTask {
         Integer issueId = parentIssue.getId();
         Issue issue = new Issue();
         issue.setDescription(parentIssue.getDescription());
-        issue.setDueDate(DateTime.now().plusDays(7).toDate());
         issue.setProjectId(parentIssue.getProjectId());
         issue.setParentId(issueId);
         issue.setTransport(transport);
+        issue.setDueDate(dueDate);
         Float front = featureTmp.getFront();
         Float algrthm = featureTmp.getAlgrthm();
         Float andrd = featureTmp.getAndrd();
