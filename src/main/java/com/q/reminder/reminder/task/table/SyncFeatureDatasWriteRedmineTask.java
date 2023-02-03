@@ -117,7 +117,7 @@ public class SyncFeatureDatasWriteRedmineTask {
             issue.addCustomFields(CUSTOM_FIELD_LIST);
 
             Issue parentIssue = RedmineApi.createIssue(issue, transport);
-            if (parentIssue.getId() == null && RedmineApi.checkRedmineTask(transport, recordsId)) {
+            if (parentIssue.getId() == null && !RedmineApi.checkRedmineTask(transport, recordsId)) {
                 continue;
             }
 
