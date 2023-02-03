@@ -229,7 +229,7 @@ public abstract class RedmineApi {
             }
             redmineSubject += "-[" + featureId + "]";
 
-            boolean check = checkRedmineTask(mgr, redmineSubject);
+            boolean check = checkRedmineTask(transport, redmineSubject);
             if (check) {
                 return;
             }
@@ -308,12 +308,11 @@ public abstract class RedmineApi {
     /**
      * 检查是否有redmine任务
      *
-     * @param mgr
+     * @param transport
      * @param redmineSubject
      * @return
      */
-    private static boolean checkRedmineTask(RedmineManager mgr, String redmineSubject) {
-        Transport transport = mgr.getTransport();
+    public static boolean checkRedmineTask(Transport transport, String redmineSubject) {
         List<RequestParam> params = List.of(new RequestParam("f[]", "subject"),
                 new RequestParam("op[subject]", "~"),
                 new RequestParam("v[subject][]", redmineSubject));

@@ -90,11 +90,12 @@ public class SyncFeatureDatasWriteRedmineTask {
 
             Transport transport = RedmineApi.getTransportByProject(projectInfo);
             StringBuilder subject = new StringBuilder();
+            subject.append("需求ID：").append("[").append(recordsId).append("]");
             if (StringUtils.isNotBlank(mdl)) {
-                subject.append("模块：").append(mdl).append("-");
+                subject.append("-").append("模块：").append(mdl);
             }
             if (StringUtils.isNotBlank(menuOne)) {
-                subject.append("一级：").append(menuOne);
+                subject.append("-").append("一级：").append(menuOne);
             }
             if (StringUtils.isNotBlank(menuTwo)) {
                 subject.append("-").append("二级：").append(menuTwo);
@@ -116,15 +117,14 @@ public class SyncFeatureDatasWriteRedmineTask {
             issue.addCustomFields(CUSTOM_FIELD_LIST);
 
             Issue parentIssue = RedmineApi.createIssue(issue, transport);
-            if (parentIssue.getId() == null) {
+            if (parentIssue.getId() == null && RedmineApi.checkRedmineTask(transport, recordsId)) {
                 continue;
             }
+
             if (!createSubIssue(parentIssue, featureTmp, config, transport)) {
                 continue;
             }
-            Map<String, Object> data = new HashMap<>(2);
-            data.put("需求ID", recordsId);
-            records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(data).build());
+            records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(Map.of("需求ID", recordsId)).build());
             featureTmp.setWriteRedmine("1");
             featureTmp.setFeatureId(recordsId);
             tTableFeatureTmpService.updateById(featureTmp);
