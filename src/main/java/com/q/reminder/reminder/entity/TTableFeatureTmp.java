@@ -9,6 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 
 
@@ -99,8 +100,9 @@ public class TTableFeatureTmp extends Model<TTableFeatureTmp> implements Seriali
      * 生产发布-时间
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @TableField(value = "prod_time", fill = FieldFill.INSERT_UPDATE)
-    private Date prodTime;
+    private LocalDate prodTime;
     /**
      * 移动工时
      */
