@@ -2,6 +2,7 @@ package com.q.reminder.reminder.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serial;
@@ -95,6 +96,7 @@ public class TTableFeatureTmp extends Model<TTableFeatureTmp> implements Seriali
     /**
      * 生产发布-时间
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @TableField(value = "prod_time", fill = FieldFill.INSERT_UPDATE)
     private Date prodTime;
     /**
