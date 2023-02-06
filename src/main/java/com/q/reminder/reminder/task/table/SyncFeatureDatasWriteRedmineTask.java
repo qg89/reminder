@@ -235,11 +235,18 @@ public class SyncFeatureDatasWriteRedmineTask {
         }
         if (test != null && createSubIssue) {
             Issue testIssue = issue;
-            testIssue.setSubject(parentIssue.getSubject() + "-测试");
+            testIssue.setSubject(parentIssue.getSubject() + "-测试用例");
             testIssue.setSpentHours(test);
             testIssue.setTracker(TEST_TRACKER);
             testIssue.setAssigneeId(config.getTestId());
             createSubIssue = testIssue.create().getId() != null;
+
+            Issue caseIssue = issue;
+            caseIssue.setSubject(parentIssue.getSubject() + "-测试执行");
+            caseIssue.setSpentHours(test);
+            caseIssue.setTracker(TEST_TRACKER);
+            caseIssue.setAssigneeId(config.getTestId());
+            createSubIssue = createSubIssue && caseIssue.create().getId() != null;
         }
         return createSubIssue;
     }
