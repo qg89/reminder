@@ -98,6 +98,7 @@ public class TTableFeatureTmp extends Model<TTableFeatureTmp> implements Seriali
     /**
      * 生产发布-时间
      */
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @TableField(value = "prod_time", fill = FieldFill.INSERT_UPDATE)
     private Date prodTime;
     /**
