@@ -15,8 +15,8 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath "io.spring.gradle:dependency-management-plugin:${dependencyManagementVersion}"
-		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+		classpath "io.spring.gradle:dependency-management-plugin:1.0.15.RELEASE"
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:2.7.5"
 	}
 }
 
@@ -29,9 +29,6 @@ plugins {
 group = 'com.q.reminder'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '17'
-
-
-apply plugin: 'java'
 
 
 configurations {
@@ -54,8 +51,8 @@ dependencies {
 //	compileOnly 'redis.clients:jedis'
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'com.mysql:mysql-connector-j'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+//	runtimeOnly 'com.mysql:mysql-connector-j:8.0.31'
+//	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	annotationProcessor 'org.projectlombok:lombok'
 
 	implementation 'mysql:mysql-connector-java:8.0.30'
@@ -93,11 +90,40 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-	implementation 'tech.powerjob:powerjob-worker-spring-boot-starter:4.2.0'
-	implementation 'tech.powerjob:powerjob-official-processors:1.2.2'
+//	implementation 'tech.powerjob:powerjob-worker-spring-boot-starter:4.2.0'
+//	implementation 'tech.powerjob:powerjob-official-processors:1.2.2'
 
 //	git
 	implementation 'org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r'
 	implementation 'org.gitective:gitective-core:0.9.9'
 
+}
+
+
+configure(allprojects) {
+	apply plugin: 'java'
+	apply plugin: "io.spring.dependency-management"
+
+	repositories {
+		mavenLocal()
+		maven {
+			credentials {
+				username '5ed0b855f3cfd0d0e769882d'
+				password '2ifmpNunm]NO' }
+			url 'https://packages.aliyun.com/maven/repository/2005435-snapshot-ENKNHJ/'
+		}
+		maven {
+			credentials {
+				username '5ed0b855f3cfd0d0e769882d'
+				password '2ifmpNunm]NO' }
+			url 'https://packages.aliyun.com/maven/repository/2005435-release-5QlEJm/'
+		}
+		mavenCentral()
+	}
+
+	dependencyManagement {
+		imports {
+			mavenBom "org.springframework.boot:spring-boot-dependencies:2.7.5"
+		}
+	}
 }
