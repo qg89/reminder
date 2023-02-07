@@ -1,7 +1,10 @@
 package com.q.reminder.reminder.controller;
 
+import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.q.reminder.reminder.constant.JsonCharsConstant;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.entity.RedmineUserInfo;
 import com.q.reminder.reminder.entity.TTableFeatureTmp;
@@ -41,8 +44,10 @@ public class TableFeatureController {
 
 
     @PostMapping("/records")
-    public void records(@RequestBody TTableFeatureTmp entity) {
-        tTableFeatureTmpService.saveOrUpdate(entity);
+    public void records(@RequestBody String entity) {
+        JSONObject json = json(entity);
+        TTableFeatureTmp featureTmp = json.to(TTableFeatureTmp.class);
+        tTableFeatureTmpService.saveOrUpdate(featureTmp);
     }
 
     @PostMapping("/user_config")
@@ -66,5 +71,41 @@ public class TableFeatureController {
         entity.setPId(projectInfo.getId());
         entity.setArchtctId(userMap.get(vo.getArchtct()));
         tTableUserConfigService.saveOrUpdate(entity);
+    }
+
+    private JSONObject json(String str) {
+        JSONObject jsonKey = jsonKey();
+        jsonKey.forEach((k, v) -> {
+            String s = str.substring(str.indexOf(k) + k.length());
+            String value = StrUtil.subBetween(s, JsonCharsConstant.CHARS_JSON);
+            if (str.contains(k)) {
+                jsonKey.put(k, value);
+            }
+        });
+        return jsonKey;
+    }
+
+    public JSONObject jsonKey() {
+        JSONObject jsonKey = new JSONObject();
+        jsonKey.put("recordsId", "");
+        jsonKey.put("menuOne", "");
+        jsonKey.put("prdct", "");
+        jsonKey.put("front", "");
+        jsonKey.put("back", "");
+        jsonKey.put("bgdt", "");
+        jsonKey.put("implmntton", "");
+        jsonKey.put("archtct", "");
+        jsonKey.put("mdl", "");
+        jsonKey.put("test", "");
+        jsonKey.put("prodTime", "");
+        jsonKey.put("andrd", "");
+        jsonKey.put("prjct", "");
+        jsonKey.put("menuTwo", "");
+        jsonKey.put("menuThree", "");
+        jsonKey.put("algrthm", "");
+        jsonKey.put("oprton", "");
+        jsonKey.put("featureId", "");
+        jsonKey.put("dscrptn", "");
+        return jsonKey;
     }
 }
