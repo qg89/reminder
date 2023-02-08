@@ -75,9 +75,6 @@ public class ProjectInfo implements Serializable {
     @TableField("pm_ou")
     private String pmOu;
 
-    @TableField("wiki_title")
-    private String wikiTitle;
-
     @TableField("wiki_token")
     private String wikiToken;
 

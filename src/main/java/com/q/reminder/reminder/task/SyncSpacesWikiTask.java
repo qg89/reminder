@@ -57,7 +57,7 @@ public class SyncSpacesWikiTask {
             }
             WikiSpace wikiSpace = spaceWikoService.getSpacesNode(client, "wikcnXpXCgmL3E7vdbM1TiwXiGc");
             String parentTitle = wikiSpace.getTitle();
-            LambdaQueryWrapper<ProjectInfo> lq = Wrappers.<ProjectInfo>lambdaQuery().select(ProjectInfo::getWikiToken, ProjectInfo::getWikiTitle, ProjectInfo::getId).isNotNull(ProjectInfo::getWikiToken);
+            LambdaQueryWrapper<ProjectInfo> lq = Wrappers.<ProjectInfo>lambdaQuery().select(ProjectInfo::getWikiToken, ProjectInfo::getId).isNotNull(ProjectInfo::getWikiToken);
             List<ProjectInfo> list = projectInfoService.list(lq);
             if (StringUtils.isNotBlank(jobParam) && NumberUtil.isInteger(jobParam) && Integer.parseInt(jobParam) <= 52) {
                 weekOfYear = Integer.parseInt(jobParam);
