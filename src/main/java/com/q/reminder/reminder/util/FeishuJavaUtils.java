@@ -572,4 +572,23 @@ public abstract class FeishuJavaUtils {
 
         System.out.println(obj);
     }
+
+    /**
+     * 知识空间获取文件详情
+     * @param client
+     * @param wikiToken
+     * @return
+     * @throws Exception
+     */
+    public static Node getNodeSpace(Client client, String wikiToken) throws Exception {
+        GetNodeSpaceReq req = GetNodeSpaceReq.newBuilder()
+                .token(wikiToken)
+                .build();
+        GetNodeSpaceResp resp = client.wiki().space().getNode(req, RequestOptions.newBuilder()
+                .build());
+        if (resp.success()) {
+            return resp.getData().getNode();
+        }
+        return null;
+    }
 }
