@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -62,6 +63,34 @@ public class RoleInvolvementUtils {
             vo.setSort(sort);
             data.add(vo);
         });
+        Double janHourse = data.stream().mapToDouble(e -> Double.parseDouble(e.getJan())).sum();
+        Double febHourse = data.stream().mapToDouble(e -> Double.parseDouble(e.getFeb())).sum();
+        Double marHourse = data.stream().mapToDouble(e -> Double.parseDouble(e.getMar())).sum();
+        Double arpHourse = data.stream().mapToDouble(e -> Double.parseDouble(e.getArp())).sum();
+        Double mayHourse = data.stream().mapToDouble(e -> Double.parseDouble(e.getMay())).sum();
+        Double junHourse = data.stream().mapToDouble(e -> Double.parseDouble(e.getJun())).sum();
+        Double julHourse = data.stream().mapToDouble(e -> Double.parseDouble(e.getJul())).sum();
+        Double augHourse = data.stream().mapToDouble(e -> Double.parseDouble(e.getAug())).sum();
+        Double sepHourse = data.stream().mapToDouble(e -> Double.parseDouble(e.getSep())).sum();
+        Double octHourse = data.stream().mapToDouble(e -> Double.parseDouble(e.getOct())).sum();
+        Double novHourse = data.stream().mapToDouble(e -> Double.parseDouble(e.getNov())).sum();
+        Double decHourse = data.stream().mapToDouble(e -> Double.parseDouble(e.getDec())).sum();
+        RoleInvolvementVo all = new RoleInvolvementVo();
+        all.setName("合计");
+        all.setJan(String.valueOf(janHourse));
+        all.setFeb(String.valueOf(febHourse));
+        all.setMar(String.valueOf(marHourse));
+        all.setArp(String.valueOf(arpHourse));
+        all.setMay(String.valueOf(mayHourse));
+        all.setJun(String.valueOf(junHourse));
+        all.setJul(String.valueOf(julHourse));
+        all.setAug(String.valueOf(augHourse));
+        all.setSep(String.valueOf(sepHourse));
+        all.setOct(String.valueOf(octHourse));
+        all.setNov(String.valueOf(novHourse));
+        all.setDec(String.valueOf(decHourse));
+        all.setSort(999);
+        data.add(all);
         return data;
     }
 }
