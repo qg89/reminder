@@ -2,7 +2,7 @@ package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.UUID;
-import com.q.reminder.reminder.contents.WeeklyReportContents;
+import com.q.reminder.reminder.constant.WeeklyReportConstants;
 import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.util.jfree.GenerateChartUtil;
@@ -498,7 +498,7 @@ public abstract class WeeklyProjectUtils {
         ).toList();
         List<String> categories = new ArrayList<>();
         // 变量
-        String title = WeeklyReportContents.COPQ;
+        String title = WeeklyReportConstants.COPQ;
 //        Map<String, List<TimeEntry>> weekNumMap = sortTimeList(timeEntryList);
 //        Map<String, List<TimeEntry>> weekNumBugsMap = sortTimeList(timeEntryBugs);
 

@@ -1,8 +1,13 @@
 package com.q.reminder.reminder.util;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.request.RequestOptions;
+import com.lark.oapi.service.bitable.v1.enums.BatchCreateAppTableRecordUserIdTypeEnum;
+import com.lark.oapi.service.bitable.v1.enums.BatchUpdateAppTableRecordUserIdTypeEnum;
+import com.lark.oapi.service.bitable.v1.enums.ListAppTableRecordUserIdTypeEnum;
+import com.lark.oapi.service.bitable.v1.model.*;
 import com.lark.oapi.service.docx.v1.enums.BatchUpdateDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.enums.PatchDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.model.*;
@@ -17,11 +22,14 @@ import com.lark.oapi.service.sheets.v3.model.QuerySpreadsheetSheetReq;
 import com.lark.oapi.service.sheets.v3.model.QuerySpreadsheetSheetResp;
 import com.lark.oapi.service.sheets.v3.model.Sheet;
 import com.lark.oapi.service.wiki.v2.model.*;
+import com.q.reminder.reminder.constant.MsgTypeConstants;
 import com.q.reminder.reminder.entity.GroupInfo;
+import com.q.reminder.reminder.entity.TTableInfo;
 import com.q.reminder.reminder.entity.UserGroup;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.vo.*;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -117,12 +125,38 @@ public abstract class FeishuJavaUtils {
             if (resp.getCode() == 0) {
                 return Boolean.TRUE;
             } else {
-                log.error("更新飞书周报失败，msg：{} error：{}", resp.getMsg(), resp.getError());
+                JSONObject json = new JSONObject();
+                json.put("text", "项目名称： " + vo.getProjectShortName() + "，msg：" + resp.getMsg() + ", error：" + resp.getError());
+                sendAdmin(client, json, List.of("ou_35e03d4d8754dd35fed26c26849c85ab"));
             }
         } catch (Exception e) {
             log.error(e);
         }
         return Boolean.FALSE;
+    }
+
+    /**
+     * 发送管理员
+     *
+     * @param client
+     * @param json
+     * @param adminInfos
+     * @throws Exception
+     */
+    public static void sendAdmin(Client client, JSONObject json, List<String> adminInfos) throws Exception {
+        adminInfos.forEach(memberId -> {
+            MessageVo messageVo = new MessageVo();
+            messageVo.setContent(json.toJSONString());
+            messageVo.setReceiveId(memberId);
+            messageVo.setMsgType(MsgTypeConstants.TEXT);
+            messageVo.setClient(client);
+            messageVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+            try {
+                FeishuJavaUtils.sendContent(messageVo);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     /**
@@ -364,5 +398,197 @@ public abstract class FeishuJavaUtils {
         ug.setChatId(chatId);
         ug.setMemberId(e.getMemberId());
         userGroupList.add(ug);
+    }
+
+    /**
+     * 多为表格-记录-列出视图记录
+     *
+     * @param client
+     * @return
+     */
+    public static List<AppTableRecord> listTableRecords(Client client, TTableInfo vo) throws Exception {
+        List<AppTableRecord> resList = new ArrayList<>();
+        ListAppTableRecordReq req = ListAppTableRecordReq.newBuilder()
+                .appToken(vo.getAppToken())
+                .tableId(vo.getTableId())
+                .viewId(vo.getViewId())
+                .filter(vo.getFilter())
+                .userIdType(ListAppTableRecordUserIdTypeEnum.OPEN_ID)
+                .build();
+        ListAppTableRecordResp resp;
+        ListAppTableRecordRespBody respData = new ListAppTableRecordRespBody();
+        do {
+            String pageToken = respData.getPageToken();
+            if (StringUtils.isNotBlank(pageToken)) {
+                req.setPageToken(pageToken);
+            }
+            resp = client.bitable().appTableRecord().list(req);
+            if (resp.getCode() != 0) {
+                return resList;
+            }
+            respData = resp.getData();
+            AppTableRecord[] items = respData.getItems();
+            if (items == null) {
+                return resList;
+            }
+            resList.addAll(Arrays.stream(items).toList());
+        } while (resp.getCode() == 0 && respData.getHasMore());
+        return resList;
+    }
+
+    /**
+     * 多为表格-记录-批量创建记录
+     *
+     * @param client
+     * @param vo
+     * @throws Exception
+     */
+    public static void batchCreateTableRecords(Client client, TTableInfo vo, AppTableRecord[] records) throws Exception {
+        BatchCreateAppTableRecordReq req = BatchCreateAppTableRecordReq.newBuilder()
+                .appToken(vo.getAppToken())
+                .tableId(vo.getTableId())
+                .userIdType(BatchCreateAppTableRecordUserIdTypeEnum.OPEN_ID)
+                .batchCreateAppTableRecordReqBody(BatchCreateAppTableRecordReqBody.newBuilder()
+                        .records(records)
+                        .build())
+                .build();
+        BatchCreateAppTableRecordResp resp = client.bitable().appTableRecord().batchCreate(req);
+        log.info("[多维表格]-保存数据：[状态] {}， [msg] {}", resp.getCode(), resp.getMsg());
+    }
+
+    /**
+     * 多为表格-记录-批量更新记录
+     *
+     * @param client
+     * @param vo
+     * @throws Exception
+     */
+    public static void batchUpdateTableRecords(Client client, TTableInfo vo, AppTableRecord[] records) throws Exception {
+        BatchUpdateAppTableRecordReq req = BatchUpdateAppTableRecordReq.newBuilder()
+                .appToken(vo.getAppToken())
+                .tableId(vo.getTableId())
+                .userIdType(BatchUpdateAppTableRecordUserIdTypeEnum.OPEN_ID)
+                .batchUpdateAppTableRecordReqBody(BatchUpdateAppTableRecordReqBody.newBuilder()
+                        .records(records)
+                        .build())
+                .build();
+        BatchUpdateAppTableRecordResp resp = client.bitable().appTableRecord().batchUpdate(req);
+        log.info("[多维表格]-更新数据：[状态] {}， [msg] {}", resp.getCode(), resp.getMsg());
+    }
+
+    /**
+     * 多为表格-记录-批量删除记录
+     *
+     * @param client
+     * @param records
+     */
+    public static void batchDeleteTableRecords(Client client, TTableInfo vo, String[] records) throws Exception {
+        // 创建请求对象
+        BatchDeleteAppTableRecordReq req = BatchDeleteAppTableRecordReq.newBuilder()
+                .appToken(vo.getAppToken())
+                .tableId(vo.getTableId())
+                .batchDeleteAppTableRecordReqBody(BatchDeleteAppTableRecordReqBody.newBuilder().records(records).build())
+                .build();
+        client.bitable().appTableRecord().batchDelete(req);
+    }
+
+    /**
+     * 多为表格-字段-列出字段
+     *
+     * @param client
+     * @param vo
+     * @return
+     * @throws Exception
+     */
+    public static List<AppTableField> listTableColumn(Client client, TTableInfo vo) throws Exception {
+        List<AppTableField> appTableFields = new ArrayList<>();
+        // 创建请求对象
+        ListAppTableFieldReq req = ListAppTableFieldReq.newBuilder()
+                .appToken(vo.getAppToken())
+                .tableId(vo.getTableId())
+                .viewId(vo.getViewId())
+                .build();
+        ListAppTableFieldResp resp;
+        ListAppTableFieldRespBody respData = new ListAppTableFieldRespBody();
+        do {
+            String pageToken = respData.getPageToken();
+            if (StringUtils.isNotBlank(pageToken)) {
+                req.setPageToken(pageToken);
+            }
+            resp = client.bitable().appTableField().list(req);
+            respData = resp.getData();
+            AppTableField[] items = respData.getItems();
+            if (items == null) {
+                continue;
+            }
+            appTableFields.addAll(Arrays.stream(items).toList());
+        } while (resp.getCode() == 0 && respData.getHasMore());
+        return appTableFields;
+    }
+
+    static Client client = null;
+
+    public static void createColumn(Client client, TTableInfo vo, String fileName) throws Exception {
+        CreateAppTableFieldReq req = CreateAppTableFieldReq.newBuilder()
+                .appToken(vo.getAppToken())
+                .tableId(vo.getTableId())
+                .appTableField(AppTableField.newBuilder()
+                        .fieldName(fileName)
+                        .type(1)
+                        .build())
+                .build();
+        CreateAppTableFieldResp resp = client.bitable().appTableField().create(req, RequestOptions.newBuilder().build());
+        System.out.println(resp.getCode());
+    }
+
+    public static void main(String[] args) throws Exception {
+        TTableInfo vo = new TTableInfo();
+        vo.setTableId("tbld61CFebNfZ6M6");
+        vo.setAppToken("bascnrkdLGoUftLgM7fvME7ly5c");
+        client = Client.newBuilder("cli_a1144b112738d013", "AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx").build();
+//        for (int i = 0; i < 10000; i++) {
+//            createColumn(client, vo, ("file" + i));
+//        }
+//        StopWatch stopWatch = new StopWatch();
+//        stopWatch.start("all");
+//        for (int i1 = 0; i1 < 18; i1++) {
+//            StopWatch s1 = new StopWatch();
+//            s1.start(i1 + "");
+//            List<AppTableRecord> records = new ArrayList<>();
+//            for (int i = 0; i < 100; i++) {
+//                Map<String, Object> data = new HashMap<>();
+//                for (int j = 0; j < 300; j++) {
+//                    data.put(("file" + j), ((i + j) + "本地表格导入为多维表格的文件大小上限是多少"));
+//                }
+//                records.add(AppTableRecord.newBuilder().fields(data).build());
+//            }
+//            batchCreateTableRecords(client, vo, records.toArray(new AppTableRecord[records.size()]));
+//            s1.stop();
+//            System.err.println(s1.prettyPrint());
+//        }
+//        stopWatch.stop();
+//        System.err.println(stopWatch.prettyPrint());
+        Object obj = listTableRecords(client, vo);
+
+        System.out.println(obj);
+    }
+
+    /**
+     * 知识空间获取文件详情
+     * @param client
+     * @param wikiToken
+     * @return
+     * @throws Exception
+     */
+    public static Node getNodeSpace(Client client, String wikiToken) throws Exception {
+        GetNodeSpaceReq req = GetNodeSpaceReq.newBuilder()
+                .token(wikiToken)
+                .build();
+        GetNodeSpaceResp resp = client.wiki().space().getNode(req, RequestOptions.newBuilder()
+                .build());
+        if (resp.success()) {
+            return resp.getData().getNode();
+        }
+        return null;
     }
 }

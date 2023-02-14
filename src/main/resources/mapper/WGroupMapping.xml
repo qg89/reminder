@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.q.reminder.reminder.mapper.WGroupMapping">
+    <select id="groupWorkload" resultType="com.q.reminder.reminder.vo.RoleInvolvementVo">
+        SELECT
+            g.`group` AS `name`,
+            dc.`month` AS `months`,
+            ROUND( SUM( ut.houses ), 2 ) AS `hours`
+        FROM
+            w_group g
+            LEFT JOIN w_role_group_user re ON g.id = re.group_id
+            LEFT JOIN w_user_times ut ON re.user_id = ut.user_id
+            LEFT JOIN r_project_info p ON p.id = ut.p_id
+            LEFT JOIN w_user_time_month um ON um.user_id = re.user_id
+            LEFT JOIN s_date_config dc ON um.date_id = dc.id
+            LEFT JOIN w_config wc ON dc.id = wc.date_id
+        WHERE
+            p.p_key = #{vo.pKey}
+          AND dc.`year` = #{vo.year}
+          AND CONCAT( dc.`year`, dc.`month` ) = DATE_FORMAT( ut.`day`, '%Y%c' )
+        <if test="vo.groupId != null and vo.groupId.size() > 0">
+            AND g.id IN(
+            <foreach collection="vo.groupId" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="vo.roleId != null and vo.roleId.size() > 0">
+            AND re.role_id IN(
+            <foreach collection="vo.roleId" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="vo.userId != null and vo.userId.size() > 0">
+            AND re.user_id IN(
+            <foreach collection="vo.userId" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
+        GROUP BY
+            g.`group`,
+            dc.`month`
+    </select>
+</mapper>
+

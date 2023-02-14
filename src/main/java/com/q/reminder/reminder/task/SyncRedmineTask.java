@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -64,7 +63,7 @@ public class SyncRedmineTask {
         lq.isNotNull(ProjectInfo::getPmKey);
         lq.eq(ProjectInfo::getSyncFeature, "0");
         List<ProjectInfo> projectInfos = projectInfoService.list(lq);
-        Map<String, Integer> redmineUserMap = redmineUserInfoService.list(Wrappers.<RedmineUserInfo>lambdaQuery().isNotNull(RedmineUserInfo::getAssigneeName)).stream().collect(Collectors.toMap(e -> e.getAssigneeName().replace(" ", ""), RedmineUserInfo::getAssigneeId));
+        Map<String, Integer> redmineUserMap = redmineUserInfoService.list(Wrappers.<RedmineUserInfo>lambdaQuery().isNotNull(RedmineUserInfo::getAssigneeName)).stream().collect(Collectors.toMap(e -> e.getAssigneeName().replace(" ", "") + "-" + e.getRedmineType(), RedmineUserInfo::getAssigneeId, (v1, v2) -> v1));
         List<AdminInfo> adminInfoList = adminInfoService.list();
         String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         StringBuilder conten = new StringBuilder();
@@ -75,6 +74,7 @@ public class SyncRedmineTask {
             String redmineUrl = projectInfo.getRedmineUrl();
             String pmKey = projectInfo.getPmKey();
             String pName = projectInfo.getPName();
+            String redmineType = projectInfo.getRedmineType();
             // 获取各项目中需求管理表中sheetId和sheet名称
             List<SheetVo> sheetList = null;
             try {
@@ -94,6 +94,7 @@ public class SyncRedmineTask {
             definition.setApiAccessKey(pmKey);
             definition.setRedmineUrl(redmineUrl);
             definition.setProjectId(Integer.valueOf(pId));
+            definition.setRedmineType(redmineType);
             for (SheetVo sheetVo : sheetList) {
                 String sheetId = sheetVo.getSheetId();
                 String title = sheetVo.getTitle();

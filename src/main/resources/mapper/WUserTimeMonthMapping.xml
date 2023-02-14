@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.q.reminder.reminder.mapper.WUserTimeMonthMapping">
+    <select id="inputRatio" resultType="com.q.reminder.reminder.vo.RoleInvolvementVo">
+        SELECT
+            u.assignee_name AS `name`,
+            u.assignee_id AS `id`,
+            um.times AS `hours`,
+            sc.`month` AS `months`
+        FROM
+            r_redmine_user_info u
+            LEFT JOIN w_user_time_month um ON um.user_id = u.assignee_id
+            LEFT JOIN s_date_config sc ON um.date_id = sc.id
+            LEFT JOIN r_project_info p ON p.id = um.p_id AND u.redmine_type = p.redmine_type
+        <where>
+            p.id = #{vo.pId}
+            <if test="vo.year != null and vo.year != ''">
+                AND sc.`year` = #{vo.year}
+            </if>
+        </where>
+    </select>
+</mapper>
+

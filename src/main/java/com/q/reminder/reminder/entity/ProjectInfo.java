@@ -21,6 +21,8 @@ public class ProjectInfo implements Serializable {
     @Serial
     private static final long serialVersionUID = 6061440968825915105L;
     @TableId(type = IdType.INPUT)
+    private Long id;
+
     @TableField("p_id")
     private String pId;
 
@@ -73,9 +75,6 @@ public class ProjectInfo implements Serializable {
     @TableField("pm_ou")
     private String pmOu;
 
-    @TableField("wiki_title")
-    private String wikiTitle;
-
     @TableField("wiki_token")
     private String wikiToken;
 
@@ -84,4 +83,16 @@ public class ProjectInfo implements Serializable {
 
     @TableLogic(value = "0", delval = "1")
     private String isDelete;
+
+    @TableField("update_time")
+    private Date updateTime;
+
+    @TableField("create_time")
+    private Date createTime;
+
+    /**
+     * redmine类型:1旧，2新
+     */
+    @TableField("redmine_type")
+    private String redmineType;
 }

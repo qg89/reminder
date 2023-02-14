@@ -1,6 +1,5 @@
 package com.q.reminder.reminder.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.github.jeffreyning.mybatisplus.base.MppBaseMapper;
 import com.q.reminder.reminder.entity.UserGroup;
 import org.apache.ibatis.annotations.Mapper;

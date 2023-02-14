@@ -15,7 +15,7 @@
             `r_project_info` p
             LEFT JOIN group_project gp ON p.p_id = gp.p_id
             LEFT JOIN fs_group_info f ON gp.chat_id = f.chat_id
-            LEFT JOIN r_coverity c ON c.r_project_id = p.p_id
+            LEFT JOIN r_coverity c ON c.r_project_id = p.id
             LEFT JOIN r_redmine_user_info r ON r.assignee_id = c.r_assignee_id
             LEFT JOIN fs_user_member_info fm ON fm.`name` = r.assignee_name
         WHERE

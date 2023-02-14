@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author : saiko
@@ -28,7 +29,11 @@ public class HoldayBase {
     public Boolean queryHoliday() {
         LambdaQueryWrapper<PublicHolidays> holdayWrapper = new LambdaQueryWrapper<>();
         holdayWrapper.eq(PublicHolidays::getHoliday, DateUtil.today());
-        PublicHolidays holidays = publicHolidaysService.getOne(holdayWrapper);
-        return DateUtil.isWeekend(new Date()) && (holidays == null || !"1".equals(holidays.getType()));
+        PublicHolidays holidayInfo = publicHolidaysService.getOne(holdayWrapper);
+        boolean weekend = DateUtil.isWeekend(new Date());
+        if (holidayInfo != null && Objects.equals("0", holidayInfo.getType()) || (holidayInfo == null && weekend)) {
+            return Boolean.TRUE;
+        }
+        return Boolean.FALSE;
     }
 }

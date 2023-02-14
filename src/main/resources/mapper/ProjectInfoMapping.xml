@@ -10,13 +10,14 @@
             p.start_day AS startDay,
             p.pm_ou AS pmOu,
             p.p_key AS pKey,
+            p.id AS id,
             fw.url AS weeklyReportUrl,
             fw.week_num weekNum,
             fw.file_name AS fileName,
             fw.file_token AS fileToken
         FROM
             r_project_info p
-            LEFT JOIN fs_weekly_project_report fw ON p.p_id = fw.r_pid
+            LEFT JOIN fs_weekly_project_report fw ON p.id = fw.r_pid
         WHERE
             fw.file_token IS NOT NULL
             AND fw.is_delete = 0
@@ -29,8 +30,8 @@
                 AND fw.week_num = WEEKOFYEAR(NOW())
             </otherwise>
         </choose>
-        <if test="pKey != null and pKey != ''">
-            AND p.p_key = #{pKey}
+        <if test="id != null and id != ''">
+            AND p.id = #{id}
         </if>
     </select>
 
@@ -43,9 +44,9 @@
             r_project_info p,
             fs_weekly_project_report fw
         WHERE
-            p.p_id = fw.r_pid
+            p.id = fw.r_pid
           AND fw.file_token IS NOT NULL
-          AND p.p_key = #{pKey}
+          AND p.id = #{id}
         <if test="name != null and name != ''">
             AND fw.file_name like concat('%',#{name},'%')
         </if>

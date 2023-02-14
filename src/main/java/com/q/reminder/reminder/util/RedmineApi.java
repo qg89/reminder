@@ -9,12 +9,10 @@ import com.taskadapter.redmineapi.IssueManager;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.RedmineManagerFactory;
-import com.taskadapter.redmineapi.bean.CustomField;
-import com.taskadapter.redmineapi.bean.Issue;
-import com.taskadapter.redmineapi.bean.IssueRelation;
-import com.taskadapter.redmineapi.bean.Tracker;
+import com.taskadapter.redmineapi.bean.*;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
+import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
@@ -35,10 +33,22 @@ import java.util.*;
 @Log4j2
 public abstract class RedmineApi {
     public static void main(String[] args) throws RedmineException {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey("http://redmine-qa.mxnavi.com/", "1f905383da4f783bad92e22f430c7db0b15ae258");
+//        ProjectInfo info = new ProjectInfo();
+//        info.setRedmineUrl("http://redmine-pa.mxnavi.com");
+//        info.setPKey("510303-gb");
+//        info.setPmKey("e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
+//
+//        List<TimeEntry> timeEntries = queryTimes(info);
+//        Map<Integer, String> collect = timeEntries.stream().collect(Collectors.toMap(TimeEntry::getUserId, TimeEntry::getUserName, (v1, v2) -> v1));
+////        List<TimeEntry> timeEntries = queryTimes(info).stream().filter(e -> e.getIssueId() == 609043).toList();
+////        Map<String, Map<String, Double>> collect = timeEntries.stream().collect(Collectors.groupingBy(e -> String.valueOf(e.getUserId()), Collectors.groupingBy(e -> new DateTime(e.getSpentOn()).toString("yyyy-MM-dd"),
+////                Collectors.summingDouble(e -> BigDecimal.valueOf(e.getHours()).setScale(2, RoundingMode.HALF_UP).doubleValue()))));
+//        System.out.println(collect);
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey("http://redmine-pa.mxnavi.com", "e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
         IssueManager issueManager = mgr.getIssueManager();
-        Issue issueById = issueManager.getIssueById(609044);
-        System.out.println(issueById);
+        Issue issueById = issueManager.getIssueById(2633);
+        PropertyStorage storage = issueById.getStorage();
+        System.out.println(storage.getProperties());
     }
 
     /**
@@ -168,12 +178,13 @@ public abstract class RedmineApi {
         Tracker tracker = new Tracker();
         tracker.setId(2);
         tracker.setName("需求");
-        Integer productAssigneeId = redmineUserMap.get(definition.getProduct());
-        Integer bigDataAssigneeId = redmineUserMap.get(definition.getBigData());
-        Integer backendAssigneeId = redmineUserMap.get(definition.getBackend());
-        Integer testAssigneeId = redmineUserMap.get(definition.getTest());
-        Integer algorithmAssigneeId = redmineUserMap.get(definition.getAlgorithm());
-        Integer frontAssigneeId = redmineUserMap.get(definition.getFront());
+        String redmineType = definition.getRedmineType();
+        Integer productAssigneeId = redmineUserMap.get(convertAssid(definition.getProduct(), redmineType));
+        Integer bigDataAssigneeId = redmineUserMap.get(convertAssid(definition.getBigData(), redmineType));
+        Integer backendAssigneeId = redmineUserMap.get(convertAssid(definition.getBackend(), redmineType));
+        Integer testAssigneeId = redmineUserMap.get(convertAssid(definition.getTest(), redmineType));
+        Integer algorithmAssigneeId = redmineUserMap.get(convertAssid(definition.getAlgorithm(), redmineType));
+        Integer frontAssigneeId = redmineUserMap.get(convertAssid(definition.getFront(), redmineType));
         Integer projectId = definition.getProjectId();
 
         for (FeatureListVo vo : featureList) {
@@ -218,7 +229,7 @@ public abstract class RedmineApi {
             }
             redmineSubject += "-[" + featureId + "]";
 
-            boolean check = checkRedmineTask(mgr, redmineSubject);
+            boolean check = checkRedmineTask(transport, redmineSubject);
             if (check) {
                 return;
             }
@@ -285,15 +296,23 @@ public abstract class RedmineApi {
         }
     }
 
+    private static String convertAssid(String name, String redmineType) {
+        String chars = "-" + redmineType;
+        if (name.contains(chars)) {
+            name = name.replace(chars, "");
+        }
+        return name;
+    }
+
+
     /**
      * 检查是否有redmine任务
      *
-     * @param mgr
+     * @param transport
      * @param redmineSubject
      * @return
      */
-    private static boolean checkRedmineTask(RedmineManager mgr, String redmineSubject) {
-        Transport transport = mgr.getTransport();
+    public static boolean checkRedmineTask(Transport transport, String redmineSubject) {
         List<RequestParam> params = List.of(new RequestParam("f[]", "subject"),
                 new RequestParam("op[subject]", "~"),
                 new RequestParam("v[subject][]", redmineSubject));
@@ -311,6 +330,7 @@ public abstract class RedmineApi {
     }
 
     /**
+     * 创建子任务
      * @param issueParent
      * @param assigneeId
      * @param tracker
@@ -393,5 +413,88 @@ public abstract class RedmineApi {
             convertSuccess = false;
         }
         return convertSuccess;
+    }
+
+    /**
+     * 查询项目耗时
+     *
+     * @param info
+     * @return
+     * @throws RedmineException
+     */
+    public static List<TimeEntry> queryTimes(ProjectInfo info) throws RedmineException {
+        String redmineUrl = info.getRedmineUrl();
+        String url = redmineUrl + "/projects/" + info.getPKey();
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(url, info.getPmKey());
+        Transport transport = mgr.getTransport();
+        Collection<RequestParam> params = new ArrayList<>();
+        Date startDay = info.getStartDay();
+        if (startDay != null) {
+            params.add(new RequestParam("f[]", "spent_on"));
+            params.add(new RequestParam("op[spent_on]", ">="));
+            params.add(new RequestParam("v[spent_on][]", new DateTime(startDay).toString("yyyy-MM-dd")));
+        }
+        List<TimeEntry> timeEntries = transport.getObjectsList(TimeEntry.class, params);
+        IssueManager issueManager = RedmineManagerFactory.createWithApiKey(redmineUrl, info.getPmKey()).getIssueManager();
+        for (TimeEntry timeEntry : timeEntries) {
+            Integer issueId = timeEntry.getIssueId();
+            Issue issue = issueManager.getIssueById(issueId);
+            CustomField customField = issue.getCustomFieldById(CustomFieldsEnum.BUG_TYPE.getId());
+            if (customField != null && "Bug".equals(customField.getValue())) {
+                timeEntry.addCustomFields(List.of(customField));
+            }
+        }
+        return timeEntries;
+    }
+
+    /**
+     * 查询项目耗时
+     *
+     * @param info
+     * @return
+     * @throws RedmineException
+     */
+    public static List<TimeEntry> queryUserTime(ProjectInfo info) throws RedmineException {
+        String redmineUrl = info.getRedmineUrl();
+        String url = redmineUrl + "/projects/" + info.getPKey();
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(url, info.getPmKey());
+        Transport transport = mgr.getTransport();
+        Collection<RequestParam> params = new ArrayList<>();
+        params.add(new RequestParam("f[]", "spent_on"));
+        params.add(new RequestParam("op[spent_on]", ">="));
+        params.add(new RequestParam("v[spent_on][]", new DateTime().minusDays(7).toString("yyyy-MM-dd")));
+        return transport.getObjectsList(TimeEntry.class, params);
+    }
+
+    public static Collection<? extends Issue> queryIssues(ProjectInfo info) throws RedmineException {
+        String redmineUrl = info.getRedmineUrl();
+        String url = redmineUrl + "/projects/" + info.getPKey();
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(url, info.getPmKey());
+        Transport transport = mgr.getTransport();
+        Collection<RequestParam> params = new ArrayList<>();
+        Date startDay = info.getStartDay();
+        if (startDay != null) {
+            params.add(new RequestParam("f[]", "updated_on"));
+            params.add(new RequestParam("op[updated_on]", ">="));
+            params.add(new RequestParam("v[updated_on][]", new DateTime(startDay).toString("yyyy-MM-dd")));
+        }
+        return transport.getObjectsList(Issue.class, params);
+    }
+
+    /**
+     * 创建任务并返回任务详情
+     *
+     * @param issue
+     * @param transport
+     * @return
+     */
+    public static Issue createIssue(Issue issue, @NonNull Transport transport) throws RedmineException {
+        issue.setStatusId(1).setCreatedOn(new Date());
+        issue.setTransport(transport);
+        return issue.create();
+    }
+
+    public static Transport getTransportByProject(ProjectInfo projectInfo) {
+        return RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl(), projectInfo.getPmKey()).getTransport();
     }
 }

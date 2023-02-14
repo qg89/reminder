@@ -45,4 +45,5 @@ public class DefinitionVo implements Serializable {
     private String redmineUrl;
     private String apiAccessKey;
     private Integer projectId;
+    private String redmineType;
 }

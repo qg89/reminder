@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static com.q.reminder.reminder.contents.WeeklyReportContents.*;
+import static com.q.reminder.reminder.constant.WeeklyReportConstants.*;
 
 /**
  * @author : saiko
@@ -43,7 +43,7 @@ public class WeeklyProjectReportController {
     public ReturnT<String> reSet(WeeklyVo vo) {
         ReturnT<String> returnT = new ReturnT<>();
         Integer weekNum = vo.getWeekNum();
-        List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNum, vo.getPKey());
+        List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNum, vo.getId());
         WeeklyProjectVo projectVo = list.get(0);
         if (projectVo == null) {
             return ReturnT.FAIL;
@@ -65,13 +65,13 @@ public class WeeklyProjectReportController {
 
     @GetMapping("/p_option")
     public ReturnT<List<ProjectInfo>> option() {
-        LambdaQueryWrapper<ProjectInfo> lq = Wrappers.<ProjectInfo>lambdaQuery().select(ProjectInfo::getPKey, ProjectInfo::getProjectShortName);
+        LambdaQueryWrapper<ProjectInfo> lq = Wrappers.<ProjectInfo>lambdaQuery().select(ProjectInfo::getId, ProjectInfo::getProjectShortName);
         return new ReturnT<>(projectInfoService.list(lq));
     }
 
     @GetMapping("/listReport")
     public ReturnT<List<WeeklyByProjectVo>> listReport(WeeklyByProjectVo vo) {
-        return new ReturnT<>(projectInfoService.weeklyByProjectList(vo.getPKey(), vo.getFileName()));
+        return new ReturnT<>(projectInfoService.weeklyByProjectList(vo.getId(), vo.getFileName()));
     }
 
     @GetMapping("/listDocx")

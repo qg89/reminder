@@ -5,7 +5,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.Client;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
-import com.q.reminder.reminder.contents.MsgTypeContents;
+import com.q.reminder.reminder.constant.MsgTypeConstants;
 import com.q.reminder.reminder.entity.CoverityLog;
 import com.q.reminder.reminder.service.CoverityLogService;
 import com.q.reminder.reminder.service.CoverityService;
@@ -118,11 +118,11 @@ public class CvoerityTask {
             return;
         }
         projectVoMap.forEach((chatId, projectInfo) -> {
-            int index = 0;
             List<CoverityLog> logList = coverityLogs.get(projectInfo.getAssigneeId());
-            if (!CollectionUtils.isEmpty(logList)) {
-                index = logList.size();
+            if (CollectionUtils.isEmpty(logList)) {
+                return;
             }
+            int index = logList.size();
             JSONObject con = new JSONObject();
             JSONObject all = new JSONObject();
             JSONArray contentJsonArray = new JSONArray();
@@ -151,7 +151,7 @@ public class CvoerityTask {
             MessageVo messageVo = new MessageVo();
             messageVo.setContent(con.toJSONString());
             messageVo.setReceiveId(chatId);
-            messageVo.setMsgType(MsgTypeContents.POST);
+            messageVo.setMsgType(MsgTypeConstants.POST);
             messageVo.setClient(client);
             messageVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.CHAT_ID);
             try {
@@ -176,7 +176,7 @@ public class CvoerityTask {
             MessageVo messageVo = new MessageVo();
             messageVo.setContent(con.toJSONString());
             messageVo.setReceiveId(chatId);
-            messageVo.setMsgType(MsgTypeContents.POST);
+            messageVo.setMsgType(MsgTypeConstants.POST);
             messageVo.setClient(client);
             messageVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.CHAT_ID);
             try {

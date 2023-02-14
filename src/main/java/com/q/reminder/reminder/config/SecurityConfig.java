@@ -43,7 +43,9 @@ public class SecurityConfig  {
                         auth.antMatchers(
                                         "/user/**",
                                         "/weekly/**",
-                                        "/p/**"
+                                        "/p/**",
+                                        "/table/**",
+                                        "/workload/**"
                                 )
                                 .permitAll()
                                 .anyRequest()

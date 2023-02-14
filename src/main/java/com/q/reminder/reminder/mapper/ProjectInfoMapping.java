@@ -19,7 +19,7 @@ import java.util.List;
 @Mapper
 public interface ProjectInfoMapping extends BaseMapper<ProjectInfo> {
 
-    List<WeeklyProjectVo> getWeeklyDocxList(@Param("weekNumber") int weekNumber, @Param("pKey") String pKey);
+    List<WeeklyProjectVo> getWeeklyDocxList(@Param("weekNumber") int weekNumber, @Param("id") String id);
 
-    List<WeeklyByProjectVo> weeklyByProjectList(@Param("pKey") String pKey,  @Param("name") String name);
+    List<WeeklyByProjectVo> weeklyByProjectList(@Param("id") String id,  @Param("name") String name);
 }
