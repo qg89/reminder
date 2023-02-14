@@ -44,7 +44,7 @@ public class UpdateFeishuRedmineTask {
     private Client client;
 
     @XxlJob("everyDaySyncMember")
-    public void update() throws Exception {
+    public void everyDaySyncMember() throws Exception {
         List<GroupInfo> groupToChats = FeishuJavaUtils.getGroupToChats(client);
         List<AdminInfo> adminInfos = adminInfoService.list();
         log.info("获取机器人所在群组信息完成!");
