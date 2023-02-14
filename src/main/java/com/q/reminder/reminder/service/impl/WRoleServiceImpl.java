@@ -35,7 +35,9 @@ public class WRoleServiceImpl extends ServiceImpl<WRoleMapping, WRole> implement
         Map<String, List<RoleInvolvementVo>> map = vos.stream().collect(Collectors.groupingBy(RoleInvolvementVo::getName));
         List<String> list = wRoleService.list().stream().map(WRole::getRole).toList();
         vos = new ArrayList<>();
-        for (String role : list) {
+        List<String> roleList = new ArrayList<>(list);
+        roleList.add("合计");
+        for (String role : roleList) {
             List<RoleInvolvementVo> vl = map.get(role);
             if (!CollectionUtils.isEmpty(vl)) {
                 vos.addAll(vl);
