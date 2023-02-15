@@ -69,14 +69,14 @@ public class SyncFeatureDatasWriteRedmineTask {
         tableQw.eq(TTableFeatureTmp::getWriteRedmine, "0");
         tableQw.gtSql(TTableFeatureTmp::getUpdateTime, " date_sub( NOW(), INTERVAL 10 MINUTE)");
         List<TTableFeatureTmp> featureDataList = tTableFeatureTmpService.list(tableQw);
-        Map<String, TTableUserConfig> userConfigMap = tTableUserConfigService.list().stream().collect(Collectors.toMap(TTableUserConfig::getPrdctName, Function.identity(), (v1, v2) -> v1));
+        Map<String, TTableUserConfig> userConfigMap = tTableUserConfigService.list().stream().collect(Collectors.toMap(TTableUserConfig::getPrjctKey, Function.identity(), (v1, v2) -> v1));
         Map<String, ProjectInfo> projectMap = projectInfoService.list().stream().collect(Collectors.toMap(e -> String.valueOf(e.getId()), Function.identity(), (v1, v2) -> v1));
 
         List<AppTableRecord> records = new ArrayList<>();
 
         for (TTableFeatureTmp featureTmp : featureDataList) {
             String recordsId = featureTmp.getRecordsId();
-            String projectName = featureTmp.getPrjct();
+            String prjctKey = featureTmp.getPrjctKey();
             String mdl = featureTmp.getMdl();
             String menuOne = featureTmp.getMenuOne();
             String menuTwo = featureTmp.getMenuTwo();
@@ -84,7 +84,7 @@ public class SyncFeatureDatasWriteRedmineTask {
             String dscrptn = featureTmp.getDscrptn();
             Float prdct = featureTmp.getPrdct();
 
-            TTableUserConfig config = userConfigMap.get(projectName);
+            TTableUserConfig config = userConfigMap.get(prjctKey);
             ProjectInfo projectInfo = projectMap.get(config.getPId().toString());
             Integer pId = Integer.valueOf(projectInfo.getPId());
 

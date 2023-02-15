@@ -37,6 +37,11 @@ public class TTableFeatureTmp extends Model<TTableFeatureTmp> implements Seriali
     @TableField(value = "prjct", fill = FieldFill.INSERT_UPDATE)
     private String prjct;
     /**
+     * 项目Key
+     */
+    @TableField(value = "prjct_key", fill = FieldFill.INSERT_UPDATE)
+    private String prjctKey;
+    /**
      * 模块
      */
     @TableField(value = "mdl", fill = FieldFill.INSERT_UPDATE)
