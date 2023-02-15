@@ -52,8 +52,9 @@ public class TableFeatureController {
 
     @PostMapping("/user_config")
     public void userConfig(@RequestBody FeatureUserConfigVo vo) {
+        String prjctKey = vo.getPrjctKey();
         LambdaQueryWrapper<ProjectInfo> lambdaQueryWrapper = Wrappers.lambdaQuery();
-        lambdaQueryWrapper.eq(ProjectInfo::getPKey, vo.getProjectKey());
+        lambdaQueryWrapper.eq(ProjectInfo::getPKey, prjctKey);
         ProjectInfo projectInfo = projectInfoService.getOne(lambdaQueryWrapper);
         LambdaQueryWrapper<RedmineUserInfo> lq = Wrappers.lambdaQuery();
         lq.eq(RedmineUserInfo::getRedmineType, projectInfo.getRedmineType());
@@ -70,6 +71,7 @@ public class TableFeatureController {
         entity.setTestId(userMap.get(vo.getTest()));
         entity.setPId(projectInfo.getId());
         entity.setArchtctId(userMap.get(vo.getArchtct()));
+        entity.setPrjctKey(prjctKey);
         tTableUserConfigService.saveOrUpdate(entity);
     }
 

@@ -20,7 +20,7 @@ public class FeatureUserConfigVo implements Serializable {
     private static final long serialVersionUID = -3247673297296429346L;
 
     private String recordsId;
-    private String projectKey;
+    private String prjctKey;
     private String prjct;
     private String prdct;
     private String front;
