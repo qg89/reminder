@@ -29,8 +29,8 @@ public class TTableUserConfig extends Model<TTableUserConfig> implements Seriali
     /**
      * 项目名称
      */
-    @TableField(value = "prdct_name", fill = FieldFill.INSERT_UPDATE)
-    private String prdctName;
+    @TableField(value = "prjct_name", fill = FieldFill.INSERT_UPDATE)
+    private String prjctName;
     /**
      * 项目Key
      */
