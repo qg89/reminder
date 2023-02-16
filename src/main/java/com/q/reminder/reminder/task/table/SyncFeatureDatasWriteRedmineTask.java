@@ -69,6 +69,7 @@ public class SyncFeatureDatasWriteRedmineTask {
         LambdaQueryWrapper<TTableFeatureTmp> tableQw = Wrappers.lambdaQuery();
         tableQw.eq(TTableFeatureTmp::getWriteRedmine, "0");
         tableQw.gtSql(TTableFeatureTmp::getUpdateTime, " date_sub( NOW(), INTERVAL 10 MINUTE)");
+        tableQw.eq(TTableFeatureTmp::getWriteType, "是");
         List<TTableFeatureTmp> featureDataList = tTableFeatureTmpService.list(tableQw);
         Map<String, TTableUserConfig> userConfigMap = tTableUserConfigService.list().stream().collect(Collectors.toMap(TTableUserConfig::getPrjctKey, Function.identity(), (v1, v2) -> v1));
         Map<String, ProjectInfo> projectMap = projectInfoService.list().stream().collect(Collectors.toMap(e -> String.valueOf(e.getId()), Function.identity(), (v1, v2) -> v1));
