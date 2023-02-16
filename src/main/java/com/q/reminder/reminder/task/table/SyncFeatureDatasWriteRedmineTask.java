@@ -18,6 +18,7 @@ import com.q.reminder.reminder.service.TTableUserConfigService;
 import com.q.reminder.reminder.util.FeishuJavaUtils;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.RedmineProcessingException;
 import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.Tracker;
@@ -115,17 +116,22 @@ public class SyncFeatureDatasWriteRedmineTask {
 
             CUSTOM_FIELD_LIST.add(new CustomField().setName(CustomFieldsEnum.FEATURE_ID.getName()).setId(CustomFieldsEnum.FEATURE_ID.getId()).setValue(recordsId));
             issue.addCustomFields(CUSTOM_FIELD_LIST);
-
-            Issue parentIssue = RedmineApi.createIssue(issue, transport);
+            Issue parentIssue = new Issue();
+            try {
+                parentIssue = RedmineApi.createIssue(issue, transport);
+            } catch (RedmineProcessingException e) {
+                List<String> errors = e.getErrors();
+                log.error("[多维表格-创建redmine任务]父任务异常：{}", errors);
+            }
+            featureTmp.setWriteRedmine("1");
             if (parentIssue.getId() == null && !RedmineApi.checkRedmineTask(transport, recordsId)) {
-                continue;
+                featureTmp.setWriteRedmine("2");
             }
 
             if (!createSubIssue(parentIssue, featureTmp, config, transport)) {
-                continue;
+                featureTmp.setWriteRedmine("3");
             }
             records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(Map.of("需求ID", recordsId)).build());
-            featureTmp.setWriteRedmine("1");
             tTableFeatureTmpService.updateById(featureTmp);
         }
 
