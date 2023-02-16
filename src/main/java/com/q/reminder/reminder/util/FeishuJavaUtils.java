@@ -464,16 +464,18 @@ public abstract class FeishuJavaUtils {
      * @throws Exception
      */
     public static void batchUpdateTableRecords(Client client, TTableInfo vo, AppTableRecord[] records) throws Exception {
+        BatchUpdateAppTableRecordReqBody reqBody = BatchUpdateAppTableRecordReqBody.newBuilder().records(records).build();
+        log.info("[多维表格]-Batch更新数据：{}", reqBody.toString());
         BatchUpdateAppTableRecordReq req = BatchUpdateAppTableRecordReq.newBuilder()
                 .appToken(vo.getAppToken())
                 .tableId(vo.getTableId())
                 .userIdType(BatchUpdateAppTableRecordUserIdTypeEnum.OPEN_ID)
-                .batchUpdateAppTableRecordReqBody(BatchUpdateAppTableRecordReqBody.newBuilder()
-                        .records(records)
-                        .build())
+                .batchUpdateAppTableRecordReqBody(reqBody)
                 .build();
         BatchUpdateAppTableRecordResp resp = client.bitable().appTableRecord().batchUpdate(req);
-        log.info("[多维表格]-更新数据：[状态] {}， [msg] {}", resp.getCode(), resp.getMsg());
+        if (!resp.success()) {
+            log.info("[多维表格]-Batch更新数据：[状态] {}， [msg] {}", resp.getCode(), resp.getMsg());
+        }
     }
 
     /**
@@ -575,6 +577,7 @@ public abstract class FeishuJavaUtils {
 
     /**
      * 知识空间获取文件详情
+     *
      * @param client
      * @param wikiToken
      * @return
