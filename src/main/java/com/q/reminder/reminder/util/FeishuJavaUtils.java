@@ -465,7 +465,7 @@ public abstract class FeishuJavaUtils {
      */
     public static void batchUpdateTableRecords(Client client, TTableInfo vo, AppTableRecord[] records) throws Exception {
         BatchUpdateAppTableRecordReqBody reqBody = BatchUpdateAppTableRecordReqBody.newBuilder().records(records).build();
-        log.info("[多维表格]-Batch更新数据：{}", reqBody.toString());
+        log.info("[多维表格]-Batch更新数据：{}", JSONObject.toJSONString(reqBody));
         BatchUpdateAppTableRecordReq req = BatchUpdateAppTableRecordReq.newBuilder()
                 .appToken(vo.getAppToken())
                 .tableId(vo.getTableId())
@@ -543,37 +543,37 @@ public abstract class FeishuJavaUtils {
         System.out.println(resp.getCode());
     }
 
-    public static void main(String[] args) throws Exception {
-        TTableInfo vo = new TTableInfo();
-        vo.setTableId("tbld61CFebNfZ6M6");
-        vo.setAppToken("bascnrkdLGoUftLgM7fvME7ly5c");
-        client = Client.newBuilder("cli_a1144b112738d013", "AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx").build();
-//        for (int i = 0; i < 10000; i++) {
-//            createColumn(client, vo, ("file" + i));
-//        }
-//        StopWatch stopWatch = new StopWatch();
-//        stopWatch.start("all");
-//        for (int i1 = 0; i1 < 18; i1++) {
-//            StopWatch s1 = new StopWatch();
-//            s1.start(i1 + "");
-//            List<AppTableRecord> records = new ArrayList<>();
-//            for (int i = 0; i < 100; i++) {
-//                Map<String, Object> data = new HashMap<>();
-//                for (int j = 0; j < 300; j++) {
-//                    data.put(("file" + j), ((i + j) + "本地表格导入为多维表格的文件大小上限是多少"));
-//                }
-//                records.add(AppTableRecord.newBuilder().fields(data).build());
-//            }
-//            batchCreateTableRecords(client, vo, records.toArray(new AppTableRecord[records.size()]));
-//            s1.stop();
-//            System.err.println(s1.prettyPrint());
-//        }
-//        stopWatch.stop();
-//        System.err.println(stopWatch.prettyPrint());
-        Object obj = listTableRecords(client, vo);
-
-        System.out.println(obj);
-    }
+//    public static void main(String[] args) throws Exception {
+//        TTableInfo vo = new TTableInfo();
+//        vo.setTableId("tbld61CFebNfZ6M6");
+//        vo.setAppToken("bascnrkdLGoUftLgM7fvME7ly5c");
+//        client = Client.newBuilder("cli_a1144b112738d013", "AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx").build();
+////        for (int i = 0; i < 10000; i++) {
+////            createColumn(client, vo, ("file" + i));
+////        }
+////        StopWatch stopWatch = new StopWatch();
+////        stopWatch.start("all");
+////        for (int i1 = 0; i1 < 18; i1++) {
+////            StopWatch s1 = new StopWatch();
+////            s1.start(i1 + "");
+////            List<AppTableRecord> records = new ArrayList<>();
+////            for (int i = 0; i < 100; i++) {
+////                Map<String, Object> data = new HashMap<>();
+////                for (int j = 0; j < 300; j++) {
+////                    data.put(("file" + j), ((i + j) + "本地表格导入为多维表格的文件大小上限是多少"));
+////                }
+////                records.add(AppTableRecord.newBuilder().fields(data).build());
+////            }
+////            batchCreateTableRecords(client, vo, records.toArray(new AppTableRecord[records.size()]));
+////            s1.stop();
+////            System.err.println(s1.prettyPrint());
+////        }
+////        stopWatch.stop();
+////        System.err.println(stopWatch.prettyPrint());
+//        Object obj = listTableRecords(client, vo);
+//
+//        System.out.println(obj);
+//    }
 
     /**
      * 知识空间获取文件详情
