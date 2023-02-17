@@ -16,7 +16,7 @@ buildscript {
 
 			url 'https://devops-maven.mxnavi.com:8081/nexus/repository/gradle-mxnavi3-group/'
 		}
-//		maven { url "https://maven.aliyun.com/repository/central"}
+		maven { url "https://maven.aliyun.com/repository/central"}
 		mavenCentral()
 	}
 	dependencies {
@@ -127,7 +127,7 @@ configure(allprojects) {
 
 			url 'https://devops-maven.mxnavi.com:8081/nexus/repository/gradle-mxnavi3-group/'
 		}
-//		maven { url "https://maven.aliyun.com/repository/central"}
+		maven { url "https://maven.aliyun.com/repository/central"}
 		mavenCentral()
 	}
 
