@@ -6,7 +6,7 @@ buildscript {
 //				password '2ifmpNunm]NO' }
 //			url 'https://packages.aliyun.com/maven/repository/2005435-snapshot-ENKNHJ/'
 
-			url 'https://devops-maven.mxnavi.com:8081/nexus/repository/gradle-mxnavi3-group/'
+			url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/'
 		}
 		maven {
 //			credentials {
@@ -14,7 +14,7 @@ buildscript {
 //				password '2ifmpNunm]NO' }
 //			url 'https://packages.aliyun.com/maven/repository/2005435-release-5QlEJm/'
 
-			url 'https://devops-maven.mxnavi.com:8081/nexus/repository/gradle-mxnavi3-group/'
+			url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/'
 		}
 		maven { url "https://maven.aliyun.com/repository/central"}
 		mavenCentral()
@@ -117,7 +117,7 @@ configure(allprojects) {
 //				password '2ifmpNunm]NO' }
 //			url 'https://packages.aliyun.com/maven/repository/2005435-snapshot-ENKNHJ/'
 
-			url 'https://devops-maven.mxnavi.com:8081/nexus/repository/gradle-mxnavi3-group/'
+			url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/'
 		}
 		maven {
 //			credentials {
@@ -125,7 +125,7 @@ configure(allprojects) {
 //				password '2ifmpNunm]NO' }
 //			url 'https://packages.aliyun.com/maven/repository/2005435-release-5QlEJm/'
 
-			url 'https://devops-maven.mxnavi.com:8081/nexus/repository/gradle-mxnavi3-group/'
+			url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/'
 		}
 		maven { url "https://maven.aliyun.com/repository/central"}
 		mavenCentral()
