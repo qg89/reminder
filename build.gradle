@@ -43,11 +43,6 @@ configurations {
 	}
 }
 
-repositories {
-	mavenCentral()
-}
-
-
 dependencies {
 //	implementation 'org.springframework.boot:spring-boot-starter-quartz'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -127,8 +122,6 @@ configure(allprojects) {
 
 			url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/'
 		}
-		maven { url "https://maven.aliyun.com/repository/central"}
-		mavenCentral()
 	}
 
 	dependencyManagement {
