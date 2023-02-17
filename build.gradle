@@ -1,18 +1,23 @@
 buildscript {
 	repositories {
-		maven {
-			credentials {
-				username '5ed0b855f3cfd0d0e769882d'
-				password '2ifmpNunm]NO' }
-			url 'https://packages.aliyun.com/maven/repository/2005435-snapshot-ENKNHJ/'
-		}
-		maven {
-			credentials {
-				username '5ed0b855f3cfd0d0e769882d'
-				password '2ifmpNunm]NO' }
-			url 'https://packages.aliyun.com/maven/repository/2005435-release-5QlEJm/'
-		}
-		mavenCentral()
+//		maven {
+//			credentials {
+//				username '5ed0b855f3cfd0d0e769882d'
+//				password '2ifmpNunm]NO' }
+//			url 'https://packages.aliyun.com/maven/repository/2005435-snapshot-ENKNHJ/'
+//
+////			url 'https://devops-maven.mxnavi.com:8081/nexus/repository/gradle-mxnavi3-group/'
+//		}
+//		maven {
+//			credentials {
+//				username '5ed0b855f3cfd0d0e769882d'
+//				password '2ifmpNunm]NO' }
+//			url 'https://packages.aliyun.com/maven/repository/2005435-release-5QlEJm/'
+//
+////			url 'https://devops-maven.mxnavi.com:8081/nexus/repository/gradle-mxnavi3-group/'
+//		}
+		maven { url "https://maven.aliyun.com/repository/central"}
+//		mavenCentral()
 	}
 	dependencies {
 		classpath "io.spring.gradle:dependency-management-plugin:1.0.15.RELEASE"
@@ -105,20 +110,25 @@ configure(allprojects) {
 	apply plugin: "io.spring.dependency-management"
 
 	repositories {
-		mavenLocal()
-		maven {
-			credentials {
-				username '5ed0b855f3cfd0d0e769882d'
-				password '2ifmpNunm]NO' }
-			url 'https://packages.aliyun.com/maven/repository/2005435-snapshot-ENKNHJ/'
-		}
-		maven {
-			credentials {
-				username '5ed0b855f3cfd0d0e769882d'
-				password '2ifmpNunm]NO' }
-			url 'https://packages.aliyun.com/maven/repository/2005435-release-5QlEJm/'
-		}
-		mavenCentral()
+//		mavenLocal()
+//		maven {
+//			credentials {
+//				username '5ed0b855f3cfd0d0e769882d'
+//				password '2ifmpNunm]NO' }
+//			url 'https://packages.aliyun.com/maven/repository/2005435-snapshot-ENKNHJ/'
+//
+////			url 'https://devops-maven.mxnavi.com:8081/nexus/repository/gradle-mxnavi3-group/'
+//		}
+//		maven {
+//			credentials {
+//				username '5ed0b855f3cfd0d0e769882d'
+//				password '2ifmpNunm]NO' }
+//			url 'https://packages.aliyun.com/maven/repository/2005435-release-5QlEJm/'
+//
+////			url 'https://devops-maven.mxnavi.com:8081/nexus/repository/gradle-mxnavi3-group/'
+//		}
+		maven { url "https://maven.aliyun.com/repository/central"}
+//		mavenCentral()
 	}
 
 	dependencyManagement {
