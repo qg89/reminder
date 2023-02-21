@@ -207,9 +207,9 @@ public abstract class RedmineApi {
             }
             String featureId = IdWorker.get32UUID().substring(22);
             String redmineSubject = "";
-            String menuOne = vo.getMenuOne().replace("[","【").replace("]", "】");
-            String menuTwo = vo.getMenuTwo().replace("[","【").replace("]", "】");
-            String menuThree = vo.getMenuThree().replace("[","【").replace("]", "】");
+            String menuOne = vo.getMenuOne().replace("[", "【").replace("]", "】");
+            String menuTwo = vo.getMenuTwo().replace("[", "【").replace("]", "】");
+            String menuThree = vo.getMenuThree().replace("[", "【").replace("]", "】");
             String front = vo.getFront();
             String backend = vo.getBackend();
             String bigData = vo.getBigData();
@@ -320,7 +320,7 @@ public abstract class RedmineApi {
         try {
             issueList = transport.getObjectsList(Issue.class, params);
         } catch (RedmineException e) {
-            log.error("Redmine-[保存任务]异常 ", e);
+            log.error("Redmine-[检查是否有redmine任务] 异常 ", e);
             return false;
         }
         if (CollectionUtils.isEmpty(issueList)) {
@@ -331,6 +331,7 @@ public abstract class RedmineApi {
 
     /**
      * 创建子任务
+     *
      * @param issueParent
      * @param assigneeId
      * @param tracker
@@ -486,6 +487,7 @@ public abstract class RedmineApi {
      *
      * @param issue
      * @param transport
+     * @param recordsId
      * @return
      */
     public static Issue createIssue(Issue issue, @NonNull Transport transport) throws RedmineException {

@@ -29,8 +29,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -86,11 +90,15 @@ public class SyncFeatureDatasWriteRedmineTask {
             String dscrptn = featureTmp.getDscrptn();
             Float prdct = featureTmp.getPrdct();
 
+
             TTableUserConfig config = userConfigMap.get(prjctKey);
             ProjectInfo projectInfo = projectMap.get(config.getPId().toString());
             Integer pId = Integer.valueOf(projectInfo.getPId());
 
             Transport transport = RedmineApi.getTransportByProject(projectInfo);
+            if (RedmineApi.checkRedmineTask(transport, recordsId)) {
+                continue;
+            }
             StringBuilder subject = new StringBuilder();
             subject.append("需求ID：").append("[").append(recordsId).append("]");
             if (StringUtils.isNotBlank(mdl)) {
@@ -125,21 +133,23 @@ public class SyncFeatureDatasWriteRedmineTask {
                 log.error("[多维表格-创建redmine任务]父任务异常：{}", errors);
             }
             featureTmp.setWriteRedmine("1");
-            if (parentIssue.getId() == null && !RedmineApi.checkRedmineTask(transport, recordsId)) {
+            if (parentIssue.getId() == null) {
                 featureTmp.setWriteRedmine("2");
             }
 
             if (!createSubIssue(parentIssue, featureTmp, config, transport)) {
                 featureTmp.setWriteRedmine("3");
             }
-            records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(Map.of("需求ID", recordsId)).build());
             tTableFeatureTmpService.updateById(featureTmp);
+            records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(Map.of("需求ID", recordsId)).build());
         }
 
         LambdaQueryWrapper<TTableInfo> lq = Wrappers.lambdaQuery();
         lq.eq(TTableInfo::getTableType, TableTypeContants.FEATURE);
         TTableInfo tTableInfo = tTableInfoService.getOne(lq);
-        FeishuJavaUtils.batchUpdateTableRecords(client, tTableInfo, records.toArray(new AppTableRecord[records.size()]));
+        if (!CollectionUtils.isEmpty(records)) {
+            FeishuJavaUtils.batchUpdateTableRecords(client, tTableInfo, records.toArray(new AppTableRecord[records.size()]));
+        }
 
         if (DateUtil.dayOfWeek(new Date()) == 1) {
             LambdaQueryWrapper<TTableFeatureTmp> query = Wrappers.lambdaQuery();
