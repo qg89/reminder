@@ -487,7 +487,6 @@ public abstract class RedmineApi {
      *
      * @param issue
      * @param transport
-     * @param recordsId
      * @return
      */
     public static Issue createIssue(Issue issue, @NonNull Transport transport) throws RedmineException {
