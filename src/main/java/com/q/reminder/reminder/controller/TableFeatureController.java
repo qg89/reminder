@@ -111,6 +111,7 @@ public class TableFeatureController {
         jsonKey.put("oprton", "");
         jsonKey.put("featureId", "");
         jsonKey.put("dscrptn", "");
+        jsonKey.put("writeType", "");
         return jsonKey;
     }
 }
