@@ -54,6 +54,7 @@ public class SyncRedmineTask {
     @Autowired
     private Client client;
 
+    @Deprecated
     @XxlJob("syncRedmineTask")
     public ReturnT<String> syncRedmineTask() {
         ReturnT<String> r = new ReturnT<>(null);
