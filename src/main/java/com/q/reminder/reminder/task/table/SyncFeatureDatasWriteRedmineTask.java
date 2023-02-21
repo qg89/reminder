@@ -59,10 +59,16 @@ public class SyncFeatureDatasWriteRedmineTask {
     @Autowired
     private ProjectInfoService projectInfoService;
 
-    private List<CustomField> CUSTOM_FIELD_LIST = new ArrayList<>(List.of(
-            new CustomField().setId(CustomFieldsEnum.FEATURE_TYPE.getId()).setName(CustomFieldsEnum.FEATURE_TYPE.getName()).setValue("功能"),
-            new CustomField().setId(CustomFieldsEnum.REQUIRE_VALIDATION.getId()).setName(CustomFieldsEnum.REQUIRE_VALIDATION.getName()).setValue("是")
-    ));
+    private List<CustomField> CUSTOM_FIELD_LIST = List.of(
+            new CustomField()
+                    .setId(CustomFieldsEnum.FEATURE_TYPE.getId())
+                    .setName(CustomFieldsEnum.FEATURE_TYPE.getName())
+                    .setValue("功能"),
+            new CustomField()
+                    .setId(CustomFieldsEnum.REQUIRE_VALIDATION.getId())
+                    .setName(CustomFieldsEnum.REQUIRE_VALIDATION.getName())
+                    .setValue("是")
+    );
     private Tracker FEATURE_TRACKER = new Tracker().setId(2).setName("需求");
     private Tracker DEV_TRACKER = new Tracker().setId(7).setName("开发");
     private Tracker TEST_TRACKER = new Tracker().setId(8).setName("测试");
@@ -122,9 +128,9 @@ public class SyncFeatureDatasWriteRedmineTask {
             issue.setProjectId(pId);
 
             issue.setTracker(FEATURE_TRACKER);
-
-            CUSTOM_FIELD_LIST.add(new CustomField().setName(CustomFieldsEnum.FEATURE_ID.getName()).setId(CustomFieldsEnum.FEATURE_ID.getId()).setValue(recordsId));
-            issue.addCustomFields(CUSTOM_FIELD_LIST);
+            List<CustomField> customFields = new ArrayList<>(CUSTOM_FIELD_LIST);
+            customFields.add(new CustomField().setName(CustomFieldsEnum.FEATURE_ID.getName()).setId(CustomFieldsEnum.FEATURE_ID.getId()).setValue(recordsId));
+            issue.addCustomFields(customFields);
             Issue parentIssue = new Issue();
             try {
                 parentIssue = RedmineApi.createIssue(issue, transport);
@@ -137,7 +143,7 @@ public class SyncFeatureDatasWriteRedmineTask {
                 featureTmp.setWriteRedmine("2");
             }
 
-            if (!createSubIssue(parentIssue, featureTmp, config, transport)) {
+            if (!createSubIssue(parentIssue, featureTmp, config, transport, customFields)) {
                 featureTmp.setWriteRedmine("3");
             }
             tTableFeatureTmpService.updateById(featureTmp);
@@ -166,12 +172,14 @@ public class SyncFeatureDatasWriteRedmineTask {
      * @param featureTmp
      * @param config
      * @param transport
+     * @param customFields
      * @throws RedmineException
      */
-    private boolean createSubIssue(Issue parentIssue, TTableFeatureTmp featureTmp, TTableUserConfig config, Transport transport) throws RedmineException {
+    private boolean createSubIssue(Issue parentIssue, TTableFeatureTmp featureTmp, TTableUserConfig config, Transport transport, List<CustomField> customFields) throws RedmineException {
         boolean createSubIssue = true;
         Integer issueId = parentIssue.getId();
         Issue issue = new Issue();
+        issue.addCustomFields(customFields);
         issue.setDescription(parentIssue.getDescription());
         issue.setProjectId(parentIssue.getProjectId());
         issue.setParentId(issueId);
