@@ -31,6 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -59,7 +61,7 @@ public class SyncFeatureDatasWriteRedmineTask {
     @Autowired
     private ProjectInfoService projectInfoService;
 
-    private List<CustomField> CUSTOM_FIELD_LIST = List.of(
+    private final List<CustomField> CUSTOM_FIELD_LIST = List.of(
             new CustomField()
                     .setId(CustomFieldsEnum.FEATURE_TYPE.getId())
                     .setName(CustomFieldsEnum.FEATURE_TYPE.getName())
@@ -69,9 +71,9 @@ public class SyncFeatureDatasWriteRedmineTask {
                     .setName(CustomFieldsEnum.REQUIRE_VALIDATION.getName())
                     .setValue("是")
     );
-    private Tracker FEATURE_TRACKER = new Tracker().setId(2).setName("需求");
-    private Tracker DEV_TRACKER = new Tracker().setId(7).setName("开发");
-    private Tracker TEST_TRACKER = new Tracker().setId(8).setName("测试");
+    private final Tracker FEATURE_TRACKER = new Tracker().setId(2).setName("需求");
+    private final Tracker DEV_TRACKER = new Tracker().setId(7).setName("开发");
+    private final Tracker TEST_TRACKER = new Tracker().setId(8).setName("测试");
     private Date dueDate = DateTime.now().plusDays(7).toDate();
 
     @XxlJob("syncTableRecordTask")
@@ -95,6 +97,7 @@ public class SyncFeatureDatasWriteRedmineTask {
             String menuThree = featureTmp.getMenuThree();
             String dscrptn = featureTmp.getDscrptn();
             Float prdct = featureTmp.getPrdct();
+            LocalDate prodTime = featureTmp.getProdTime();
 
 
             TTableUserConfig config = userConfigMap.get(prjctKey);
@@ -124,6 +127,10 @@ public class SyncFeatureDatasWriteRedmineTask {
             issue.setDescription(dscrptn);
             issue.setAssigneeId(config.getPrdctId());
             issue.setDueDate(dueDate);
+            if (prodTime != null) {
+                dueDate = Date.from(prodTime.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+                issue.setDueDate(dueDate);
+            }
             issue.setSpentHours(prdct);
             issue.setProjectId(pId);
 
@@ -154,7 +161,7 @@ public class SyncFeatureDatasWriteRedmineTask {
         lq.eq(TTableInfo::getTableType, TableTypeContants.FEATURE);
         TTableInfo tTableInfo = tTableInfoService.getOne(lq);
         if (!CollectionUtils.isEmpty(records)) {
-            FeishuJavaUtils.batchUpdateTableRecords(client, tTableInfo, records.toArray(new AppTableRecord[records.size()]));
+            FeishuJavaUtils.batchUpdateTableRecords(client, tTableInfo, records.toArray(new AppTableRecord[0]));
         }
 
         if (DateUtil.dayOfWeek(new Date()) == 1) {
