@@ -80,6 +80,7 @@ public class OverdueTasksAgainToGroupBase {
         List<ProjectInfo> projectInfoList = projectInfoService.list(lambdaQueryWrapper);
         List<RedmineVo> issueUserList = RedmineApi.queryUserByExpiredDayList(vo, projectInfoList);
 
+        // 保存历史记录
         issueUserList.forEach(e -> {
             OverdueTaskHistory history = new OverdueTaskHistory();
             String assigneeName = e.getAssigneeName();
@@ -112,6 +113,9 @@ public class OverdueTasksAgainToGroupBase {
             } else {
                 Map<String, List<RedmineVo>> assigneeMap = issueUserList.stream().filter(e -> StringUtils.isNotBlank(e.getAssigneeId())).collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
                 Map<String, List<RedmineVo>> noneAssigneeMap = issueUserList.stream().filter(e -> StringUtils.isBlank(e.getAssigneeId()) && StringUtils.isNotBlank(e.getAuthorName())).collect(Collectors.groupingBy(RedmineVo::getAuthorName));
+                if (!CollectionUtils.isEmpty(noneAssigneeMap)) {
+                    log.info("[飞书群发提醒]-redmine =未指派人集合为 {}", noneAssigneeMap);
+                }
                 assigneeMap.putAll(noneAssigneeMap);
                 contentJsonArray = extracted(assigneeMap);
             }
@@ -181,8 +185,6 @@ public class OverdueTasksAgainToGroupBase {
             for (RedmineVo issue : issueList) {
                 String id = issue.getRedmineId();
                 String subject = issue.getSubject();
-                Date updatedOn = issue.getUpdatedOn();
-                String projectName = issue.getProjectName();
                 redmineUrl = issue.getRedmineUrl();
 
                 JSONObject a = new JSONObject();
