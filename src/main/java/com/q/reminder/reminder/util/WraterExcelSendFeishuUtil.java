@@ -60,12 +60,12 @@ public class WraterExcelSendFeishuUtil {
         contentVo.setAppId(appId);
         contentVo.setFile(file);
         contentVo.setReceiveId(weeklyVo.getPmOu());
-        String fileKey = FeishuJavaUtils.imUploadFile(contentVo);
+        String fileKey = BaseFeishuJavaUtils.imUploadFile(contentVo);
         JSONObject json = new JSONObject();
         json.put("file_key", fileKey);
         contentVo.setContent(json.toJSONString());
         contentVo.setMsgType("file");
-        FeishuJavaUtils.sendContent(contentVo);
+        BaseFeishuJavaUtils.sendContent(contentVo);
         file.delete();
     }
 
@@ -102,12 +102,12 @@ public class WraterExcelSendFeishuUtil {
         contentVo.setAppId(appId);
         contentVo.setFile(file);
         contentVo.setReceiveId(weeklyVo.getPmOu());
-        String fileKey = FeishuJavaUtils.imUploadFile(contentVo);
+        String fileKey = BaseFeishuJavaUtils.imUploadFile(contentVo);
         JSONObject json = new JSONObject();
         json.put("file_key", fileKey);
         contentVo.setContent(json.toJSONString());
         contentVo.setMsgType("file");
-        FeishuJavaUtils.sendContent(contentVo);
+        BaseFeishuJavaUtils.sendContent(contentVo);
         file.delete();
     }
 }

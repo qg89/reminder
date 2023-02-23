@@ -15,7 +15,7 @@ import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.TTableFeatureTmpService;
 import com.q.reminder.reminder.service.TTableInfoService;
 import com.q.reminder.reminder.service.TTableUserConfigService;
-import com.q.reminder.reminder.util.FeishuJavaUtils;
+import com.q.reminder.reminder.util.BaseFeishuJavaUtils;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineProcessingException;
@@ -161,7 +161,7 @@ public class SyncFeatureDatasWriteRedmineTask {
         lq.eq(TTableInfo::getTableType, TableTypeContants.FEATURE);
         TTableInfo tTableInfo = tTableInfoService.getOne(lq);
         if (!CollectionUtils.isEmpty(records)) {
-            FeishuJavaUtils.batchUpdateTableRecords(client, tTableInfo, records.toArray(new AppTableRecord[0]));
+            BaseFeishuJavaUtils.batchUpdateTableRecords(client, tTableInfo, records.toArray(new AppTableRecord[0]));
         }
 
         if (DateUtil.dayOfWeek(new Date()) == 1) {

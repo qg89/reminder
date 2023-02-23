@@ -13,7 +13,7 @@ import com.q.reminder.reminder.service.AdminInfoService;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RedmineUserInfoService;
 import com.q.reminder.reminder.util.FeiShuApi;
-import com.q.reminder.reminder.util.FeishuJavaUtils;
+import com.q.reminder.reminder.util.BaseFeishuJavaUtils;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.vo.DefinitionVo;
 import com.q.reminder.reminder.vo.FeatureListVo;
@@ -79,7 +79,7 @@ public class SyncRedmineTask {
             // 获取各项目中需求管理表中sheetId和sheet名称
             List<SheetVo> sheetList = null;
             try {
-                sheetList = FeishuJavaUtils.getSpredsheets(client, featureToken);
+                sheetList = BaseFeishuJavaUtils.getSpredsheets(client, featureToken);
             } catch (Exception e) {
                 log.error(e);
             }

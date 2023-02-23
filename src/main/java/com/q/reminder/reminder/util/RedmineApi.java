@@ -216,8 +216,6 @@ public abstract class RedmineApi {
             String algorithm = vo.getAlgorithm();
             String test = vo.getTest();
             String desc = vo.getDesc();
-            String featureType = vo.getFeatureType();
-            String parentFeatureId = vo.getParentFeatureId();
             if (StringUtils.isNotBlank(menuOne)) {
                 redmineSubject += "[" + menuOne + "]";
             }

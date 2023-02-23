@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.request.RequestOptions;
+import com.lark.oapi.service.approval.v4.model.*;
 import com.lark.oapi.service.bitable.v1.enums.BatchCreateAppTableRecordUserIdTypeEnum;
 import com.lark.oapi.service.bitable.v1.enums.BatchUpdateAppTableRecordUserIdTypeEnum;
 import com.lark.oapi.service.bitable.v1.enums.ListAppTableRecordUserIdTypeEnum;
@@ -46,7 +47,8 @@ import java.util.UUID;
  * @date :  2022.11.03 14:45
  */
 @Log4j2
-public abstract class FeishuJavaUtils {
+public abstract class BaseFeishuJavaUtils {
+    private static Client CLIENT = null;
     /**
      * 上传素材
      *
@@ -55,9 +57,11 @@ public abstract class FeishuJavaUtils {
      */
     public static String upload(FeishuUploadImageVo vo) {
         String fileToken = null;
-        Client client = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
+        if (CLIENT == null) {
+            CLIENT = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
+        }
         try {
-            UploadAllMediaResp uploadAllMediaResp = client.drive().media().uploadAll(
+            UploadAllMediaResp uploadAllMediaResp = CLIENT.drive().media().uploadAll(
                     UploadAllMediaReq.newBuilder().uploadAllMediaReqBody(UploadAllMediaReqBody.newBuilder()
                             .fileName(vo.getFileName())
                             .size(Math.toIntExact(vo.getSize()))
@@ -84,13 +88,15 @@ public abstract class FeishuJavaUtils {
      * @param vo
      */
     public static Boolean updateBlocks(WeeklyProjectVo vo) {
-        Client client = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
+        if (CLIENT == null) {
+            CLIENT = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
+        }
         UpdateBlockRequest update = UpdateBlockRequest.newBuilder().build();
         update.setReplaceImage(ReplaceImageRequest.newBuilder()
                 .token(vo.getImageToken())
                 .build());
         try {
-            PatchDocumentBlockResp patch = client.docx().documentBlock().patch(PatchDocumentBlockReq.newBuilder()
+            PatchDocumentBlockResp patch = CLIENT.docx().documentBlock().patch(PatchDocumentBlockReq.newBuilder()
                     .documentId(vo.getFileToken())
                     .blockId(vo.getBlockId())
                     .documentRevisionId(-1)
@@ -112,8 +118,9 @@ public abstract class FeishuJavaUtils {
      * @param vo
      */
     public static Boolean batchUpdateBlocks(WeeklyProjectVo vo, UpdateBlockRequest[] updateBlockRequests) {
-        Client client = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
-
+        if (CLIENT == null) {
+            CLIENT = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
+        }
         BatchUpdateDocumentBlockReq req = BatchUpdateDocumentBlockReq.newBuilder()
                 .documentId(vo.getFileToken())
                 .documentRevisionId(-1)
@@ -121,13 +128,13 @@ public abstract class FeishuJavaUtils {
                 .batchUpdateDocumentBlockReqBody(BatchUpdateDocumentBlockReqBody.newBuilder().requests(updateBlockRequests).build())
                 .build();
         try {
-            BatchUpdateDocumentBlockResp resp = client.docx().documentBlock().batchUpdate(req);
+            BatchUpdateDocumentBlockResp resp = CLIENT.docx().documentBlock().batchUpdate(req);
             if (resp.getCode() == 0) {
                 return Boolean.TRUE;
             } else {
                 JSONObject json = new JSONObject();
                 json.put("text", "项目名称： " + vo.getProjectShortName() + "，msg：" + resp.getMsg() + ", error：" + resp.getError());
-                sendAdmin(client, json, List.of("ou_35e03d4d8754dd35fed26c26849c85ab"));
+                sendAdmin(CLIENT, json, List.of("ou_35e03d4d8754dd35fed26c26849c85ab"));
             }
         } catch (Exception e) {
             log.error(e);
@@ -144,15 +151,18 @@ public abstract class FeishuJavaUtils {
      * @throws Exception
      */
     public static void sendAdmin(Client client, JSONObject json, List<String> adminInfos) throws Exception {
+        if (CLIENT == null) {
+            CLIENT = client;
+        }
         adminInfos.forEach(memberId -> {
             MessageVo messageVo = new MessageVo();
             messageVo.setContent(json.toJSONString());
             messageVo.setReceiveId(memberId);
             messageVo.setMsgType(MsgTypeConstants.TEXT);
-            messageVo.setClient(client);
+            messageVo.setClient(CLIENT);
             messageVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
             try {
-                FeishuJavaUtils.sendContent(messageVo);
+                BaseFeishuJavaUtils.sendContent(messageVo);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -167,7 +177,9 @@ public abstract class FeishuJavaUtils {
      * @throws Exception
      */
     public static Boolean sendContent(ContentVo vo) throws Exception {
-        Client client = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
+        if (CLIENT == null) {
+            CLIENT = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
+        }
         CreateMessageReq req = CreateMessageReq.newBuilder()
                 .createMessageReqBody(CreateMessageReqBody.newBuilder()
                         .msgType(vo.getMsgType())
@@ -175,7 +187,7 @@ public abstract class FeishuJavaUtils {
                         .content(vo.getContent())
                         .uuid(UUID.randomUUID().toString())
                         .build()).receiveIdType(CreateMessageReceiveIdTypeEnum.OPEN_ID).build();
-        CreateMessageResp resp = client.im().message().create(req);
+        CreateMessageResp resp = CLIENT.im().message().create(req);
         if (resp.getCode() == 0) {
             return Boolean.TRUE;
         }
@@ -184,6 +196,9 @@ public abstract class FeishuJavaUtils {
     }
 
     public static Boolean sendContent(MessageVo vo) throws Exception {
+        if (CLIENT == null) {
+            CLIENT = vo.getClient();
+        }
         CreateMessageReq req = CreateMessageReq.newBuilder()
                 .createMessageReqBody(CreateMessageReqBody.newBuilder()
                         .msgType(vo.getMsgType())
@@ -191,7 +206,7 @@ public abstract class FeishuJavaUtils {
                         .content(vo.getContent())
                         .uuid(UUID.randomUUID().toString())
                         .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
-        CreateMessageResp resp = vo.getClient().im().message().create(req);
+        CreateMessageResp resp = CLIENT.im().message().create(req);
         if (resp.getCode() == 0) {
             return Boolean.TRUE;
         }
@@ -208,7 +223,9 @@ public abstract class FeishuJavaUtils {
      */
     public static String uploadFile(FeishuUploadImageVo vo) throws Exception {
         File file = vo.getFile();
-        Client client = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
+        if (CLIENT == null) {
+            CLIENT = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
+        }
         UploadAllFileReq req = UploadAllFileReq.newBuilder()
                 .uploadAllFileReqBody(UploadAllFileReqBody.newBuilder()
                         .file(file)
@@ -218,19 +235,21 @@ public abstract class FeishuJavaUtils {
                         .size((int) file.length())
                         .build())
                 .build();
-        UploadAllFileResp resp = client.drive().file().uploadAll(req);
+        UploadAllFileResp resp = CLIENT.drive().file().uploadAll(req);
         return resp.getData().getFileToken();
     }
 
     public static Meta[] getDocx(ContentVo vo, RequestDoc[] doc) throws Exception {
-        Client client = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
+        if (CLIENT == null) {
+            CLIENT = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
+        }
         BatchQueryMetaReq req = BatchQueryMetaReq.newBuilder()
                 .metaRequest(MetaRequest.newBuilder()
                         .requestDocs(doc)
                         .withUrl(true)
                         .build())
                 .userIdType(BatchQueryMetaUserIdTypeEnum.OPEN_ID).build();
-        BatchQueryMetaResp resp = client.drive().meta().batchQuery(req);
+        BatchQueryMetaResp resp = CLIENT.drive().meta().batchQuery(req);
         return resp.getData().getMetas();
     }
 
@@ -243,7 +262,9 @@ public abstract class FeishuJavaUtils {
      */
     public static String imUploadFile(ContentVo vo) throws Exception {
         File file = vo.getFile();
-        Client client = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
+        if (CLIENT == null) {
+            CLIENT = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
+        }
         CreateFileReq req = CreateFileReq.newBuilder()
                 .createFileReqBody(CreateFileReqBody.newBuilder()
                         .file(file)
@@ -251,7 +272,7 @@ public abstract class FeishuJavaUtils {
                         .fileType(vo.getFileType())
                         .build())
                 .build();
-        CreateFileResp resp = client.im().file().create(req);
+        CreateFileResp resp = CLIENT.im().file().create(req);
         return resp.getData().getFileKey();
     }
 
@@ -265,6 +286,9 @@ public abstract class FeishuJavaUtils {
      * @throws Exception
      */
     public static Node syncSpacesWiki(Client client, String projectToken, String title) throws Exception {
+        if (CLIENT == null) {
+            CLIENT = client;
+        }
         CopySpaceNodeReq req = CopySpaceNodeReq.newBuilder()
                 .copySpaceNodeReqBody(CopySpaceNodeReqBody.newBuilder()
                         .targetParentToken(projectToken)
@@ -274,7 +298,7 @@ public abstract class FeishuJavaUtils {
                 .nodeToken("wikcnXpXCgmL3E7vdbM1TiwXiGc")
                 .spaceId("7046680616087126018")
                 .build();
-        CopySpaceNodeResp resp = client.wiki().spaceNode().copy(req);
+        CopySpaceNodeResp resp = CLIENT.wiki().spaceNode().copy(req);
         return resp.getData().getNode();
     }
 
@@ -285,12 +309,15 @@ public abstract class FeishuJavaUtils {
      * @return
      */
     public static List<SheetVo> getSpredsheets(Client client, String spreadsheetToken) throws Exception {
+        if (CLIENT == null) {
+            CLIENT = client;
+        }
         // 创建请求对象
         QuerySpreadsheetSheetReq req = QuerySpreadsheetSheetReq.newBuilder()
                 .spreadsheetToken(spreadsheetToken)
                 .build();
         // 发起请求
-        QuerySpreadsheetSheetResp resp = client.sheets().spreadsheetSheet().query(req, RequestOptions.newBuilder().build());
+        QuerySpreadsheetSheetResp resp = CLIENT.sheets().spreadsheetSheet().query(req, RequestOptions.newBuilder().build());
         List<SheetVo> list = new ArrayList<>();
         Sheet[] sheets = resp.getData().getSheets();
         for (Sheet sheet : sheets) {
@@ -312,10 +339,13 @@ public abstract class FeishuJavaUtils {
      * @throws Exception
      */
     public static Node getSpacesNode(Client client, String token) throws Exception {
+        if (CLIENT == null) {
+            CLIENT = client;
+        }
         GetNodeSpaceReq req = GetNodeSpaceReq.newBuilder()
                 .token(token)
                 .build();
-        GetNodeSpaceResp resp = client.wiki().space().getNode(req);
+        GetNodeSpaceResp resp = CLIENT.wiki().space().getNode(req);
         return resp.getData().getNode();
     }
 
@@ -327,8 +357,11 @@ public abstract class FeishuJavaUtils {
      * @throws Exception
      */
     public static List<GroupInfo> getGroupToChats(Client client) throws Exception {
+        if (CLIENT == null) {
+            CLIENT = client;
+        }
         ListChatReq req = ListChatReq.newBuilder().userIdType(ListChatUserIdTypeEnum.OPEN_ID).build();
-        ListChatResp resp = client.im().chat().list(req);
+        ListChatResp resp = CLIENT.im().chat().list(req);
         ListChatRespBody data = resp.getData();
         ListChat[] items = data.getItems();
         ArrayList<ListChat> listChats = new ArrayList<>(Arrays.asList(items));
@@ -342,6 +375,9 @@ public abstract class FeishuJavaUtils {
     }
 
     public static List<UserMemgerInfo> getMembersByChats(Client client, List<GroupInfo> chats, List<UserGroup> userGroupList) throws Exception {
+        if (CLIENT == null) {
+            CLIENT = client;
+        }
         List<UserMemgerInfo> items = new ArrayList<>();
         for (GroupInfo chat : chats) {
             String chatId = chat.getChatId();
@@ -350,7 +386,7 @@ public abstract class FeishuJavaUtils {
                     .memberIdType(GetChatMembersMemberIdTypeEnum.OPEN_ID)
                     .pageSize(20)
                     .build();
-            GetChatMembersResp resp = client.im().chatMembers().get(req, RequestOptions.newBuilder().build());
+            GetChatMembersResp resp = CLIENT.im().chatMembers().get(req, RequestOptions.newBuilder().build());
             GetChatMembersRespBody data = resp.getData();
             for (ListMember dataItem : data.getItems()) {
                 UserMemgerInfo userMemgerInfo = new UserMemgerInfo();
@@ -360,7 +396,7 @@ public abstract class FeishuJavaUtils {
             }
             String pageToken = data.getPageToken();
             if (data.getHasMore()) {
-                query(items, chatId, userGroupList, pageToken, req, client);
+                query(items, chatId, userGroupList, pageToken, req, CLIENT);
             }
         }
         return items.stream().distinct().toList();
@@ -378,7 +414,10 @@ public abstract class FeishuJavaUtils {
      */
     private static void query(List<UserMemgerInfo> lists, String chatId, List<UserGroup> userGroupList, String pageToken, GetChatMembersReq req, Client client) throws Exception {
         req.setPageToken(pageToken);
-        GetChatMembersResp resp = client.im().chatMembers().get(req, RequestOptions.newBuilder().build());
+        if (CLIENT == null) {
+            CLIENT = client;
+        }
+        GetChatMembersResp resp = CLIENT.im().chatMembers().get(req, RequestOptions.newBuilder().build());
         GetChatMembersRespBody data = resp.getData();
         ListMember[] dataItems = data.getItems();
         for (ListMember dataItem : dataItems) {
@@ -389,7 +428,7 @@ public abstract class FeishuJavaUtils {
         }
         if (data.getHasMore()) {
             pageToken = data.getPageToken();
-            query(lists, chatId, userGroupList, pageToken, req, client);
+            query(lists, chatId, userGroupList, pageToken, req, CLIENT);
         }
     }
 
@@ -407,6 +446,9 @@ public abstract class FeishuJavaUtils {
      * @return
      */
     public static List<AppTableRecord> listTableRecords(Client client, TTableInfo vo) throws Exception {
+        if (CLIENT == null) {
+            CLIENT = client;
+        }
         List<AppTableRecord> resList = new ArrayList<>();
         ListAppTableRecordReq req = ListAppTableRecordReq.newBuilder()
                 .appToken(vo.getAppToken())
@@ -422,7 +464,7 @@ public abstract class FeishuJavaUtils {
             if (StringUtils.isNotBlank(pageToken)) {
                 req.setPageToken(pageToken);
             }
-            resp = client.bitable().appTableRecord().list(req);
+            resp = CLIENT.bitable().appTableRecord().list(req);
             if (resp.getCode() != 0) {
                 return resList;
             }
@@ -444,6 +486,9 @@ public abstract class FeishuJavaUtils {
      * @throws Exception
      */
     public static void batchCreateTableRecords(Client client, TTableInfo vo, AppTableRecord[] records) throws Exception {
+        if (CLIENT == null) {
+            CLIENT = client;
+        }
         BatchCreateAppTableRecordReq req = BatchCreateAppTableRecordReq.newBuilder()
                 .appToken(vo.getAppToken())
                 .tableId(vo.getTableId())
@@ -452,7 +497,7 @@ public abstract class FeishuJavaUtils {
                         .records(records)
                         .build())
                 .build();
-        BatchCreateAppTableRecordResp resp = client.bitable().appTableRecord().batchCreate(req);
+        BatchCreateAppTableRecordResp resp = CLIENT.bitable().appTableRecord().batchCreate(req);
         log.info("[多维表格]-保存数据：[状态] {}， [msg] {}", resp.getCode(), resp.getMsg());
     }
 
@@ -464,6 +509,9 @@ public abstract class FeishuJavaUtils {
      * @throws Exception
      */
     public static void batchUpdateTableRecords(Client client, TTableInfo vo, AppTableRecord[] records) throws Exception {
+        if (CLIENT == null) {
+            CLIENT = client;
+        }
         BatchUpdateAppTableRecordReqBody reqBody = BatchUpdateAppTableRecordReqBody.newBuilder().records(records).build();
         log.info("[多维表格]-Batch更新数据：{}", JSONObject.toJSONString(reqBody));
         BatchUpdateAppTableRecordReq req = BatchUpdateAppTableRecordReq.newBuilder()
@@ -472,7 +520,7 @@ public abstract class FeishuJavaUtils {
                 .userIdType(BatchUpdateAppTableRecordUserIdTypeEnum.OPEN_ID)
                 .batchUpdateAppTableRecordReqBody(reqBody)
                 .build();
-        BatchUpdateAppTableRecordResp resp = client.bitable().appTableRecord().batchUpdate(req);
+        BatchUpdateAppTableRecordResp resp = CLIENT.bitable().appTableRecord().batchUpdate(req);
         if (!resp.success()) {
             log.info("[多维表格]-Batch更新数据：[状态] {}， [msg] {}", resp.getCode(), resp.getMsg());
         }
@@ -485,13 +533,16 @@ public abstract class FeishuJavaUtils {
      * @param records
      */
     public static void batchDeleteTableRecords(Client client, TTableInfo vo, String[] records) throws Exception {
+        if (CLIENT == null) {
+            CLIENT = client;
+        }
         // 创建请求对象
         BatchDeleteAppTableRecordReq req = BatchDeleteAppTableRecordReq.newBuilder()
                 .appToken(vo.getAppToken())
                 .tableId(vo.getTableId())
                 .batchDeleteAppTableRecordReqBody(BatchDeleteAppTableRecordReqBody.newBuilder().records(records).build())
                 .build();
-        client.bitable().appTableRecord().batchDelete(req);
+        CLIENT.bitable().appTableRecord().batchDelete(req);
     }
 
     /**
@@ -503,6 +554,9 @@ public abstract class FeishuJavaUtils {
      * @throws Exception
      */
     public static List<AppTableField> listTableColumn(Client client, TTableInfo vo) throws Exception {
+        if (CLIENT == null) {
+            CLIENT = client;
+        }
         List<AppTableField> appTableFields = new ArrayList<>();
         // 创建请求对象
         ListAppTableFieldReq req = ListAppTableFieldReq.newBuilder()
@@ -517,7 +571,7 @@ public abstract class FeishuJavaUtils {
             if (StringUtils.isNotBlank(pageToken)) {
                 req.setPageToken(pageToken);
             }
-            resp = client.bitable().appTableField().list(req);
+            resp = CLIENT.bitable().appTableField().list(req);
             respData = resp.getData();
             AppTableField[] items = respData.getItems();
             if (items == null) {
@@ -528,9 +582,10 @@ public abstract class FeishuJavaUtils {
         return appTableFields;
     }
 
-    static Client client = null;
-
     public static void createColumn(Client client, TTableInfo vo, String fileName) throws Exception {
+        if (CLIENT == null) {
+            CLIENT = client;
+        }
         CreateAppTableFieldReq req = CreateAppTableFieldReq.newBuilder()
                 .appToken(vo.getAppToken())
                 .tableId(vo.getTableId())
@@ -539,41 +594,10 @@ public abstract class FeishuJavaUtils {
                         .type(1)
                         .build())
                 .build();
-        CreateAppTableFieldResp resp = client.bitable().appTableField().create(req, RequestOptions.newBuilder().build());
+        CreateAppTableFieldResp resp = CLIENT.bitable().appTableField().create(req, RequestOptions.newBuilder().build());
         System.out.println(resp.getCode());
     }
 
-//    public static void main(String[] args) throws Exception {
-//        TTableInfo vo = new TTableInfo();
-//        vo.setTableId("tbld61CFebNfZ6M6");
-//        vo.setAppToken("bascnrkdLGoUftLgM7fvME7ly5c");
-//        client = Client.newBuilder("cli_a1144b112738d013", "AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx").build();
-////        for (int i = 0; i < 10000; i++) {
-////            createColumn(client, vo, ("file" + i));
-////        }
-////        StopWatch stopWatch = new StopWatch();
-////        stopWatch.start("all");
-////        for (int i1 = 0; i1 < 18; i1++) {
-////            StopWatch s1 = new StopWatch();
-////            s1.start(i1 + "");
-////            List<AppTableRecord> records = new ArrayList<>();
-////            for (int i = 0; i < 100; i++) {
-////                Map<String, Object> data = new HashMap<>();
-////                for (int j = 0; j < 300; j++) {
-////                    data.put(("file" + j), ((i + j) + "本地表格导入为多维表格的文件大小上限是多少"));
-////                }
-////                records.add(AppTableRecord.newBuilder().fields(data).build());
-////            }
-////            batchCreateTableRecords(client, vo, records.toArray(new AppTableRecord[records.size()]));
-////            s1.stop();
-////            System.err.println(s1.prettyPrint());
-////        }
-////        stopWatch.stop();
-////        System.err.println(stopWatch.prettyPrint());
-//        Object obj = listTableRecords(client, vo);
-//
-//        System.out.println(obj);
-//    }
 
     /**
      * 知识空间获取文件详情
@@ -584,14 +608,83 @@ public abstract class FeishuJavaUtils {
      * @throws Exception
      */
     public static Node getNodeSpace(Client client, String wikiToken) throws Exception {
+        if (CLIENT == null) {
+            CLIENT = client;
+        }
         GetNodeSpaceReq req = GetNodeSpaceReq.newBuilder()
                 .token(wikiToken)
                 .build();
-        GetNodeSpaceResp resp = client.wiki().space().getNode(req, RequestOptions.newBuilder()
+        GetNodeSpaceResp resp = CLIENT.wiki().space().getNode(req, RequestOptions.newBuilder()
                 .build());
         if (resp.success()) {
             return resp.getData().getNode();
         }
         return null;
+    }
+
+    /**
+     * 审批-批量获取审批实例 ID
+     */
+    public static String[] listInstanceSample(Client client, ApprovalSampleVo vo) throws Exception {
+        if (CLIENT == null) {
+            CLIENT = client;
+        }
+        ListInstanceReq req = ListInstanceReq.newBuilder()
+                .approvalCode(vo.getApprovalCode())
+                .startTime(vo.getStartTime())
+                .endTime(vo.getEndTime())
+                .build();
+
+        // 发起请求
+        ListInstanceResp resp = CLIENT.approval().instance().list(req, RequestOptions.newBuilder()
+                .build());
+        if (resp.success()) {
+            return resp.getData().getInstanceCodeList();
+        }
+        return null;
+    }
+
+    /**
+     * 审批-获取单个审批实例详情
+     *
+     * @param client
+     * @param instanceId
+     * @return
+     * @throws Exception
+     */
+    public static InstanceComment[] getInstanceSample(Client client, String instanceId) throws Exception {
+        if (CLIENT == null) {
+            CLIENT = client;
+        }
+        // 创建请求对象
+        GetInstanceReq req = GetInstanceReq.newBuilder()
+                .instanceId(instanceId)
+                .build();
+
+        // 发起请求
+        // 如开启了Sdk的token管理功能，就无需调用 RequestOptions.newBuilder().tenantAccessToken("t-xxx").build()来设置租户token了
+        GetInstanceResp resp = CLIENT.approval().instance().get(req, RequestOptions.newBuilder()
+                .build());
+        if (resp.success()) {
+            return resp.getData().getCommentList();
+        }
+        return null;
+    }
+
+    public static void main(String[] args) throws Exception {
+//        TTableInfo vo = new TTableInfo();
+//        vo.setTableId("tbld61CFebNfZ6M6");
+//        vo.setAppToken("bascnrkdLGoUftLgM7fvME7ly5c");
+        if (CLIENT == null) {
+            CLIENT = Client.newBuilder("cli_a1144b112738d013", "AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx").build();;
+        }
+        ApprovalSampleVo vo = new ApprovalSampleVo();
+        vo.setApprovalCode("25A0EB8B-1F70-4322-84B4-861C69429A5A");
+        vo.setStartTime("1676973115000");
+        vo.setEndTime("1677145915000");
+        for (String instand : listInstanceSample(CLIENT, vo)) {
+            InstanceComment[] instanceSample = getInstanceSample(CLIENT, instand);
+            System.out.println(instanceSample);
+        }
     }
 }

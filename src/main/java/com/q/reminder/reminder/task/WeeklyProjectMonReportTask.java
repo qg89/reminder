@@ -135,7 +135,7 @@ public class WeeklyProjectMonReportTask {
                     }
                 }
             }
-            FeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
+            BaseFeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
             log.info("[{}]项目周报更新完成", projectShortName);
 
             sendFeishu(report);
@@ -274,7 +274,7 @@ public class WeeklyProjectMonReportTask {
         imageVo.setAppSecret(vo.getAppSecret());
         imageVo.setAppId(vo.getAppId());
         imageVo.setParentNode(blockId);
-        String fileToken = FeishuJavaUtils.upload(imageVo);
+        String fileToken = BaseFeishuJavaUtils.upload(imageVo);
         if (StringUtils.isBlank(fileToken)) {
             log.info("飞书上传素材返回为空");
             return;
@@ -309,10 +309,10 @@ public class WeeklyProjectMonReportTask {
         imageVo.setAppSecret(vo.getAppSecret());
         imageVo.setAppId(vo.getAppId());
         imageVo.setParentNode(vo.getBlockId());
-        String fileToken = FeishuJavaUtils.upload(imageVo);
+        String fileToken = BaseFeishuJavaUtils.upload(imageVo);
         vo.setImageToken(fileToken);
         // 通过飞书替换图片至block_id
-        Boolean updateBlocks = FeishuJavaUtils.updateBlocks(vo);
+        Boolean updateBlocks = BaseFeishuJavaUtils.updateBlocks(vo);
         if (!updateBlocks) {
             System.out.println();
         }
@@ -374,7 +374,7 @@ public class WeeklyProjectMonReportTask {
                 }
             }
         }
-        FeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
+        BaseFeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
         log.info("[{}]项目周报更新完成", projectShortName);
         return vo;
     }
