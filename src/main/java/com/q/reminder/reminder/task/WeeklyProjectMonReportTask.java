@@ -3,6 +3,7 @@ package com.q.reminder.reminder.task;
 import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.lark.oapi.Client;
 import com.lark.oapi.service.docx.v1.model.ReplaceImageRequest;
 import com.lark.oapi.service.docx.v1.model.UpdateBlockRequest;
 import com.q.reminder.reminder.config.FeishuProperties;
@@ -10,6 +11,7 @@ import com.q.reminder.reminder.constant.WeeklyReportConstants;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.util.*;
+import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.FeishuUploadImageVo;
 import com.q.reminder.reminder.vo.SendVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
@@ -49,6 +51,8 @@ public class WeeklyProjectMonReportTask {
     private ProjectInfoService projectInfoService;
     @Autowired
     private FeishuProperties feishuProperties;
+    @Autowired
+    private Client client;
 
     @XxlJob("weekProjectMonReport")
     public ReturnT<String> weekProjectMonReport() throws Exception {
@@ -135,7 +139,7 @@ public class WeeklyProjectMonReportTask {
                     }
                 }
             }
-            BaseFeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
+            BaseFeishu.block(client).batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
             log.info("[{}]项目周报更新完成", projectShortName);
 
             sendFeishu(report);
@@ -296,7 +300,7 @@ public class WeeklyProjectMonReportTask {
      *
      * @param vo
      */
-    private void replaceImaage(WeeklyProjectVo vo, File file) {
+    private void replaceImaage(WeeklyProjectVo vo, File file) throws Exception {
         if (file == null) {
             return;
         }
@@ -309,10 +313,10 @@ public class WeeklyProjectMonReportTask {
         imageVo.setAppSecret(vo.getAppSecret());
         imageVo.setAppId(vo.getAppId());
         imageVo.setParentNode(vo.getBlockId());
-        String fileToken = BaseFeishuJavaUtils.upload(imageVo);
+        String fileToken = BaseFeishu.cloud(client).uploadFile(imageVo);
         vo.setImageToken(fileToken);
         // 通过飞书替换图片至block_id
-        Boolean updateBlocks = BaseFeishuJavaUtils.updateBlocks(vo);
+        Boolean updateBlocks = BaseFeishu.block(client).updateBlocks(vo);
         if (!updateBlocks) {
             System.out.println();
         }
@@ -374,7 +378,8 @@ public class WeeklyProjectMonReportTask {
                 }
             }
         }
-        BaseFeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
+        BaseFeishu.block(client).batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
+//        BaseFeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
         log.info("[{}]项目周报更新完成", projectShortName);
         return vo;
     }

@@ -11,8 +11,8 @@ import com.q.reminder.reminder.service.CoverityLogService;
 import com.q.reminder.reminder.service.CoverityService;
 import com.q.reminder.reminder.service.GroupInfoService;
 import com.q.reminder.reminder.util.CoverityApi;
-import com.q.reminder.reminder.util.BaseFeishuJavaUtils;
 import com.q.reminder.reminder.util.RedmineApi;
+import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.ChatProjectVo;
 import com.q.reminder.reminder.vo.CoverityAndRedmineSaveTaskVo;
 import com.q.reminder.reminder.vo.MessageVo;
@@ -152,10 +152,9 @@ public class CvoerityTask {
             messageVo.setContent(con.toJSONString());
             messageVo.setReceiveId(chatId);
             messageVo.setMsgType(MsgTypeConstants.POST);
-            messageVo.setClient(client);
             messageVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.CHAT_ID);
             try {
-                BaseFeishuJavaUtils.sendContent(messageVo);
+                BaseFeishu.message(client).sendContent(messageVo);
             } catch (Exception e) {
                 log.error(e);
             }
@@ -177,10 +176,9 @@ public class CvoerityTask {
             messageVo.setContent(con.toJSONString());
             messageVo.setReceiveId(chatId);
             messageVo.setMsgType(MsgTypeConstants.POST);
-            messageVo.setClient(client);
             messageVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.CHAT_ID);
             try {
-                BaseFeishuJavaUtils.sendContent(messageVo);
+                BaseFeishu.message(client).sendContent(messageVo);
             } catch (Exception e) {
                 log.error(e);
             }

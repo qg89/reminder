@@ -11,6 +11,7 @@ import com.q.reminder.reminder.service.WeeklyProjectReportService;
 import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.util.BaseFeishuJavaUtils;
 import com.q.reminder.reminder.util.WeeklyProjectFeishuUtils;
+import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.context.XxlJobHelper;
@@ -69,6 +70,6 @@ public class WeeklyProjectReportTask {
     }
 
     private String getFileToken() throws Exception {
-        return BaseFeishuJavaUtils.getNodeSpace(client, "wikcnV143lsJnKeF2b65nSKGt1K").getObjToken();
+        return BaseFeishu.wiki(client).getNodeSpace("wikcnV143lsJnKeF2b65nSKGt1K").getObjToken();
     }
 }

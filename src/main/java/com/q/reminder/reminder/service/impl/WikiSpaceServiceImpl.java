@@ -7,7 +7,7 @@ import com.lark.oapi.service.wiki.v2.model.Node;
 import com.q.reminder.reminder.entity.WikiSpace;
 import com.q.reminder.reminder.mapper.WikiSpaceMapping;
 import com.q.reminder.reminder.service.WikiSpaceService;
-import com.q.reminder.reminder.util.BaseFeishuJavaUtils;
+import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import org.springframework.stereotype.Service;
 
 /**
@@ -22,7 +22,7 @@ public class WikiSpaceServiceImpl extends ServiceImpl<WikiSpaceMapping, WikiSpac
 
     @Override
     public WikiSpace syncSpacesWiki(Client client, String projectToken, String title) throws Exception {
-        Node node = BaseFeishuJavaUtils.syncSpacesWiki(client, projectToken, title);
+        Node node = BaseFeishu.wiki(client).syncSpacesWiki(projectToken, title);
         WikiSpace space = new WikiSpace();
         BeanUtil.copyProperties(node, space);
         return space;
@@ -30,7 +30,7 @@ public class WikiSpaceServiceImpl extends ServiceImpl<WikiSpaceMapping, WikiSpac
 
     @Override
     public WikiSpace getSpacesNode(Client client, String token) throws Exception {
-        Node node = BaseFeishuJavaUtils.getSpacesNode(client, token);
+        Node node =  BaseFeishu.wiki(client).getSpacesNode(token);
         WikiSpace space = new WikiSpace();
         BeanUtil.copyProperties(node, space);
         return space;

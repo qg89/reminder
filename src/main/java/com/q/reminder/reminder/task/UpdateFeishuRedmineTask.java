@@ -10,7 +10,7 @@ import com.q.reminder.reminder.service.AdminInfoService;
 import com.q.reminder.reminder.service.GroupInfoService;
 import com.q.reminder.reminder.service.UserGroupService;
 import com.q.reminder.reminder.service.UserMemberService;
-import com.q.reminder.reminder.util.BaseFeishuJavaUtils;
+import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.MessageVo;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
@@ -45,11 +45,11 @@ public class UpdateFeishuRedmineTask {
 
     @XxlJob("everyDaySyncMember")
     public void everyDaySyncMember() throws Exception {
-        List<GroupInfo> groupToChats = BaseFeishuJavaUtils.getGroupToChats(client);
+        List<GroupInfo> groupToChats = BaseFeishu.groupMessage(client).getGroupToChats();
         List<AdminInfo> adminInfos = adminInfoService.list();
         log.info("获取机器人所在群组信息完成!");
         List<UserGroup> userGroupList = new ArrayList<>();
-        List<UserMemgerInfo> membersByChats = BaseFeishuJavaUtils.getMembersByChats(client, groupToChats, userGroupList);
+        List<UserMemgerInfo> membersByChats = BaseFeishu.groupMessage(client).getMembersByChats(groupToChats, userGroupList);
         StringBuilder content = new StringBuilder();
         if (CollectionUtils.isEmpty(membersByChats)) {
             content.append("\r\n获取机器人所在群组信息为空");
@@ -70,13 +70,12 @@ public class UpdateFeishuRedmineTask {
         if (StringUtils.isNotBlank(content)) {
             MessageVo vo = new MessageVo();
             vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-            vo.setClient(client);
             vo.setMsgType("text");
             adminInfos.forEach(e -> {
                 try {
                     vo.setReceiveId(e.getMemberId());
                     vo.setContent(content.toString());
-                    BaseFeishuJavaUtils.sendContent(vo);
+                    BaseFeishu.message(client).sendContent(vo);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

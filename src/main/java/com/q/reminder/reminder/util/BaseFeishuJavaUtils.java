@@ -28,6 +28,7 @@ import com.q.reminder.reminder.entity.GroupInfo;
 import com.q.reminder.reminder.entity.TTableInfo;
 import com.q.reminder.reminder.entity.UserGroup;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
+import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.*;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -87,6 +88,7 @@ public abstract class BaseFeishuJavaUtils {
      *
      * @param vo
      */
+    @Deprecated
     public static Boolean updateBlocks(WeeklyProjectVo vo) {
         if (CLIENT == null) {
             CLIENT = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
@@ -117,6 +119,7 @@ public abstract class BaseFeishuJavaUtils {
      *
      * @param vo
      */
+    @Deprecated
     public static Boolean batchUpdateBlocks(WeeklyProjectVo vo, UpdateBlockRequest[] updateBlockRequests) {
         if (CLIENT == null) {
             CLIENT = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
@@ -159,10 +162,9 @@ public abstract class BaseFeishuJavaUtils {
             messageVo.setContent(json.toJSONString());
             messageVo.setReceiveId(memberId);
             messageVo.setMsgType(MsgTypeConstants.TEXT);
-            messageVo.setClient(CLIENT);
             messageVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
             try {
-                BaseFeishuJavaUtils.sendContent(messageVo);
+                BaseFeishu.message(client).sendContent(messageVo);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -195,6 +197,7 @@ public abstract class BaseFeishuJavaUtils {
         return Boolean.FALSE;
     }
 
+    @Deprecated
     public static Boolean sendContent(MessageVo vo) throws Exception {
         if (CLIENT == null) {
             CLIENT = vo.getClient();
@@ -221,6 +224,7 @@ public abstract class BaseFeishuJavaUtils {
      * @return
      * @throws Exception
      */
+    @Deprecated
     public static String uploadFile(FeishuUploadImageVo vo) throws Exception {
         File file = vo.getFile();
         if (CLIENT == null) {
@@ -239,6 +243,7 @@ public abstract class BaseFeishuJavaUtils {
         return resp.getData().getFileToken();
     }
 
+    @Deprecated
     public static Meta[] getDocx(ContentVo vo, RequestDoc[] doc) throws Exception {
         if (CLIENT == null) {
             CLIENT = Client.newBuilder(vo.getAppId(), vo.getAppSecret()).build();
@@ -285,6 +290,7 @@ public abstract class BaseFeishuJavaUtils {
      * @return
      * @throws Exception
      */
+    @Deprecated
     public static Node syncSpacesWiki(Client client, String projectToken, String title) throws Exception {
         if (CLIENT == null) {
             CLIENT = client;
@@ -308,6 +314,7 @@ public abstract class BaseFeishuJavaUtils {
      * @param spreadsheetToken
      * @return
      */
+    @Deprecated
     public static List<SheetVo> getSpredsheets(Client client, String spreadsheetToken) throws Exception {
         if (CLIENT == null) {
             CLIENT = client;
@@ -338,6 +345,7 @@ public abstract class BaseFeishuJavaUtils {
      * @return
      * @throws Exception
      */
+    @Deprecated
     public static Node getSpacesNode(Client client, String token) throws Exception {
         if (CLIENT == null) {
             CLIENT = client;
@@ -356,6 +364,7 @@ public abstract class BaseFeishuJavaUtils {
      * @return
      * @throws Exception
      */
+    @Deprecated
     public static List<GroupInfo> getGroupToChats(Client client) throws Exception {
         if (CLIENT == null) {
             CLIENT = client;
@@ -374,6 +383,7 @@ public abstract class BaseFeishuJavaUtils {
         return list;
     }
 
+    @Deprecated
     public static List<UserMemgerInfo> getMembersByChats(Client client, List<GroupInfo> chats, List<UserGroup> userGroupList) throws Exception {
         if (CLIENT == null) {
             CLIENT = client;
@@ -412,6 +422,7 @@ public abstract class BaseFeishuJavaUtils {
      * @param req
      * @param client
      */
+    @Deprecated
     private static void query(List<UserMemgerInfo> lists, String chatId, List<UserGroup> userGroupList, String pageToken, GetChatMembersReq req, Client client) throws Exception {
         req.setPageToken(pageToken);
         if (CLIENT == null) {
@@ -445,6 +456,7 @@ public abstract class BaseFeishuJavaUtils {
      * @param client
      * @return
      */
+    @Deprecated
     public static List<AppTableRecord> listTableRecords(Client client, TTableInfo vo) throws Exception {
         if (CLIENT == null) {
             CLIENT = client;
@@ -485,6 +497,7 @@ public abstract class BaseFeishuJavaUtils {
      * @param vo
      * @throws Exception
      */
+    @Deprecated
     public static void batchCreateTableRecords(Client client, TTableInfo vo, AppTableRecord[] records) throws Exception {
         if (CLIENT == null) {
             CLIENT = client;
@@ -508,6 +521,7 @@ public abstract class BaseFeishuJavaUtils {
      * @param vo
      * @throws Exception
      */
+    @Deprecated
     public static void batchUpdateTableRecords(Client client, TTableInfo vo, AppTableRecord[] records) throws Exception {
         if (CLIENT == null) {
             CLIENT = client;
@@ -532,6 +546,7 @@ public abstract class BaseFeishuJavaUtils {
      * @param client
      * @param records
      */
+    @Deprecated
     public static void batchDeleteTableRecords(Client client, TTableInfo vo, String[] records) throws Exception {
         if (CLIENT == null) {
             CLIENT = client;
@@ -546,60 +561,6 @@ public abstract class BaseFeishuJavaUtils {
     }
 
     /**
-     * 多为表格-字段-列出字段
-     *
-     * @param client
-     * @param vo
-     * @return
-     * @throws Exception
-     */
-    public static List<AppTableField> listTableColumn(Client client, TTableInfo vo) throws Exception {
-        if (CLIENT == null) {
-            CLIENT = client;
-        }
-        List<AppTableField> appTableFields = new ArrayList<>();
-        // 创建请求对象
-        ListAppTableFieldReq req = ListAppTableFieldReq.newBuilder()
-                .appToken(vo.getAppToken())
-                .tableId(vo.getTableId())
-                .viewId(vo.getViewId())
-                .build();
-        ListAppTableFieldResp resp;
-        ListAppTableFieldRespBody respData = new ListAppTableFieldRespBody();
-        do {
-            String pageToken = respData.getPageToken();
-            if (StringUtils.isNotBlank(pageToken)) {
-                req.setPageToken(pageToken);
-            }
-            resp = CLIENT.bitable().appTableField().list(req);
-            respData = resp.getData();
-            AppTableField[] items = respData.getItems();
-            if (items == null) {
-                continue;
-            }
-            appTableFields.addAll(Arrays.stream(items).toList());
-        } while (resp.getCode() == 0 && respData.getHasMore());
-        return appTableFields;
-    }
-
-    public static void createColumn(Client client, TTableInfo vo, String fileName) throws Exception {
-        if (CLIENT == null) {
-            CLIENT = client;
-        }
-        CreateAppTableFieldReq req = CreateAppTableFieldReq.newBuilder()
-                .appToken(vo.getAppToken())
-                .tableId(vo.getTableId())
-                .appTableField(AppTableField.newBuilder()
-                        .fieldName(fileName)
-                        .type(1)
-                        .build())
-                .build();
-        CreateAppTableFieldResp resp = CLIENT.bitable().appTableField().create(req, RequestOptions.newBuilder().build());
-        System.out.println(resp.getCode());
-    }
-
-
-    /**
      * 知识空间获取文件详情
      *
      * @param client
@@ -607,6 +568,7 @@ public abstract class BaseFeishuJavaUtils {
      * @return
      * @throws Exception
      */
+    @Deprecated
     public static Node getNodeSpace(Client client, String wikiToken) throws Exception {
         if (CLIENT == null) {
             CLIENT = client;
@@ -622,54 +584,7 @@ public abstract class BaseFeishuJavaUtils {
         return null;
     }
 
-    /**
-     * 审批-批量获取审批实例 ID
-     */
-    public static String[] listInstanceSample(Client client, ApprovalSampleVo vo) throws Exception {
-        if (CLIENT == null) {
-            CLIENT = client;
-        }
-        ListInstanceReq req = ListInstanceReq.newBuilder()
-                .approvalCode(vo.getApprovalCode())
-                .startTime(vo.getStartTime())
-                .endTime(vo.getEndTime())
-                .build();
 
-        // 发起请求
-        ListInstanceResp resp = CLIENT.approval().instance().list(req, RequestOptions.newBuilder()
-                .build());
-        if (resp.success()) {
-            return resp.getData().getInstanceCodeList();
-        }
-        return null;
-    }
-
-    /**
-     * 审批-获取单个审批实例详情
-     *
-     * @param client
-     * @param instanceId
-     * @return
-     * @throws Exception
-     */
-    public static InstanceComment[] getInstanceSample(Client client, String instanceId) throws Exception {
-        if (CLIENT == null) {
-            CLIENT = client;
-        }
-        // 创建请求对象
-        GetInstanceReq req = GetInstanceReq.newBuilder()
-                .instanceId(instanceId)
-                .build();
-
-        // 发起请求
-        // 如开启了Sdk的token管理功能，就无需调用 RequestOptions.newBuilder().tenantAccessToken("t-xxx").build()来设置租户token了
-        GetInstanceResp resp = CLIENT.approval().instance().get(req, RequestOptions.newBuilder()
-                .build());
-        if (resp.success()) {
-            return resp.getData().getCommentList();
-        }
-        return null;
-    }
 
     public static void main(String[] args) throws Exception {
 //        TTableInfo vo = new TTableInfo();
@@ -678,13 +593,6 @@ public abstract class BaseFeishuJavaUtils {
         if (CLIENT == null) {
             CLIENT = Client.newBuilder("cli_a1144b112738d013", "AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx").build();;
         }
-        ApprovalSampleVo vo = new ApprovalSampleVo();
-        vo.setApprovalCode("25A0EB8B-1F70-4322-84B4-861C69429A5A");
-        vo.setStartTime("1676973115000");
-        vo.setEndTime("1677145915000");
-        for (String instand : listInstanceSample(CLIENT, vo)) {
-            InstanceComment[] instanceSample = getInstanceSample(CLIENT, instand);
-            System.out.println(instanceSample);
-        }
+
     }
 }

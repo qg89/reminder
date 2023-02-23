@@ -13,6 +13,7 @@ import com.q.reminder.reminder.service.TTableInfoService;
 import com.q.reminder.reminder.service.TTableUserTimeService;
 import com.q.reminder.reminder.service.WUserTimesService;
 import com.q.reminder.reminder.util.BaseFeishuJavaUtils;
+import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
@@ -81,7 +82,7 @@ public class SyncProjcetTimeTableTask {
             });
             records.add(AppTableRecord.newBuilder().fields(data).build());
         }
-        BaseFeishuJavaUtils.batchCreateTableRecords(client, tableInfo, records.toArray(new AppTableRecord[records.size()]));
+        BaseFeishu.table(client).batchCreateTableRecords(tableInfo, records.toArray(new AppTableRecord[0]));
     }
 
     /**
@@ -91,10 +92,10 @@ public class SyncProjcetTimeTableTask {
      * @throws Exception
      */
     private void delRecords(TTableInfo tTableInfo) throws Exception {
-        List<String> list = BaseFeishuJavaUtils.listTableRecords(client, tTableInfo).stream().map(AppTableRecord::getRecordId).toList();
+        List<String> list = BaseFeishu.table(client).listTableRecords(tTableInfo).stream().map(AppTableRecord::getRecordId).toList();
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
-        BaseFeishuJavaUtils.batchDeleteTableRecords(client, tTableInfo, list.toArray(new String[list.size()]));
+        BaseFeishu.table(client).batchDeleteTableRecords(tTableInfo, list.toArray(new String[0]));
     }
 }
