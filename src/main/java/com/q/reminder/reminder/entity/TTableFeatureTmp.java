@@ -1,6 +1,5 @@
 package com.q.reminder.reminder.entity;
 
-import com.alibaba.fastjson2.annotation.JSONField;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -11,7 +10,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Date;
-
 
 /**
  * 需求管理表临时表（避免重复）(TTableFeatureTmp)实体类
