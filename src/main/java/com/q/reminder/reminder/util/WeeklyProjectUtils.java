@@ -3,7 +3,7 @@ package com.q.reminder.reminder.util;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.UUID;
 import com.q.reminder.reminder.constant.WeeklyReportConstants;
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.util.jfree.GenerateChartUtil;
 import com.q.reminder.reminder.util.jfree.GeneratePieChartUtil;
@@ -54,10 +54,10 @@ public abstract class WeeklyProjectUtils {
      * @return
      */
     public static File reviewQuestions(WeeklyProjectVo vo) throws Exception {
-        ProjectInfo projectInfo = new ProjectInfo();
-        projectInfo.setRedmineUrl(vo.getRedmineUrl());
-        projectInfo.setPmKey(vo.getPmKey());
-        projectInfo.setPKey(vo.getPKey());
+        RProjectInfo RProjectInfo = new RProjectInfo();
+        RProjectInfo.setRedmineUrl(vo.getRedmineUrl());
+        RProjectInfo.setPmKey(vo.getPmKey());
+        RProjectInfo.setPKey(vo.getPKey());
         String fileName = vo.getFileName();
         Date startDay = vo.getStartDay();
         Date sunday = getWeekNumToSunday(vo.getWeekNum() - 1);

@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.Client;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RedmineUserInfo;
 import com.q.reminder.reminder.service.AdminInfoService;
 import com.q.reminder.reminder.service.ProjectInfoService;
@@ -59,16 +59,16 @@ public class SyncRedmineTask {
     public ReturnT<String> syncRedmineTask() {
         ReturnT<String> r = new ReturnT<>(null);
         // 查询项目对应的需求管理表token
-        LambdaQueryWrapper<ProjectInfo> lq = new LambdaQueryWrapper<>();
-        lq.isNotNull(ProjectInfo::getFeatureToken);
-        lq.isNotNull(ProjectInfo::getPmKey);
-        lq.eq(ProjectInfo::getSyncFeature, "0");
-        List<ProjectInfo> projectInfos = projectInfoService.list(lq);
+        LambdaQueryWrapper<RProjectInfo> lq = new LambdaQueryWrapper<>();
+        lq.isNotNull(RProjectInfo::getFeatureToken);
+        lq.isNotNull(RProjectInfo::getPmKey);
+        lq.eq(RProjectInfo::getSyncFeature, "0");
+        List<RProjectInfo> RProjectInfos = projectInfoService.list(lq);
         Map<String, Integer> redmineUserMap = redmineUserInfoService.list(Wrappers.<RedmineUserInfo>lambdaQuery().isNotNull(RedmineUserInfo::getAssigneeName)).stream().collect(Collectors.toMap(e -> e.getAssigneeName().replace(" ", "") + "-" + e.getRedmineType(), RedmineUserInfo::getAssigneeId, (v1, v2) -> v1));
         List<AdminInfo> adminInfoList = adminInfoService.list();
         String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         StringBuilder conten = new StringBuilder();
-        projectInfos.forEach(projectInfo -> {
+        RProjectInfos.forEach(projectInfo -> {
             String pKey = projectInfo.getPKey();
             String pId = projectInfo.getPId();
             String featureToken = projectInfo.getFeatureToken();

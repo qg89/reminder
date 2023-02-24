@@ -2,7 +2,7 @@ package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.vo.*;
 import com.taskadapter.redmineapi.IssueManager;
@@ -54,14 +54,14 @@ public abstract class RedmineApi {
     /**
      * 通过项目读取redmine过期任务,只包含打开的状态
      *
-     * @param projectInfoList
+     * @param RProjectInfoList
      * @return 按指派人员返回问题列表
      */
-    public static List<RedmineVo> queryUserByExpiredDayList(QueryVo vo, List<ProjectInfo> projectInfoList) {
+    public static List<RedmineVo> queryUserByExpiredDayList(QueryVo vo, List<RProjectInfo> RProjectInfoList) {
         List<String> noneStatusList = vo.getNoneStatusList();
         Integer expiredDay = vo.getExpiredDay();
         List<RedmineVo> allIssueList = new ArrayList<>();
-        projectInfoList.forEach(p -> {
+        RProjectInfoList.forEach(p -> {
             String redmineUrl = p.getRedmineUrl();
             RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, p.getPmKey());
             IssueManager issueManager = mgr.getIssueManager();
@@ -101,12 +101,12 @@ public abstract class RedmineApi {
     /**
      * 查询redmine当天修改的任务，所有状态
      *
-     * @param projectInfoList
+     * @param RProjectInfoList
      * @return
      */
-    public static List<RedmineVo> queryUpdateIssue(List<ProjectInfo> projectInfoList) {
+    public static List<RedmineVo> queryUpdateIssue(List<RProjectInfo> RProjectInfoList) {
         List<RedmineVo> issues = new ArrayList<>();
-        for (ProjectInfo project : projectInfoList) {
+        for (RProjectInfo project : RProjectInfoList) {
             RedmineManager mgr = RedmineManagerFactory.createWithApiKey(project.getRedmineUrl(), project.getPmKey());
             Transport transport = mgr.getTransport();
             List<RequestParam> params = List.of(
@@ -421,7 +421,7 @@ public abstract class RedmineApi {
      * @return
      * @throws RedmineException
      */
-    public static List<TimeEntry> queryTimes(ProjectInfo info) throws RedmineException {
+    public static List<TimeEntry> queryTimes(RProjectInfo info) throws RedmineException {
         String redmineUrl = info.getRedmineUrl();
         String url = redmineUrl + "/projects/" + info.getPKey();
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(url, info.getPmKey());
@@ -453,7 +453,7 @@ public abstract class RedmineApi {
      * @return
      * @throws RedmineException
      */
-    public static List<TimeEntry> queryUserTime(ProjectInfo info) throws RedmineException {
+    public static List<TimeEntry> queryUserTime(RProjectInfo info) throws RedmineException {
         String redmineUrl = info.getRedmineUrl();
         String url = redmineUrl + "/projects/" + info.getPKey();
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(url, info.getPmKey());
@@ -465,7 +465,7 @@ public abstract class RedmineApi {
         return transport.getObjectsList(TimeEntry.class, params);
     }
 
-    public static Collection<? extends Issue> queryIssues(ProjectInfo info) throws RedmineException {
+    public static Collection<? extends Issue> queryIssues(RProjectInfo info) throws RedmineException {
         String redmineUrl = info.getRedmineUrl();
         String url = redmineUrl + "/projects/" + info.getPKey();
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(url, info.getPmKey());
@@ -493,7 +493,7 @@ public abstract class RedmineApi {
         return issue.create();
     }
 
-    public static Transport getTransportByProject(ProjectInfo projectInfo) {
-        return RedmineManagerFactory.createWithApiKey(projectInfo.getRedmineUrl(), projectInfo.getPmKey()).getTransport();
+    public static Transport getTransportByProject(RProjectInfo RProjectInfo) {
+        return RedmineManagerFactory.createWithApiKey(RProjectInfo.getRedmineUrl(), RProjectInfo.getPmKey()).getTransport();
     }
 }

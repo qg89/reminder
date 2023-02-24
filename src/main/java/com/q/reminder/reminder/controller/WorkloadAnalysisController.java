@@ -2,9 +2,8 @@ package com.q.reminder.reminder.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RedmineUserInfo;
-import com.q.reminder.reminder.entity.WUserTimeMonth;
 import com.q.reminder.reminder.service.*;
 import com.q.reminder.reminder.vo.OptionVo;
 import com.q.reminder.reminder.vo.RoleInvolvementVo;
@@ -57,9 +56,9 @@ public class WorkloadAnalysisController {
      * @return
      */
     @GetMapping("/project_option")
-    public ReturnT<List<ProjectInfo>> projectOption() {
-        LambdaQueryWrapper<ProjectInfo> lq = Wrappers.lambdaQuery();
-        lq.select(ProjectInfo::getId, ProjectInfo::getPName);
+    public ReturnT<List<RProjectInfo>> projectOption() {
+        LambdaQueryWrapper<RProjectInfo> lq = Wrappers.lambdaQuery();
+        lq.select(RProjectInfo::getId, RProjectInfo::getPName);
         return new ReturnT<>(projectInfoService.list(lq));
     }
 

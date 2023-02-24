@@ -1,7 +1,7 @@
 package com.q.reminder.reminder.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.vo.WeeklyByProjectVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import org.apache.ibatis.annotations.Mapper;
@@ -17,7 +17,7 @@ import java.util.List;
  * @date :  2022.09.27 13:24
  */
 @Mapper
-public interface ProjectInfoMapping extends BaseMapper<ProjectInfo> {
+public interface ProjectInfoMapping extends BaseMapper<RProjectInfo> {
 
     List<WeeklyProjectVo> getWeeklyDocxList(@Param("weekNumber") int weekNumber, @Param("id") String id);
 

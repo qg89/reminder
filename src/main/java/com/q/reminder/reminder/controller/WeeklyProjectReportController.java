@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.impl.WeeklyServiceImpl;
 import com.q.reminder.reminder.vo.WeeklyByProjectVo;
@@ -64,8 +64,8 @@ public class WeeklyProjectReportController {
     }
 
     @GetMapping("/p_option")
-    public ReturnT<List<ProjectInfo>> option() {
-        LambdaQueryWrapper<ProjectInfo> lq = Wrappers.<ProjectInfo>lambdaQuery().select(ProjectInfo::getId, ProjectInfo::getProjectShortName);
+    public ReturnT<List<RProjectInfo>> option() {
+        LambdaQueryWrapper<RProjectInfo> lq = Wrappers.<RProjectInfo>lambdaQuery().select(RProjectInfo::getId, RProjectInfo::getProjectShortName);
         return new ReturnT<>(projectInfoService.list(lq));
     }
 

@@ -5,7 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.constant.JsonCharsConstant;
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RedmineUserInfo;
 import com.q.reminder.reminder.entity.TTableFeatureTmp;
 import com.q.reminder.reminder.entity.TTableUserConfig;
@@ -56,11 +56,11 @@ public class TableFeatureController {
     @PostMapping("/user_config")
     public void userConfig(@RequestBody FeatureUserConfigVo vo) {
         String prjctKey = vo.getPrjctKey();
-        LambdaQueryWrapper<ProjectInfo> lambdaQueryWrapper = Wrappers.lambdaQuery();
-        lambdaQueryWrapper.eq(ProjectInfo::getPKey, prjctKey);
-        ProjectInfo projectInfo = projectInfoService.getOne(lambdaQueryWrapper);
+        LambdaQueryWrapper<RProjectInfo> lambdaQueryWrapper = Wrappers.lambdaQuery();
+        lambdaQueryWrapper.eq(RProjectInfo::getPKey, prjctKey);
+        RProjectInfo RProjectInfo = projectInfoService.getOne(lambdaQueryWrapper);
         LambdaQueryWrapper<RedmineUserInfo> lq = Wrappers.lambdaQuery();
-        lq.eq(RedmineUserInfo::getRedmineType, projectInfo.getRedmineType());
+        lq.eq(RedmineUserInfo::getRedmineType, RProjectInfo.getRedmineType());
         Map<String, Integer> userMap = redmineUserInfoService.list(lq).stream().collect(Collectors.toMap(RedmineUserInfo::getAssigneeName, RedmineUserInfo::getAssigneeId));
         TTableUserConfig entity = new TTableUserConfig();
         entity.setPrdctId(userMap.get(vo.getPrdct()));
@@ -72,7 +72,7 @@ public class TableFeatureController {
         entity.setOprtonId(userMap.get(vo.getOprton()));
         entity.setPrjctName(vo.getPrjct());
         entity.setTestId(userMap.get(vo.getTest()));
-        entity.setPId(projectInfo.getId());
+        entity.setPId(RProjectInfo.getId());
         entity.setArchtctId(userMap.get(vo.getArchtct()));
         entity.setPrjctKey(prjctKey);
         tTableUserConfigService.saveOrUpdate(entity);

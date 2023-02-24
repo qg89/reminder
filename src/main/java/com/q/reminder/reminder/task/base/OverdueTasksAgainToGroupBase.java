@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.service.AdminInfoService;
 import com.q.reminder.reminder.service.OverdueTaskHistoryService;
@@ -75,10 +75,10 @@ public class OverdueTasksAgainToGroupBase {
         String redminderType = vo.getRedminderType();
         String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         // 组装数据， 通过人员，获取要发送的内容
-        LambdaQueryWrapper<ProjectInfo> lambdaQueryWrapper = Wrappers.<ProjectInfo>lambdaQuery();
-        lambdaQueryWrapper.isNotNull(ProjectInfo::getPmKey);
-        List<ProjectInfo> projectInfoList = projectInfoService.list(lambdaQueryWrapper);
-        List<RedmineVo> issueUserList = RedmineApi.queryUserByExpiredDayList(vo, projectInfoList);
+        LambdaQueryWrapper<RProjectInfo> lambdaQueryWrapper = Wrappers.<RProjectInfo>lambdaQuery();
+        lambdaQueryWrapper.isNotNull(RProjectInfo::getPmKey);
+        List<RProjectInfo> RProjectInfoList = projectInfoService.list(lambdaQueryWrapper);
+        List<RedmineVo> issueUserList = RedmineApi.queryUserByExpiredDayList(vo, RProjectInfoList);
 
         // 保存历史记录
         issueUserList.forEach(e -> {

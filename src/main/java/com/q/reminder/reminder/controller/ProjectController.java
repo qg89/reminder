@@ -5,10 +5,9 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.*;
 import com.q.reminder.reminder.service.*;
-import com.q.reminder.reminder.vo.ProjectReaVo;
+import com.q.reminder.reminder.vo.RProjectReaVo;
 import com.xxl.job.core.biz.model.ReturnT;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,15 +39,15 @@ public class ProjectController {
     private LoginService loginService;
 
     @GetMapping("/i")
-    public ReturnT<List<ProjectInfo>> list() {
-        LambdaQueryWrapper<ProjectInfo> lq = Wrappers.lambdaQuery();
-        lq.orderByDesc(ProjectInfo::getUpdateTime);
-        List<ProjectInfo> list = projectInfoService.list(lq);
+    public ReturnT<List<RProjectInfo>> list() {
+        LambdaQueryWrapper<RProjectInfo> lq = Wrappers.lambdaQuery();
+        lq.orderByDesc(RProjectInfo::getUpdateTime);
+        List<RProjectInfo> list = projectInfoService.list(lq);
         return new ReturnT<>(list);
     }
 
     @PostMapping("/s")
-    public ReturnT<String> save(@RequestBody ProjectReaVo info) {
+    public ReturnT<String> save(@RequestBody RProjectReaVo info) {
         projectInfoService.save(info);
         if (!saveRea(info)) {
             return ReturnT.FAIL;
@@ -57,7 +56,7 @@ public class ProjectController {
     }
 
     @PostMapping("/e")
-    public ReturnT<String> edit(@RequestBody ProjectReaVo info) {
+    public ReturnT<String> edit(@RequestBody RProjectReaVo info) {
         projectInfoService.updateById(info);
         if (!saveRea(info)) {
             return ReturnT.FAIL;
@@ -66,14 +65,14 @@ public class ProjectController {
     }
 
     @PostMapping("/r")
-    public ReturnT<String> rea(@RequestBody ProjectReaVo vo) {
+    public ReturnT<String> rea(@RequestBody RProjectReaVo vo) {
         if (!saveRea(vo)) {
             return ReturnT.FAIL;
         }
         return ReturnT.SUCCESS;
     }
 
-    private Boolean saveRea(ProjectReaVo vo) {
+    private Boolean saveRea(RProjectReaVo vo) {
         String pId = vo.getPId();
         String chatId = vo.getChatId();
         String userId = vo.getUserId();

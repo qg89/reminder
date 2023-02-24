@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.Client;
 import com.lark.oapi.service.bitable.v1.model.AppTableRecord;
 import com.q.reminder.reminder.constant.TableTypeContants;
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.TTableFeatureTmp;
 import com.q.reminder.reminder.entity.TTableInfo;
 import com.q.reminder.reminder.entity.TTableUserConfig;
@@ -15,7 +15,6 @@ import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.TTableFeatureTmpService;
 import com.q.reminder.reminder.service.TTableInfoService;
 import com.q.reminder.reminder.service.TTableUserConfigService;
-import com.q.reminder.reminder.util.BaseFeishuJavaUtils;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.taskadapter.redmineapi.RedmineException;
@@ -85,7 +84,7 @@ public class SyncFeatureDatasWriteRedmineTask {
         tableQw.eq(TTableFeatureTmp::getWriteType, "是");
         List<TTableFeatureTmp> featureDataList = tTableFeatureTmpService.list(tableQw);
         Map<String, TTableUserConfig> userConfigMap = tTableUserConfigService.list().stream().collect(Collectors.toMap(TTableUserConfig::getPrjctKey, Function.identity(), (v1, v2) -> v1));
-        Map<String, ProjectInfo> projectMap = projectInfoService.list().stream().collect(Collectors.toMap(e -> String.valueOf(e.getId()), Function.identity(), (v1, v2) -> v1));
+        Map<String, RProjectInfo> projectMap = projectInfoService.list().stream().collect(Collectors.toMap(e -> String.valueOf(e.getId()), Function.identity(), (v1, v2) -> v1));
 
         List<AppTableRecord> records = new ArrayList<>();
 
@@ -102,10 +101,10 @@ public class SyncFeatureDatasWriteRedmineTask {
 
 
             TTableUserConfig config = userConfigMap.get(prjctKey);
-            ProjectInfo projectInfo = projectMap.get(config.getPId().toString());
-            Integer pId = Integer.valueOf(projectInfo.getPId());
+            RProjectInfo RProjectInfo = projectMap.get(config.getPId().toString());
+            Integer pId = Integer.valueOf(RProjectInfo.getPId());
 
-            Transport transport = RedmineApi.getTransportByProject(projectInfo);
+            Transport transport = RedmineApi.getTransportByProject(RProjectInfo);
             if (RedmineApi.checkRedmineTask(transport, recordsId)) {
                 continue;
             }

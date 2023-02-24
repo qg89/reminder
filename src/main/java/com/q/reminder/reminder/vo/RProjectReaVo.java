@@ -1,6 +1,6 @@
 package com.q.reminder.reminder.vo;
 
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,7 +16,7 @@ import java.io.Serializable;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ProjectReaVo extends ProjectInfo implements Serializable {
+public class RProjectReaVo extends RProjectInfo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -7559515469488244195L;

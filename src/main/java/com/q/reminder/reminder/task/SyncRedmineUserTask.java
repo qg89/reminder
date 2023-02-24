@@ -1,6 +1,6 @@
 package com.q.reminder.reminder.task;
 
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RedmineUserInfo;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RedmineUserInfoService;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -35,7 +34,7 @@ public class SyncRedmineUserTask {
     @XxlJob("syncRedmineUserTask")
     public void syncRedmineUserTask() throws RedmineException {
         List<RedmineUserInfo> data = new ArrayList<>();
-        for (ProjectInfo info : projectInfoService.list()) {
+        for (RProjectInfo info : projectInfoService.list()) {
              RedmineApi.queryUserTime(info).stream().collect(Collectors.toMap(TimeEntry::getUserId, TimeEntry::getUserName, (v1, v2) -> v1)).forEach((userId, userName) -> {
                  RedmineUserInfo userInfo = new RedmineUserInfo();
                  userInfo.setRedmineType(info.getRedmineType());

@@ -1,11 +1,9 @@
 package com.q.reminder.reminder.task.redmine;
 
-import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONObject;
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RdIssue;
-import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdIssueService;
 import com.q.reminder.reminder.util.RedmineApi;
@@ -18,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -39,7 +36,7 @@ public class SyncIssueTask {
     @XxlJob("syncIssueTask")
     public void syncIssueTask() {
         List<Issue> issueData = new ArrayList<>();
-        List<ProjectInfo> projectList = projectInfoService.list();
+        List<RProjectInfo> projectList = projectInfoService.list();
         projectList.forEach(projectInfo -> {
             projectInfo.setStartDay(DateUtil.beginOfWeek(DateTime.now().minusWeeks(1).toDate()));
             try {

@@ -5,7 +5,7 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.WUserTimes;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WUserTimesService;
@@ -64,13 +64,13 @@ public class SyncRedmineProjectUserTimeTask {
         if (json.containsKey("endDate")) {
             endDate = json.getDate("endDate");
         }
-        LambdaQueryWrapper<ProjectInfo> lq = Wrappers.lambdaQuery();
+        LambdaQueryWrapper<RProjectInfo> lq = Wrappers.lambdaQuery();
         if (json.containsKey("pKey")) {
-            lq.eq(ProjectInfo::getPKey, json.getString("pKey"));
+            lq.eq(RProjectInfo::getPKey, json.getString("pKey"));
         }
-        List<ProjectInfo> projectList = projectInfoService.list(lq);
+        List<RProjectInfo> projectList = projectInfoService.list(lq);
         List<WUserTimes> userTimesData = new ArrayList<>();
-        for (ProjectInfo info : projectList) {
+        for (RProjectInfo info : projectList) {
             Long id = info.getId();
             Date finalStartDate = startDate;
             Date finalEndDate = endDate;

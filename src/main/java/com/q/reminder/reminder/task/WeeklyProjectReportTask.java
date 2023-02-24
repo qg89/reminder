@@ -4,12 +4,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.Client;
 import com.q.reminder.reminder.config.FeishuProperties;
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.WeeklyProjectReport;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WeeklyProjectReportService;
 import com.q.reminder.reminder.task.base.HoldayBase;
-import com.q.reminder.reminder.util.BaseFeishuJavaUtils;
 import com.q.reminder.reminder.util.WeeklyProjectFeishuUtils;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
@@ -54,10 +53,10 @@ public class WeeklyProjectReportTask {
         vo.setAppSecret(feishuProperties.getAppSecret());
         vo.setAppId(feishuProperties.getAppId());
         vo.setFileToken(getFileToken());
-        LambdaQueryWrapper<ProjectInfo> wrapper = Wrappers.lambdaQuery();
-        wrapper.isNotNull(ProjectInfo::getFolderToken).isNotNull(ProjectInfo::getProjectShortName).isNotNull(ProjectInfo::getPmKey);
+        LambdaQueryWrapper<RProjectInfo> wrapper = Wrappers.lambdaQuery();
+        wrapper.isNotNull(RProjectInfo::getFolderToken).isNotNull(RProjectInfo::getProjectShortName).isNotNull(RProjectInfo::getPmKey);
         if (StringUtils.isNotBlank(jobParam)) {
-            wrapper.eq(ProjectInfo::getId, jobParam);
+            wrapper.eq(RProjectInfo::getId, jobParam);
         }
         projectInfoService.list(wrapper).forEach(projectInfo -> {
             vo.setProjectShortName(projectInfo.getProjectShortName());

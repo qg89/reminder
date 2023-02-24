@@ -1,9 +1,7 @@
 package com.q.reminder.reminder.task.redmine;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.io.unit.DataUnit;
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdTimeEntryService;
@@ -36,7 +34,7 @@ public class SyncTimeEntryTask {
 
     @XxlJob("syncTimeEntryTask")
     public void SyncTimeEntryTask() {
-        List<ProjectInfo> projectList = projectInfoService.list();
+        List<RProjectInfo> projectList = projectInfoService.list();
         List<TimeEntry> timeData = new ArrayList<>();
         projectList.forEach(projectInfo -> {
             projectInfo.setStartDay(DateUtil.beginOfWeek(DateTime.now().minusWeeks(1).toDate()));

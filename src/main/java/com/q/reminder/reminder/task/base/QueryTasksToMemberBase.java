@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.service.AdminInfoService;
 import com.q.reminder.reminder.service.OverdueTaskHistoryService;
@@ -68,16 +68,16 @@ public class QueryTasksToMemberBase {
         Map<String, String> memberIds = list.stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
 
         // 组装数据， 通过人员，获取要发送的内容
-        LambdaQueryWrapper<ProjectInfo> lambdaQueryWrapper = Wrappers.<ProjectInfo>lambdaQuery();
-        lambdaQueryWrapper.isNotNull(ProjectInfo::getPmKey);
-        List<ProjectInfo> projectInfoList = projectInfoService.list(lambdaQueryWrapper);
+        LambdaQueryWrapper<RProjectInfo> lambdaQueryWrapper = Wrappers.<RProjectInfo>lambdaQuery();
+        lambdaQueryWrapper.isNotNull(RProjectInfo::getPmKey);
+        List<RProjectInfo> RProjectInfoList = projectInfoService.list(lambdaQueryWrapper);
         List<AdminInfo> adminInfoList = adminInfoService.list();
 
         QueryVo vo = new QueryVo();
         vo.setNoneStatusList(noneStatusList);
         vo.setExpiredDay(expiredDay);
         vo.setContainsStatus(contentStatus);
-        Map<String, List<RedmineVo>> listMap = RedmineApi.queryUserByExpiredDayList(vo, projectInfoList).stream().collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
+        Map<String, List<RedmineVo>> listMap = RedmineApi.queryUserByExpiredDayList(vo, RProjectInfoList).stream().collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
         if (CollectionUtils.isEmpty(listMap)) {
             contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append("\r\n");
             contentAll.append("执行完成!");

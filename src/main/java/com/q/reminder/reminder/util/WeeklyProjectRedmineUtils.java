@@ -1,9 +1,7 @@
 package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
-import com.q.reminder.reminder.entity.ProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
-import com.q.reminder.reminder.vo.QueryVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
@@ -12,14 +10,12 @@ import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
-import org.joda.time.DateTime;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * @author : saiko

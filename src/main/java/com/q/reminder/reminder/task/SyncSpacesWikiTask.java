@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.Client;
-import com.q.reminder.reminder.entity.ProjectInfo;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.WikiSpace;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WikiSpaceService;
@@ -60,9 +60,10 @@ public class SyncSpacesWikiTask {
             }
             WikiSpace wikiSpace = spaceWikoService.getSpacesNode(client, "wikcnXpXCgmL3E7vdbM1TiwXiGc");
             String parentTitle = wikiSpace.getTitle();
-            LambdaQueryWrapper<ProjectInfo> lq = Wrappers.<ProjectInfo>lambdaQuery().select(ProjectInfo::getWikiToken, ProjectInfo::getId).isNotNull(ProjectInfo::getWikiToken);
-            List<ProjectInfo> list = projectInfoService.list(lq);
-            for (ProjectInfo info : list) {
+            LambdaQueryWrapper<RProjectInfo> lq = Wrappers.<RProjectInfo>lambdaQuery().select(RProjectInfo::getWikiToken, RProjectInfo::getId).isNotNull(RProjectInfo::getWikiToken);
+            lq.eq(RProjectInfo::getWikiType, "0");
+            List<RProjectInfo> list = projectInfoService.list(lq);
+            for (RProjectInfo info : list) {
                 String title  = parentTitle + "-" + DateTime.now().toString("yy") + "W" + weekOfYear;
                 WikiSpace space = spaceWikoService.syncSpacesWiki(client, info.getWikiToken(), title);
                 space.setPId(info.getId());
