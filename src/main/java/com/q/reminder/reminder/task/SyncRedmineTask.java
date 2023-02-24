@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
  * @Description :
  * @date :  2022.10.27 10:56
  */
+@Deprecated
 @Log4j2
 @Component
 public class SyncRedmineTask {
