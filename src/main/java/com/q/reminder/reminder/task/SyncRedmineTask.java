@@ -63,12 +63,12 @@ public class SyncRedmineTask {
         lq.isNotNull(RProjectInfo::getFeatureToken);
         lq.isNotNull(RProjectInfo::getPmKey);
         lq.eq(RProjectInfo::getSyncFeature, "0");
-        List<RProjectInfo> RProjectInfos = projectInfoService.list(lq);
+        List<RProjectInfo> projectInfoList = projectInfoService.list(lq);
         Map<String, Integer> redmineUserMap = redmineUserInfoService.list(Wrappers.<RedmineUserInfo>lambdaQuery().isNotNull(RedmineUserInfo::getAssigneeName)).stream().collect(Collectors.toMap(e -> e.getAssigneeName().replace(" ", "") + "-" + e.getRedmineType(), RedmineUserInfo::getAssigneeId, (v1, v2) -> v1));
         List<AdminInfo> adminInfoList = adminInfoService.list();
         String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         StringBuilder conten = new StringBuilder();
-        RProjectInfos.forEach(projectInfo -> {
+        projectInfoList.forEach(projectInfo -> {
             String pKey = projectInfo.getPKey();
             String pId = projectInfo.getPId();
             String featureToken = projectInfo.getFeatureToken();
