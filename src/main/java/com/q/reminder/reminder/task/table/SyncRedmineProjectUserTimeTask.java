@@ -58,7 +58,6 @@ public class SyncRedmineProjectUserTimeTask {
             startDate = DateUtil.beginOfMonth(new Date()).toJdkDate();
         }
 
-        String pKey = "";
         if (json.containsKey("startDate")) {
             startDate = json.getDate("startDate");
         }
@@ -67,8 +66,7 @@ public class SyncRedmineProjectUserTimeTask {
         }
         LambdaQueryWrapper<ProjectInfo> lq = Wrappers.lambdaQuery();
         if (json.containsKey("pKey")) {
-            pKey = json.getString("pKey");
-            lq.eq(ProjectInfo::getPKey, pKey);
+            lq.eq(ProjectInfo::getPKey, json.getString("pKey"));
         }
         List<ProjectInfo> projectList = projectInfoService.list(lq);
         List<WUserTimes> userTimesData = new ArrayList<>();

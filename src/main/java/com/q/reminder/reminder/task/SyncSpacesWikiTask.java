@@ -46,6 +46,9 @@ public class SyncSpacesWikiTask {
         }
         ReturnT<String> returnT = new ReturnT<>(null);
         String jobParam = XxlJobHelper.getJobParam();
+        if (StringUtils.isNotBlank(jobParam) && NumberUtil.isInteger(jobParam) && Integer.parseInt(jobParam) <= 52) {
+            weekOfYear = Integer.parseInt(jobParam);
+        }
         List<WikiSpace> wikiSpaceList = new ArrayList<>();
         try {
             LambdaQueryWrapper<WikiSpace> wikiLq = Wrappers.lambdaQuery();
@@ -59,9 +62,6 @@ public class SyncSpacesWikiTask {
             String parentTitle = wikiSpace.getTitle();
             LambdaQueryWrapper<ProjectInfo> lq = Wrappers.<ProjectInfo>lambdaQuery().select(ProjectInfo::getWikiToken, ProjectInfo::getId).isNotNull(ProjectInfo::getWikiToken);
             List<ProjectInfo> list = projectInfoService.list(lq);
-            if (StringUtils.isNotBlank(jobParam) && NumberUtil.isInteger(jobParam) && Integer.parseInt(jobParam) <= 52) {
-                weekOfYear = Integer.parseInt(jobParam);
-            }
             for (ProjectInfo info : list) {
                 String title  = parentTitle + "-" + DateTime.now().toString("yy") + "W" + weekOfYear;
                 WikiSpace space = spaceWikoService.syncSpacesWiki(client, info.getWikiToken(), title);
