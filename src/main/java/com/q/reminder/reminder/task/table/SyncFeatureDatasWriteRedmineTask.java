@@ -154,7 +154,9 @@ public class SyncFeatureDatasWriteRedmineTask {
                 featureTmp.setWriteRedmine("3");
             }
             tTableFeatureTmpService.updateById(featureTmp);
-            records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(Map.of("需求ID", recordsId)).build());
+            if ("1".equals(featureTmp.getWriteRedmine())){
+                records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(Map.of("需求ID", recordsId)).build());
+            }
         }
 
         LambdaQueryWrapper<TTableInfo> lq = Wrappers.lambdaQuery();
