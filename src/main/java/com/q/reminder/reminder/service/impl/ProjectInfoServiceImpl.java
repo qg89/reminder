@@ -59,6 +59,9 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
                     vo.setColumnType("api");
                     vo.setColumnDesc(Map.of("url", "/p/group", "method", "GET", "return", "array"));
                 }
+                if ("startDay".equals(k)) {
+                    vo.setColumnType("date");
+                }
                 res.add(vo);
             });
             resDate.add(res);
