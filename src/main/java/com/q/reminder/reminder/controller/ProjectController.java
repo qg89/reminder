@@ -5,12 +5,15 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.*;
 import com.q.reminder.reminder.service.*;
+import com.q.reminder.reminder.vo.OptionVo;
+import com.q.reminder.reminder.vo.ProjectInfoVo;
 import com.q.reminder.reminder.vo.RProjectReaVo;
 import com.xxl.job.core.biz.model.ReturnT;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,13 +40,16 @@ public class ProjectController {
     private GroupInfoService groupInfoService;
     @Autowired
     private LoginService loginService;
+    @Autowired
+    private UserMemberService userMemberService;
 
     @GetMapping("/i")
-    public ReturnT<List<RProjectInfo>> list() {
+    public ReturnT<List<ProjectInfoVo>> list() {
         LambdaQueryWrapper<RProjectInfo> lq = Wrappers.lambdaQuery();
         lq.orderByDesc(RProjectInfo::getUpdateTime);
         List<RProjectInfo> list = projectInfoService.list(lq);
-        return new ReturnT<>(list);
+        List<ProjectInfoVo> res = projectInfoService.listToArray(list);
+        return new ReturnT<>(res);
     }
 
     @PostMapping("/s")
@@ -122,5 +128,34 @@ public class ProjectController {
         map.put("user", userList);
         map.put("coverity", coverityList);
         return new ReturnT<>(map);
+    }
+
+    @GetMapping("/group")
+    public ReturnT<List<OptionVo>> group() {
+        LambdaQueryWrapper<GroupInfo> lq = Wrappers.lambdaQuery();
+        lq.select(GroupInfo::getChatId, GroupInfo::getName);
+        List<GroupInfo> list = groupInfoService.list(lq);
+        List<OptionVo> res = new ArrayList<>();
+        list.forEach(i -> {
+            OptionVo vo = new OptionVo();
+            vo.setId(i.getChatId());
+            vo.setName(i.getName());
+            res.add(vo);
+        });
+        return new ReturnT<>(res);
+    }
+
+    @GetMapping("/member")
+    public ReturnT<List<OptionVo>> member() {
+        LambdaQueryWrapper<UserMemgerInfo> lq = Wrappers.lambdaQuery();
+        lq.select(UserMemgerInfo::getMemberId, UserMemgerInfo::getName);
+        List<OptionVo> res = new ArrayList<>();
+        userMemberService.list(lq).forEach(i -> {
+            OptionVo vo = new OptionVo();
+            vo.setId(i.getMemberId());
+            vo.setName(i.getName());
+            res.add(vo);
+        });
+        return new ReturnT<>(res);
     }
 }
