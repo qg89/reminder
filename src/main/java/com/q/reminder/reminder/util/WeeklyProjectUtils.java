@@ -57,7 +57,7 @@ public abstract class WeeklyProjectUtils {
         RProjectInfo RProjectInfo = new RProjectInfo();
         RProjectInfo.setRedmineUrl(vo.getRedmineUrl());
         RProjectInfo.setPmKey(vo.getPmKey());
-        RProjectInfo.setPKey(vo.getPKey());
+        RProjectInfo.setPkey(vo.getPKey());
         String fileName = vo.getFileName();
         Date startDay = vo.getStartDay();
         Date sunday = getWeekNumToSunday(vo.getWeekNum() - 1);

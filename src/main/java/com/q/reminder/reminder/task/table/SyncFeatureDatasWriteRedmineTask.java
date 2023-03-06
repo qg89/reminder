@@ -102,7 +102,7 @@ public class SyncFeatureDatasWriteRedmineTask {
 
             TTableUserConfig config = userConfigMap.get(prjctKey);
             RProjectInfo RProjectInfo = projectMap.get(config.getPId().toString());
-            Integer pId = Integer.valueOf(RProjectInfo.getPId());
+            Integer pId = Integer.valueOf(RProjectInfo.getPid());
 
             Transport transport = RedmineApi.getTransportByProject(RProjectInfo);
             if (RedmineApi.checkRedmineTask(transport, recordsId)) {

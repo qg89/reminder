@@ -57,7 +57,7 @@ public class TableFeatureController {
     public void userConfig(@RequestBody FeatureUserConfigVo vo) {
         String prjctKey = vo.getPrjctKey();
         LambdaQueryWrapper<RProjectInfo> lambdaQueryWrapper = Wrappers.lambdaQuery();
-        lambdaQueryWrapper.eq(RProjectInfo::getPKey, prjctKey);
+        lambdaQueryWrapper.eq(RProjectInfo::getPkey, prjctKey);
         RProjectInfo RProjectInfo = projectInfoService.getOne(lambdaQueryWrapper);
         LambdaQueryWrapper<RedmineUserInfo> lq = Wrappers.lambdaQuery();
         lq.eq(RedmineUserInfo::getRedmineType, RProjectInfo.getRedmineType());

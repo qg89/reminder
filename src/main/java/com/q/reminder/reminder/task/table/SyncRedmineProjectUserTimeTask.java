@@ -66,7 +66,7 @@ public class SyncRedmineProjectUserTimeTask {
         }
         LambdaQueryWrapper<RProjectInfo> lq = Wrappers.lambdaQuery();
         if (json.containsKey("pKey")) {
-            lq.eq(RProjectInfo::getPKey, json.getString("pKey"));
+            lq.eq(RProjectInfo::getPkey, json.getString("pKey"));
         }
         List<RProjectInfo> projectList = projectInfoService.list(lq);
         List<WUserTimes> userTimesData = new ArrayList<>();

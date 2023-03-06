@@ -66,7 +66,7 @@ public abstract class RedmineApi {
             RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, p.getPmKey());
             IssueManager issueManager = mgr.getIssueManager();
             try {
-                issueManager.getIssues(p.getPKey(), null).stream().filter(e -> {
+                issueManager.getIssues(p.getPkey(), null).stream().filter(e -> {
                     Date dueDate = e.getDueDate();
                     boolean filter = dueDate != null && new DateTime().minusDays(expiredDay).isAfter(new DateTime(dueDate)) && StringUtils.isNotBlank(e.getAssigneeName());
                     if (vo.getContainsStatus()) {
@@ -110,7 +110,7 @@ public abstract class RedmineApi {
             RedmineManager mgr = RedmineManagerFactory.createWithApiKey(project.getRedmineUrl(), project.getPmKey());
             Transport transport = mgr.getTransport();
             List<RequestParam> params = List.of(
-                    new RequestParam("project_id", project.getPId()),
+                    new RequestParam("project_id", project.getPid()),
                     new RequestParam("status_id", "*"),
 //                    new RequestParam("assigned_to_id", "*"),
                     new RequestParam("updated_on", DateUtil.today()));
@@ -423,7 +423,7 @@ public abstract class RedmineApi {
      */
     public static List<TimeEntry> queryTimes(RProjectInfo info) throws RedmineException {
         String redmineUrl = info.getRedmineUrl();
-        String url = redmineUrl + "/projects/" + info.getPKey();
+        String url = redmineUrl + "/projects/" + info.getPkey();
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(url, info.getPmKey());
         Transport transport = mgr.getTransport();
         Collection<RequestParam> params = new ArrayList<>();
@@ -456,7 +456,7 @@ public abstract class RedmineApi {
     public static List<TimeEntry> queryUserTime(RProjectInfo info) throws RedmineException {
         String redmineUrl = info.getRedmineUrl();
         String pmKey = info.getPmKey();
-        String url = redmineUrl + "/projects/" + info.getPKey();
+        String url = redmineUrl + "/projects/" + info.getPkey();
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(url, pmKey);
         Transport transport = mgr.getTransport();
         Collection<RequestParam> params = new ArrayList<>();
@@ -468,7 +468,7 @@ public abstract class RedmineApi {
 
     public static Collection<? extends Issue> queryIssues(RProjectInfo info) throws RedmineException {
         String redmineUrl = info.getRedmineUrl();
-        String url = redmineUrl + "/projects/" + info.getPKey();
+        String url = redmineUrl + "/projects/" + info.getPkey();
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(url, info.getPmKey());
         Transport transport = mgr.getTransport();
         Collection<RequestParam> params = new ArrayList<>();

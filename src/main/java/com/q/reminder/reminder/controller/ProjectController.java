@@ -63,7 +63,7 @@ public class ProjectController {
 
     @PostMapping("/e")
     public ReturnT<String> edit(@RequestBody RProjectReaVo info) {
-        projectInfoService.updateById(info);
+        projectInfoService.update(info, Wrappers.<RProjectInfo>lambdaUpdate().eq(RProjectInfo::getPkey, info.getPkey()));
         if (!saveRea(info)) {
             return ReturnT.FAIL;
         }
@@ -84,11 +84,11 @@ public class ProjectController {
     }
 
     private Boolean saveRea(RProjectReaVo vo) {
-        String pId = vo.getPId();
+        String pId = vo.getPid();
         String chatId = vo.getChatId();
         String userId = vo.getUserId();
         String cProjectId = vo.getCProjectId();
-        if (StringUtils.isBlank(pId) || projectInfoService.getById(pId) == null) {
+        if (StringUtils.isBlank(pId) || projectInfoService.getOne(Wrappers.<RProjectInfo>lambdaQuery().eq(RProjectInfo::getPid, pId)) == null) {
             return Boolean.FALSE;
         }
         if (StringUtils.isNotBlank(chatId)) {

@@ -58,7 +58,7 @@ public class WorkloadAnalysisController {
     @GetMapping("/project_option")
     public ReturnT<List<RProjectInfo>> projectOption() {
         LambdaQueryWrapper<RProjectInfo> lq = Wrappers.lambdaQuery();
-        lq.select(RProjectInfo::getId, RProjectInfo::getPName);
+        lq.select(RProjectInfo::getId, RProjectInfo::getPname);
         return new ReturnT<>(projectInfoService.list(lq));
     }
 

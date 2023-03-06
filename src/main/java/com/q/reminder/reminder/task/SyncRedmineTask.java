@@ -68,12 +68,12 @@ public class SyncRedmineTask {
         String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         StringBuilder conten = new StringBuilder();
         projectInfoList.forEach(projectInfo -> {
-            String pKey = projectInfo.getPKey();
-            String pId = projectInfo.getPId();
+            String pKey = projectInfo.getPkey();
+            String pId = projectInfo.getPid();
             String featureToken = projectInfo.getFeatureToken();
             String redmineUrl = projectInfo.getRedmineUrl();
             String pmKey = projectInfo.getPmKey();
-            String pName = projectInfo.getPName();
+            String pName = projectInfo.getPname();
             String redmineType = projectInfo.getRedmineType();
             // 获取各项目中需求管理表中sheetId和sheet名称
             List<SheetVo> sheetList = null;
