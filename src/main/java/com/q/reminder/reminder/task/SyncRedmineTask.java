@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.Client;
+import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.RProjectInfo;
@@ -15,19 +16,16 @@ import com.q.reminder.reminder.service.RedmineUserInfoService;
 import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
-import com.q.reminder.reminder.vo.DefinitionVo;
-import com.q.reminder.reminder.vo.FeatureListVo;
-import com.q.reminder.reminder.vo.RedmineVo;
-import com.q.reminder.reminder.vo.SheetVo;
+import com.q.reminder.reminder.vo.*;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -150,35 +148,52 @@ public class SyncRedmineTask {
             String sendGroupChatId = projectInfo.getSendGroupChatId();
             String productMemberId = projectInfo.getProductMemberId();
             if ("0".equals(isSendGroup) && StringUtils.isNotBlank(sendGroupChatId) && StringUtils.isNotBlank(productMemberId) && !CollectionUtils.isEmpty(redmineVos)) {
-                JSONObject content = new JSONObject();
-                JSONObject all = new JSONObject();
-                all.put("title", "新增需求如下:");
-                JSONArray contentJsonArray = new JSONArray();
-                JSONArray subContentJsonArray = new JSONArray();
-                JSONObject at = new JSONObject();
-                at.put("tag", "at");
-                at.put("user_id", productMemberId);
-                at.put("user_name", definition.getProduct());
-                subContentJsonArray.add(at);
-
-                for (RedmineVo redmineVo : redmineVos) {
-                    JSONObject a = new JSONObject();
-                    a.put("tag", "a");
-                    a.put("href", redmineUrl + "/issues/" + redmineVo.getRedmineId());
-                    a.put("text", "\r\n" + redmineVo.getSubject());
-                    subContentJsonArray.add(a);
-                }
-
-                contentJsonArray.add(subContentJsonArray);
-                all.put("content", contentJsonArray);
-                content.put("zh_cn", all);
+                JSONObject content = getJsonObject(redmineUrl, definition, redmineVos, productMemberId);
                 try {
-                    FeiShuApi.sendGroupByChats(sendGroupChatId, content.toJSONString(), secret);
-                } catch (IOException e) {
+                    MessageVo vo = new MessageVo();
+                    vo.setContent(content.toJSONString());
+                    vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.CHAT_ID);
+                    vo.setReceiveId(sendGroupChatId);
+                    vo.setMsgType("post");
+                    BaseFeishu.message(client).sendContent(vo);
+                } catch (Exception e) {
                     FeiShuApi.sendAdmin(adminInfoList, "发送飞书需求群异常!", secret);
                 }
             }
         });
         return r;
+    }
+
+    /**
+     * 组装发送群消息
+     * @param redmineUrl
+     * @param definition
+     * @param redmineVos
+     * @param productMemberId
+     * @return
+     */
+    @NotNull
+    private static JSONObject getJsonObject(String redmineUrl, DefinitionVo definition, List<RedmineVo> redmineVos, String productMemberId) {
+        JSONObject content = new JSONObject();
+        JSONObject all = new JSONObject();
+        all.put("title", "新增需求如下:");
+        JSONArray contentJsonArray = new JSONArray();
+        JSONArray subContentJsonArray = new JSONArray();
+        JSONObject at = new JSONObject();
+        at.put("tag", "at");
+        at.put("user_id", productMemberId);
+        at.put("user_name", definition.getProduct());
+        subContentJsonArray.add(at);
+        for (RedmineVo redmineVo : redmineVos) {
+            JSONObject a = new JSONObject();
+            a.put("tag", "a");
+            a.put("href", redmineUrl + "/issues/" + redmineVo.getRedmineId());
+            a.put("text", "\r\n" + redmineVo.getSubject());
+            subContentJsonArray.add(a);
+        }
+        contentJsonArray.add(subContentJsonArray);
+        all.put("content", contentJsonArray);
+        content.put("zh_cn", all);
+        return content;
     }
 }

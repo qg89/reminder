@@ -4,6 +4,8 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.lark.oapi.Client;
+import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
@@ -15,6 +17,8 @@ import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
+import com.q.reminder.reminder.util.feishu.BaseFeishu;
+import com.q.reminder.reminder.vo.MessageVo;
 import com.q.reminder.reminder.vo.QueryVo;
 import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.SendUserByGroupVo;
@@ -24,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -50,6 +53,8 @@ public class OverdueTasksAgainToGroupBase {
     private AdminInfoService adminInfoService;
     @Autowired
     private FeishuProperties feishuProperties;
+    @Autowired
+    private Client client;
 
     /**
      * 无任务提醒
@@ -138,8 +143,13 @@ public class OverdueTasksAgainToGroupBase {
             all.put("content", contentJsonArray);
             content.put("zh_cn", all);
             try {
-                FeiShuApi.sendGroupByChats(map.getKey(), content.toJSONString(), secret);
-            } catch (IOException ex) {
+                MessageVo m = new MessageVo();
+                m.setReceiveId(map.getKey());
+                m.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.CHAT_ID);
+                m.setContent(content.toJSONString());
+                m.setMsgType("post");
+                BaseFeishu.message(client).sendContent(m);
+            } catch (Exception ex) {
                 FeiShuApi.sendAdmin(adminInfoList, "过期任务提醒群组,发送异常", secret);
             }
         }

@@ -109,6 +109,7 @@ public abstract class FeiShuApi {
      * @param security
      * @throws IOException
      */
+    @Deprecated
     public static void sendGroupByChats(String chatId, String content, String security) throws IOException {
         JSONObject paramsJson = new JSONObject();
         paramsJson.put("receive_id", chatId);
