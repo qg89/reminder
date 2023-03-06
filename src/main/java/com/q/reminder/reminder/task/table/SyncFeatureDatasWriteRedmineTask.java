@@ -98,7 +98,9 @@ public class SyncFeatureDatasWriteRedmineTask {
             String dscrptn = featureTmp.getDscrptn();
             Float prdct = featureTmp.getPrdct();
             LocalDate prodTime = featureTmp.getProdTime();
+            String featureType = featureTmp.getFeatureType();
 
+            boolean ftrTyp = "非功能".equals(featureType);
 
             TTableUserConfig config = userConfigMap.get(prjctKey);
             RProjectInfo RProjectInfo = projectMap.get(config.getPId().toString());
@@ -133,8 +135,10 @@ public class SyncFeatureDatasWriteRedmineTask {
             }
             issue.setSpentHours(prdct);
             issue.setProjectId(pId);
-
             issue.setTracker(FEATURE_TRACKER);
+            if (ftrTyp) {
+                issue.setTracker(DEV_TRACKER);
+            }
             List<CustomField> customFields = new ArrayList<>(CUSTOM_FIELD_LIST);
             customFields.add(new CustomField().setName(CustomFieldsEnum.FEATURE_ID.getName()).setId(CustomFieldsEnum.FEATURE_ID.getId()).setValue(recordsId));
             issue.addCustomFields(customFields);
@@ -150,11 +154,11 @@ public class SyncFeatureDatasWriteRedmineTask {
                 featureTmp.setWriteRedmine("2");
             }
 
-            if (!createSubIssue(parentIssue, featureTmp, config, transport, customFields)) {
+            if (!createSubIssue(parentIssue, featureTmp, config, transport, customFields, ftrTyp)) {
                 featureTmp.setWriteRedmine("3");
             }
             tTableFeatureTmpService.updateById(featureTmp);
-            if ("1".equals(featureTmp.getWriteRedmine())){
+            if ("1".equals(featureTmp.getWriteRedmine())) {
                 records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(Map.of("需求ID", recordsId)).build());
             }
         }
@@ -182,16 +186,19 @@ public class SyncFeatureDatasWriteRedmineTask {
      * @param config
      * @param transport
      * @param customFields
+     * @param ftrTyp
      * @throws RedmineException
      */
-    private boolean createSubIssue(Issue parentIssue, TTableFeatureTmp featureTmp, TTableUserConfig config, Transport transport, List<CustomField> customFields) throws RedmineException {
+    private boolean createSubIssue(Issue parentIssue, TTableFeatureTmp featureTmp, TTableUserConfig config, Transport transport, List<CustomField> customFields, boolean ftrTyp) throws RedmineException {
         boolean createSubIssue = true;
         Integer issueId = parentIssue.getId();
         Issue issue = new Issue();
         issue.addCustomFields(customFields);
         issue.setDescription(parentIssue.getDescription());
         issue.setProjectId(parentIssue.getProjectId());
-        issue.setParentId(issueId);
+        if (!ftrTyp) {
+            issue.setParentId(issueId);
+        }
         issue.setTransport(transport);
         issue.setDueDate(dueDate);
         Float front = featureTmp.getFront();
