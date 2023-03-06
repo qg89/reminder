@@ -94,7 +94,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
                 "weeklyType", radios,
                 "wikiType", radios,
                 "redmineType", List.of(Map.of("1", "旧"), Map.of("2", "新")),
-                "isDelete", radios
+                "isDelete", List.of(Map.of("1", "是"), Map.of("0", "否"))
         );
     }
 
