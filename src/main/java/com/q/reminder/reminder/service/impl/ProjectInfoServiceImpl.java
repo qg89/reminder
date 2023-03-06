@@ -32,11 +32,13 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     }
 
     @Override
-    public List<ProjectInfoVo> listToArray(List<RProjectInfo> list) {
-        List<ProjectInfoVo> res = new ArrayList<>();
+    public List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list) {
+        List<List<ProjectInfoVo>> resDate = new ArrayList<>();
+        List<String> removeColumn = List.of("id", "updateTime", "createTime");
         list.forEach(info -> {
+            List<ProjectInfoVo> res = new ArrayList<>();
             BeanUtil.beanToMap(info).forEach((k, v) -> {
-                if ("id".equals(k)) {
+                if (removeColumn.contains(k)) {
                     return;
                 }
                 ProjectInfoVo vo = new ProjectInfoVo();
@@ -59,8 +61,9 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
                 }
                 res.add(vo);
             });
+            resDate.add(res);
         });
-        return res;
+        return resDate;
     }
 
     private Map<String, Object> radio() {

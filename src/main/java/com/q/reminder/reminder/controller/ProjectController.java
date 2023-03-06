@@ -44,11 +44,11 @@ public class ProjectController {
     private UserMemberService userMemberService;
 
     @GetMapping("/i")
-    public ReturnT<List<ProjectInfoVo>> list() {
+    public ReturnT<List<List<ProjectInfoVo>>> list() {
         LambdaQueryWrapper<RProjectInfo> lq = Wrappers.lambdaQuery();
         lq.orderByDesc(RProjectInfo::getUpdateTime);
         List<RProjectInfo> list = projectInfoService.list(lq);
-        List<ProjectInfoVo> res = projectInfoService.listToArray(list);
+        List<List<ProjectInfoVo>> res = projectInfoService.listToArray(list);
         return new ReturnT<>(res);
     }
 
