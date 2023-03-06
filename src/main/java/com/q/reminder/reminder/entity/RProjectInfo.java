@@ -16,13 +16,13 @@ import java.util.Date;
  * redmine 项目表(RProjectInfo)实体类
  *
  * @author makejava
- * @since 2023-03-06 10:26:22
+ * @since 2023-03-06 10:45:31
  */
 @Data
 @TableName("r_project_info")
 public class RProjectInfo extends Model<RProjectInfo> implements Serializable {
     @Serial
-    private static final long serialVersionUID = 360205437127741498L;
+    private static final long serialVersionUID = -81733391617223332L;
     
         
     @TableId(type = IdType.AUTO)
@@ -98,6 +98,11 @@ public class RProjectInfo extends Model<RProjectInfo> implements Serializable {
      */     
      @TableField(value = "folder_token")
      private String folderToken;
+    /**
+     * 项目周报是否复制：0复制，1不复制
+     */     
+     @TableField(value = "weekly_copy_type")
+     private String weeklyCopyType;
     /**
      * 项目周报类型：0生成，1不生成
      */     

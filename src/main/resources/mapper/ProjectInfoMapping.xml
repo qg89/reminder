@@ -22,6 +22,7 @@
             fw.file_token IS NOT NULL
             AND fw.is_delete = 0
             AND p.is_delete = 0
+            AND p.weekly_type = 0
         <choose>
             <when test="weekNumber > 0">
                 AND fw.week_num = #{weekNumber}
