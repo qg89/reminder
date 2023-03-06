@@ -99,7 +99,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     }
 
     private Map<String, String> map() {
-        Map<String, String> resMap = new HashMap<>();
+        Map<String, String> resMap = new LinkedHashMap<>();
         resMap.put("pId", "redmine项目ID");
         resMap.put("pKey", "redmine项目key");
         resMap.put("pName", "redmine项目名称");
