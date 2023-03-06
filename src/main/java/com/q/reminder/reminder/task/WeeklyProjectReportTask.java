@@ -55,6 +55,7 @@ public class WeeklyProjectReportTask {
         vo.setFileToken(getFileToken());
         LambdaQueryWrapper<RProjectInfo> wrapper = Wrappers.lambdaQuery();
         wrapper.isNotNull(RProjectInfo::getFolderToken).isNotNull(RProjectInfo::getProjectShortName).isNotNull(RProjectInfo::getPmKey);
+        wrapper.eq(RProjectInfo::getWeeklyType, "0");
         if (StringUtils.isNotBlank(jobParam)) {
             wrapper.eq(RProjectInfo::getId, jobParam);
         }

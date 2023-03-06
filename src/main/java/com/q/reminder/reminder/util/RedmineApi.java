@@ -455,8 +455,9 @@ public abstract class RedmineApi {
      */
     public static List<TimeEntry> queryUserTime(RProjectInfo info) throws RedmineException {
         String redmineUrl = info.getRedmineUrl();
+        String pmKey = info.getPmKey();
         String url = redmineUrl + "/projects/" + info.getPKey();
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(url, info.getPmKey());
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(url, pmKey);
         Transport transport = mgr.getTransport();
         Collection<RequestParam> params = new ArrayList<>();
         params.add(new RequestParam("f[]", "spent_on"));
