@@ -78,6 +78,11 @@ public class ProjectController {
         return ReturnT.SUCCESS;
     }
 
+    @GetMapping("/info")
+    public ReturnT<List<ProjectInfoVo>> info() {
+        return new ReturnT<>(projectInfoService.listInfo());
+    }
+
     private Boolean saveRea(RProjectReaVo vo) {
         String pId = vo.getPId();
         String chatId = vo.getChatId();

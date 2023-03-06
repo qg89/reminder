@@ -43,31 +43,47 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
                 }
                 ProjectInfoVo vo = new ProjectInfoVo();
                 vo.setValue(v);
-                vo.setKey(k);
-                vo.setLabel(map().get(k));
-                vo.setColumnType("input");
-                Object radio = radio().get(k);
-                if (!Objects.equals(radio, null)) {
-                    vo.setColumnType("radio");
-                    vo.setColumnDesc(radio);
-                }
-                if ("productMemberId".equals(k) || "pmOu".equals(k)) {
-                    vo.setColumnType("api");
-                    vo.setColumnDesc(Map.of("url", "/p/member", "method", "GET", "return", "array"));
-                }
-                if ("sendGroupChatId".equals(k)) {
-                    vo.setColumnType("api");
-                    vo.setColumnDesc(Map.of("url", "/p/group", "method", "GET", "return", "array"));
-                }
-                if ("startDay".equals(k)) {
-                    vo.setColumnType("date");
-                }
+                extracted(k, vo);
                 res.add(vo);
             });
             resDate.add(res);
         });
         return resDate;
     }
+
+    private void extracted(String k, ProjectInfoVo vo) {
+        vo.setKey(k);
+        vo.setLabel(map().get(k));
+        vo.setColumnType("input");
+        Object radio = radio().get(k);
+        if (!Objects.equals(radio, null)) {
+            vo.setColumnType("radio");
+            vo.setColumnDesc(radio);
+        }
+        if ("productMemberId".equals(k) || "pmOu".equals(k)) {
+            vo.setColumnType("api");
+            vo.setColumnDesc(Map.of("url", "/p/member", "method", "GET", "return", "array"));
+        }
+        if ("sendGroupChatId".equals(k)) {
+            vo.setColumnType("api");
+            vo.setColumnDesc(Map.of("url", "/p/group", "method", "GET", "return", "array"));
+        }
+        if ("startDay".equals(k)) {
+            vo.setColumnType("date");
+        }
+    }
+
+    @Override
+    public List<ProjectInfoVo> listInfo() {
+        List<ProjectInfoVo> res = new ArrayList<>();
+        map().forEach((k, v) -> {
+            ProjectInfoVo vo = new ProjectInfoVo();
+            extracted(k, vo);
+            res.add(vo);
+        });
+        return res;
+    }
+
 
     private Map<String, Object> radio() {
         List<Map<String, String>> radios = List.of(Map.of("0", "是"), Map.of("1", "否"));

@@ -7,6 +7,7 @@ import com.q.reminder.reminder.vo.WeeklyByProjectVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author : saiko
@@ -21,4 +22,6 @@ public interface ProjectInfoService extends IService<RProjectInfo> {
     List<WeeklyByProjectVo> weeklyByProjectList(String pKey, String name);
 
     List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list);
+
+    List<ProjectInfoVo> listInfo();
 }
