@@ -74,7 +74,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
                 "weeklyCopyType", radios,
                 "weeklyType", radios,
                 "wikiType", radios,
-                "redmineType", radios,
+                "redmineType", List.of(Map.of("1", "旧"), Map.of("2", "新")),
                 "isDelete", radios
         );
     }
@@ -86,16 +86,16 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         resMap.put("pName", "redmine项目名称");
         resMap.put("featureToken", "需求管理表token");
         resMap.put("syncFeature", "同步需求管理表");
-        resMap.put("projectShort", "项目短名称");
+        resMap.put("projectShortName", "项目短名称");
         resMap.put("pmOu", "项目经理");
         resMap.put("pmKey", "项目经理redminekey");
         resMap.put("redmineUrl", "redmineURL");
         resMap.put("startDay", "项目开始时间");
-        resMap.put("sendGroupChat", "项目需求群");
+        resMap.put("sendGroupChatId", "项目需求群");
         resMap.put("isSendGroup", "是否发送需求群");
-        resMap.put("productMember_", "产品经理");
+        resMap.put("productMemberId", "产品经理");
         resMap.put("folderToken", "项目周报文件夹token");
-        resMap.put("weeklyCopyTyp", "项目周报是否复制");
+        resMap.put("weeklyCopyType", "项目周报是否复制");
         resMap.put("weeklyType", "项目周报类型是否自动生成");
         resMap.put("wikiType", "是否自动复制标准过程表");
         resMap.put("wikiToken", "知识库token");
