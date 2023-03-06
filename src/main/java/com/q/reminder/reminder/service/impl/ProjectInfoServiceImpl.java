@@ -83,7 +83,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         resMap.put("pName", "redmine项目名称");
         resMap.put("featureToken", "需求管理表token");
         resMap.put("syncFeature", "同步需求管理表");
-        resMap.put("projectShort_n", "项目短名称");
+        resMap.put("projectShort", "项目短名称");
         resMap.put("pmOu", "项目经理Open_Id");
         resMap.put("pmKey", "项目经理redminekey");
         resMap.put("redmineUrl", "redmineURL");
@@ -93,7 +93,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         resMap.put("productMember_", "产品经理飞书ID");
         resMap.put("folderToken", "项目周报文件夹token");
         resMap.put("weeklyCopyTyp", "项目周报是否复制");
-        resMap.put("weeklyType", "项目周报类型");
+        resMap.put("weeklyType", "项目周报类型是否自动生成");
         resMap.put("wikiType", "生成状态");
         resMap.put("wikiToken", "知识库token");
         resMap.put("redmineType", "redmine类型");
