@@ -79,7 +79,7 @@ public class TableFeatureController {
     }
 
     private JSONObject json(String str) {
-        JSONObject jsonKey = jsonKey();
+        JSONObject jsonKey = JSONObject.parseObject(str);
         jsonKey.forEach((k, v) -> {
             String s = str.substring(str.indexOf(k) + k.length());
             String value = StrUtil.subBetween(s, JsonCharsConstant.CHARS_JSON);
@@ -112,6 +112,7 @@ public class TableFeatureController {
         jsonKey.put("featureId", "");
         jsonKey.put("dscrptn", "");
         jsonKey.put("writeType", "");
+        jsonKey.put("featureType", "");
         return jsonKey;
     }
 }
