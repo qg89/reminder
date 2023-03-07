@@ -2,6 +2,7 @@ package com.q.reminder.reminder.config;
 
 import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.Tracker;
+import com.taskadapter.redmineapi.internal.RequestParam;
 
 import java.util.List;
 
@@ -20,13 +21,16 @@ public class RedmineConfig {
     public static List<CustomField> CUSTOM_FIELDS;
 
     private static CustomField CUSTOM_FIELD = new CustomField();
+    private static String FILTER;
 
     public static RedmineConfig type(String type) {
         if ("1".equals(type)) {
             oldRedmine();
+            FILTER = "cf_5";
         }
         if ("2".equals(type)) {
             newRedmine();
+            FILTER = "cf_226";
         }
         return new RedmineConfig();
     }
@@ -68,5 +72,11 @@ public class RedmineConfig {
 
     public CustomField setCustomValue(String value) {
         return CUSTOM_FIELD.setValue(value);
+    }
+
+    public static List<RequestParam> issue(String value) {
+        return List.of(new RequestParam("f[]", FILTER),
+                new RequestParam("op[" + FILTER + "]", "~"),
+                new RequestParam("v[" + FILTER + "][]", value));
     }
 }

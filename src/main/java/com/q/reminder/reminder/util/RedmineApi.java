@@ -2,6 +2,7 @@ package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.q.reminder.reminder.config.RedmineConfig;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.vo.*;
@@ -49,6 +50,21 @@ public abstract class RedmineApi {
         Issue issueById = issueManager.getIssueById(2633);
         PropertyStorage storage = issueById.getStorage();
         System.out.println(storage.getProperties());
+    }
+
+    public static boolean checkIssue(Transport transport, String redmineSubject) {
+        List<RequestParam> params = RedmineConfig.issue(redmineSubject);
+        List<Issue> issueList;
+        try {
+            issueList = transport.getObjectsList(Issue.class, params);
+        } catch (RedmineException e) {
+            log.error("Redmine-[检查是否有redmine任务] 异常 ", e);
+            return false;
+        }
+        if (CollectionUtils.isEmpty(issueList)) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -310,7 +326,7 @@ public abstract class RedmineApi {
      * @param redmineSubject
      * @return
      */
-    public static boolean checkRedmineTask(Transport transport, String redmineSubject) {
+    private static boolean checkRedmineTask(Transport transport, String redmineSubject) {
         List<RequestParam> params = List.of(new RequestParam("f[]", "subject"),
                 new RequestParam("op[subject]", "~"),
                 new RequestParam("v[subject][]", redmineSubject));

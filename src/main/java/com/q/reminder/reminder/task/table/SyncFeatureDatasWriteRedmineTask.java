@@ -97,11 +97,11 @@ public class SyncFeatureDatasWriteRedmineTask {
             Integer pId = Integer.valueOf(RProjectInfo.getPid());
 
             Transport transport = RedmineApi.getTransportByProject(RProjectInfo);
-            if (RedmineApi.checkRedmineTask(transport, recordsId)) {
+            if (RedmineApi.checkIssue(transport, recordsId)) {
                 continue;
             }
             StringBuilder subject = new StringBuilder();
-            subject.append("需求ID：").append("[").append(recordsId).append("]");
+//            subject.append("需求ID：").append("[").append(recordsId).append("]");
             if (StringUtils.isNotBlank(mdl)) {
                 subject.append("-").append("模块：").append(mdl);
             }
