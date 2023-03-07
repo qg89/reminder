@@ -101,18 +101,21 @@ public class SyncFeatureDatasWriteRedmineTask {
                 continue;
             }
             StringBuilder subject = new StringBuilder();
-//            subject.append("需求ID：").append("[").append(recordsId).append("]");
             if (StringUtils.isNotBlank(mdl)) {
-                subject.append("-").append("模块：").append(mdl);
+                subject.append("模块：").append(mdl).append("-");
             }
             if (StringUtils.isNotBlank(menuOne)) {
-                subject.append("-").append("一级：").append(menuOne);
+                subject.append("一级：").append(menuOne).append("-");
             }
             if (StringUtils.isNotBlank(menuTwo)) {
-                subject.append("-").append("二级：").append(menuTwo);
+                subject.append("二级：").append(menuTwo).append("-");
             }
             if (StringUtils.isNotBlank(menuThree)) {
-                subject.append("-").append("三级：").append(menuThree);
+                subject.append("三级：").append(menuThree);
+            }
+            int lastChar = subject.lastIndexOf("-");
+            if (lastChar == subject.length() - 1) {
+                subject.deleteCharAt(lastChar);
             }
             Issue issue = new Issue();
             issue.setSubject(subject.toString());
@@ -125,28 +128,31 @@ public class SyncFeatureDatasWriteRedmineTask {
             }
             issue.setSpentHours(prdct);
             issue.setProjectId(pId);
-            issue.setTracker(RedmineConfig.FEATURE_TRACKER);
-            if (ftrTyp) {
-                issue.setTracker(RedmineConfig.DEV_TRACKER);
-            }
             CustomField customField = type.setCustomValue(recordsId);
-//            List<CustomField> customFields = new ArrayList<>(RedmineConfig.CUSTOM_FIELDS);
-//            customFields.add(new CustomField().setName(CustomFieldsEnum.FEATURE_ID.getName()).setId(CustomFieldsEnum.FEATURE_ID.getId()).setValue(recordsId));
             List<CustomField> customFieldList = new ArrayList<>(RedmineConfig.CUSTOM_FIELDS);
             customFieldList.add(customField);
             issue.addCustomFields(customFieldList);
             Issue parentIssue = new Issue();
-            try {
-                parentIssue = RedmineApi.createIssue(issue, transport);
-            } catch (RedmineProcessingException e) {
-                List<String> errors = e.getErrors();
-                log.error("[多维表格-创建redmine任务]父任务异常：{}", errors);
-            }
-            featureTmp.setWriteRedmine("1");
-            if (parentIssue.getId() == null) {
-                featureTmp.setWriteRedmine("2");
-            } else if (!createSubIssue(parentIssue, featureTmp, config, transport, customFieldList, ftrTyp)) {
-                featureTmp.setWriteRedmine("3");
+            if (ftrTyp) {
+                issue.setStatusId(1).setCreatedOn(new Date());
+                issue.setTracker(RedmineConfig.DEV_TRACKER);
+                if (!createSubIssue(issue, featureTmp, config, transport, customFieldList, ftrTyp)) {
+                    featureTmp.setWriteRedmine("3");
+                }
+            } else {
+                issue.setTracker(RedmineConfig.FEATURE_TRACKER);
+                try {
+                    parentIssue = RedmineApi.createIssue(issue, transport);
+                } catch (RedmineProcessingException e) {
+                    List<String> errors = e.getErrors();
+                    log.error("[多维表格-创建redmine任务]父任务异常：{}", errors);
+                }
+                featureTmp.setWriteRedmine("1");
+                if (parentIssue.getId() == null) {
+                    featureTmp.setWriteRedmine("2");
+                } else if (!createSubIssue(parentIssue, featureTmp, config, transport, customFieldList, ftrTyp)) {
+                    featureTmp.setWriteRedmine("3");
+                }
             }
 
             tTableFeatureTmpService.updateById(featureTmp);
