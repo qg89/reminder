@@ -34,7 +34,7 @@ public class SyncTimeEntryTask {
 
     @XxlJob("syncTimeEntryTask")
     public void SyncTimeEntryTask() {
-        List<RProjectInfo> projectList = projectInfoService.list();
+        List<RProjectInfo> projectList = projectInfoService.listAll();
         List<TimeEntry> timeData = new ArrayList<>();
         projectList.forEach(projectInfo -> {
             projectInfo.setStartDay(DateUtil.beginOfWeek(DateTime.now().minusWeeks(1).toDate()));
