@@ -3,7 +3,7 @@ package com.q.reminder.reminder.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.jeffreyning.mybatisplus.service.MppServiceImpl;
-import com.q.reminder.reminder.constant.RedisKeyRedmine;
+import com.q.reminder.reminder.constant.RedisKeyContents;
 import com.q.reminder.reminder.entity.RedmineUserInfo;
 import com.q.reminder.reminder.mapper.RedmineUserInfoMapping;
 import com.q.reminder.reminder.service.RedmineUserInfoService;
@@ -44,7 +44,7 @@ public class RedmineUserInfoServiceImpl extends MppServiceImpl<RedmineUserInfoMa
     }
 
     @Override
-    @Cacheable(cacheNames = RedisKeyRedmine.REDMINE_USERINFO_REDMINE_TYPE, key = "#redmineType")
+    @Cacheable(cacheNames = RedisKeyContents.REDMINE_USERINFO_REDMINE_TYPE, key = "#redmineType")
     public List<RedmineUserInfo> listUsers(String redmineType) {
         LambdaQueryWrapper<RedmineUserInfo> lq = Wrappers.lambdaQuery();
         lq.eq(RedmineUserInfo::getRedmineType, redmineType);
@@ -52,13 +52,13 @@ public class RedmineUserInfoServiceImpl extends MppServiceImpl<RedmineUserInfoMa
     }
 
     @Override
-    @Cacheable(cacheNames = RedisKeyRedmine.REDMINE_USERINFO_REDMINE_ALL)
+    @Cacheable(cacheNames = RedisKeyContents.REDMINE_USERINFO_REDMINE_ALL)
     public List<RedmineUserInfo> listUserAll() {
         return list(Wrappers.<RedmineUserInfo>lambdaQuery().isNotNull(RedmineUserInfo::getAssigneeName));
     }
 
     @Override
-    @CacheEvict(cacheNames = RedisKeyRedmine.REDMINE_USERINFO_REDMINE_ALL, allEntries = true)
+    @CacheEvict(cacheNames = RedisKeyContents.REDMINE_USERINFO_REDMINE_ALL, allEntries = true)
     public void saveOrupdateMultiIdAll(List<RedmineUserInfo> data) {
         saveOrUpdateBatchByMultiId(data);
     }
