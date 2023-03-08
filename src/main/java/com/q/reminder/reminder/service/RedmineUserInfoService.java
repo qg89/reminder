@@ -20,4 +20,10 @@ public interface RedmineUserInfoService extends IMppService<RedmineUserInfo> {
     List<RoleInvolvementVo> residualWorkload(WorkloadParamsVo paramsVo);
 
     List<RoleInvolvementVo> groupUserWorkload(WorkloadParamsVo paramsVo);
+
+    List<RedmineUserInfo> listUsers(String redmineType);
+
+    List<RedmineUserInfo> listUserAll();
+
+    void saveOrupdateMultiIdAll(List<RedmineUserInfo> data);
 }

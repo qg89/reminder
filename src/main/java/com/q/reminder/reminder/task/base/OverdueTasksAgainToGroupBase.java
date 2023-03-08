@@ -2,8 +2,6 @@ package com.q.reminder.reminder.task.base;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.Client;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.config.FeishuProperties;
@@ -80,9 +78,7 @@ public class OverdueTasksAgainToGroupBase {
         String redminderType = vo.getRedminderType();
         String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         // 组装数据， 通过人员，获取要发送的内容
-        LambdaQueryWrapper<RProjectInfo> lambdaQueryWrapper = Wrappers.<RProjectInfo>lambdaQuery();
-        lambdaQueryWrapper.isNotNull(RProjectInfo::getPmKey);
-        List<RProjectInfo> RProjectInfoList = projectInfoService.list(lambdaQueryWrapper);
+        List<RProjectInfo> RProjectInfoList = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();
         List<RedmineVo> issueUserList = RedmineApi.queryUserByExpiredDayList(vo, RProjectInfoList);
 
         // 保存历史记录

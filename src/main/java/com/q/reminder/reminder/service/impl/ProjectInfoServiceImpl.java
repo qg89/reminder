@@ -1,13 +1,19 @@
 package com.q.reminder.reminder.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.q.reminder.reminder.constant.RedisKeyRedmine;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.mapper.ProjectInfoMapping;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.vo.ProjectInfoVo;
+import com.q.reminder.reminder.vo.RProjectReaVo;
 import com.q.reminder.reminder.vo.WeeklyByProjectVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -82,6 +88,26 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             res.add(vo);
         });
         return res;
+    }
+
+    @Override
+    @Cacheable(cacheNames = RedisKeyRedmine.REDMINE_PROJECT_ALL)
+    public List<RProjectInfo> listAll() {
+        return list();
+    }
+
+    @Override
+    @CacheEvict(cacheNames = RedisKeyRedmine.REDMINE_PROJECT_ALL)
+    public void updateInfo(RProjectReaVo info) {
+        update(info, Wrappers.<RProjectInfo>lambdaUpdate().eq(RProjectInfo::getPkey, info.getPkey()));
+    }
+
+    @Override
+    @Cacheable(cacheNames = RedisKeyRedmine.REDMINE_PROJECT_KEY, key = "#prjctKey")
+    public RProjectInfo projectInfoByPrjctKey(String prjctKey) {
+        LambdaQueryWrapper<RProjectInfo> lambdaQueryWrapper = Wrappers.lambdaQuery();
+        lambdaQueryWrapper.eq(RProjectInfo::getPkey, prjctKey);
+        return getOne(lambdaQueryWrapper);
     }
 
 

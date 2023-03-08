@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -47,7 +48,7 @@ public class TableFeatureController {
     public void records(@RequestBody String entity) {
         JSONObject json = json(entity);
         TTableFeatureTmp featureTmp = json.to(TTableFeatureTmp.class);
-        Map<String, String> userConfigMap = tTableUserConfigService.list().stream().collect(Collectors.toMap(TTableUserConfig::getPrjctName, TTableUserConfig::getPrjctKey));
+        Map<String, String> userConfigMap = tTableUserConfigService.listAll().stream().collect(Collectors.toMap(TTableUserConfig::getPrjctName, TTableUserConfig::getPrjctKey));
         String prjct = featureTmp.getPrjct();
         featureTmp.setPrjctKey(userConfigMap.get(prjct));
         tTableFeatureTmpService.saveOrUpdate(featureTmp);
@@ -56,12 +57,11 @@ public class TableFeatureController {
     @PostMapping("/user_config")
     public void userConfig(@RequestBody FeatureUserConfigVo vo) {
         String prjctKey = vo.getPrjctKey();
-        LambdaQueryWrapper<RProjectInfo> lambdaQueryWrapper = Wrappers.lambdaQuery();
-        lambdaQueryWrapper.eq(RProjectInfo::getPkey, prjctKey);
-        RProjectInfo RProjectInfo = projectInfoService.getOne(lambdaQueryWrapper);
+        RProjectInfo RProjectInfo = projectInfoService.projectInfoByPrjctKey(prjctKey);
         LambdaQueryWrapper<RedmineUserInfo> lq = Wrappers.lambdaQuery();
         lq.eq(RedmineUserInfo::getRedmineType, RProjectInfo.getRedmineType());
-        Map<String, Integer> userMap = redmineUserInfoService.list(lq).stream().collect(Collectors.toMap(RedmineUserInfo::getAssigneeName, RedmineUserInfo::getAssigneeId));
+        List<RedmineUserInfo> userInfoList = redmineUserInfoService.listUsers(RProjectInfo.getRedmineType());
+        Map<String, Integer> userMap = userInfoList.stream().collect(Collectors.toMap(RedmineUserInfo::getAssigneeName, RedmineUserInfo::getAssigneeId));
         TTableUserConfig entity = new TTableUserConfig();
         entity.setPrdctId(userMap.get(vo.getPrdct()));
         entity.setAlgrthmId(userMap.get(vo.getAlgrthm()));
@@ -75,7 +75,7 @@ public class TableFeatureController {
         entity.setPId(RProjectInfo.getId());
         entity.setArchtctId(userMap.get(vo.getArchtct()));
         entity.setPrjctKey(prjctKey);
-        tTableUserConfigService.saveOrUpdate(entity);
+        tTableUserConfigService.saveInfo(entity);
     }
 
     private JSONObject json(String str) {

@@ -36,7 +36,7 @@ public class SyncIssueTask {
     @XxlJob("syncIssueTask")
     public void syncIssueTask() {
         List<Issue> issueData = new ArrayList<>();
-        List<RProjectInfo> projectList = projectInfoService.list();
+        List<RProjectInfo> projectList = projectInfoService.listAll();
         projectList.forEach(projectInfo -> {
             projectInfo.setStartDay(DateUtil.beginOfWeek(DateTime.now().minusWeeks(1).toDate()));
             try {

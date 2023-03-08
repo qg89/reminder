@@ -3,11 +3,11 @@ package com.q.reminder.reminder.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.vo.ProjectInfoVo;
+import com.q.reminder.reminder.vo.RProjectReaVo;
 import com.q.reminder.reminder.vo.WeeklyByProjectVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author : saiko
@@ -24,4 +24,10 @@ public interface ProjectInfoService extends IService<RProjectInfo> {
     List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list);
 
     List<ProjectInfoVo> listInfo();
+
+    List<RProjectInfo> listAll();
+
+    void updateInfo(RProjectReaVo info);
+
+    RProjectInfo projectInfoByPrjctKey(String prjctKey);
 }

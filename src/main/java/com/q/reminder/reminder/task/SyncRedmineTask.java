@@ -3,7 +3,6 @@ package com.q.reminder.reminder.task;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.Client;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.config.FeishuProperties;
@@ -63,7 +62,8 @@ public class SyncRedmineTask {
         lq.isNotNull(RProjectInfo::getPmKey);
         lq.eq(RProjectInfo::getSyncFeature, "0");
         List<RProjectInfo> projectInfoList = projectInfoService.list(lq);
-        Map<String, Integer> redmineUserMap = redmineUserInfoService.list(Wrappers.<RedmineUserInfo>lambdaQuery().isNotNull(RedmineUserInfo::getAssigneeName)).stream().collect(Collectors.toMap(e -> e.getAssigneeName().replace(" ", "") + "-" + e.getRedmineType(), RedmineUserInfo::getAssigneeId, (v1, v2) -> v1));
+        List<RedmineUserInfo> redmineUserInfos = redmineUserInfoService.listUserAll();
+        Map<String, Integer> redmineUserMap = redmineUserInfos.stream().collect(Collectors.toMap(e -> e.getAssigneeName().replace(" ", "") + "-" + e.getRedmineType(), RedmineUserInfo::getAssigneeId, (v1, v2) -> v1));
         List<AdminInfo> adminInfoList = adminInfoService.list();
         String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         StringBuilder conten = new StringBuilder();

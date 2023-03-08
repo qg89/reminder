@@ -34,7 +34,7 @@ public class SyncRedmineUserTask {
     @XxlJob("syncRedmineUserTask")
     public void syncRedmineUserTask() throws RedmineException {
         List<RedmineUserInfo> data = new ArrayList<>();
-        for (RProjectInfo info : projectInfoService.list()) {
+        for (RProjectInfo info : projectInfoService.listAll()) {
              RedmineApi.queryUserTime(info).stream().collect(Collectors.toMap(TimeEntry::getUserId, TimeEntry::getUserName, (v1, v2) -> v1)).forEach((userId, userName) -> {
                  RedmineUserInfo userInfo = new RedmineUserInfo();
                  userInfo.setRedmineType(info.getRedmineType());
@@ -44,6 +44,6 @@ public class SyncRedmineUserTask {
                  data.add(userInfo);
              });
         }
-        redmineUserInfoService.saveOrUpdateBatchByMultiId(data);
+        redmineUserInfoService.saveOrupdateMultiIdAll(data);
     }
 }

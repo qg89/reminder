@@ -63,7 +63,7 @@ public class ProjectController {
 
     @PostMapping("/e")
     public ReturnT<String> edit(@RequestBody RProjectReaVo info) {
-        projectInfoService.update(info, Wrappers.<RProjectInfo>lambdaUpdate().eq(RProjectInfo::getPkey, info.getPkey()));
+        projectInfoService.updateInfo(info);
         if (!saveRea(info)) {
             return ReturnT.FAIL;
         }

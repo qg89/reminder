@@ -1,10 +1,15 @@
 package com.q.reminder.reminder.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.q.reminder.reminder.constant.RedisKeyRedmine;
 import com.q.reminder.reminder.entity.TTableUserConfig;
 import com.q.reminder.reminder.mapper.TTableUserConfigMapping;
 import com.q.reminder.reminder.service.TTableUserConfigService;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 /**
@@ -15,5 +20,16 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class TTableUserConfigServiceImpl extends ServiceImpl<TTableUserConfigMapping, TTableUserConfig> implements TTableUserConfigService {
-    
+
+    @Override
+    @Cacheable(cacheNames = RedisKeyRedmine.TABLE_USER_CONFIG)
+    public List<TTableUserConfig> listAll() {
+        return list();
+    }
+
+    @Override
+    @CacheEvict(cacheNames = RedisKeyRedmine.TABLE_USER_CONFIG)
+    public void saveInfo(TTableUserConfig entity) {
+        saveOrUpdate(entity);
+    }
 }

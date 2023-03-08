@@ -5,7 +5,6 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
@@ -48,9 +47,7 @@ public class RedmineUpdateTask {
 
     @XxlJob("redmineUpdate10")
     public void redmineUpdate10() {
-        LambdaQueryWrapper<RProjectInfo> lambdaQueryWrapper = Wrappers.<RProjectInfo>lambdaQuery();
-        lambdaQueryWrapper.isNotNull(RProjectInfo::getPmKey);
-        List<RProjectInfo> RProjectInfoList = projectInfoService.list(lambdaQueryWrapper);
+        List<RProjectInfo> RProjectInfoList = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();
         List<RedmineVo> issues = RedmineApi.queryUpdateIssue(RProjectInfoList);
         Map<String, List<RedmineVo>> issueMap = issues.stream().filter(issue ->
                 DateUtil.between(issue.getUpdatedOn(), new Date(), DateUnit.MINUTE) <= 10 && StringUtils.isNotBlank(issue.getAssigneeName())
