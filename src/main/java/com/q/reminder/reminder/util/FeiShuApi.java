@@ -82,7 +82,7 @@ public abstract class FeiShuApi {
                 .addHeader("Content-Type", "application/json")
                 .addHeader("Authorization", security)
                 .build();
-        try (Response response = client.newCall(request).execute();) {
+        try (Response response = client.newCall(request).execute()) {
             log.info("消息发送状态:{}, receive_id:{}", response.code(), receiveId);
         } catch (IOException e) {
             log.error("消息发送异常, receive_id:{}", receiveId);

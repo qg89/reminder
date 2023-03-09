@@ -1,9 +1,11 @@
 package com.q.reminder.reminder.util.feishu.message;
 
+import com.lark.oapi.service.im.v1.ImService;
 import com.lark.oapi.service.im.v1.model.*;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.ContentVo;
 import com.q.reminder.reminder.vo.MessageVo;
+import lombok.extern.log4j.Log4j2;
 
 import java.io.File;
 import java.util.UUID;
@@ -15,6 +17,7 @@ import java.util.UUID;
  * @Description :
  * @date :  2023.02.23 11:50
  */
+@Log4j2
 public class Message extends BaseFeishu {
 
     private static Message instance;
@@ -38,7 +41,7 @@ public class Message extends BaseFeishu {
      * @return
      * @throws Exception
      */
-    public Boolean sendContent(MessageVo vo) throws Exception {
+    public void sendContent(MessageVo vo) {
         CreateMessageReq req = CreateMessageReq.newBuilder()
                 .createMessageReqBody(CreateMessageReqBody.newBuilder()
                         .msgType(vo.getMsgType())
@@ -46,11 +49,21 @@ public class Message extends BaseFeishu {
                         .content(vo.getContent())
                         .uuid(UUID.randomUUID().toString())
                         .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
-        CreateMessageResp resp = CLIENT.im().message().create(req);
-        if (resp.success()) {
-            return Boolean.TRUE;
+        CreateMessageResp resp = new CreateMessageResp();
+        ImService.Message message = CLIENT.im().message();
+        try {
+            resp = message.create(req);
+        } catch (Exception e) {
+            int i = 0;
+            while (!resp.success() && i <= 3) {
+                i++;
+                try {
+                    resp = message.create(req);
+                } catch (Exception ex) {
+                    log.error("发送消息异常次数:【{}】：{}", i, ex);
+                }
+            }
         }
-        return Boolean.FALSE;
     }
 
     /**

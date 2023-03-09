@@ -73,7 +73,7 @@ public class OverdueTasksAgainToGroupBase {
      *
      * @param vo
      */
-    public void overdueTasksAgainToGroup(QueryVo vo) {
+    public void overdueTasksAgainToGroup(QueryVo vo) throws InterruptedException {
         List<OverdueTaskHistory> historys = new ArrayList<>();
         String redminderType = vo.getRedminderType();
         String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
@@ -130,7 +130,7 @@ public class OverdueTasksAgainToGroupBase {
             SendUserByGroupVo groupInfo = map.getValue();
             if (overdueTask) {
                 noneOverdueTask(contentJsonArray);
-                contentJsonArray= JSONArray.parseArray(String.format(contentJsonArray.toJSONString(), groupInfo.getReminderNone()));
+                contentJsonArray = JSONArray.parseArray(String.format(contentJsonArray.toJSONString(), groupInfo.getReminderNone()));
             } else {
                 content = JSONObject.parseObject(String.format(content.toJSONString(), groupInfo.getReminderNone()));
             }
@@ -138,15 +138,15 @@ public class OverdueTasksAgainToGroupBase {
             all.put("title", groupInfo.getReminderTitle() + (StringUtils.isBlank(redminderType) ? "" : redminderType));
             all.put("content", contentJsonArray);
             content.put("zh_cn", all);
+            MessageVo m = new MessageVo();
+            m.setReceiveId(map.getKey());
+            m.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.CHAT_ID);
+            m.setContent(content.toJSONString());
+            m.setMsgType("post");
             try {
-                MessageVo m = new MessageVo();
-                m.setReceiveId(map.getKey());
-                m.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.CHAT_ID);
-                m.setContent(content.toJSONString());
-                m.setMsgType("post");
                 BaseFeishu.message(client).sendContent(m);
             } catch (Exception ex) {
-                FeiShuApi.sendAdmin(adminInfoList, "过期任务提醒群组,发送异常", secret);
+                FeiShuApi.sendAdmin(adminInfoList, this.getClass().getName() + " 过期任务提醒群组,发送异常", secret);
             }
         }
 
