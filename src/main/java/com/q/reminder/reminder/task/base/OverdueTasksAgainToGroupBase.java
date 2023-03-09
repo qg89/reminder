@@ -73,7 +73,7 @@ public class OverdueTasksAgainToGroupBase {
      *
      * @param vo
      */
-    public void overdueTasksAgainToGroup(QueryVo vo) throws InterruptedException {
+    public void overdueTasksAgainToGroup(QueryVo vo) {
         List<OverdueTaskHistory> historys = new ArrayList<>();
         String redminderType = vo.getRedminderType();
         String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
