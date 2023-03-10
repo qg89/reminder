@@ -508,6 +508,6 @@ public abstract class RedmineApi {
     }
 
     public static Transport getTransportByProject(RProjectInfo RProjectInfo) {
-        return RedmineManagerFactory.createWithApiKey(RProjectInfo.getRedmineUrl(), RProjectInfo.getPmKey()).getTransport();
+        return RedmineManagerFactory.createWithApiKey(RProjectInfo.getRedmineUrl() + "/projects/" + RProjectInfo.getPkey(), RProjectInfo.getPmKey()).getTransport();
     }
 }
