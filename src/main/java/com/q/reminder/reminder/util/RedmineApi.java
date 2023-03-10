@@ -61,10 +61,7 @@ public abstract class RedmineApi {
             log.error("Redmine-[检查是否有redmine任务] 异常 ", e);
             return false;
         }
-        if (CollectionUtils.isEmpty(issueList)) {
-            return false;
-        }
-        return true;
+        return !CollectionUtils.isEmpty(issueList);
     }
 
     /**
