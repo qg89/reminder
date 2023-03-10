@@ -10,7 +10,7 @@ import com.q.reminder.reminder.service.impl.WeeklyServiceImpl;
 import com.q.reminder.reminder.vo.WeeklyByProjectVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.q.reminder.reminder.vo.WeeklyVo;
-import com.xxl.job.core.biz.model.ReturnT;
+import com.q.reminder.reminder.vo.base.ReturnT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -10,13 +10,13 @@ import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.WikiSpace;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WikiSpaceService;
-import com.xxl.job.core.biz.model.ReturnT;
-import com.xxl.job.core.context.XxlJobHelper;
-import com.xxl.job.core.handler.annotation.XxlJob;
-import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tech.powerjob.worker.core.processor.ProcessResult;
+import tech.powerjob.worker.core.processor.TaskContext;
+import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +28,8 @@ import java.util.List;
  * @Description : 同步知识库中标准过程复制
  * @date :  2022.11.18 14:34
  */
-@Log4j2
 @Component
-public class SyncSpacesWikiTask {
+public class SyncSpacesWikiTask implements BasicProcessor {
     @Autowired
     private WikiSpaceService spaceWikoService;
     @Autowired
@@ -38,43 +37,41 @@ public class SyncSpacesWikiTask {
     @Autowired
     private ProjectInfoService projectInfoService;
 
-    @XxlJob("syncSpacesWiki")
-    public ReturnT<String> syncSpacesWiki() {
+    @Override
+    public ProcessResult process(TaskContext context) throws Exception {
+        OmsLogger log = context.getOmsLogger();
+        ProcessResult processResult = new ProcessResult();
         int weekOfYear = DateUtil.thisWeekOfYear() - 1;
         if (weekOfYear == 0) {
             weekOfYear = 52;
         }
-        ReturnT<String> returnT = new ReturnT<>(null);
-        String jobParam = XxlJobHelper.getJobParam();
+        String jobParam = context.getJobParams();
         if (StringUtils.isNotBlank(jobParam) && NumberUtil.isInteger(jobParam) && Integer.parseInt(jobParam) <= 52) {
             weekOfYear = Integer.parseInt(jobParam);
         }
         List<WikiSpace> wikiSpaceList = new ArrayList<>();
-        try {
-            LambdaQueryWrapper<WikiSpace> wikiLq = Wrappers.lambdaQuery();
-            wikiLq.eq(WikiSpace::getWeekNum, weekOfYear);
-            long count = spaceWikoService.count(wikiLq);
-            if (count > 0) {
-                returnT.setMsg("当前周已复制");
-                return returnT;
-            }
-            WikiSpace wikiSpace = spaceWikoService.getSpacesNode(client, "wikcnXpXCgmL3E7vdbM1TiwXiGc");
-            String parentTitle = wikiSpace.getTitle();
-            LambdaQueryWrapper<RProjectInfo> lq = Wrappers.<RProjectInfo>lambdaQuery().select(RProjectInfo::getWikiToken, RProjectInfo::getId).isNotNull(RProjectInfo::getWikiToken);
-            lq.eq(RProjectInfo::getWikiType, "0");
-            List<RProjectInfo> list = projectInfoService.list(lq);
-            for (RProjectInfo info : list) {
-                String title  = parentTitle + "-" + DateTime.now().toString("yy") + "W" + weekOfYear;
-                WikiSpace space = spaceWikoService.syncSpacesWiki(client, info.getWikiToken(), title);
-                space.setPId(info.getId());
-                space.setWeekNum(weekOfYear);
-                wikiSpaceList.add(space);
-            }
-            spaceWikoService.saveOrUpdateBatch(wikiSpaceList);
-        } catch (Exception e) {
-            returnT.setCode(500);
-            returnT.setContent(e.getMessage());
+
+        LambdaQueryWrapper<WikiSpace> wikiLq = Wrappers.lambdaQuery();
+        wikiLq.eq(WikiSpace::getWeekNum, weekOfYear);
+        long count = spaceWikoService.count(wikiLq);
+        if (count > 0) {
+            log.info("当前周已复制");
+            return processResult;
         }
-        return returnT;
+        WikiSpace wikiSpace = spaceWikoService.getSpacesNode(client, "wikcnXpXCgmL3E7vdbM1TiwXiGc");
+        String parentTitle = wikiSpace.getTitle();
+        LambdaQueryWrapper<RProjectInfo> lq = Wrappers.<RProjectInfo>lambdaQuery().select(RProjectInfo::getWikiToken, RProjectInfo::getId).isNotNull(RProjectInfo::getWikiToken);
+        lq.eq(RProjectInfo::getWikiType, "0");
+        List<RProjectInfo> list = projectInfoService.list(lq);
+        for (RProjectInfo info : list) {
+            String title = parentTitle + "-" + DateTime.now().toString("yy") + "W" + weekOfYear;
+            WikiSpace space = spaceWikoService.syncSpacesWiki(client, info.getWikiToken(), title);
+            space.setPId(info.getId());
+            space.setWeekNum(weekOfYear);
+            wikiSpaceList.add(space);
+        }
+        spaceWikoService.saveOrUpdateBatch(wikiSpaceList);
+
+        return processResult;
     }
 }

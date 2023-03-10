@@ -12,13 +12,13 @@ import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.util.WeeklyProjectFeishuUtils;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
-import com.xxl.job.core.biz.model.ReturnT;
-import com.xxl.job.core.context.XxlJobHelper;
-import com.xxl.job.core.handler.annotation.XxlJob;
-import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tech.powerjob.worker.core.processor.ProcessResult;
+import tech.powerjob.worker.core.processor.TaskContext;
+import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
+import tech.powerjob.worker.log.OmsLogger;
 
 /**
  * @author : saiko
@@ -28,8 +28,7 @@ import org.springframework.stereotype.Component;
  * @date :  2022.11.01 14:14
  */
 @Component
-@Log4j2
-public class WeeklyProjectReportTask {
+public class WeeklyProjectReportTask implements BasicProcessor {
 
     @Autowired
     private WeeklyProjectReportService weeklyProjectReportService;
@@ -42,13 +41,15 @@ public class WeeklyProjectReportTask {
     @Autowired
     private Client client;
 
-    @XxlJob("xxlJobWeekly")
-    public ReturnT<String> weekly() throws Exception {
+    @Override
+    public ProcessResult process(TaskContext context) throws Exception {
+        OmsLogger log = context.getOmsLogger();
+        ProcessResult result = new ProcessResult();
         if (holdayBase.queryHoliday()) {
             log.info("节假日放假!!!!");
-            return ReturnT.SUCCESS;
+            return result;
         }
-        String jobParam = XxlJobHelper.getJobParam();
+        String jobParam = context.getJobParams();
         WeeklyProjectVo vo = new WeeklyProjectVo();
         vo.setAppSecret(feishuProperties.getAppSecret());
         vo.setAppId(feishuProperties.getAppId());
@@ -66,7 +67,7 @@ public class WeeklyProjectReportTask {
             projectReport.setRPid(projectInfo.getId());
             weeklyProjectReportService.save(projectReport);
         });
-        return ReturnT.SUCCESS;
+        return result;
     }
 
     private String getFileToken() throws Exception {

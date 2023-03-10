@@ -10,17 +10,15 @@ import com.q.reminder.reminder.entity.WUserTimes;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WUserTimesService;
 import com.q.reminder.reminder.util.RedmineApi;
-import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.bean.TimeEntry;
-import com.xxl.job.core.biz.model.ReturnT;
-import com.xxl.job.core.context.XxlJobHelper;
-import com.xxl.job.core.handler.annotation.XxlJob;
-import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.worker.core.processor.ProcessResult;
+import tech.powerjob.worker.core.processor.TaskContext;
+import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -37,17 +35,16 @@ import java.util.stream.Collectors;
  * @Description : 同步redmine上工时同步到数据库
  * @date :  2022.12.28 11:34
  */
-@Log4j2
 @Component
-public class SyncRedmineProjectUserTimeTask {
+public class SyncRedmineProjectUserTimeTask implements BasicProcessor {
     @Autowired
     private ProjectInfoService projectInfoService;
     @Autowired
     private WUserTimesService wUserTimesService;
 
-    @XxlJob("syncProjcetUserTimeTask")
-    public ReturnT<String> syncProjcetUserTimeTask() throws RedmineException {
-        String jobParam = XxlJobHelper.getJobParam();
+    @Override
+    public ProcessResult process(TaskContext context) throws Exception {
+        String jobParam = context.getJobParams();
         JSONObject json = new JSONObject();
         if (StringUtils.isNotBlank(jobParam)) {
             json = JSONObject.parseObject(jobParam);
@@ -102,7 +99,7 @@ public class SyncRedmineProjectUserTimeTask {
             time(userTimesData, id, bugTimeType, mapBug);
         }
         wUserTimesService.saveOrUpdateBatch(userTimesData);
-        return new ReturnT<>(null);
+        return new ProcessResult();
     }
 
     /**

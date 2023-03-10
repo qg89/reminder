@@ -10,24 +10,18 @@ import com.q.reminder.reminder.entity.CoverityLog;
 import com.q.reminder.reminder.service.CoverityLogService;
 import com.q.reminder.reminder.service.CoverityService;
 import com.q.reminder.reminder.service.GroupInfoService;
-import com.q.reminder.reminder.util.CoverityApi;
-import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.ChatProjectVo;
-import com.q.reminder.reminder.vo.CoverityAndRedmineSaveTaskVo;
 import com.q.reminder.reminder.vo.MessageVo;
-import com.xxl.job.core.biz.model.ReturnT;
-import com.xxl.job.core.context.XxlJobHelper;
-import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -37,8 +31,8 @@ import java.util.stream.Collectors;
  * @Description :
  * @date :  2022.12.01 10:37
  */
-@Log4j2
 @Component
+@Log4j2
 public class CvoerityTask {
     @Autowired
     private CoverityService coverityService;
@@ -49,60 +43,59 @@ public class CvoerityTask {
     @Autowired
     private CoverityLogService coverityLogService;
 
-    @XxlJob("coverity")
-    public ReturnT<String> coverity() {
-        String pKey = XxlJobHelper.getJobParam();
-        ReturnT<String> returnT = new ReturnT<>(null);
-        List<CoverityAndRedmineSaveTaskVo> list = coverityService.queryByProject(pKey);
-        String weekOfYear = DateTime.now().toString("yy") + "W" + (DateUtil.thisWeekOfYear() - 1);
-        JSONArray subContentJsonArray = new JSONArray();
-        Map<String, ChatProjectVo> projectVoMap = groupInfoService.listByProect(pKey).stream().collect(Collectors.toMap(ChatProjectVo::getChatId, Function.identity(), (v1, v2) -> v1));
-
-        Map<String, JSONArray> arrayMap = new LinkedHashMap<>();
-
-        List<CoverityLog> coverityLogList = new ArrayList<>();
-        list.forEach(vo -> {
-            String assigneeId = vo.getAssigneeId().toString();
-            CoverityAndRedmineSaveTaskVo coverityAndRedmineSaveTaskVo = CoverityApi.readCoverity(vo);
-            List<CoverityLog> coverityLogs = coverityAndRedmineSaveTaskVo.getCoverityLogs();
-            if (CollectionUtils.isEmpty(coverityLogs)) {
-                returnT.setMsg(returnT.getMsg() + vo.getRedmineProjectName() + "-中、高问题报告-为空;    ");
-                return;
-            }
-            coverityLogList.addAll(coverityLogs);
-            try {
-                coverityAndRedmineSaveTaskVo.setSubject(vo.getRedmineProjectName() + "-中、高问题报告-" + weekOfYear + "\r\n");
-                RedmineApi.saveTask(coverityAndRedmineSaveTaskVo);
-            } catch (Exception e) {
-                returnT.setCode(500);
-                returnT.setContent(e.getMessage());
-            }
-            Integer coverityNo = coverityAndRedmineSaveTaskVo.getCoverityNo();
-            if (coverityNo != null && coverityNo > 0) {
-                JSONObject content = new JSONObject();
-                content.put("tag", "text");
-                content.put("text", "  " + vo.getRedmineProjectName() + "-问题数量：" + coverityNo + "\r\n");
-
-                JSONObject at = new JSONObject();
-                at.put("tag", "at");
-                at.put("user_id", vo.getMemberId());
-                at.put("user_name", vo.getName());
-                subContentJsonArray.add(at);
-                subContentJsonArray.add(content);
-            }
-
-            JSONArray jsonArray = arrayMap.get(assigneeId);
-            if (jsonArray != null) {
-                jsonArray.addAll(subContentJsonArray);
-            } else {
-                arrayMap.put(assigneeId, subContentJsonArray);
-            }
-        });
-        sendGroups(subContentJsonArray, projectVoMap);
-        expiredTask(projectVoMap, coverityLogList);
-        coverityLogService.saveBatch(coverityLogList);
-        return returnT;
-    }
+//    public ReturnT<String> coverity() {
+//        String pKey = XxlJobHelper.getJobParam();
+//        ReturnT<String> returnT = new ReturnT<>(null);
+//        List<CoverityAndRedmineSaveTaskVo> list = coverityService.queryByProject(pKey);
+//        String weekOfYear = DateTime.now().toString("yy") + "W" + (DateUtil.thisWeekOfYear() - 1);
+//        JSONArray subContentJsonArray = new JSONArray();
+//        Map<String, ChatProjectVo> projectVoMap = groupInfoService.listByProect(pKey).stream().collect(Collectors.toMap(ChatProjectVo::getChatId, Function.identity(), (v1, v2) -> v1));
+//
+//        Map<String, JSONArray> arrayMap = new LinkedHashMap<>();
+//
+//        List<CoverityLog> coverityLogList = new ArrayList<>();
+//        list.forEach(vo -> {
+//            String assigneeId = vo.getAssigneeId().toString();
+//            CoverityAndRedmineSaveTaskVo coverityAndRedmineSaveTaskVo = CoverityApi.readCoverity(vo);
+//            List<CoverityLog> coverityLogs = coverityAndRedmineSaveTaskVo.getCoverityLogs();
+//            if (CollectionUtils.isEmpty(coverityLogs)) {
+//                returnT.setMsg(returnT.getMsg() + vo.getRedmineProjectName() + "-中、高问题报告-为空;    ");
+//                return;
+//            }
+//            coverityLogList.addAll(coverityLogs);
+//            try {
+//                coverityAndRedmineSaveTaskVo.setSubject(vo.getRedmineProjectName() + "-中、高问题报告-" + weekOfYear + "\r\n");
+//                RedmineApi.saveTask(coverityAndRedmineSaveTaskVo);
+//            } catch (Exception e) {
+//                returnT.setCode(500);
+//                returnT.setContent(e.getMessage());
+//            }
+//            Integer coverityNo = coverityAndRedmineSaveTaskVo.getCoverityNo();
+//            if (coverityNo != null && coverityNo > 0) {
+//                JSONObject content = new JSONObject();
+//                content.put("tag", "text");
+//                content.put("text", "  " + vo.getRedmineProjectName() + "-问题数量：" + coverityNo + "\r\n");
+//
+//                JSONObject at = new JSONObject();
+//                at.put("tag", "at");
+//                at.put("user_id", vo.getMemberId());
+//                at.put("user_name", vo.getName());
+//                subContentJsonArray.add(at);
+//                subContentJsonArray.add(content);
+//            }
+//
+//            JSONArray jsonArray = arrayMap.get(assigneeId);
+//            if (jsonArray != null) {
+//                jsonArray.addAll(subContentJsonArray);
+//            } else {
+//                arrayMap.put(assigneeId, subContentJsonArray);
+//            }
+//        });
+//        sendGroups(subContentJsonArray, projectVoMap);
+//        expiredTask(projectVoMap, coverityLogList);
+//        coverityLogService.saveBatch(coverityLogList);
+//        return returnT;
+//    }
 
     /**
      * 过期任务

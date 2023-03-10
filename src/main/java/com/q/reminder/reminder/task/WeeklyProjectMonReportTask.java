@@ -15,15 +15,14 @@ import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.FeishuUploadImageVo;
 import com.q.reminder.reminder.vo.SendVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
-import com.q.reminder.reminder.vo.WeeklyVo;
 import com.taskadapter.redmineapi.bean.Issue;
-import com.xxl.job.core.biz.model.ReturnT;
-import com.xxl.job.core.context.XxlJobHelper;
-import com.xxl.job.core.handler.annotation.XxlJob;
-import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tech.powerjob.worker.core.processor.ProcessResult;
+import tech.powerjob.worker.core.processor.TaskContext;
+import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -43,8 +42,7 @@ import static com.q.reminder.reminder.util.WeeklyProjectUtils.getWeekNumToSunday
  * @date :  2022.11.01 17:55
  */
 @Component
-@Log4j2
-public class WeeklyProjectMonReportTask {
+public class WeeklyProjectMonReportTask implements BasicProcessor {
     @Autowired
     private HoldayBase holdayBase;
     @Autowired
@@ -54,14 +52,15 @@ public class WeeklyProjectMonReportTask {
     @Autowired
     private Client client;
 
-    @XxlJob("weekProjectMonReport")
-    public ReturnT<String> weekProjectMonReport() throws Exception {
-        ReturnT<String> ret = new ReturnT<>(null);
+    @Override
+    public ProcessResult process(TaskContext context) throws Exception {
+        OmsLogger log = context.getOmsLogger();
+        ProcessResult result = new ProcessResult();
         if (holdayBase.queryHoliday()) {
-            ret.setMsg("节假日放假!!!!");
-            return ret;
+            result.setMsg("节假日放假!!!!");
+            return result;
         }
-        String jobParam = XxlJobHelper.getJobParam();
+        String jobParam = context.getJobParams();
         int weekNumber = 0;
         String id = null;
         if (StringUtils.isNotBlank(jobParam)) {
@@ -76,7 +75,7 @@ public class WeeklyProjectMonReportTask {
         }
         List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNumber, id);
         this.writeReport(list);
-        return ret;
+        return result;
     }
 
     private void writeReport(List<WeeklyProjectVo> list) throws Exception {
@@ -140,7 +139,7 @@ public class WeeklyProjectMonReportTask {
                 }
             }
             BaseFeishu.block(client).batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
-            log.info("[{}]项目周报更新完成", projectShortName);
+//            log.info("[{}]项目周报更新完成", projectShortName);
 
             sendFeishu(report);
         }
@@ -161,7 +160,7 @@ public class WeeklyProjectMonReportTask {
         // 评审问题
         File file = WeeklyProjectUtils.reviewQuestions(vo);
         addRequests(vo, file, requests);
-        log.info("[{}]项目周报，评审问题 执行完成", vo.getProjectShortName());
+//        log.info("[{}]项目周报，评审问题 执行完成", vo.getProjectShortName());
         return i;
     }
 
@@ -185,7 +184,7 @@ public class WeeklyProjectMonReportTask {
             openBug15 = logoFile;
         }
         addRequests(vo, openBug15, requests);
-        log.info("[{}]项目周报，open-Bug >15 执行完成", vo.getProjectShortName());
+//        log.info("[{}]项目周报，open-Bug >15 执行完成", vo.getProjectShortName());
         return i;
     }
 
@@ -204,7 +203,7 @@ public class WeeklyProjectMonReportTask {
         vo.setBlockId(block.getString("block_id"));
         File openBug = WeeklyProjectUtils.openBug(vo.getAllBugList(), vo);
         addRequests(vo, openBug, requests);
-        log.info("[{}]项目周报，Open-Bug等级分布 执行完成", vo.getProjectShortName());
+//        log.info("[{}]项目周报，Open-Bug等级分布 执行完成", vo.getProjectShortName());
         return i;
     }
 
@@ -223,7 +222,7 @@ public class WeeklyProjectMonReportTask {
         vo.setBlockId(block.getString("block_id"));
         File bugLevel = WeeklyProjectUtils.AllBugLevel(vo.getAllBugList(), vo);
         addRequests(vo, bugLevel, requests);
-        log.info("[{}]项目周报，All-bug等级分布 执行完成", vo.getProjectShortName());
+//        log.info("[{}]项目周报，All-bug等级分布 执行完成", vo.getProjectShortName());
         return i;
     }
 
@@ -253,7 +252,7 @@ public class WeeklyProjectMonReportTask {
         sendVo.setMemberId(vo.getPmOu());
         sendVo.setContent(con.toJSONString());
         FeiShuApi.sendPost(sendVo, secret, new StringBuilder());
-        log.info("[{}]-周报更新已通知PM", fileName);
+//        log.info("[{}]-周报更新已通知PM", fileName);
     }
 
     /**
@@ -280,7 +279,7 @@ public class WeeklyProjectMonReportTask {
         imageVo.setParentNode(blockId);
         String fileToken = BaseFeishuJavaUtils.upload(imageVo);
         if (StringUtils.isBlank(fileToken)) {
-            log.info("飞书上传素材返回为空");
+//            log.info("飞书上传素材返回为空");
             return;
         }
         UpdateBlockRequest update = UpdateBlockRequest.newBuilder().build();
@@ -330,67 +329,13 @@ public class WeeklyProjectMonReportTask {
         }
     }
 
-    @Deprecated
-    public WeeklyVo resetReport(WeeklyVo vo) throws Exception {
-        File logoFile = new File(ResourceUtils.path());
-        String projectShortName = vo.getProjectShortName();
-        vo.setAppSecret(feishuProperties.getAppSecret());
-        vo.setAppId(feishuProperties.getAppId());
-        String title = vo.getTitle();
-        List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(vo);
-        vo.setAllBugList(allBugList);
-
-        JSONArray jsonArray = WeeklyProjectFeishuUtils.blocks(vo);
-        ArrayList<UpdateBlockRequest> requests = new ArrayList<>();
-        for (int i = 0; i < Objects.requireNonNull(jsonArray).size(); i++) {
-            JSONObject block = JSONObject.parseObject(jsonArray.get(i).toString());
-            Integer blockType = block.getInteger("block_type");
-            if (4 == blockType) {
-                String heading2 = JSONObject.parseObject(block.getJSONObject("heading2").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
-                if (WeeklyReportConstants.REVIEW_QUESTIONS.equals(heading2) && WeeklyReportConstants.REVIEW_QUESTIONS.equals(title)) {
-                    reviewQuestions(vo, jsonArray, requests, i);
-                    break;
-                }
-                if (WeeklyReportConstants.COPQ.equals(heading2) && WeeklyReportConstants.COPQ.equals(title)) {
-                    copq(vo, jsonArray, requests, i);
-                    break;
-                }
-            }
-            if (5 == blockType) {
-                String heading3 = JSONObject.parseObject(block.getJSONObject("heading3").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
-                if (WeeklyReportConstants.TRENDS.equals(heading3) && WeeklyReportConstants.TRENDS.equals(title)) {
-                    tends(vo, jsonArray, requests, i);
-                    break;
-                }
-                if (WeeklyReportConstants.BUG_LEVEL.equals(heading3)) {
-                    if ("All-Bug等级分布".equals(title)) {
-                        allBugLevel(vo, jsonArray, requests, i);
-                        break;
-                    }
-                    if ("Open-Bug等级分布".equals(title)) {
-                        openBugLevel(vo, jsonArray, requests, i);
-                        break;
-                    }
-                    if ("Open-Bug>15".equals(title)) {
-                        openBug15(logoFile, vo, jsonArray, requests, i);
-                        break;
-                    }
-                }
-            }
-        }
-        BaseFeishu.block(client).batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
-//        BaseFeishuJavaUtils.batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
-        log.info("[{}]项目周报更新完成", projectShortName);
-        return vo;
-    }
-
     public int copq(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) throws Exception {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
         vo.setBlockId(block.getString("block_id"));
         // 评审问题
         File file = WeeklyProjectUtils.copq(vo);
         addRequests(vo, file, requests);
-        log.info("{}项目周报，COPQ 执行完成", vo.getProjectShortName());
+//        log.info("{}项目周报，COPQ 执行完成", vo.getProjectShortName());
         return i;
     }
 
@@ -410,7 +355,7 @@ public class WeeklyProjectMonReportTask {
         weeklyVo.setBlockId(block.getString("block_id"));
         File file = WeeklyProjectUtils.trends(weeklyVo);
         addRequests(weeklyVo, file, requests);
-        log.info("[{}]项目周报，趋势 执行完成", weeklyVo.getProjectShortName());
+//        log.info("[{}]项目周报，趋势 执行完成", weeklyVo.getProjectShortName());
         return i;
     }
 }

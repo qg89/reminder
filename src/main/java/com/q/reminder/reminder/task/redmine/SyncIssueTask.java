@@ -8,12 +8,14 @@ import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdIssueService;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.taskadapter.redmineapi.RedmineException;
-import com.taskadapter.redmineapi.bean.*;
-import com.xxl.job.core.handler.annotation.XxlJob;
-import lombok.extern.log4j.Log4j2;
+import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.Tracker;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tech.powerjob.worker.core.processor.ProcessResult;
+import tech.powerjob.worker.core.processor.TaskContext;
+import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,15 +28,14 @@ import java.util.List;
  * @date :  2023.01.19 11:18
  */
 @Component
-@Log4j2
-public class SyncIssueTask {
+public class SyncIssueTask implements BasicProcessor {
     @Autowired
     private ProjectInfoService projectInfoService;
     @Autowired
     private RdIssueService rdIssueService;
 
-    @XxlJob("syncIssueTask")
-    public void syncIssueTask() {
+    @Override
+    public ProcessResult process(TaskContext context) throws Exception {
         List<Issue> issueData = new ArrayList<>();
         List<RProjectInfo> projectList = projectInfoService.listAll();
         projectList.forEach(projectInfo -> {
@@ -85,5 +86,6 @@ public class SyncIssueTask {
             data.add(issue);
         }
         rdIssueService.saveOrUpdateBatchByMultiId(data);
+        return new ProcessResult(true, "success");
     }
 }

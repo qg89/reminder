@@ -8,11 +8,13 @@ import com.q.reminder.reminder.service.RdTimeEntryService;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.bean.TimeEntry;
-import com.xxl.job.core.handler.annotation.XxlJob;
-import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tech.powerjob.worker.core.processor.ProcessResult;
+import tech.powerjob.worker.core.processor.TaskContext;
+import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,15 +27,15 @@ import java.util.List;
  * @date :  2023.01.19 11:18
  */
 @Component
-@Log4j2
-public class SyncTimeEntryTask {
+public class SyncTimeEntryTask implements BasicProcessor {
     @Autowired
     private ProjectInfoService projectInfoService;
     @Autowired
     private RdTimeEntryService rdTimeEntryService;
 
-    @XxlJob("syncTimeEntryTask")
-    public void SyncTimeEntryTask() {
+    @Override
+    public ProcessResult process(TaskContext context) throws Exception {
+        OmsLogger log = context.getOmsLogger();
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<TimeEntry> timeData = new ArrayList<>();
         projectList.forEach(projectInfo -> {
@@ -41,7 +43,7 @@ public class SyncTimeEntryTask {
             try {
                 timeData.addAll(RedmineApi.queryTimes(projectInfo));
             } catch (RedmineException e) {
-                e.printStackTrace();
+                log.error("【redmine】同步redmine工时-查询工时异常", e.getMessage());
             }
         });
         List<RdTimeEntry> data = new ArrayList<>();
@@ -63,5 +65,6 @@ public class SyncTimeEntryTask {
             data.add(time);
         }
         rdTimeEntryService.saveOrUpdateBatchByMultiId(data);
+        return new ProcessResult(true);
     }
 }

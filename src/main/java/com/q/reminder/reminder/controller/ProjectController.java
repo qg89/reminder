@@ -8,7 +8,7 @@ import com.q.reminder.reminder.service.*;
 import com.q.reminder.reminder.vo.OptionVo;
 import com.q.reminder.reminder.vo.ProjectInfoVo;
 import com.q.reminder.reminder.vo.RProjectReaVo;
-import com.xxl.job.core.biz.model.ReturnT;
+import com.q.reminder.reminder.vo.base.ReturnT;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

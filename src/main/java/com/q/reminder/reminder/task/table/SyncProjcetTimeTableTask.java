@@ -12,14 +12,14 @@ import com.q.reminder.reminder.entity.TTableUserTime;
 import com.q.reminder.reminder.service.TTableInfoService;
 import com.q.reminder.reminder.service.TTableUserTimeService;
 import com.q.reminder.reminder.service.WUserTimesService;
-import com.q.reminder.reminder.util.BaseFeishuJavaUtils;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
-import com.xxl.job.core.context.XxlJobHelper;
-import com.xxl.job.core.handler.annotation.XxlJob;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.worker.core.processor.ProcessResult;
+import tech.powerjob.worker.core.processor.TaskContext;
+import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.*;
 import java.util.function.Function;
@@ -33,8 +33,7 @@ import java.util.stream.Collectors;
  * @date :  2023.01.18 11:28
  */
 @Component
-@Log4j2
-public class SyncProjcetTimeTableTask {
+public class SyncProjcetTimeTableTask implements BasicProcessor {
     @Autowired
     private Client client;
     @Autowired
@@ -44,9 +43,11 @@ public class SyncProjcetTimeTableTask {
     @Autowired
     private TTableUserTimeService tTableUserTimeService;
 
-    @XxlJob("syncProjcetTimeTableTask")
-    public void syncProjcetTimeTableTask() throws Exception {
-        String jobParam = XxlJobHelper.getJobParam();
+    //    @XxlJob("syncProjcetTimeTableTask")
+    @Override
+    public ProcessResult process(TaskContext context) throws Exception {
+        OmsLogger log = context.getOmsLogger();
+        String jobParam = context.getJobParams();
         String day = "";
 
         LambdaQueryWrapper<TTableInfo> qw = Wrappers.lambdaQuery();
@@ -83,6 +84,7 @@ public class SyncProjcetTimeTableTask {
             records.add(AppTableRecord.newBuilder().fields(data).build());
         }
         BaseFeishu.table(client).batchCreateTableRecords(tableInfo, records.toArray(new AppTableRecord[0]));
+        return new ProcessResult(true);
     }
 
     /**

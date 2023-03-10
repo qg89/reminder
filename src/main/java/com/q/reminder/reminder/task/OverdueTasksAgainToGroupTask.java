@@ -2,15 +2,17 @@ package com.q.reminder.reminder.task;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.q.reminder.reminder.entity.NoneStatus;
+import com.q.reminder.reminder.service.NoneStatusService;
 import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.task.base.OverdueTasksAgainToGroupBase;
-import com.q.reminder.reminder.service.NoneStatusService;
 import com.q.reminder.reminder.vo.QueryVo;
-import com.xxl.job.core.handler.annotation.XxlJob;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.worker.core.processor.ProcessResult;
+import tech.powerjob.worker.core.processor.TaskContext;
+import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.List;
 import java.util.Map;
@@ -23,9 +25,8 @@ import java.util.stream.Collectors;
  * @Description : 每天9点半提醒，群提醒
  * @date :  2022.10.18 17:02
  */
-@Log4j2
 @Component
-public class OverdueTasksAgainToGroupTask {
+public class OverdueTasksAgainToGroupTask implements BasicProcessor {
 
     @Autowired
     private OverdueTasksAgainToGroupBase overdueTasksAgainToGroupBase;
@@ -34,11 +35,13 @@ public class OverdueTasksAgainToGroupTask {
     @Autowired
     private HoldayBase holdayBase;
 
-    @XxlJob("overdueTasksAgain1ToGroupHandle")
-    public void query() {
+    @Override
+    public ProcessResult process(TaskContext context) throws Exception {
+        OmsLogger log = context.getOmsLogger();
+        ProcessResult result = new ProcessResult();
         if (holdayBase.queryHoliday()) {
             log.info("节假日放假!!!!");
-            return;
+            return result;
         }
 
         LambdaQueryWrapper<NoneStatus> lq = new LambdaQueryWrapper<>();
@@ -63,5 +66,6 @@ public class OverdueTasksAgainToGroupTask {
         vo.setContainsStatus(Boolean.TRUE);
         vo.setRedminderType("(Resolved)");
         overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(vo);
+        return result;
     }
 }

@@ -14,12 +14,14 @@ import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.SendVo;
-import com.xxl.job.core.handler.annotation.XxlJob;
-import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.worker.core.processor.ProcessResult;
+import tech.powerjob.worker.core.processor.TaskContext;
+import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.io.IOException;
 import java.util.Date;
@@ -34,9 +36,8 @@ import java.util.stream.Collectors;
  * @Description : 每10分钟提醒一次变更的任务
  * @date :  2022.10.19 13:42
  */
-@Log4j2
 @Component
-public class RedmineUpdateTask {
+public class RedmineUpdateTask implements BasicProcessor {
 
     @Autowired
     private ProjectInfoService projectInfoService;
@@ -45,8 +46,9 @@ public class RedmineUpdateTask {
     @Autowired
     private FeishuProperties feishuProperties;
 
-    @XxlJob("redmineUpdate10")
-    public void redmineUpdate10() {
+    @Override
+    public ProcessResult process(TaskContext context) throws Exception {
+        OmsLogger log = context.getOmsLogger();
         List<RProjectInfo> RProjectInfoList = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();
         List<RedmineVo> issues = RedmineApi.queryUpdateIssue(RProjectInfoList);
         Map<String, List<RedmineVo>> issueMap = issues.stream().filter(issue ->
@@ -105,10 +107,11 @@ public class RedmineUpdateTask {
             try {
                 FeiShuApi.sendPost(sendVo, authorization, new StringBuilder());
             } catch (IOException e) {
-                log.error(e);
+                log.error("e{}", e.getMessage());
             }
             log.info("{},变更提醒,任务发送成功", assigneeName);
         });
         log.info("变更提醒,任务执行完成!");
+        return new ProcessResult();
     }
 }

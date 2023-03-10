@@ -22,13 +22,15 @@ import com.taskadapter.redmineapi.RedmineProcessingException;
 import com.taskadapter.redmineapi.bean.CustomField;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.internal.Transport;
-import com.xxl.job.core.handler.annotation.XxlJob;
-import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.worker.core.processor.ProcessResult;
+import tech.powerjob.worker.core.processor.TaskContext;
+import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -46,9 +48,8 @@ import java.util.stream.Collectors;
  * @Description : 同步多维度表格记录-需求管理表写入redmine
  * @date :  2023.01.17 11:40
  */
-@Log4j2
 @Component
-public class SyncFeatureDatasWriteRedmineTask {
+public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
     @Autowired
     private Client client;
     @Autowired
@@ -62,119 +63,6 @@ public class SyncFeatureDatasWriteRedmineTask {
 
     private Date dueDate = DateTime.now().plusDays(7).toDate();
 
-    @XxlJob("syncTableRecordTask")
-    public void syncTableRecordTask() throws Exception {
-        LambdaQueryWrapper<TTableFeatureTmp> tableQw = Wrappers.lambdaQuery();
-        tableQw.eq(TTableFeatureTmp::getWriteRedmine, "0");
-//        tableQw.gtSql(TTableFeatureTmp::getUpdateTime, " date_sub( NOW(), INTERVAL 10 MINUTE)");
-        tableQw.eq(TTableFeatureTmp::getWriteType, "是");
-        List<TTableFeatureTmp> featureDataList = tTableFeatureTmpService.list(tableQw);
-        Map<String, TTableUserConfig> userConfigMap = tTableUserConfigService.list().stream().collect(Collectors.toMap(TTableUserConfig::getPrjctKey, Function.identity(), (v1, v2) -> v1));
-        Map<String, RProjectInfo> projectMap = projectInfoService.listAll().stream().collect(Collectors.toMap(e -> String.valueOf(e.getId()), Function.identity(), (v1, v2) -> v1));
-
-        List<AppTableRecord> records = new ArrayList<>();
-
-        // key: pkey, value redmineType
-        Map<String, String> redmineTypeMap = projectInfoService.listAll().stream().collect(Collectors.toMap(RProjectInfo::getPkey, RProjectInfo::getRedmineType));
-
-        for (TTableFeatureTmp featureTmp : featureDataList) {
-            String recordsId = featureTmp.getRecordsId();
-            String prjctKey = featureTmp.getPrjctKey();
-            String mdl = featureTmp.getMdl();
-            String menuOne = featureTmp.getMenuOne();
-            String menuTwo = featureTmp.getMenuTwo();
-            String menuThree = featureTmp.getMenuThree();
-            String dscrptn = featureTmp.getDscrptn();
-            Float prdct = featureTmp.getPrdct();
-            LocalDate prodTime = featureTmp.getProdTime();
-            String featureType = featureTmp.getFeatureType();
-            RedmineConfig type = RedmineConfig.type(redmineTypeMap.get(prjctKey));
-
-            boolean ftrTyp = "非功能".equals(featureType);
-
-            TTableUserConfig config = userConfigMap.get(prjctKey);
-            RProjectInfo RProjectInfo = projectMap.get(config.getPId().toString());
-            Integer pId = Integer.valueOf(RProjectInfo.getPid());
-
-            Transport transport = RedmineApi.getTransportByProject(RProjectInfo);
-            if (RedmineApi.checkIssue(transport, recordsId)) {
-                continue;
-            }
-            StringBuilder subject = new StringBuilder();
-            if (StringUtils.isNotBlank(mdl)) {
-                subject.append("模块：").append(mdl).append("-");
-            }
-            if (StringUtils.isNotBlank(menuOne)) {
-                subject.append("一级：").append(menuOne).append("-");
-            }
-            if (StringUtils.isNotBlank(menuTwo)) {
-                subject.append("二级：").append(menuTwo).append("-");
-            }
-            if (StringUtils.isNotBlank(menuThree)) {
-                subject.append("三级：").append(menuThree);
-            }
-            int lastChar = subject.lastIndexOf("-");
-            if (lastChar == subject.length() - 1) {
-                subject.deleteCharAt(lastChar);
-            }
-            Issue issue = new Issue();
-            issue.setSubject(subject.toString());
-            issue.setDescription(dscrptn);
-            issue.setAssigneeId(config.getPrdctId());
-            issue.setDueDate(dueDate);
-            if (prodTime != null) {
-                dueDate = Date.from(prodTime.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-                issue.setDueDate(dueDate);
-            }
-            issue.setSpentHours(prdct);
-            issue.setProjectId(pId);
-            CustomField customField = type.setCustomValue(recordsId);
-            List<CustomField> customFieldList = new ArrayList<>(RedmineConfig.CUSTOM_FIELDS);
-            customFieldList.add(customField);
-            issue.addCustomFields(customFieldList);
-            Issue parentIssue = new Issue();
-            if (ftrTyp) {
-                issue.setStatusId(1).setCreatedOn(new Date());
-                issue.setTracker(RedmineConfig.DEV_TRACKER);
-                if (!createSubIssue(issue, featureTmp, config, transport, customFieldList, ftrTyp)) {
-                    featureTmp.setWriteRedmine("3");
-                }
-            } else {
-                issue.setTracker(RedmineConfig.FEATURE_TRACKER);
-                try {
-                    parentIssue = RedmineApi.createIssue(issue, transport);
-                } catch (RedmineProcessingException e) {
-                    List<String> errors = e.getErrors();
-                    log.error("[多维表格-创建redmine任务]父任务异常：{}", errors);
-                }
-                featureTmp.setWriteRedmine("1");
-                if (parentIssue.getId() == null) {
-                    featureTmp.setWriteRedmine("2");
-                } else if (!createSubIssue(parentIssue, featureTmp, config, transport, customFieldList, ftrTyp)) {
-                    featureTmp.setWriteRedmine("3");
-                }
-            }
-
-            tTableFeatureTmpService.updateById(featureTmp);
-            if ("1".equals(featureTmp.getWriteRedmine())) {
-                records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(Map.of("需求ID", recordsId)).build());
-            }
-        }
-
-        LambdaQueryWrapper<TTableInfo> lq = Wrappers.lambdaQuery();
-        lq.eq(TTableInfo::getTableType, TableTypeContants.FEATURE);
-        TTableInfo tTableInfo = tTableInfoService.getOne(lq);
-        if (!CollectionUtils.isEmpty(records)) {
-            BaseFeishu.table(client).batchUpdateTableRecords(tTableInfo, records.toArray(new AppTableRecord[0]));
-        }
-
-        if (DateUtil.dayOfWeek(new Date()) == 1) {
-            LambdaQueryWrapper<TTableFeatureTmp> query = Wrappers.lambdaQuery();
-            query.eq(TTableFeatureTmp::getWriteRedmine, "1");
-            List<TTableFeatureTmp> tempList = tTableFeatureTmpService.list(query);
-            tTableFeatureTmpService.removeBatchByIds(tempList);
-        }
-    }
 
     /**
      * 创建子任务
@@ -288,5 +176,121 @@ public class SyncFeatureDatasWriteRedmineTask {
             createSubIssue = createSubIssue && caseIssue.create().getId() != null;
         }
         return createSubIssue;
+    }
+
+    @Override
+    public ProcessResult process(TaskContext context) throws Exception {
+        OmsLogger log = context.getOmsLogger();
+        LambdaQueryWrapper<TTableFeatureTmp> tableQw = Wrappers.lambdaQuery();
+        tableQw.eq(TTableFeatureTmp::getWriteRedmine, "0");
+//        tableQw.gtSql(TTableFeatureTmp::getUpdateTime, " date_sub( NOW(), INTERVAL 10 MINUTE)");
+        tableQw.eq(TTableFeatureTmp::getWriteType, "是");
+        List<TTableFeatureTmp> featureDataList = tTableFeatureTmpService.list(tableQw);
+        Map<String, TTableUserConfig> userConfigMap = tTableUserConfigService.list().stream().collect(Collectors.toMap(TTableUserConfig::getPrjctKey, Function.identity(), (v1, v2) -> v1));
+        Map<String, RProjectInfo> projectMap = projectInfoService.listAll().stream().collect(Collectors.toMap(e -> String.valueOf(e.getId()), Function.identity(), (v1, v2) -> v1));
+
+        List<AppTableRecord> records = new ArrayList<>();
+
+        // key: pkey, value redmineType
+        Map<String, String> redmineTypeMap = projectInfoService.listAll().stream().collect(Collectors.toMap(RProjectInfo::getPkey, RProjectInfo::getRedmineType));
+
+        for (TTableFeatureTmp featureTmp : featureDataList) {
+            String recordsId = featureTmp.getRecordsId();
+            String prjctKey = featureTmp.getPrjctKey();
+            String mdl = featureTmp.getMdl();
+            String menuOne = featureTmp.getMenuOne();
+            String menuTwo = featureTmp.getMenuTwo();
+            String menuThree = featureTmp.getMenuThree();
+            String dscrptn = featureTmp.getDscrptn();
+            Float prdct = featureTmp.getPrdct();
+            LocalDate prodTime = featureTmp.getProdTime();
+            String featureType = featureTmp.getFeatureType();
+            RedmineConfig type = RedmineConfig.type(redmineTypeMap.get(prjctKey));
+
+            boolean ftrTyp = "非功能".equals(featureType);
+
+            TTableUserConfig config = userConfigMap.get(prjctKey);
+            RProjectInfo RProjectInfo = projectMap.get(config.getPId().toString());
+            Integer pId = Integer.valueOf(RProjectInfo.getPid());
+
+            Transport transport = RedmineApi.getTransportByProject(RProjectInfo);
+            if (RedmineApi.checkIssue(transport, recordsId)) {
+                continue;
+            }
+            StringBuilder subject = new StringBuilder();
+            if (StringUtils.isNotBlank(mdl)) {
+                subject.append("模块：").append(mdl).append("-");
+            }
+            if (StringUtils.isNotBlank(menuOne)) {
+                subject.append("一级：").append(menuOne).append("-");
+            }
+            if (StringUtils.isNotBlank(menuTwo)) {
+                subject.append("二级：").append(menuTwo).append("-");
+            }
+            if (StringUtils.isNotBlank(menuThree)) {
+                subject.append("三级：").append(menuThree);
+            }
+            int lastChar = subject.lastIndexOf("-");
+            if (lastChar == subject.length() - 1) {
+                subject.deleteCharAt(lastChar);
+            }
+            Issue issue = new Issue();
+            issue.setSubject(subject.toString());
+            issue.setDescription(dscrptn);
+            issue.setAssigneeId(config.getPrdctId());
+            issue.setDueDate(dueDate);
+            if (prodTime != null) {
+                dueDate = Date.from(prodTime.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+                issue.setDueDate(dueDate);
+            }
+            issue.setSpentHours(prdct);
+            issue.setProjectId(pId);
+            CustomField customField = type.setCustomValue(recordsId);
+            List<CustomField> customFieldList = new ArrayList<>(RedmineConfig.CUSTOM_FIELDS);
+            customFieldList.add(customField);
+            issue.addCustomFields(customFieldList);
+            Issue parentIssue = new Issue();
+            if (ftrTyp) {
+                issue.setStatusId(1).setCreatedOn(new Date());
+                issue.setTracker(RedmineConfig.DEV_TRACKER);
+                if (!createSubIssue(issue, featureTmp, config, transport, customFieldList, ftrTyp)) {
+                    featureTmp.setWriteRedmine("3");
+                }
+            } else {
+                issue.setTracker(RedmineConfig.FEATURE_TRACKER);
+                try {
+                    parentIssue = RedmineApi.createIssue(issue, transport);
+                } catch (RedmineProcessingException e) {
+                    List<String> errors = e.getErrors();
+                    log.error("[多维表格-创建redmine任务]父任务异常：{}", errors);
+                }
+                featureTmp.setWriteRedmine("1");
+                if (parentIssue.getId() == null) {
+                    featureTmp.setWriteRedmine("2");
+                } else if (!createSubIssue(parentIssue, featureTmp, config, transport, customFieldList, ftrTyp)) {
+                    featureTmp.setWriteRedmine("3");
+                }
+            }
+
+            tTableFeatureTmpService.updateById(featureTmp);
+            if ("1".equals(featureTmp.getWriteRedmine())) {
+                records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(Map.of("需求ID", recordsId)).build());
+            }
+        }
+
+        LambdaQueryWrapper<TTableInfo> lq = Wrappers.lambdaQuery();
+        lq.eq(TTableInfo::getTableType, TableTypeContants.FEATURE);
+        TTableInfo tTableInfo = tTableInfoService.getOne(lq);
+        if (!CollectionUtils.isEmpty(records)) {
+            BaseFeishu.table(client).batchUpdateTableRecords(tTableInfo, records.toArray(new AppTableRecord[0]));
+        }
+
+        if (DateUtil.dayOfWeek(new Date()) == 1) {
+            LambdaQueryWrapper<TTableFeatureTmp> query = Wrappers.lambdaQuery();
+            query.eq(TTableFeatureTmp::getWriteRedmine, "1");
+            List<TTableFeatureTmp> tempList = tTableFeatureTmpService.list(query);
+            tTableFeatureTmpService.removeBatchByIds(tempList);
+        }
+        return new ProcessResult(true);
     }
 }

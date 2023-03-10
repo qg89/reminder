@@ -12,12 +12,14 @@ import com.q.reminder.reminder.service.UserGroupService;
 import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.MessageVo;
-import com.xxl.job.core.handler.annotation.XxlJob;
-import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.worker.core.processor.ProcessResult;
+import tech.powerjob.worker.core.processor.TaskContext;
+import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +31,8 @@ import java.util.List;
  * @Description : 每日更新当前群信息，人员信息，及人群关系
  * @date :  2022.09.27 20:11
  */
-@Log4j2
 @Component
-public class UpdateFeishuRedmineTask {
+public class UpdateFeishuRedmineTask implements BasicProcessor {
     @Autowired
     private GroupInfoService groupInfoService;
     @Autowired
@@ -43,8 +44,9 @@ public class UpdateFeishuRedmineTask {
     @Autowired
     private Client client;
 
-    @XxlJob("everyDaySyncMember")
-    public void everyDaySyncMember() throws Exception {
+    @Override
+    public ProcessResult process(TaskContext context) throws Exception {
+        OmsLogger log = context.getOmsLogger();
         List<GroupInfo> groupToChats = BaseFeishu.groupMessage(client).getGroupToChats();
         List<AdminInfo> adminInfos = adminInfoService.list();
         log.info("获取机器人所在群组信息完成!");
@@ -83,5 +85,6 @@ public class UpdateFeishuRedmineTask {
         }
         log.info("保存机器人所在群组和人员关系完成!");
         log.info("每日更新当前群信息，人员信息，及人群关系, 任务执行成功!");
+        return new ProcessResult();
     }
 }

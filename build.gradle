@@ -76,7 +76,7 @@ dependencies {
 //	implementation 'com.larksuite.oapi:larksuite-oapi:1.0.18-rc4'
 
 
-	implementation 'com.xuxueli:xxl-job-core:2.3.1'
+//	implementation 'com.xuxueli:xxl-job-core:2.3.1'
 
 	implementation 'org.freemarker:freemarker:2.3.31'
 
@@ -90,8 +90,11 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
-//	implementation 'tech.powerjob:powerjob-worker-spring-boot-starter:4.2.0'
-//	implementation 'tech.powerjob:powerjob-official-processors:1.2.2'
+//	powerjob
+	implementation 'tech.powerjob:powerjob-worker-spring-boot-starter:4.3.1-bugfix'
+//	implementation 'tech.powerjob:powerjob-official-processors:4.3.1-bugfix'
+	implementation 'org.agrona:agrona:1.4.0'
+	implementation 'javax.xml.bind:jaxb-api:2.3.1'
 
 //	git
 	implementation 'org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r'

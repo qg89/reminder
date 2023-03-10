@@ -5,12 +5,12 @@ import com.q.reminder.reminder.entity.RedmineUserInfo;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RedmineUserInfoService;
 import com.q.reminder.reminder.util.RedmineApi;
-import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.bean.TimeEntry;
-import com.xxl.job.core.handler.annotation.XxlJob;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import tech.powerjob.worker.core.processor.ProcessResult;
+import tech.powerjob.worker.core.processor.TaskContext;
+import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,15 +24,14 @@ import java.util.stream.Collectors;
  * @date :  2023.01.18 16:42
  */
 @Component
-@Log4j2
-public class SyncRedmineUserTask {
+public class SyncRedmineUserTask implements BasicProcessor {
     @Autowired
     private RedmineUserInfoService redmineUserInfoService;
     @Autowired
     private ProjectInfoService projectInfoService;
 
-    @XxlJob("syncRedmineUserTask")
-    public void syncRedmineUserTask() throws RedmineException {
+@Override
+public ProcessResult process(TaskContext context) throws Exception {
         List<RedmineUserInfo> data = new ArrayList<>();
         for (RProjectInfo info : projectInfoService.listAll()) {
              RedmineApi.queryUserTime(info).stream().collect(Collectors.toMap(TimeEntry::getUserId, TimeEntry::getUserName, (v1, v2) -> v1)).forEach((userId, userName) -> {
@@ -45,5 +44,6 @@ public class SyncRedmineUserTask {
              });
         }
         redmineUserInfoService.saveOrupdateMultiIdAll(data);
+        return new ProcessResult();
     }
 }
