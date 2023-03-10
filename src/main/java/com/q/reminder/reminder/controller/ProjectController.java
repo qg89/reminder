@@ -154,6 +154,7 @@ public class ProjectController {
     public ReturnT<List<OptionVo>> member() {
         LambdaQueryWrapper<UserMemgerInfo> lq = Wrappers.lambdaQuery();
         lq.select(UserMemgerInfo::getMemberId, UserMemgerInfo::getName);
+        lq.eq(UserMemgerInfo::getResign, "0");
         List<OptionVo> res = new ArrayList<>();
         userMemberService.list(lq).forEach(i -> {
             OptionVo vo = new OptionVo();
