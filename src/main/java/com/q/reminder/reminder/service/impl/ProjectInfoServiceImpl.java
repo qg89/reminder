@@ -127,24 +127,24 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     private Map<String, String> map() {
         Map<String, String> resMap = new LinkedHashMap<>();
         resMap.put("pid", "redmine项目ID");
-        resMap.put("pKey", "redmine项目key");
+        resMap.put("pKey", "redmine项目Key");
         resMap.put("pName", "redmine项目名称");
-        resMap.put("featureToken", "需求管理表token");
+        resMap.put("featureToken", "需求管理表Token");
         resMap.put("syncFeature", "同步需求管理表");
         resMap.put("projectShortName", "项目短名称");
         resMap.put("pmOu", "项目经理");
-        resMap.put("pmKey", "项目经理redminekey");
-        resMap.put("redmineUrl", "redmineURL");
+        resMap.put("pmKey", "项目经理RedmineKey");
+        resMap.put("redmineUrl", "RedmineURL");
         resMap.put("startDay", "项目开始时间");
         resMap.put("sendGroupChatId", "项目需求群");
-        resMap.put("isSendGroup", "是否发送需求群");
+        resMap.put("isSendGroup", "发送需求群");
         resMap.put("productMemberId", "产品经理");
-        resMap.put("folderToken", "项目周报文件夹token");
-        resMap.put("weeklyCopyType", "项目周报是否复制");
-        resMap.put("weeklyType", "项目周报类型是否自动生成");
-        resMap.put("wikiType", "是否自动复制标准过程表");
-        resMap.put("wikiToken", "知识库token");
-        resMap.put("redmineType", "redmine类型");
+        resMap.put("folderToken", "项目周报文件夹Token");
+        resMap.put("weeklyCopyType", "复制项目周报");
+        resMap.put("weeklyType", "自动生成项目周报");
+        resMap.put("wikiType", "自动复制标准过程表");
+        resMap.put("wikiToken", "知识库Token");
+        resMap.put("redmineType", "Redmine类型");
         resMap.put("isDelete", "删除标识");
         return resMap;
     }
