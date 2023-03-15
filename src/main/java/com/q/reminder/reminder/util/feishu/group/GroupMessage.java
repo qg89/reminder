@@ -43,7 +43,7 @@ public class GroupMessage extends BaseFeishu {
      */
     public List<GroupInfo> getGroupToChats() throws Exception {
         ListChatReq req = ListChatReq.newBuilder().userIdType(ListChatUserIdTypeEnum.OPEN_ID).build();
-        ListChatResp resp = CLIENT.im().chat().list(req);
+        ListChatResp resp = CLIENT.im().chat().list(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
         ListChatRespBody data = resp.getData();
         ListChat[] items = data.getItems();
         ArrayList<ListChat> listChats = new ArrayList<>(Arrays.asList(items));
@@ -65,7 +65,7 @@ public class GroupMessage extends BaseFeishu {
                     .memberIdType(GetChatMembersMemberIdTypeEnum.OPEN_ID)
                     .pageSize(20)
                     .build();
-            GetChatMembersResp resp = CLIENT.im().chatMembers().get(req, RequestOptions.newBuilder().build());
+            GetChatMembersResp resp = CLIENT.im().chatMembers().get(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
             GetChatMembersRespBody data = resp.getData();
             for (ListMember dataItem : data.getItems()) {
                 UserMemgerInfo userMemgerInfo = new UserMemgerInfo();

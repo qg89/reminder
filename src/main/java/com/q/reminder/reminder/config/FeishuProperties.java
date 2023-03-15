@@ -1,9 +1,7 @@
 package com.q.reminder.reminder.config;
 
 import com.lark.oapi.Client;
-import com.lark.oapi.core.cache.ICache;
 import com.lark.oapi.core.cache.LocalCache;
-import com.lark.oapi.core.enums.AppType;
 import com.lark.oapi.core.enums.BaseUrlEnum;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -38,6 +36,7 @@ public class FeishuProperties implements Serializable {
                 .requestTimeout(5, TimeUnit.MINUTES)
                 .tokenCache(LocalCache.getInstance())
                 .openBaseUrl(BaseUrlEnum.FeiShu)
+                .disableTokenCache()
                 .build();
     }
 }

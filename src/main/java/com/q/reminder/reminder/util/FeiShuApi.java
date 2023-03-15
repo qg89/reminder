@@ -32,6 +32,11 @@ public abstract class FeiShuApi {
     private final static String SEND_GROUP_URL = "https://open.feishu.cn/open-apis/im/v1/messages?receive_id_type=chat_id";
     private final static String TOKEN_URL = "https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal";
 
+
+    public static void main(String arg[]) throws Exception {
+        String post = HttpUtil.post("https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal", Map.of("app_id", "cli_a1144b112738d013", "app_secret", "AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx"));
+        System.out.println(post);
+    }
     /**
      * 通过人员ID 发送消息
      *

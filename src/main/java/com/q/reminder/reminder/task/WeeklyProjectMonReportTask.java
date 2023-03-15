@@ -3,7 +3,6 @@ package com.q.reminder.reminder.task;
 import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.lark.oapi.Client;
 import com.lark.oapi.service.docx.v1.model.ReplaceImageRequest;
 import com.lark.oapi.service.docx.v1.model.UpdateBlockRequest;
 import com.q.reminder.reminder.config.FeishuProperties;
@@ -50,7 +49,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
     @Autowired
     private FeishuProperties feishuProperties;
     @Autowired
-    private Client client;
+    private BaseFeishu baseFeishu;
 
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
@@ -138,7 +137,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
                     }
                 }
             }
-            BaseFeishu.block(client).batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
+            baseFeishu.block().batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
 //            log.info("[{}]项目周报更新完成", projectShortName);
 
             sendFeishu(report);
@@ -312,10 +311,10 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         imageVo.setAppSecret(vo.getAppSecret());
         imageVo.setAppId(vo.getAppId());
         imageVo.setParentNode(vo.getBlockId());
-        String fileToken = BaseFeishu.cloud(client).uploadFile(imageVo);
+        String fileToken = baseFeishu.cloud().uploadFile(imageVo);
         vo.setImageToken(fileToken);
         // 通过飞书替换图片至block_id
-        Boolean updateBlocks = BaseFeishu.block(client).updateBlocks(vo);
+        Boolean updateBlocks = baseFeishu.block().updateBlocks(vo);
         if (!updateBlocks) {
             System.out.println();
         }

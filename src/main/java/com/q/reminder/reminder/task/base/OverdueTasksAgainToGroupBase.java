@@ -2,7 +2,6 @@ package com.q.reminder.reminder.task.base;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.lark.oapi.Client;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;
@@ -52,7 +51,7 @@ public class OverdueTasksAgainToGroupBase {
     @Autowired
     private FeishuProperties feishuProperties;
     @Autowired
-    private Client client;
+    private BaseFeishu baseFeishu;
 
     /**
      * 无任务提醒
@@ -144,7 +143,7 @@ public class OverdueTasksAgainToGroupBase {
             m.setContent(content.toJSONString());
             m.setMsgType("post");
             try {
-                BaseFeishu.message(client).sendContent(m);
+                baseFeishu.message().sendContent(m);
             } catch (Exception ex) {
                 FeiShuApi.sendAdmin(adminInfoList, this.getClass().getName() + " 过期任务提醒群组,发送异常", secret);
             }

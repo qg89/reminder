@@ -5,7 +5,6 @@ import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.lark.oapi.Client;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.WikiSpace;
 import com.q.reminder.reminder.service.ProjectInfoService;
@@ -33,8 +32,6 @@ public class SyncSpacesWikiTask implements BasicProcessor {
     @Autowired
     private WikiSpaceService spaceWikoService;
     @Autowired
-    private Client client;
-    @Autowired
     private ProjectInfoService projectInfoService;
 
     @Override
@@ -58,14 +55,14 @@ public class SyncSpacesWikiTask implements BasicProcessor {
             log.info("当前周已复制");
             return processResult;
         }
-        WikiSpace wikiSpace = spaceWikoService.getSpacesNode(client, "wikcnXpXCgmL3E7vdbM1TiwXiGc");
+        WikiSpace wikiSpace = spaceWikoService.getSpacesNode("wikcnXpXCgmL3E7vdbM1TiwXiGc");
         String parentTitle = wikiSpace.getTitle();
         LambdaQueryWrapper<RProjectInfo> lq = Wrappers.<RProjectInfo>lambdaQuery().select(RProjectInfo::getWikiToken, RProjectInfo::getId).isNotNull(RProjectInfo::getWikiToken);
         lq.eq(RProjectInfo::getWikiType, "0");
         List<RProjectInfo> list = projectInfoService.list(lq);
         for (RProjectInfo info : list) {
             String title = parentTitle + "-" + DateTime.now().toString("yy") + "W" + weekOfYear;
-            WikiSpace space = spaceWikoService.syncSpacesWiki(client, info.getWikiToken(), title);
+            WikiSpace space = spaceWikoService.syncSpacesWiki(info.getWikiToken(), title);
             space.setPId(info.getId());
             space.setWeekNum(weekOfYear);
             wikiSpaceList.add(space);

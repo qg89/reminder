@@ -3,7 +3,6 @@ package com.q.reminder.reminder.task.table;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.lark.oapi.Client;
 import com.lark.oapi.service.bitable.v1.model.AppTableRecord;
 import com.q.reminder.reminder.config.RedmineConfig;
 import com.q.reminder.reminder.constant.TableTypeContants;
@@ -51,7 +50,7 @@ import java.util.stream.Collectors;
 @Component
 public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
     @Autowired
-    private Client client;
+    private BaseFeishu baseFeishu;
     @Autowired
     private TTableFeatureTmpService tTableFeatureTmpService;
     @Autowired
@@ -282,7 +281,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
         lq.eq(TTableInfo::getTableType, TableTypeContants.FEATURE);
         TTableInfo tTableInfo = tTableInfoService.getOne(lq);
         if (!CollectionUtils.isEmpty(records)) {
-            BaseFeishu.table(client).batchUpdateTableRecords(tTableInfo, records.toArray(new AppTableRecord[0]));
+            baseFeishu.table().batchUpdateTableRecords(tTableInfo, records.toArray(new AppTableRecord[0]));
         }
 
         if (DateUtil.dayOfWeek(new Date()) == 1) {

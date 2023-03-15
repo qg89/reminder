@@ -4,7 +4,6 @@ import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.lark.oapi.Client;
 import com.lark.oapi.service.bitable.v1.model.AppTableRecord;
 import com.q.reminder.reminder.constant.TableTypeContants;
 import com.q.reminder.reminder.entity.TTableInfo;
@@ -35,7 +34,7 @@ import java.util.stream.Collectors;
 @Component
 public class SyncProjcetTimeTableTask implements BasicProcessor {
     @Autowired
-    private Client client;
+    private BaseFeishu baseFeishu;
     @Autowired
     private TTableInfoService tTableInfoService;
     @Autowired
@@ -83,7 +82,7 @@ public class SyncProjcetTimeTableTask implements BasicProcessor {
             });
             records.add(AppTableRecord.newBuilder().fields(data).build());
         }
-        BaseFeishu.table(client).batchCreateTableRecords(tableInfo, records.toArray(new AppTableRecord[0]));
+        baseFeishu.table().batchCreateTableRecords(tableInfo, records.toArray(new AppTableRecord[0]));
         return new ProcessResult(true);
     }
 
@@ -94,10 +93,10 @@ public class SyncProjcetTimeTableTask implements BasicProcessor {
      * @throws Exception
      */
     private void delRecords(TTableInfo tTableInfo) throws Exception {
-        List<String> list = BaseFeishu.table(client).listTableRecords(tTableInfo).stream().map(AppTableRecord::getRecordId).toList();
+        List<String> list = baseFeishu.table().listTableRecords(tTableInfo).stream().map(AppTableRecord::getRecordId).toList();
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
-        BaseFeishu.table(client).batchDeleteTableRecords(tTableInfo, list.toArray(new String[0]));
+        baseFeishu.table().batchDeleteTableRecords(tTableInfo, list.toArray(new String[0]));
     }
 }

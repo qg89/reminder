@@ -1,6 +1,5 @@
 package com.q.reminder.reminder.task;
 
-import com.lark.oapi.Client;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.GroupInfo;
@@ -42,16 +41,16 @@ public class UpdateFeishuRedmineTask implements BasicProcessor {
     @Autowired
     private AdminInfoService adminInfoService;
     @Autowired
-    private Client client;
+    private BaseFeishu baseFeishu;
 
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
         OmsLogger log = context.getOmsLogger();
-        List<GroupInfo> groupToChats = BaseFeishu.groupMessage(client).getGroupToChats();
+        List<GroupInfo> groupToChats = baseFeishu.groupMessage().getGroupToChats();
         List<AdminInfo> adminInfos = adminInfoService.list();
         log.info("获取机器人所在群组信息完成!");
         List<UserGroup> userGroupList = new ArrayList<>();
-        List<UserMemgerInfo> membersByChats = BaseFeishu.groupMessage(client).getMembersByChats(groupToChats, userGroupList);
+        List<UserMemgerInfo> membersByChats = baseFeishu.groupMessage().getMembersByChats(groupToChats, userGroupList);
         StringBuilder content = new StringBuilder();
         if (CollectionUtils.isEmpty(membersByChats)) {
             content.append("\r\n获取机器人所在群组信息为空");
@@ -77,7 +76,7 @@ public class UpdateFeishuRedmineTask implements BasicProcessor {
                 try {
                     vo.setReceiveId(e.getMemberId());
                     vo.setContent(content.toString());
-                    BaseFeishu.message(client).sendContent(vo);
+                    baseFeishu.message().sendContent(vo);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

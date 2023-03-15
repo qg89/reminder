@@ -2,7 +2,6 @@ package com.q.reminder.reminder.task;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.lark.oapi.Client;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.WeeklyProjectReport;
@@ -39,7 +38,7 @@ public class WeeklyProjectReportTask implements BasicProcessor {
     @Autowired
     private HoldayBase holdayBase;
     @Autowired
-    private Client client;
+    private BaseFeishu baseFeishu;
 
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
@@ -71,6 +70,6 @@ public class WeeklyProjectReportTask implements BasicProcessor {
     }
 
     private String getFileToken() throws Exception {
-        return BaseFeishu.wiki(client).getNodeSpace("wikcnV143lsJnKeF2b65nSKGt1K").getObjToken();
+        return baseFeishu.wiki().getNodeSpace("wikcnV143lsJnKeF2b65nSKGt1K").getObjToken();
     }
 }

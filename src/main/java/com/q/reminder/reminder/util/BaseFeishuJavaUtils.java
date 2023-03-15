@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.request.RequestOptions;
-import com.lark.oapi.service.approval.v4.model.*;
 import com.lark.oapi.service.bitable.v1.enums.BatchCreateAppTableRecordUserIdTypeEnum;
 import com.lark.oapi.service.bitable.v1.enums.BatchUpdateAppTableRecordUserIdTypeEnum;
 import com.lark.oapi.service.bitable.v1.enums.ListAppTableRecordUserIdTypeEnum;
@@ -28,7 +27,6 @@ import com.q.reminder.reminder.entity.GroupInfo;
 import com.q.reminder.reminder.entity.TTableInfo;
 import com.q.reminder.reminder.entity.UserGroup;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
-import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.*;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
@@ -164,7 +162,11 @@ public abstract class BaseFeishuJavaUtils {
             messageVo.setMsgType(MsgTypeConstants.TEXT);
             messageVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
             try {
-                BaseFeishu.message(client).sendContent(messageVo);
+                ContentVo vo = new ContentVo();
+                vo.setContent(json.toJSONString());
+                vo.setReceiveId(memberId);
+                vo.setMsgType(MsgTypeConstants.TEXT);
+                sendContent(vo);
             } catch (Exception e) {
                 e.printStackTrace();
             }

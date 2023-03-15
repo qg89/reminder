@@ -3,7 +3,6 @@ package com.q.reminder.reminder.task;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.lark.oapi.Client;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.constant.MsgTypeConstants;
 import com.q.reminder.reminder.entity.CoverityLog;
@@ -39,7 +38,7 @@ public class CvoerityTask {
     @Autowired
     private GroupInfoService groupInfoService;
     @Autowired
-    private Client client;
+    private BaseFeishu baseFeishu;
     @Autowired
     private CoverityLogService coverityLogService;
 
@@ -147,7 +146,7 @@ public class CvoerityTask {
             messageVo.setMsgType(MsgTypeConstants.POST);
             messageVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.CHAT_ID);
             try {
-                BaseFeishu.message(client).sendContent(messageVo);
+                baseFeishu.message().sendContent(messageVo);
             } catch (Exception e) {
                 log.error(e);
             }
@@ -171,7 +170,7 @@ public class CvoerityTask {
             messageVo.setMsgType(MsgTypeConstants.POST);
             messageVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.CHAT_ID);
             try {
-                BaseFeishu.message(client).sendContent(messageVo);
+                baseFeishu.message().sendContent(messageVo);
             } catch (Exception e) {
                 log.error(e);
             }
