@@ -1,6 +1,5 @@
 package com.q.reminder.reminder.util.feishu.wiki;
 
-import com.lark.oapi.Client;
 import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.wiki.v2.model.*;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;

@@ -50,8 +50,6 @@ import java.util.stream.Collectors;
 @Component
 public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
     @Autowired
-    private BaseFeishu baseFeishu;
-    @Autowired
     private TTableFeatureTmpService tTableFeatureTmpService;
     @Autowired
     private TTableInfoService tTableInfoService;
@@ -281,7 +279,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
         lq.eq(TTableInfo::getTableType, TableTypeContants.FEATURE);
         TTableInfo tTableInfo = tTableInfoService.getOne(lq);
         if (!CollectionUtils.isEmpty(records)) {
-            baseFeishu.table().batchUpdateTableRecords(tTableInfo, records.toArray(new AppTableRecord[0]));
+            BaseFeishu.table().batchUpdateTableRecords(tTableInfo, records.toArray(new AppTableRecord[0]));
         }
 
         if (DateUtil.dayOfWeek(new Date()) == 1) {

@@ -50,8 +50,6 @@ public class OverdueTasksAgainToGroupBase {
     private AdminInfoService adminInfoService;
     @Autowired
     private FeishuProperties feishuProperties;
-    @Autowired
-    private BaseFeishu baseFeishu;
 
     /**
      * 无任务提醒
@@ -143,7 +141,7 @@ public class OverdueTasksAgainToGroupBase {
             m.setContent(content.toJSONString());
             m.setMsgType("post");
             try {
-                baseFeishu.message().sendContent(m);
+                BaseFeishu.message().sendContent(m);
             } catch (Exception ex) {
                 FeiShuApi.sendAdmin(adminInfoList, this.getClass().getName() + " 过期任务提醒群组,发送异常", secret);
             }

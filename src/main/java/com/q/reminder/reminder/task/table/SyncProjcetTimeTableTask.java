@@ -34,8 +34,6 @@ import java.util.stream.Collectors;
 @Component
 public class SyncProjcetTimeTableTask implements BasicProcessor {
     @Autowired
-    private BaseFeishu baseFeishu;
-    @Autowired
     private TTableInfoService tTableInfoService;
     @Autowired
     private WUserTimesService wUserTimesService;
@@ -82,7 +80,7 @@ public class SyncProjcetTimeTableTask implements BasicProcessor {
             });
             records.add(AppTableRecord.newBuilder().fields(data).build());
         }
-        baseFeishu.table().batchCreateTableRecords(tableInfo, records.toArray(new AppTableRecord[0]));
+        BaseFeishu.table().batchCreateTableRecords(tableInfo, records.toArray(new AppTableRecord[0]));
         return new ProcessResult(true);
     }
 
@@ -93,10 +91,10 @@ public class SyncProjcetTimeTableTask implements BasicProcessor {
      * @throws Exception
      */
     private void delRecords(TTableInfo tTableInfo) throws Exception {
-        List<String> list = baseFeishu.table().listTableRecords(tTableInfo).stream().map(AppTableRecord::getRecordId).toList();
+        List<String> list = BaseFeishu.table().listTableRecords(tTableInfo).stream().map(AppTableRecord::getRecordId).toList();
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
-        baseFeishu.table().batchDeleteTableRecords(tTableInfo, list.toArray(new String[0]));
+        BaseFeishu.table().batchDeleteTableRecords(tTableInfo, list.toArray(new String[0]));
     }
 }

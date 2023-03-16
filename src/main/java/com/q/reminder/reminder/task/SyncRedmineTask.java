@@ -2,7 +2,6 @@ package com.q.reminder.reminder.task;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.lark.oapi.Client;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.service.AdminInfoService;
 import com.q.reminder.reminder.service.ProjectInfoService;
@@ -35,8 +34,6 @@ public class SyncRedmineTask {
     private AdminInfoService adminInfoService;
     @Autowired
     private FeishuProperties feishuProperties;
-    @Autowired
-    private Client client;
 
 //    @Deprecated
 //    @XxlJob("syncRedmineTask")

@@ -1,10 +1,8 @@
 package com.q.reminder.reminder.util.feishu.approval;
 
-import com.lark.oapi.Client;
 import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.approval.v4.model.*;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
-import com.q.reminder.reminder.util.feishu.message.Message;
 import com.q.reminder.reminder.vo.ApprovalSampleVo;
 
 /**

@@ -20,11 +20,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class WikiSpaceServiceImpl extends ServiceImpl<WikiSpaceMapping, WikiSpace> implements WikiSpaceService {
 
-    @Autowired
-    private BaseFeishu baseFeishu;
     @Override
     public WikiSpace syncSpacesWiki(String projectToken, String title) throws Exception {
-        Node node = baseFeishu.wiki().syncSpacesWiki(projectToken, title);
+        Node node = BaseFeishu.wiki().syncSpacesWiki(projectToken, title);
         WikiSpace space = new WikiSpace();
         BeanUtil.copyProperties(node, space);
         return space;
@@ -32,7 +30,7 @@ public class WikiSpaceServiceImpl extends ServiceImpl<WikiSpaceMapping, WikiSpac
 
     @Override
     public WikiSpace getSpacesNode(String token) throws Exception {
-        Node node =  baseFeishu.wiki().getSpacesNode(token);
+        Node node =  BaseFeishu.wiki().getSpacesNode(token);
         WikiSpace space = new WikiSpace();
         BeanUtil.copyProperties(node, space);
         return space;

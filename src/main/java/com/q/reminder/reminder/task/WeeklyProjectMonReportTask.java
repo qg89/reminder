@@ -48,8 +48,6 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
     private ProjectInfoService projectInfoService;
     @Autowired
     private FeishuProperties feishuProperties;
-    @Autowired
-    private BaseFeishu baseFeishu;
 
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
@@ -137,7 +135,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
                     }
                 }
             }
-            baseFeishu.block().batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
+            BaseFeishu.block().batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
 //            log.info("[{}]项目周报更新完成", projectShortName);
 
             sendFeishu(report);
@@ -311,10 +309,10 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         imageVo.setAppSecret(vo.getAppSecret());
         imageVo.setAppId(vo.getAppId());
         imageVo.setParentNode(vo.getBlockId());
-        String fileToken = baseFeishu.cloud().uploadFile(imageVo);
+        String fileToken = BaseFeishu.cloud().uploadFile(imageVo);
         vo.setImageToken(fileToken);
         // 通过飞书替换图片至block_id
-        Boolean updateBlocks = baseFeishu.block().updateBlocks(vo);
+        Boolean updateBlocks = BaseFeishu.block().updateBlocks(vo);
         if (!updateBlocks) {
             System.out.println();
         }

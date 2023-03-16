@@ -1,9 +1,11 @@
 package com.q.reminder.reminder;
 
 import com.github.jeffreyning.mybatisplus.conf.EnableMPP;
+import com.q.reminder.reminder.config.SpringContextUtils;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * @author saiko
@@ -14,7 +16,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ReminderApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ReminderApplication.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(ReminderApplication.class, args);
+        SpringContextUtils.setApplicationContext(context);
     }
 
 }

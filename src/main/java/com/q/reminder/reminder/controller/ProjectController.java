@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.*;
 import com.q.reminder.reminder.service.*;
+import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.OptionVo;
 import com.q.reminder.reminder.vo.ProjectInfoVo;
 import com.q.reminder.reminder.vo.RProjectReaVo;
@@ -59,6 +60,10 @@ public class ProjectController {
             return ReturnT.FAIL;
         }
         return ReturnT.SUCCESS;
+    }
+    @GetMapping("/t")
+    public List<GroupInfo> t() throws Exception {
+       return BaseFeishu.groupMessage().getGroupToChats();
     }
 
     @PostMapping("/e")

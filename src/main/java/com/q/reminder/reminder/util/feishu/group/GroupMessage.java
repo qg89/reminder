@@ -24,9 +24,13 @@ import java.util.List;
  */
 public class GroupMessage extends BaseFeishu {
 
-    private  static GroupMessage groupMessage;
-    private GroupMessage(){}
-    public static synchronized GroupMessage getInstance(){
+    private static GroupMessage groupMessage;
+
+    private GroupMessage(){
+        super();
+    }
+
+    public static synchronized GroupMessage getInstance() {
         if (groupMessage == null) {
             groupMessage = new GroupMessage();
         }

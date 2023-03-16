@@ -40,17 +40,15 @@ public class UpdateFeishuRedmineTask implements BasicProcessor {
     private UserGroupService userGroupService;
     @Autowired
     private AdminInfoService adminInfoService;
-    @Autowired
-    private BaseFeishu baseFeishu;
 
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
         OmsLogger log = context.getOmsLogger();
-        List<GroupInfo> groupToChats = baseFeishu.groupMessage().getGroupToChats();
+        List<GroupInfo> groupToChats = BaseFeishu.groupMessage().getGroupToChats();
         List<AdminInfo> adminInfos = adminInfoService.list();
         log.info("获取机器人所在群组信息完成!");
         List<UserGroup> userGroupList = new ArrayList<>();
-        List<UserMemgerInfo> membersByChats = baseFeishu.groupMessage().getMembersByChats(groupToChats, userGroupList);
+        List<UserMemgerInfo> membersByChats = BaseFeishu.groupMessage().getMembersByChats(groupToChats, userGroupList);
         StringBuilder content = new StringBuilder();
         if (CollectionUtils.isEmpty(membersByChats)) {
             content.append("\r\n获取机器人所在群组信息为空");
@@ -76,7 +74,7 @@ public class UpdateFeishuRedmineTask implements BasicProcessor {
                 try {
                     vo.setReceiveId(e.getMemberId());
                     vo.setContent(content.toString());
-                    baseFeishu.message().sendContent(vo);
+                    BaseFeishu.message().sendContent(vo);
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

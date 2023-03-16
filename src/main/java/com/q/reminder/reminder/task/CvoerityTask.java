@@ -38,8 +38,6 @@ public class CvoerityTask {
     @Autowired
     private GroupInfoService groupInfoService;
     @Autowired
-    private BaseFeishu baseFeishu;
-    @Autowired
     private CoverityLogService coverityLogService;
 
 //    public ReturnT<String> coverity() {
@@ -146,7 +144,7 @@ public class CvoerityTask {
             messageVo.setMsgType(MsgTypeConstants.POST);
             messageVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.CHAT_ID);
             try {
-                baseFeishu.message().sendContent(messageVo);
+                BaseFeishu.message().sendContent(messageVo);
             } catch (Exception e) {
                 log.error(e);
             }
@@ -170,7 +168,7 @@ public class CvoerityTask {
             messageVo.setMsgType(MsgTypeConstants.POST);
             messageVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.CHAT_ID);
             try {
-                baseFeishu.message().sendContent(messageVo);
+                BaseFeishu.message().sendContent(messageVo);
             } catch (Exception e) {
                 log.error(e);
             }

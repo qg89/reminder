@@ -37,8 +37,6 @@ public class WeeklyProjectReportTask implements BasicProcessor {
     private FeishuProperties feishuProperties;
     @Autowired
     private HoldayBase holdayBase;
-    @Autowired
-    private BaseFeishu baseFeishu;
 
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
@@ -70,6 +68,6 @@ public class WeeklyProjectReportTask implements BasicProcessor {
     }
 
     private String getFileToken() throws Exception {
-        return baseFeishu.wiki().getNodeSpace("wikcnV143lsJnKeF2b65nSKGt1K").getObjToken();
+        return BaseFeishu.wiki().getNodeSpace("wikcnV143lsJnKeF2b65nSKGt1K").getObjToken();
     }
 }

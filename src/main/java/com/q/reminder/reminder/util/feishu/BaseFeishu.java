@@ -1,22 +1,14 @@
 package com.q.reminder.reminder.util.feishu;
 
-import cn.hutool.http.HttpUtil;
-import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.Client;
-import com.q.reminder.reminder.config.FeishuProperties;
+import com.q.reminder.reminder.config.SpringContextUtils;
+import com.q.reminder.reminder.service.impl.FeishuService;
 import com.q.reminder.reminder.util.feishu.cloud.documents.Documents;
 import com.q.reminder.reminder.util.feishu.cloud.space.Space;
 import com.q.reminder.reminder.util.feishu.cloud.table.Table;
 import com.q.reminder.reminder.util.feishu.group.GroupMessage;
 import com.q.reminder.reminder.util.feishu.message.Message;
 import com.q.reminder.reminder.util.feishu.wiki.Wiki;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
-
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author : saiko
@@ -25,28 +17,14 @@ import java.util.concurrent.TimeUnit;
  * @Description :
  * @date :  2023.02.23 11:32
  */
-@Component
-public class BaseFeishu {
-    protected BaseFeishu() {
-    }
-
-    protected Client CLIENT = null;
+public abstract class BaseFeishu {
+    protected Client CLIENT;
     protected String TENANT_ACCESS_TOKEN;
 
-    @Autowired
-    private RedisTemplate<String, String> redisTemplate;
-    @Autowired
-    private FeishuProperties feishuProperties;
-    @Autowired
-    private Client client;
-
-    @Cacheable(cacheNames = "TENANT_ACCESS_TOKEN")
-    public String tenantAccessToken() {
-        String post = HttpUtil.post("https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal", Map.of("app_id", feishuProperties.getAppId(), "app_secret", feishuProperties.getAppSecret()));
-        JSONObject token = JSONObject.parseObject(post);
-        String tenantAccessToken = token.getString("tenant_access_token");
-        redisTemplate.opsForValue().set("TENANT_ACCESS_TOKEN", tenantAccessToken, token.getInteger("expire") - 10, TimeUnit.SECONDS);
-        return tenantAccessToken;
+    protected BaseFeishu() {
+        FeishuService feishuService = SpringContextUtils.getBean(FeishuService.class);
+        CLIENT = feishuService.client();
+        TENANT_ACCESS_TOKEN = feishuService.tenantAccessToken();
     }
 
     /**
@@ -54,8 +32,7 @@ public class BaseFeishu {
      *
      * @return
      */
-    public Space cloud() {
-        init();
+    public static Space cloud() {
         return Space.getInstance();
     }
 
@@ -64,8 +41,7 @@ public class BaseFeishu {
      *
      * @return
      */
-    public Documents block() {
-        init();
+    public static Documents block() {
         return Documents.getInstance();
     }
 
@@ -74,8 +50,7 @@ public class BaseFeishu {
      *
      * @return
      */
-    public Message message() {
-        init();
+    public static Message message() {
         return Message.getInstance();
     }
 
@@ -84,8 +59,7 @@ public class BaseFeishu {
      *
      * @return
      */
-    public Wiki wiki() {
-        init();
+    public static Wiki wiki() {
         return Wiki.getInstance();
     }
 
@@ -94,8 +68,7 @@ public class BaseFeishu {
      *
      * @return
      */
-    public GroupMessage groupMessage() {
-        init();
+    public static GroupMessage groupMessage() {
         return GroupMessage.getInstance();
     }
 
@@ -104,13 +77,7 @@ public class BaseFeishu {
      *
      * @return
      */
-    public Table table() {
-        init();
+    public static Table table() {
         return Table.getInstance();
-    }
-
-    private void init() {
-        CLIENT = client;
-        TENANT_ACCESS_TOKEN = tenantAccessToken();
     }
 }
