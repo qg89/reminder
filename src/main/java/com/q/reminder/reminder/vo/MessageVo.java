@@ -19,7 +19,6 @@ public class MessageVo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1403735921910913274L;
-    private Client client;
     private String receiveId;
     private String content;
     private String msgType;

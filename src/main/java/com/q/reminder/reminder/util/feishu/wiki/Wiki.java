@@ -44,7 +44,7 @@ public class Wiki extends BaseFeishu {
                 .nodeToken("wikcnXpXCgmL3E7vdbM1TiwXiGc")
                 .spaceId("7046680616087126018")
                 .build();
-        CopySpaceNodeResp resp = CLIENT.wiki().spaceNode().copy(req);
+        CopySpaceNodeResp resp = CLIENT.wiki().spaceNode().copy(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
         return resp.getData().getNode();
     }
 
@@ -59,7 +59,7 @@ public class Wiki extends BaseFeishu {
         GetNodeSpaceReq req = GetNodeSpaceReq.newBuilder()
                 .token(token)
                 .build();
-        GetNodeSpaceResp resp = CLIENT.wiki().space().getNode(req);
+        GetNodeSpaceResp resp = CLIENT.wiki().space().getNode(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
         return resp.getData().getNode();
     }
 
@@ -74,8 +74,7 @@ public class Wiki extends BaseFeishu {
         GetNodeSpaceReq req = GetNodeSpaceReq.newBuilder()
                 .token(wikiToken)
                 .build();
-        GetNodeSpaceResp resp = CLIENT.wiki().space().getNode(req, RequestOptions.newBuilder()
-                .build());
+        GetNodeSpaceResp resp = CLIENT.wiki().space().getNode(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
         if (resp.success()) {
             return resp.getData().getNode();
         }

@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.util.feishu.cloud.table;
 
 import com.lark.oapi.Client;
+import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.bitable.v1.enums.BatchCreateAppTableRecordUserIdTypeEnum;
 import com.lark.oapi.service.bitable.v1.enums.BatchUpdateAppTableRecordUserIdTypeEnum;
 import com.lark.oapi.service.bitable.v1.enums.ListAppTableRecordUserIdTypeEnum;
@@ -57,7 +58,7 @@ public class Table extends BaseFeishu {
             if (StringUtils.isNotBlank(pageToken)) {
                 req.setPageToken(pageToken);
             }
-            resp = CLIENT.bitable().appTableRecord().list(req);
+            resp = CLIENT.bitable().appTableRecord().list(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
             if (resp.getCode() != 0) {
                 return resList;
             }
@@ -87,7 +88,7 @@ public class Table extends BaseFeishu {
                         .records(records)
                         .build())
                 .build();
-        BatchCreateAppTableRecordResp resp = client.bitable().appTableRecord().batchCreate(req);
+        BatchCreateAppTableRecordResp resp = client.bitable().appTableRecord().batchCreate(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
     }
 
     /**
@@ -102,7 +103,7 @@ public class Table extends BaseFeishu {
                 .tableId(vo.getTableId())
                 .batchDeleteAppTableRecordReqBody(BatchDeleteAppTableRecordReqBody.newBuilder().records(records).build())
                 .build();
-        CLIENT.bitable().appTableRecord().batchDelete(req);
+        CLIENT.bitable().appTableRecord().batchDelete(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
     }
 
     /**
@@ -119,7 +120,7 @@ public class Table extends BaseFeishu {
                 .userIdType(BatchUpdateAppTableRecordUserIdTypeEnum.OPEN_ID)
                 .batchUpdateAppTableRecordReqBody(reqBody)
                 .build();
-        BatchUpdateAppTableRecordResp resp = CLIENT.bitable().appTableRecord().batchUpdate(req);
+        BatchUpdateAppTableRecordResp resp = CLIENT.bitable().appTableRecord().batchUpdate(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
     }
 
     /**
@@ -137,6 +138,6 @@ public class Table extends BaseFeishu {
                         .records(records)
                         .build())
                 .build();
-        BatchCreateAppTableRecordResp resp = CLIENT.bitable().appTableRecord().batchCreate(req);
+        BatchCreateAppTableRecordResp resp = CLIENT.bitable().appTableRecord().batchCreate(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
     }
 }

@@ -52,6 +52,7 @@ public class Space extends BaseFeishu {
                         .file(vo.getFile())
                         .build()
                 ).build()
+                , RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build()
         );
         if (uploadAllMediaResp.success()) {
             UploadAllMediaRespBody data = uploadAllMediaResp.getData();
@@ -72,7 +73,7 @@ public class Space extends BaseFeishu {
                 .spreadsheetToken(spreadsheetToken)
                 .build();
         // 发起请求
-        QuerySpreadsheetSheetResp resp = CLIENT.sheets().spreadsheetSheet().query(req, RequestOptions.newBuilder().build());
+        QuerySpreadsheetSheetResp resp = CLIENT.sheets().spreadsheetSheet().query(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
         List<SheetVo> list = new ArrayList<>();
         Sheet[] sheets = resp.getData().getSheets();
         for (Sheet sheet : sheets) {

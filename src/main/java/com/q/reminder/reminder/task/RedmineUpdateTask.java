@@ -5,15 +5,15 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.q.reminder.reminder.config.FeishuProperties;
+import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.UserMemberService;
-import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
+import com.q.reminder.reminder.util.feishu.BaseFeishu;
+import com.q.reminder.reminder.vo.MessageVo;
 import com.q.reminder.reminder.vo.RedmineVo;
-import com.q.reminder.reminder.vo.SendVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,6 @@ import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 import tech.powerjob.worker.log.OmsLogger;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -43,20 +42,18 @@ public class RedmineUpdateTask implements BasicProcessor {
     private ProjectInfoService projectInfoService;
     @Autowired
     private UserMemberService userMemberService;
-    @Autowired
-    private FeishuProperties feishuProperties;
 
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
         OmsLogger log = context.getOmsLogger();
-        List<RProjectInfo> RProjectInfoList = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();
-        List<RedmineVo> issues = RedmineApi.queryUpdateIssue(RProjectInfoList);
+        List<RProjectInfo> projectInfoList = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();
+        List<RedmineVo> issues = RedmineApi.queryUpdateIssue(projectInfoList);
         Map<String, List<RedmineVo>> issueMap = issues.stream().filter(issue ->
                 DateUtil.between(issue.getUpdatedOn(), new Date(), DateUnit.MINUTE) <= 10 && StringUtils.isNotBlank(issue.getAssigneeName())
         ).collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
 
         Map<String, List<RedmineVo>> noneIssueMapByAuthorName = issues.stream().filter(issue ->
-                DateUtil.between(issue.getUpdatedOn(), new Date(), DateUnit.MINUTE) <= 10 && StringUtils.isBlank(issue.getAssigneeName())
+                /*DateUtil.between(issue.getUpdatedOn(), new Date(), DateUnit.MINUTE) <= 10 &&*/ StringUtils.isBlank(issue.getAssigneeName())
         ).collect(Collectors.groupingBy(RedmineVo::getAuthorName));
 
         issueMap.forEach((ik, iv) -> noneIssueMapByAuthorName.forEach((k, v) -> {
@@ -70,14 +67,13 @@ public class RedmineUpdateTask implements BasicProcessor {
 
         LambdaQueryWrapper<UserMemgerInfo> lqw = new LambdaQueryWrapper<>();
         lqw.select(UserMemgerInfo::getName, UserMemgerInfo::getMemberId);
+        lqw.eq(UserMemgerInfo::getResign, "0");
         Map<String, String> userNameMap = userMemberService.list(lqw).stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
 
-        String authorization = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         issueMap.forEach((assigneeName, issueList) -> {
             JSONObject con = new JSONObject();
             JSONObject all = new JSONObject();
             con.put("zh_cn", all);
-            all.put("title", "【任务变更提醒 (" + DateUtil.now() + ")】");
             JSONArray contentJsonArray = new JSONArray();
             all.put("content", contentJsonArray);
             for (RedmineVo issue : issueList) {
@@ -86,9 +82,11 @@ public class RedmineUpdateTask implements BasicProcessor {
                 JSONObject subject = new JSONObject();
                 subject.put("tag", "text");
                 if (StringUtils.isBlank(issueAssigneeName)) {
-                    subject.put("text", "\r\n任务指派人为空-请及时更新指派人: ");
+                    all.put("title", "【任务指派人为空提醒 (" + DateUtil.now() + ")】");
+                    subject.put("text", "\r\n请及时更新指派人: ");
                     assigneeName = assigneeName.replace(" ", "");
                 } else {
+                    all.put("title", "【任务变更提醒 (" + DateUtil.now() + ")】");
                     subject.put("text", "\r\n任务主题: ");
                 }
                 subContentJsonArray.add(subject);
@@ -100,16 +98,12 @@ public class RedmineUpdateTask implements BasicProcessor {
                 contentJsonArray.add(subContentJsonArray);
             }
 
-            SendVo sendVo = new SendVo();
-            sendVo.setContent(con.toJSONString());
-            sendVo.setMemberId(userNameMap.get(assigneeName));
-            sendVo.setAssigneeName(assigneeName);
-            try {
-                FeiShuApi.sendPost(sendVo, authorization, new StringBuilder());
-            } catch (IOException e) {
-                log.error("e{}", e.getMessage());
-            }
-            log.info("{},变更提醒,任务发送成功", assigneeName);
+            MessageVo vo = new MessageVo();
+            vo.setMsgType("post");
+            vo.setReceiveId(userNameMap.get(assigneeName));
+            vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+            vo.setContent(con.toJSONString());
+            BaseFeishu.message().sendContent(vo);
         });
         log.info("变更提醒,任务执行完成!");
         return new ProcessResult();

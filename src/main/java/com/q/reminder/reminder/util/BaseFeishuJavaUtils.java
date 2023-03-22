@@ -199,26 +199,6 @@ public abstract class BaseFeishuJavaUtils {
         return Boolean.FALSE;
     }
 
-    @Deprecated
-    public static Boolean sendContent(MessageVo vo) throws Exception {
-        if (CLIENT == null) {
-            CLIENT = vo.getClient();
-        }
-        CreateMessageReq req = CreateMessageReq.newBuilder()
-                .createMessageReqBody(CreateMessageReqBody.newBuilder()
-                        .msgType(vo.getMsgType())
-                        .receiveId(vo.getReceiveId())
-                        .content(vo.getContent())
-                        .uuid(UUID.randomUUID().toString())
-                        .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
-        CreateMessageResp resp = CLIENT.im().message().create(req);
-        if (resp.getCode() == 0) {
-            return Boolean.TRUE;
-        }
-        log.error("发送飞书消息失败，msg：{} ;\r\n\terror：{}", resp.getMsg(), resp.getError());
-        return Boolean.FALSE;
-    }
-
     /**
      * 上传文件
      *

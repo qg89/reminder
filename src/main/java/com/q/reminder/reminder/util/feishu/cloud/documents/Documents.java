@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.util.feishu.cloud.documents;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.docx.v1.enums.BatchUpdateDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.enums.PatchDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.model.*;
@@ -45,7 +46,7 @@ public class Documents extends BaseFeishu {
                 .documentRevisionId(-1)
                 .userIdType(PatchDocumentBlockUserIdTypeEnum.USER_ID)
                 .updateBlockRequest(update)
-                .build());
+                .build(), RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
         if (patch.success()) {
             return Boolean.TRUE;
         }
@@ -67,7 +68,7 @@ public class Documents extends BaseFeishu {
                 .batchUpdateDocumentBlockReqBody(BatchUpdateDocumentBlockReqBody.newBuilder().requests(updateBlockRequests).build())
                 .build();
 
-        BatchUpdateDocumentBlockResp resp = CLIENT.docx().documentBlock().batchUpdate(req);
+        BatchUpdateDocumentBlockResp resp = CLIENT.docx().documentBlock().batchUpdate(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
         if (resp.success()) {
             return Boolean.TRUE;
         } else {

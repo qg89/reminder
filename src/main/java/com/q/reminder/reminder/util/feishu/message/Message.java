@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.util.feishu.message;
 
+import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.im.v1.ImService;
 import com.lark.oapi.service.im.v1.model.*;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
@@ -52,7 +53,7 @@ public class Message extends BaseFeishu {
         CreateMessageResp resp = new CreateMessageResp();
         ImService.Message message = CLIENT.im().message();
         try {
-            resp = message.create(req);
+            message.create(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
         } catch (Exception e) {
             int i = 0;
             while (!resp.success() && i <= 3) {
@@ -63,6 +64,7 @@ public class Message extends BaseFeishu {
                     log.error("发送消息异常次数:【{}】：{}", i, ex);
                 }
             }
+            log.error("发送消息异常次数:【{}】：{}", i, e);
         }
     }
 
