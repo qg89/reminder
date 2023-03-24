@@ -106,6 +106,6 @@ public class RedmineUpdateTask implements BasicProcessor {
             BaseFeishu.message().sendContent(vo);
         });
         log.info("变更提醒,任务执行完成!");
-        return new ProcessResult();
+        return new ProcessResult(true);
     }
 }

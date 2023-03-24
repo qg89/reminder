@@ -33,7 +33,7 @@ public class Overdue0Tasks implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
         OmsLogger log = context.getOmsLogger();
-        ProcessResult result = new ProcessResult();
+        ProcessResult result = new ProcessResult(true);
         if (holdayBase.queryHoliday()) {
             log.info("节假日放假!!!!");
             return result;

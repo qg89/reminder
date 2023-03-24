@@ -99,7 +99,7 @@ public class SyncRedmineProjectUserTimeTask implements BasicProcessor {
             time(userTimesData, id, bugTimeType, mapBug);
         }
         wUserTimesService.saveOrUpdateBatch(userTimesData);
-        return new ProcessResult();
+        return new ProcessResult(true);
     }
 
     /**

@@ -37,7 +37,7 @@ public class SyncSpacesWikiTask implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
         OmsLogger log = context.getOmsLogger();
-        ProcessResult processResult = new ProcessResult();
+        ProcessResult processResult = new ProcessResult(true);
         int weekOfYear = DateUtil.thisWeekOfYear() - 1;
         if (weekOfYear == 0) {
             weekOfYear = 52;

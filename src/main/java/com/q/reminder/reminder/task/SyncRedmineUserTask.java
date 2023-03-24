@@ -44,6 +44,6 @@ public ProcessResult process(TaskContext context) throws Exception {
              });
         }
         redmineUserInfoService.saveOrupdateMultiIdAll(data);
-        return new ProcessResult();
+        return new ProcessResult(true);
     }
 }
