@@ -184,12 +184,14 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
         tableQw.eq(TTableFeatureTmp::getWriteType, "是");
         List<TTableFeatureTmp> featureDataList = tTableFeatureTmpService.list(tableQw);
         Map<String, TTableUserConfig> userConfigMap = tTableUserConfigService.list().stream().collect(Collectors.toMap(TTableUserConfig::getPrjctKey, Function.identity(), (v1, v2) -> v1));
-        Map<String, RProjectInfo> projectMap = projectInfoService.listAll().stream().collect(Collectors.toMap(e -> String.valueOf(e.getId()), Function.identity(), (v1, v2) -> v1));
+        List<RProjectInfo> rProjectInfos = projectInfoService.listAll();
+        log.info("[需求管理表写入redmine] project list : {}", rProjectInfos);
+        Map<String, RProjectInfo> projectMap = rProjectInfos.stream().collect(Collectors.toMap(e -> String.valueOf(e.getId()), Function.identity(), (v1, v2) -> v1));
 
         List<AppTableRecord> records = new ArrayList<>();
 
         // key: pkey, value redmineType
-        Map<String, String> redmineTypeMap = projectInfoService.listAll().stream().collect(Collectors.toMap(RProjectInfo::getPkey, RProjectInfo::getRedmineType));
+        Map<String, String> redmineTypeMap = rProjectInfos.stream().collect(Collectors.toMap(RProjectInfo::getPkey, RProjectInfo::getRedmineType));
 
         for (TTableFeatureTmp featureTmp : featureDataList) {
             String recordsId = featureTmp.getRecordsId();
