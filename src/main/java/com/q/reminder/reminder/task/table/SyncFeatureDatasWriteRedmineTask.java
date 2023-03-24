@@ -271,10 +271,13 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                 }
             }
 
-            tTableFeatureTmpService.updateById(featureTmp);
             if ("1".equals(featureTmp.getWriteRedmine())) {
                 records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(Map.of("需求ID", recordsId)).build());
             }
+        }
+        List<TTableFeatureTmp> featureTmps = featureDataList.stream().filter(e -> "1".equals(e.getWriteRedmine())).toList();
+        if (!CollectionUtils.isEmpty(featureTmps)) {
+            tTableFeatureTmpService.updateBatchById(featureTmps);
         }
 
         LambdaQueryWrapper<TTableInfo> lq = Wrappers.lambdaQuery();
