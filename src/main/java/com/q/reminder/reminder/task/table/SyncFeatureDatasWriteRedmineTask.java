@@ -278,6 +278,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
         List<TTableFeatureTmp> featureTmps = featureDataList.stream().filter(e -> "1".equals(e.getWriteRedmine())).toList();
         if (!CollectionUtils.isEmpty(featureTmps)) {
             tTableFeatureTmpService.updateBatchById(featureTmps);
+            log.info("[需求管理表写入redmine] update : {}", featureTmps);
         }
 
         LambdaQueryWrapper<TTableInfo> lq = Wrappers.lambdaQuery();
@@ -285,6 +286,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
         TTableInfo tTableInfo = tTableInfoService.getOne(lq);
         if (!CollectionUtils.isEmpty(records)) {
             BaseFeishu.table().batchUpdateTableRecords(tTableInfo, records.toArray(new AppTableRecord[0]));
+            log.info("[需求管理表写入redmine] 更新成功");
         }
 
         if (DateUtil.dayOfWeek(new Date()) == 1) {
@@ -292,6 +294,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
             query.eq(TTableFeatureTmp::getWriteRedmine, "1");
             List<TTableFeatureTmp> tempList = tTableFeatureTmpService.list(query);
             tTableFeatureTmpService.removeBatchByIds(tempList);
+            log.info("[需求管理表写入redmine] 周一删除历史数据完成");
         }
         return new ProcessResult(true);
     }
