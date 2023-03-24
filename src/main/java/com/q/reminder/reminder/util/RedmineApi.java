@@ -33,63 +33,13 @@ import java.util.*;
  */
 @Log4j2
 public abstract class RedmineApi {
-    public static void main(String[] args) throws RedmineException {
-//        ProjectInfo info = new ProjectInfo();
-//        info.setRedmineUrl("http://redmine-pa.mxnavi.com");
-//        info.setPKey("510303-gb");
-//        info.setPmKey("e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
-//
-//        List<TimeEntry> timeEntries = queryTimes(info);
-//        Map<Integer, String> collect = timeEntries.stream().collect(Collectors.toMap(TimeEntry::getUserId, TimeEntry::getUserName, (v1, v2) -> v1));
-////        List<TimeEntry> timeEntries = queryTimes(info).stream().filter(e -> e.getIssueId() == 609043).toList();
-////        Map<String, Map<String, Double>> collect = timeEntries.stream().collect(Collectors.groupingBy(e -> String.valueOf(e.getUserId()), Collectors.groupingBy(e -> new DateTime(e.getSpentOn()).toString("yyyy-MM-dd"),
-////                Collectors.summingDouble(e -> BigDecimal.valueOf(e.getHours()).setScale(2, RoundingMode.HALF_UP).doubleValue()))));
-//        System.out.println(collect);
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey("http://redmine-qa.mxnavi.com/projects/203301_vehicle_digitization", "f4883d6d5f03ca5ed14cc168ec578c4e7d396c20");
-//        Issue issue = new Issue();
-//        issue.setSubject("需求ID：[recVGCsjk]-模块：系统管理-一级：用户管理");
-//        issue.setDescription("页面功能补充+原型");
-//        issue.setAssigneeId(2529);
-//        issue.setProjectId(1699);
-//        Tracker tracker = new Tracker();
-//        tracker.setId(2);
-//        issue.setTracker(tracker);
-//        issue.setDueDate(new DateTime().plusDays(7).toDate());
-//        issue.setStartDate(new Date());
-//        issue.setStatusId(1);
-//        CustomField recVlGCsjk = RedmineConfig.type("1").setCustomValue("recVlGCsjk");
-//        List<CustomField> L = new ArrayList<>(RedmineConfig.CUSTOM_FIELDS);
-//        L.add(recVlGCsjk);
-//        issue.addCustomFields(L);
-//        issue.setTransport(mgr.getTransport());
-//        issue.create();
 
-        List<RequestParam> params = List.of(new RequestParam("f[]", "cf_5"),
-                new RequestParam("op[cf_5]", "~"),
-                new RequestParam("v[cf_5][]", "recVlGCsjk"));
-        List<Issue> issueList = null;
-        try {
-            issueList = mgr.getTransport().getObjectsList(Issue.class, params);
-        } catch (RedmineException e) {
-            log.error("Redmine-[检查是否有redmine任务] 异常 ", e);
-        }
-        System.out.println(issueList);
-//        Issue issueById = issueManager.getIssueById(619140);
-//        PropertyStorage storage = issueById.getStorage();
-//        System.out.println(storage.getProperties());
-//        RProjectInfo vo = new RProjectInfo();
-//        vo.setRedmineUrl("http://redmine-pa.mxnavi.com");
-//        vo.setPmKey("af8ef2224ec0842bc633577d23fe032b9d66025a");
-//        vo.setPKey("510303-gb");
-
-//        RedmineManager mgr = RedmineManagerFactory.createWithApiKey("http://redmine-pa.mxnavi.com", "e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
-//        IssueManager issueManager = mgr.getIssueManager();
-//        Issue issueById = issueManager.getIssueById(4090);
-        System.out.println();
-//        List<TimeEntry> timeEntries = queryUserTime(vo);
-//        System.out.println(timeEntries);
-    }
-
+    /**
+     * 检查任务是否创建
+     * @param transport
+     * @param redmineSubject
+     * @return
+     */
     public static boolean checkIssue(Transport transport, String redmineSubject) {
         List<RequestParam> params = RedmineConfig.issue(redmineSubject);
         List<Issue> issueList;
@@ -173,6 +123,41 @@ public abstract class RedmineApi {
                     queryRedmineVo.setSubject(e.getSubject());
                     queryRedmineVo.setRedmineId(e.getId() + "");
                     queryRedmineVo.setAuthorName(e.getAuthorName());
+                    if (StringUtils.isNotBlank(assigneeName)) {
+                        queryRedmineVo.setAssigneeName(assigneeName.replace(" ", ""));
+                    }
+                    queryRedmineVo.setRedmineUrl(project.getRedmineUrl());
+                    issues.add(queryRedmineVo);
+                });
+            } catch (RedmineException e) {
+                log.error("Redmine-查询当天更新的任务异常");
+            }
+        }
+        return issues;
+    }
+
+    public static List<RedmineVo> queryUpdateIssueNameNone(List<RProjectInfo> projectInfos) {
+        List<RedmineVo> issues = new ArrayList<>();
+        for (RProjectInfo project : projectInfos) {
+            RedmineManager mgr = RedmineManagerFactory.createWithApiKey(project.getRedmineUrl(), project.getPmKey());
+            Transport transport = mgr.getTransport();
+            List<RequestParam> params = List.of(
+                    new RequestParam("project_id", project.getPid()),
+                    new RequestParam("status_id", "*"),
+                    new RequestParam("assigned_to_id", "!*")
+//                    new RequestParam("due_date", "!*")
+            );
+            try {
+                transport.getObjectsList(Issue.class, params).forEach(e -> {
+                    String assigneeName = e.getAssigneeName();
+                    RedmineVo queryRedmineVo = new RedmineVo();
+                    queryRedmineVo.setUpdatedOn(e.getUpdatedOn());
+                    queryRedmineVo.setSubject(e.getSubject());
+                    queryRedmineVo.setRedmineId(e.getId() + "");
+                    queryRedmineVo.setAuthorName(e.getAuthorName());
+                    queryRedmineVo.setProjectName(project.getPname());
+                    queryRedmineVo.setStatusName(e.getStatusName());
+                    queryRedmineVo.setDueDate(e.getDueDate());
                     if (StringUtils.isNotBlank(assigneeName)) {
                         queryRedmineVo.setAssigneeName(assigneeName.replace(" ", ""));
                     }
