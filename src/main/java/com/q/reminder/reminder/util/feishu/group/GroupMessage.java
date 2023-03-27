@@ -104,7 +104,7 @@ public class GroupMessage extends BaseFeishu {
      */
     private void query(List<UserMemgerInfo> lists, String chatId, List<UserGroup> userGroupList, String pageToken, GetChatMembersReq req, Client client) throws Exception {
         req.setPageToken(pageToken);
-        GetChatMembersResp resp = client.im().chatMembers().get(req, RequestOptions.newBuilder().build());
+        GetChatMembersResp resp = client.im().chatMembers().get(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
         GetChatMembersRespBody data = resp.getData();
         ListMember[] dataItems = data.getItems();
         for (ListMember dataItem : dataItems) {
