@@ -6,12 +6,14 @@ import com.q.reminder.reminder.exception.BizException;
 import com.q.reminder.reminder.strategys.anno.RedmineTypeAnnotation;
 import com.q.reminder.reminder.strategys.service.RedmineTypeStrategy;
 import lombok.extern.log4j.Log4j2;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,20 +31,20 @@ public class HandlerTypeContext implements ApplicationContextAware {
     /**
      * 锁, 防止重复创建同一对象
      */
-    private static final Object lock = new Object();
+    private static final Object LOCK = new Object();
 
     /**
      * 创建redmine服务策略class集合 <key,value>=<redmine类型, 创建redmine服务策略class>
      * <p>
      * 注：此集合只存放RedmineTypeStrategy的子类class，对应的实例交由spring容器来管理
      */
-    private static Map<ReminderTypeEnum, Class<? extends RedmineTypeStrategy>> orderStrategyBeanMap = new HashMap<>();
+    private static final Map<ReminderTypeEnum, Class<? extends RedmineTypeStrategy>> orderStrategyBeanMap = new HashMap<>();
 
     @Autowired
     private static ApplicationContext applicationContext;
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(@NotNull ApplicationContext applicationContext) throws BeansException {
         HandlerTypeContext.applicationContext = applicationContext;
     }
 
@@ -85,20 +87,20 @@ public class HandlerTypeContext implements ApplicationContextAware {
      * 初始化
      */
     private static void initStrategy() {
-        synchronized (lock) {
+        synchronized (LOCK) {
             // 获取接口下所有实例bean
             Map<String, RedmineTypeStrategy> strategyMap = applicationContext.getBeansOfType(RedmineTypeStrategy.class);
-            if (null == strategyMap || strategyMap.size() == 0) {
+            if (CollectionUtils.isEmpty(strategyMap)) {
                 throw new BizException(BizResultCode.ERR_SYSTEM.getCode(), "代码配置错误：未获取到RedmineTypeStrategy的实现类，请检查代码中是否有将实现类bean注册到spring容器");
             }
 
             // 加载所有策略类对应的配置
             RedmineTypeAnnotation annotation;
-            for (Map.Entry strategy : strategyMap.entrySet()) {
-                Class strategyClazz = strategy.getValue().getClass();
+            for (Map.Entry<String, RedmineTypeStrategy> strategy : strategyMap.entrySet()) {
+                Class<? extends RedmineTypeStrategy> strategyClazz = strategy.getValue().getClass();
                 // 因为策略bean可能是经过动态代理生成的bean实例（可能是多重动态代理后的代理对象），
                 // 故而bean实例的class可能已经不是原来的class了，所以beanClass.getAnnotation(...)获取不到对应的注解元信息
-                annotation = (RedmineTypeAnnotation) strategyClazz.getAnnotation(RedmineTypeAnnotation.class);
+                annotation = strategyClazz.getAnnotation(RedmineTypeAnnotation.class);
                 if (null == annotation) {
                     // 当从bean实例的class上获取不到注解元信息时，通过AnnotationUtils工具类递归来获取
                     annotation = AnnotationUtils.findAnnotation(strategyClazz, RedmineTypeAnnotation.class);
