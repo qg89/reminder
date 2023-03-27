@@ -18,6 +18,8 @@ import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 import tech.powerjob.worker.log.OmsLogger;
 
+import java.util.List;
+
 /**
  * @author : saiko
  * @version : v1.0
@@ -56,7 +58,8 @@ public class WeeklyProjectReportTask implements BasicProcessor {
         if (StringUtils.isNotBlank(jobParam)) {
             wrapper.eq(RProjectInfo::getId, jobParam);
         }
-        projectInfoService.list(wrapper).forEach(projectInfo -> {
+        List<RProjectInfo> list = projectInfoService.list(wrapper);
+        list.forEach(projectInfo -> {
             vo.setProjectShortName(projectInfo.getProjectShortName());
             vo.setFolderToken(projectInfo.getFolderToken());
             WeeklyProjectReport projectReport = null;
@@ -64,6 +67,9 @@ public class WeeklyProjectReportTask implements BasicProcessor {
                 projectReport = BaseFeishu.cloud().space().copyFile(vo);
             } catch (Exception e) {
                 log.error("复制文件异常", e);
+            }
+            if (projectReport == null) {
+                return;
             }
             projectReport.setRPid(projectInfo.getId());
             weeklyProjectReportService.save(projectReport);
