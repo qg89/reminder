@@ -77,13 +77,17 @@ feishu-config:
 #      logpath: ./data/xxl-job/jobhandler  #执行器运行日志文件存储磁盘路径
 #      logretentiondays: 14  #调度中心日志表数据保存天数，过期日志自动清理；限制大于等于7时生效，否则, 如-1，关闭自动清理功能
 #    accessToken: default_token
-
+logging:
+#  level:
+#    root: debug
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger- %msg%n'
 powerjob:
   worker:
     enabled: true
     app-name: admin
-    server-address: 192.168.3.46:7700
-#    server-address: 192.168.40.170:7700
+#    server-address: 192.168.3.46:7700
+    server-address: 127.0.0.1:7700
     protocol: akka
     store-strategy: disk
     max-result-length: 4096

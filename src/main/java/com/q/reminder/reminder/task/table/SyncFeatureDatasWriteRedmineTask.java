@@ -142,7 +142,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
         lq.eq(TTableInfo::getTableType, TableTypeContants.FEATURE);
         TTableInfo tTableInfo = tTableInfoService.getOne(lq);
         if (!CollectionUtils.isEmpty(records)) {
-            BaseFeishu.table().batchUpdateTableRecords(tTableInfo, records.toArray(new AppTableRecord[0]));
+            BaseFeishu.cloud().table().batchUpdateTableRecords(tTableInfo, records.toArray(new AppTableRecord[0]));
             log.info("[需求管理表写入redmine] 更新成功");
         }
 

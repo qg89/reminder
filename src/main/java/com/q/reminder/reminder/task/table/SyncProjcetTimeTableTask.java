@@ -80,7 +80,7 @@ public class SyncProjcetTimeTableTask implements BasicProcessor {
             });
             records.add(AppTableRecord.newBuilder().fields(data).build());
         }
-        BaseFeishu.table().batchCreateTableRecords(tableInfo, records.toArray(new AppTableRecord[0]));
+        BaseFeishu.cloud().table().batchCreateTableRecords(tableInfo, records.toArray(new AppTableRecord[0]));
         return new ProcessResult(true);
     }
 
@@ -95,6 +95,6 @@ public class SyncProjcetTimeTableTask implements BasicProcessor {
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
-        BaseFeishu.table().batchDeleteTableRecords(tTableInfo, list.toArray(new String[0]));
+        BaseFeishu.cloud().table().batchDeleteTableRecords(tTableInfo, list.toArray(new String[0]));
     }
 }
