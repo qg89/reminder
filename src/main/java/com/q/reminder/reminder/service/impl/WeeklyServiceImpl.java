@@ -8,8 +8,8 @@ import com.q.reminder.reminder.constant.WeeklyReportConstants;
 import com.q.reminder.reminder.service.WeeklyService;
 import com.q.reminder.reminder.task.WeeklyProjectMonReportTask;
 import com.q.reminder.reminder.util.ResourceUtils;
-import com.q.reminder.reminder.util.WeeklyProjectFeishuUtils;
 import com.q.reminder.reminder.util.WeeklyProjectRedmineUtils;
+import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.WeeklyVo;
 import com.taskadapter.redmineapi.bean.Issue;
 import lombok.extern.log4j.Log4j2;
@@ -48,7 +48,7 @@ public class WeeklyServiceImpl implements WeeklyService {
         Date startDay = vo.getStartDay();
         Date sunday = getWeekNumToSunday(vo.getWeekNum() - 1);
         String title = vo.getTitle();
-        JSONArray jsonArray = WeeklyProjectFeishuUtils.blocks(vo);
+        JSONArray jsonArray = BaseFeishu.cloud().documents().blocks(vo);
         ArrayList<UpdateBlockRequest> requests = new ArrayList<>();
 
         for (int i = 0; i < Objects.requireNonNull(jsonArray).size(); i++) {

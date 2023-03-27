@@ -1,8 +1,11 @@
 package com.q.reminder.reminder.util.feishu.cloud.documents;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.core.request.RequestOptions;
+import com.lark.oapi.core.utils.Jsons;
 import com.lark.oapi.service.docx.v1.enums.BatchUpdateDocumentBlockUserIdTypeEnum;
+import com.lark.oapi.service.docx.v1.enums.ListDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.enums.PatchDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.model.*;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
@@ -77,5 +80,32 @@ public class Documents extends BaseFeishu {
 //                sendAdmin(client, json, List.of("ou_35e03d4d8754dd35fed26c26849c85ab"));
         }
         return Boolean.FALSE;
+    }
+
+    /**
+     * 获取文档所有块
+     *
+     * @param vo
+     * @return
+     */
+    public JSONArray blocks(WeeklyProjectVo vo) throws Exception {
+        // 构建client
+
+        // 创建请求对象
+        ListDocumentBlockReq req = ListDocumentBlockReq.newBuilder()
+                .documentId(vo.getFileToken())
+                .pageSize(500)
+                .documentRevisionId(-1)
+                .userIdType(ListDocumentBlockUserIdTypeEnum.USER_ID)
+                .build();
+
+        // 发起请求
+        ListDocumentBlockResp resp = CLIENT.docx().documentBlock().list(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+        // 业务数据处理
+        if (resp != null && resp.getCode() == 0) {
+            JSONObject result = JSONObject.parseObject(Jsons.DEFAULT.toJson(resp.getData()));
+            return result.getJSONArray("items");
+        }
+        return new JSONArray();
     }
 }

@@ -1,11 +1,21 @@
 package com.q.reminder.reminder.util.feishu.cloud.space;
 
+import cn.hutool.core.date.DateUtil;
+import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.core.request.RequestOptions;
+import com.lark.oapi.core.utils.Jsons;
+import com.lark.oapi.service.drive.v1.model.CopyFileReq;
+import com.lark.oapi.service.drive.v1.model.CopyFileReqBody;
+import com.lark.oapi.service.drive.v1.model.CopyFileResp;
+import com.lark.oapi.service.drive.v1.model.Property;
 import com.lark.oapi.service.sheets.v3.model.QuerySpreadsheetSheetReq;
 import com.lark.oapi.service.sheets.v3.model.QuerySpreadsheetSheetResp;
 import com.lark.oapi.service.sheets.v3.model.Sheet;
+import com.q.reminder.reminder.entity.WeeklyProjectReport;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.SheetVo;
+import com.q.reminder.reminder.vo.WeeklyProjectVo;
+import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +39,30 @@ public class Space extends BaseFeishu {
             instance = new Space();
         }
         return instance;
+    }
+
+    public WeeklyProjectReport copyFile(WeeklyProjectVo vo) throws Exception {
+        String weekNum = String.valueOf(DateUtil.thisWeekOfYear());
+        CopyFileReq req = CopyFileReq.newBuilder()
+                .fileToken(vo.getFileToken())
+                .copyFileReqBody(CopyFileReqBody.newBuilder()
+                        .name("【业务三部】" + vo.getProjectShortName() + "项目周报-" + DateTime.now().toString("yy") + "W" + weekNum)
+                        .type("docx")
+                        .folderToken(vo.getFolderToken())
+                        .extra(new Property[]{})
+                        .build())
+                .build();
+        CopyFileResp resp = CLIENT.drive().file().copy(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+        if (resp.success()) {
+            JSONObject result = JSONObject.parseObject(Jsons.DEFAULT.toJson(resp.getData()));
+            WeeklyProjectReport file = JSONObject.parseObject(result.getString("file"), WeeklyProjectReport.class);
+            if (file == null) {
+                return new WeeklyProjectReport();
+            }
+            file.setWeekNum(weekNum);
+            return file;
+        }
+        return null;
     }
 
     /**

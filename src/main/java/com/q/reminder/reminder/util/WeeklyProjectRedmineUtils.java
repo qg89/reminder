@@ -26,20 +26,6 @@ import java.util.List;
  */
 public abstract class WeeklyProjectRedmineUtils {
 
-
-//    public static void main(String[] args) {
-//        ProjectInfo projectInfo = new ProjectInfo();
-//        projectInfo.setRedmineUrl("http://redmine-qa.mxnavi.com/");
-//        projectInfo.setPKey("dcsp-2");
-//        projectInfo.setPmKey("1f905383da4f783bad92e22f430c7db0b15ae258");
-////        List<TimeEntry> copq = wprojectTimesBugs(projectInfo, "2022-11-04");
-////        List<Issue> issues1 = queryRedmine(projectInfo, new ArrayList<>());
-////        List<Issue> issues = OverallBug.allBug(projectInfo);
-//        List<TimeEntry> timeEntries = wprojectTimesBugs(projectInfo);
-////        List<TimeEntry> bug = Objects.requireNonNull(WeeklyProjectRedmineUtils.wprojectTimesBugs(projectInfo, "Bug")).stream().filter(e -> e.getCreatedOn().before(new DateTime(getWeekNumToSunday(DateUtil.thisWeekOfYear() - 2)).toDate())).toList();
-//        System.out.println();
-//    }
-
     /**
      * 项目周报，获取评审问题
      */

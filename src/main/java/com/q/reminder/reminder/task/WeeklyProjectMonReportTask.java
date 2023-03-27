@@ -110,7 +110,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
             }).collect(Collectors.toList());
             vo.setAllBugList(allBugList);
 
-            JSONArray jsonArray = WeeklyProjectFeishuUtils.blocks(vo);
+            JSONArray jsonArray = BaseFeishu.cloud().documents().blocks(vo);
             ArrayList<UpdateBlockRequest> requests = new ArrayList<>();
             for (int i = 0; i < Objects.requireNonNull(jsonArray).size(); i++) {
                 JSONObject block = JSONObject.parseObject(jsonArray.get(i).toString());

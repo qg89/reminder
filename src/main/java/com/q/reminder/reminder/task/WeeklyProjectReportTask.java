@@ -8,7 +8,6 @@ import com.q.reminder.reminder.entity.WeeklyProjectReport;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WeeklyProjectReportService;
 import com.q.reminder.reminder.task.base.HoldayBase;
-import com.q.reminder.reminder.util.WeeklyProjectFeishuUtils;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import org.apache.commons.lang3.StringUtils;
@@ -60,7 +59,12 @@ public class WeeklyProjectReportTask implements BasicProcessor {
         projectInfoService.list(wrapper).forEach(projectInfo -> {
             vo.setProjectShortName(projectInfo.getProjectShortName());
             vo.setFolderToken(projectInfo.getFolderToken());
-            WeeklyProjectReport projectReport = WeeklyProjectFeishuUtils.copyFile(vo);
+            WeeklyProjectReport projectReport = null;
+            try {
+                projectReport = BaseFeishu.cloud().space().copyFile(vo);
+            } catch (Exception e) {
+                log.error("复制文件异常", e);
+            }
             projectReport.setRPid(projectInfo.getId());
             weeklyProjectReportService.save(projectReport);
         });
