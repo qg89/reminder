@@ -275,7 +275,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         imageVo.setAppSecret(vo.getAppSecret());
         imageVo.setAppId(vo.getAppId());
         imageVo.setParentNode(blockId);
-        String fileToken = BaseFeishu.upload().uploadFile(imageVo);
+        String fileToken = BaseFeishu.cloud().upload().uploadFile(imageVo);
         if (StringUtils.isBlank(fileToken)) {
 //            log.info("飞书上传素材返回为空");
             return;
@@ -310,7 +310,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         imageVo.setAppSecret(vo.getAppSecret());
         imageVo.setAppId(vo.getAppId());
         imageVo.setParentNode(vo.getBlockId());
-        String fileToken = BaseFeishu.upload().uploadFile(imageVo);
+        String fileToken = BaseFeishu.cloud().upload().uploadFile(imageVo);
         vo.setImageToken(fileToken);
         // 通过飞书替换图片至block_id
         Boolean updateBlocks = BaseFeishu.cloud().documents().updateBlocks(vo);

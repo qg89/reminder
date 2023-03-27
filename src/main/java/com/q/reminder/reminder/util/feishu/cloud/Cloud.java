@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.util.feishu.cloud;
 
 import com.q.reminder.reminder.util.feishu.cloud.documents.Documents;
+import com.q.reminder.reminder.util.feishu.cloud.documents.Upload;
 import com.q.reminder.reminder.util.feishu.cloud.space.Space;
 import com.q.reminder.reminder.util.feishu.cloud.table.Table;
 
@@ -33,5 +34,9 @@ public class Cloud {
 
     public Table table() {
         return Table.getInstance();
+    }
+
+    public Upload upload() {
+        return Upload.getInstance();
     }
 }

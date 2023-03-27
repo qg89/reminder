@@ -4,7 +4,6 @@ import com.lark.oapi.Client;
 import com.q.reminder.reminder.config.SpringContextUtils;
 import com.q.reminder.reminder.service.impl.FeishuService;
 import com.q.reminder.reminder.util.feishu.cloud.Cloud;
-import com.q.reminder.reminder.util.feishu.cloud.documents.Upload;
 import com.q.reminder.reminder.util.feishu.group.GroupMessage;
 import com.q.reminder.reminder.util.feishu.message.Message;
 import com.q.reminder.reminder.util.feishu.wiki.Wiki;
@@ -60,9 +59,5 @@ public abstract class BaseFeishu {
      */
     public static GroupMessage groupMessage() {
         return GroupMessage.getInstance();
-    }
-
-    public static Upload upload() {
-        return Upload.getInstance();
     }
 }
