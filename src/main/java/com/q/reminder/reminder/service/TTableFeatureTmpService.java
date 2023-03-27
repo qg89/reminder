@@ -3,6 +3,7 @@ package com.q.reminder.reminder.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.q.reminder.reminder.entity.TTableFeatureTmp;
 import com.q.reminder.reminder.vo.FeautreTimeVo;
+import com.q.reminder.reminder.vo.RedmineDataVo;
 
 import java.util.List;
 
@@ -13,7 +14,10 @@ import java.util.List;
  * @author makejava
  * @since 2023-02-01 17:36:49
  */
-public interface TTableFeatureTmpService extends IService<TTableFeatureTmp>{
+public interface TTableFeatureTmpService extends IService<TTableFeatureTmp> {
 
-    List<FeautreTimeVo> queryTimes(String records);
+    List<FeautreTimeVo> queryAllTimes();
+
+    List<RedmineDataVo> listByProject();
+
 }

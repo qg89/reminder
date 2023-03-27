@@ -2,7 +2,6 @@ package com.q.reminder.reminder.util;
 
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import com.q.reminder.reminder.config.RedmineConfig;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.vo.*;
@@ -34,14 +33,16 @@ import java.util.*;
 @Log4j2
 public abstract class RedmineApi {
 
+    public static Date dueDate = DateTime.now().plusDays(7).toDate();
+
     /**
      * 检查任务是否创建
+     *
      * @param transport
-     * @param redmineSubject
+     * @param params
      * @return
      */
-    public static boolean checkIssue(Transport transport, String redmineSubject) {
-        List<RequestParam> params = RedmineConfig.issue(redmineSubject);
+    public static boolean checkIssue(Transport transport, List<RequestParam> params) {
         List<Issue> issueList;
         try {
             issueList = transport.getObjectsList(Issue.class, params);
@@ -533,4 +534,105 @@ public abstract class RedmineApi {
     public static Transport getTransportByProject(RProjectInfo RProjectInfo) {
         return RedmineManagerFactory.createWithApiKey(RProjectInfo.getRedmineUrl() + "/projects/" + RProjectInfo.getPkey(), RProjectInfo.getPmKey()).getTransport();
     }
+
+    public static String createSubject(RedmineDataVo featureTmp) {
+        StringBuilder subject = new StringBuilder();
+        String mdl = featureTmp.getMdl();
+        String menuOne = featureTmp.getMenuOne();
+        String menuTwo = featureTmp.getMenuTwo();
+        String menuThree = featureTmp.getMenuThree();
+        if (StringUtils.isNotBlank(mdl)) {
+            subject.append("模块：").append(mdl).append("-");
+        }
+        if (StringUtils.isNotBlank(menuOne)) {
+            subject.append("一级：").append(menuOne).append("-");
+        }
+        if (StringUtils.isNotBlank(menuTwo)) {
+            subject.append("二级：").append(menuTwo).append("-");
+        }
+        if (StringUtils.isNotBlank(menuThree)) {
+            subject.append("三级：").append(menuThree);
+        }
+        int lastChar = subject.lastIndexOf("-");
+        if (lastChar == subject.length() - 1) {
+            subject.deleteCharAt(lastChar);
+        }
+        return subject.toString();
+    }
+
+    /**
+     * 创建子任务
+     *
+     * @param transport
+     * @param customFields
+     * @param ftrType
+     * @param records
+     * @param testTracker
+     * @param devTracker
+     */
+    public static boolean createSubIssue(Issue parentIssue, Transport transport, List<CustomField> customFields, boolean ftrType, List<FeautreTimeVo> records, Tracker testTracker, Tracker devTracker) {
+        boolean createSubIssue = true;
+        Integer issueId = parentIssue.getId();
+        Issue issue = new Issue();
+        if (!ftrType) {
+            issue.setParentId(issueId);
+        }
+        issue.addCustomFields(customFields);
+        issue.setDescription(parentIssue.getDescription());
+        issue.setProjectId(parentIssue.getProjectId());
+        String subject = parentIssue.getSubject();
+        issue.setTransport(transport);
+        issue.setDueDate(dueDate);
+        issue.setStatusId(1);
+        issue.setPriorityId(4);
+
+        for (FeautreTimeVo e : records) {
+            String name = e.getName();
+            Float times = e.getTimes();
+            Integer id = e.getId();
+            Issue newIssue = issue;
+            if ("test".equals(name)) {
+                newIssue.setSubject(subject + "-测试用例");
+                newIssue.setSpentHours(times);
+                newIssue.setTracker(testTracker);
+                newIssue.setAssigneeId(id);
+                try {
+                    createSubIssue = createSubIssue && newIssue.create().getId() != null;
+                    newIssue.setSubject(subject + "-测试执行");
+                    createSubIssue = createSubIssue && newIssue.create().getId() != null;
+                } catch (RedmineException ex) {
+                    ex.printStackTrace();
+                    createSubIssue = false;
+                    log.error(ex);
+                }
+            } else {
+                newIssue.setSubject(subject + "-" + ROLE_MAP.get(name));
+                newIssue.setSpentHours(times);
+                newIssue.setTracker(devTracker);
+                newIssue.setAssigneeId(id);
+                try {
+                    Issue issu = newIssue.create();
+                    createSubIssue = createSubIssue && issu.getId() != null;
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    log.error(ex);
+                    createSubIssue = false;
+                }
+            }
+        }
+        return createSubIssue;
+    }
+
+    public static final Map<String, String> ROLE_MAP = Map.of(
+            "test", "测试",
+            "front", "前端",
+            "back", "后端",
+            "bgdt", "大数据",
+            "prdct", "产品",
+            "andrd", "安卓",
+            "algrthm", "算法",
+            "oprton", "运维",
+            "archtct", "架构",
+            "implmntton", "实施"
+    );
 }

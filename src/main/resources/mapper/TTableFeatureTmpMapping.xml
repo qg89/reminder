@@ -2,72 +2,99 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.q.reminder.reminder.mapper.TTableFeatureTmpMapping">
 
-<select id="queryTimes" resultType="com.q.reminder.reminder.vo.FeautreTimeVo">
+    <select id="queryAllTimes" resultType="com.q.reminder.reminder.vo.FeautreTimeVo">
+        SELECT a.`name`,
+               a.`times`,
+               a.id,
+               a.records_id AS recordsId
+        FROM (SELECT 'test' as `name`,
+                     test   AS times,
+                     (SELECT test_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id,
+                     records_id
+              FROM t_table_feature_tmp
+              WHERE test IS NOT NULL
+              UNION
+              SELECT 'front' as `name`,
+                     front   AS times,
+                     (SELECT front_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id,
+                     records_id
+              FROM t_table_feature_tmp
+              WHERE front IS NOT NULL
+              UNION
+              SELECT 'back' as `name`,
+                     back   AS times,
+                     (SELECT back_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id,
+                     records_id
+              FROM t_table_feature_tmp
+              WHERE back IS NOT NULL
+              UNION
+              SELECT 'bgdt' as `name`,
+                     bgdt   AS times,
+                     (SELECT bgdt_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id,
+                     records_id
+              FROM t_table_feature_tmp
+              WHERE bgdt IS NOT NULL
+              UNION
+              SELECT 'prdct' as `name`,
+                     prdct   AS times,
+                     (SELECT prdct_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id,
+                     records_id
+              FROM t_table_feature_tmp
+              WHERE prdct IS NOT NULL
+              UNION
+              SELECT 'andrd' as `name`,
+                     andrd   AS times,
+                     (SELECT andrd_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id,
+                     records_id
+              FROM t_table_feature_tmp
+              WHERE andrd IS NOT NULL
+              UNION
+              SELECT 'algrthm' as `name`,
+                     algrthm   AS times,
+                     (SELECT algrthm_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id,
+                     records_id
+              FROM t_table_feature_tmp
+              WHERE algrthm IS NOT NULL
+              UNION
+              SELECT 'oprton' as `name`,
+                     oprton   AS times,
+                     (SELECT oprton_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id,
+                     records_id
+              FROM t_table_feature_tmp
+              WHERE oprton IS NOT NULL
+              UNION
+              SELECT 'archtct' as `name`,
+                     archtct   AS times,
+                     (SELECT archtct_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id,
+                     records_id
+              FROM t_table_feature_tmp
+              WHERE archtct IS NOT NULL
+              UNION
+              SELECT 'implmntton' as `name`,
+                     implmntton   AS times,
+                     (SELECT implmntton_id
+                      FROM t_table_user_config
+                      WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id,
+                     records_id
+              FROM t_table_feature_tmp
+              WHERE implmntton IS NOT NULL) AS a
+    </select>
+
+<select id="listByProject" resultType="com.q.reminder.reminder.vo.RedmineDataVo">
     SELECT
-        a.`name`,
-        a.`times`,
-        a.id
-    FROM (
-         SELECT
-            'test' as `name`,test AS times,(SELECT test_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id
-         FROM
-             t_table_feature_tmp
-         WHERE
-             test IS NOT NULL AND records_id = #{recordsId} UNION
-         SELECT
-            'front' as `name`,front AS times,(SELECT front_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id
-         FROM
-             t_table_feature_tmp
-         WHERE
-             front IS NOT NULL AND records_id = #{recordsId} UNION
-         SELECT
-            'back' as `name`,back AS times,(SELECT back_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id
-         FROM
-             t_table_feature_tmp
-         WHERE
-             back IS NOT NULL AND records_id = #{recordsId} UNION
-         SELECT
-             'bgdt' as `name`,bgdt AS times,(SELECT bgdt_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id
-         FROM
-             t_table_feature_tmp
-         WHERE
-             bgdt IS NOT NULL AND records_id = #{recordsId} UNION
-         SELECT
-             'prdct' as `name`,prdct AS times,(SELECT prdct_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id
-         FROM
-             t_table_feature_tmp
-         WHERE
-             prdct IS NOT NULL AND records_id = #{recordsId} UNION
-         SELECT
-             'andrd' as `name`,andrd AS times,(SELECT andrd_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id
-         FROM
-             t_table_feature_tmp
-         WHERE
-             andrd IS NOT NULL AND records_id = #{recordsId} UNION
-         SELECT
-             'algrthm' as `name`,algrthm AS times,(SELECT algrthm_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id
-         FROM
-             t_table_feature_tmp
-         WHERE
-             algrthm IS NOT NULL AND records_id = #{recordsId} UNION
-         SELECT
-             'oprton' as `name`,oprton AS times,(SELECT oprton_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id
-         FROM
-             t_table_feature_tmp
-         WHERE
-             oprton IS NOT NULL AND records_id = #{recordsId} UNION
-         SELECT
-             'archtct' as `name`,archtct AS times,(SELECT archtct_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id
-         FROM
-             t_table_feature_tmp
-         WHERE archtct IS NOT NULL AND records_id = #{recordsId} UNION
-         SELECT
-             'implmntton' as `name`,implmntton AS times,(SELECT implmntton_id FROM t_table_user_config WHERE prjct_key = t_table_feature_tmp.prjct_key) AS id
-         FROM
-             t_table_feature_tmp
-         WHERE
-             implmntton IS NOT NULL AND records_id = #{recordsId}
-     ) AS a
+        tmp.*,
+        p.redmine_type AS redmineType,
+        p.pm_key as pmKey,
+        p.redmine_url as redmineUrl,
+        p.p_id AS pId,
+        (SELECT prdct_id FROM t_table_user_config WHERE prjct_key = tmp.prjct_key ) prdctId
+    FROM
+        t_table_feature_tmp tmp
+            LEFT JOIN `r_project_info` p ON tmp.prjct_key = p.p_key
+    WHERE
+        p.is_delete = 0
+      AND tmp.write_redmine = '0'
+      AND tmp.write_type = '是'
 </select>
 </mapper>
 

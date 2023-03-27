@@ -3,8 +3,8 @@ package com.q.reminder.reminder.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.q.reminder.reminder.entity.TTableFeatureTmp;
 import com.q.reminder.reminder.vo.FeautreTimeVo;
+import com.q.reminder.reminder.vo.RedmineDataVo;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -16,6 +16,8 @@ import java.util.List;
  */
 @Mapper
 public interface TTableFeatureTmpMapping extends BaseMapper<TTableFeatureTmp> {
-    List<FeautreTimeVo> queryTimes(@Param("recordsId") String recordsId);
+    List<FeautreTimeVo> queryAllTimes();
+
+    List<RedmineDataVo> listByProject();
 }
 

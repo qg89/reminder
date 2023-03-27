@@ -18,4 +18,5 @@ public class FeautreTimeVo implements Serializable {
     private Integer id;
     private String name;
     private Float times;
+    private String recordsId;
 }

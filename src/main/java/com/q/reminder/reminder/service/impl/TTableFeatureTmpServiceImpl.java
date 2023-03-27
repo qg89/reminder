@@ -5,6 +5,7 @@ import com.q.reminder.reminder.entity.TTableFeatureTmp;
 import com.q.reminder.reminder.mapper.TTableFeatureTmpMapping;
 import com.q.reminder.reminder.service.TTableFeatureTmpService;
 import com.q.reminder.reminder.vo.FeautreTimeVo;
+import com.q.reminder.reminder.vo.RedmineDataVo;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,8 +20,14 @@ import java.util.List;
 @Service
 public class TTableFeatureTmpServiceImpl extends ServiceImpl<TTableFeatureTmpMapping, TTableFeatureTmp> implements TTableFeatureTmpService {
 
+
     @Override
-    public List<FeautreTimeVo> queryTimes(String records) {
-        return baseMapper.queryTimes(records);
+    public List<FeautreTimeVo> queryAllTimes() {
+        return baseMapper.queryAllTimes();
+    }
+
+    @Override
+    public List<RedmineDataVo> listByProject() {
+        return baseMapper.listByProject();
     }
 }

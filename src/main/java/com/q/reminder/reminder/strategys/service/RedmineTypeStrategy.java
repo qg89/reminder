@@ -1,5 +1,11 @@
 package com.q.reminder.reminder.strategys.service;
 
+import com.taskadapter.redmineapi.bean.CustomField;
+import com.taskadapter.redmineapi.bean.Tracker;
+import com.taskadapter.redmineapi.internal.RequestParam;
+
+import java.util.List;
+
 /**
  * @author : saiko
  * @version : v1.0
@@ -9,5 +15,10 @@ package com.q.reminder.reminder.strategys.service;
  */
 public interface RedmineTypeStrategy {
 
-    Boolean createIssue();
+    List<CustomField> getCustomField(String featureValue);
+
+    Tracker getDevTracker();
+    Tracker getTestTracker();
+
+    List<RequestParam> getFeatureIdParams(String value);
 }
