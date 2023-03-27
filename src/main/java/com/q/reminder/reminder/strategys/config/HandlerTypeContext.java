@@ -25,7 +25,7 @@ import java.util.Map;
  */
 @Log4j2
 @Component
-public class HandlerOrderContext implements ApplicationContextAware {
+public class HandlerTypeContext implements ApplicationContextAware {
     /**
      * 锁, 防止重复创建同一对象
      */
@@ -43,7 +43,7 @@ public class HandlerOrderContext implements ApplicationContextAware {
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        HandlerOrderContext.applicationContext = applicationContext;
+        HandlerTypeContext.applicationContext = applicationContext;
     }
 
     public static ApplicationContext getApplicationContext() {
