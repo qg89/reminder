@@ -86,8 +86,8 @@ powerjob:
   worker:
     enabled: true
     app-name: admin
-#    server-address: 192.168.3.46:7700
-    server-address: 127.0.0.1:7700
+    server-address: 192.168.3.46:7700
+#    server-address: 127.0.0.1:7700
     protocol: akka
     store-strategy: disk
     max-result-length: 4096
