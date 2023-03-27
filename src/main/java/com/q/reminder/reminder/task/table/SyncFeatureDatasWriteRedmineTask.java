@@ -16,6 +16,7 @@ import com.q.reminder.reminder.service.TTableInfoService;
 import com.q.reminder.reminder.service.TTableUserConfigService;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
+import com.q.reminder.reminder.vo.FeautreTimeVo;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineProcessingException;
 import com.taskadapter.redmineapi.bean.CustomField;
@@ -64,113 +65,53 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
     /**
      * 创建子任务
      *
-     * @param parentIssue
-     * @param featureTmp
-     * @param config
      * @param transport
      * @param customFields
-     * @param ftrTyp
+     * @param ftrType
+     * @param recordsId
      * @throws RedmineException
      */
-    private boolean createSubIssue(Issue parentIssue, TTableFeatureTmp featureTmp, TTableUserConfig config, Transport transport, List<CustomField> customFields, boolean ftrTyp) throws RedmineException {
+    private boolean createSubIssue(Issue parentIssue, Transport transport, List<CustomField> customFields, boolean ftrType, String recordsId) throws RedmineException {
         boolean createSubIssue = true;
         Integer issueId = parentIssue.getId();
+
         Issue issue = new Issue();
+        if (!ftrType) {
+            issue.setParentId(issueId);
+        }
         issue.addCustomFields(customFields);
         issue.setDescription(parentIssue.getDescription());
         issue.setProjectId(parentIssue.getProjectId());
-        if (!ftrTyp) {
-            issue.setParentId(issueId);
-        }
+        String subject = parentIssue.getSubject();
         issue.setTransport(transport);
         issue.setDueDate(dueDate);
-        Float front = featureTmp.getFront();
-        Float algrthm = featureTmp.getAlgrthm();
-        Float andrd = featureTmp.getAndrd();
-        Float archtct = featureTmp.getArchtct();
-        Float back = featureTmp.getBack();
-        Float bgdt = featureTmp.getBgdt();
-        Float implmntton = featureTmp.getImplmntton();
-        Float oprton = featureTmp.getOprton();
-        Float test = featureTmp.getTest();
-        if (front != null && createSubIssue) {
-            Issue frontIssue = issue;
-            frontIssue.setSubject(parentIssue.getSubject() + "-前端");
-            frontIssue.setSpentHours(front);
-            frontIssue.setTracker(RedmineConfig.DEV_TRACKER);
-            frontIssue.setAssigneeId(config.getFrontId());
-            createSubIssue = frontIssue.create().getId() != null;
-        }
-        if (algrthm != null && createSubIssue) {
-            Issue algrthmIssue = issue;
-            algrthmIssue.setSubject(parentIssue.getSubject() + "-算法");
-            algrthmIssue.setSpentHours(algrthm);
-            algrthmIssue.setTracker(RedmineConfig.DEV_TRACKER);
-            algrthmIssue.setAssigneeId(config.getAlgrthmId());
-            createSubIssue = algrthmIssue.create().getId() != null;
-        }
-        if (andrd != null && createSubIssue) {
-            Issue andrdIssue = issue;
-            andrdIssue.setSubject(parentIssue.getSubject() + "-安卓");
-            andrdIssue.setSpentHours(andrd);
-            andrdIssue.setTracker(RedmineConfig.DEV_TRACKER);
-            issue.setAssigneeId(config.getAndrdId());
-            createSubIssue = andrdIssue.create().getId() != null;
-        }
-        if (archtct != null && createSubIssue) {
-            Issue archtctIssue = issue;
-            archtctIssue.setSubject(parentIssue.getSubject() + "-架构");
-            archtctIssue.setSpentHours(archtct);
-            archtctIssue.setTracker(RedmineConfig.DEV_TRACKER);
-            archtctIssue.setAssigneeId(config.getArchtctId());
-            createSubIssue = archtctIssue.create().getId() != null;
-        }
-        if (back != null && createSubIssue) {
-            Issue backIssue = issue;
-            backIssue.setSubject(parentIssue.getSubject() + "-后端");
-            backIssue.setSpentHours(back);
-            backIssue.setTracker(RedmineConfig.DEV_TRACKER);
-            backIssue.setAssigneeId(config.getBackId());
-            createSubIssue = backIssue.create().getId() != null;
-        }
-        if (bgdt != null && createSubIssue) {
-            Issue bgdtIssue = issue;
-            bgdtIssue.setSubject(parentIssue.getSubject() + "-大数据");
-            bgdtIssue.setSpentHours(bgdt);
-            bgdtIssue.setTracker(RedmineConfig.DEV_TRACKER);
-            bgdtIssue.setAssigneeId(config.getBgdtId());
-            createSubIssue = bgdtIssue.create().getId() != null;
-        }
-        if (implmntton != null && createSubIssue) {
-            Issue impIssue = issue;
-            impIssue.setSubject(parentIssue.getSubject() + "-实施");
-            impIssue.setSpentHours(implmntton);
-            impIssue.setTracker(RedmineConfig.DEV_TRACKER);
-            impIssue.setAssigneeId(config.getImplmnttonId());
-            createSubIssue = impIssue.create().getId() != null;
-        }
-        if (oprton != null && createSubIssue) {
-            Issue impIssue = issue;
-            impIssue.setSubject(parentIssue.getSubject() + "-运维");
-            impIssue.setSpentHours(oprton);
-            impIssue.setTracker(RedmineConfig.DEV_TRACKER);
-            impIssue.setAssigneeId(config.getOprtonId());
-            createSubIssue = impIssue.create().getId() != null;
-        }
-        if (test != null && createSubIssue) {
-            Issue testIssue = issue;
-            testIssue.setSubject(parentIssue.getSubject() + "-测试用例");
-            testIssue.setSpentHours(test);
-            testIssue.setTracker(RedmineConfig.TEST_TRACKER);
-            testIssue.setAssigneeId(config.getTestId());
-            createSubIssue = testIssue.create().getId() != null;
 
-            Issue caseIssue = issue;
-            caseIssue.setSubject(parentIssue.getSubject() + "-测试执行");
-            caseIssue.setSpentHours(test);
-            caseIssue.setTracker(RedmineConfig.TEST_TRACKER);
-            caseIssue.setAssigneeId(config.getTestId());
-            createSubIssue = createSubIssue && caseIssue.create().getId() != null;
+        List<FeautreTimeVo> li = tTableFeatureTmpService.queryTimes(recordsId);
+        for (FeautreTimeVo e : li) {
+            String name = e.getName();
+            Float times = e.getTimes();
+            Integer id = e.getId();
+            Issue newIssue = issue;
+            if ("test".equals(name)) {
+                newIssue.setSubject(subject + "-测试用例");
+                newIssue.setSpentHours(times);
+                newIssue.setTracker(RedmineConfig.TEST_TRACKER);
+                newIssue.setAssigneeId(id);
+                createSubIssue = newIssue.create().getId() != null;
+
+                newIssue.setSubject(subject + "-测试执行");
+                createSubIssue = createSubIssue && newIssue.create().getId() != null;
+            } else {
+                newIssue.setSubject(subject + "-" + ROLE_MAP.get(name));
+                newIssue.setSpentHours(times);
+                newIssue.setTracker(RedmineConfig.DEV_TRACKER);
+                newIssue.setAssigneeId(id);
+                try {
+                    createSubIssue = newIssue.create().getId() != null;
+                } catch (RedmineException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
         }
         return createSubIssue;
     }
@@ -206,7 +147,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
             String featureType = featureTmp.getFeatureType();
             RedmineConfig type = RedmineConfig.type(redmineTypeMap.get(prjctKey));
 
-            boolean ftrTyp = "非功能".equals(featureType);
+            boolean ftrType = "非功能".equals(featureType);
 
             TTableUserConfig config = userConfigMap.get(prjctKey);
             RProjectInfo RProjectInfo = projectMap.get(config.getPId().toString());
@@ -249,10 +190,10 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
             customFieldList.add(customField);
             issue.addCustomFields(customFieldList);
             Issue parentIssue = new Issue();
-            if (ftrTyp) {
+            if (ftrType) {
                 issue.setStatusId(1).setCreatedOn(new Date());
                 issue.setTracker(RedmineConfig.DEV_TRACKER);
-                if (!createSubIssue(issue, featureTmp, config, transport, customFieldList, ftrTyp)) {
+                if (!createSubIssue(issue, transport, customFieldList, true, recordsId)) {
                     featureTmp.setWriteRedmine("3");
                 }
             } else {
@@ -266,7 +207,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                 featureTmp.setWriteRedmine("1");
                 if (parentIssue.getId() == null) {
                     featureTmp.setWriteRedmine("2");
-                } else if (!createSubIssue(parentIssue, featureTmp, config, transport, customFieldList, ftrTyp)) {
+                } else if (!createSubIssue(parentIssue, transport, customFieldList, false, recordsId)) {
                     featureTmp.setWriteRedmine("3");
                 }
             }
@@ -298,4 +239,17 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
         }
         return new ProcessResult(true);
     }
+
+    private static final Map<String, String> ROLE_MAP = Map.of(
+            "test", "测试",
+            "front", "前端",
+            "back", "后端",
+            "bgdt", "大数据",
+            "prdct", "产品",
+            "andrd", "安卓",
+            "algrthm", "算法",
+            "oprton", "运维",
+            "archtct", "架构",
+            "implmntton", "实施"
+    );
 }

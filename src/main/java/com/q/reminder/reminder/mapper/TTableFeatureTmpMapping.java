@@ -1,8 +1,12 @@
 package com.q.reminder.reminder.mapper;
 
-import com.q.reminder.reminder.entity.TTableFeatureTmp;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.q.reminder.reminder.entity.TTableFeatureTmp;
+import com.q.reminder.reminder.vo.FeautreTimeVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * 需求管理表临时表（避免重复）(TTableFeatureTmp)表数据库访问层
@@ -12,5 +16,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface TTableFeatureTmpMapping extends BaseMapper<TTableFeatureTmp> {
+    List<FeautreTimeVo> queryTimes(@Param("recordsId") String recordsId);
 }
 

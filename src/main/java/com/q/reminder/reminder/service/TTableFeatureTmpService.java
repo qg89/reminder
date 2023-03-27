@@ -2,6 +2,9 @@ package com.q.reminder.reminder.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.q.reminder.reminder.entity.TTableFeatureTmp;
+import com.q.reminder.reminder.vo.FeautreTimeVo;
+
+import java.util.List;
 
 
 /**
@@ -12,4 +15,5 @@ import com.q.reminder.reminder.entity.TTableFeatureTmp;
  */
 public interface TTableFeatureTmpService extends IService<TTableFeatureTmp>{
 
+    List<FeautreTimeVo> queryTimes(String records);
 }
