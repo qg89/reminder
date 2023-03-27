@@ -174,6 +174,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
             tTableFeatureTmpService.removeBatchByIds(tempList);
             log.info("[需求管理表写入redmine] 周一删除历史数据完成");
         }
+        log.info("[需求管理表写入redmine] 执行完成");
         return processResult;
     }
 }
