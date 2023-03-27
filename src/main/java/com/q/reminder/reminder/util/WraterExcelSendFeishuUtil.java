@@ -5,10 +5,8 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.alibaba.fastjson2.JSONObject;
-import com.q.reminder.reminder.vo.ContentVo;
-import com.q.reminder.reminder.vo.ExcelVo;
-import com.q.reminder.reminder.vo.FeishuUploadImageVo;
-import com.q.reminder.reminder.vo.WeeklyProjectVo;
+import com.q.reminder.reminder.util.feishu.BaseFeishu;
+import com.q.reminder.reminder.vo.*;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.File;
@@ -56,16 +54,14 @@ public class WraterExcelSendFeishuUtil {
         ContentVo contentVo = new ContentVo();
         contentVo.setFileType("xls");
         contentVo.setReceiveId(vo.getPmOu());
-        contentVo.setAppSecret(appSecret);
-        contentVo.setAppId(appId);
         contentVo.setFile(file);
         contentVo.setReceiveId(weeklyVo.getPmOu());
-        String fileKey = BaseFeishuJavaUtils.imUploadFile(contentVo);
+        String fileKey = BaseFeishu.message().imUploadFile(contentVo);
         JSONObject json = new JSONObject();
         json.put("file_key", fileKey);
         contentVo.setContent(json.toJSONString());
         contentVo.setMsgType("file");
-        BaseFeishuJavaUtils.sendContent(contentVo);
+        BaseFeishu.message().sendContent(contentVo);
         file.delete();
     }
 
@@ -98,16 +94,14 @@ public class WraterExcelSendFeishuUtil {
         ContentVo contentVo = new ContentVo();
         contentVo.setFileType("xls");
         contentVo.setReceiveId(vo.getPmOu());
-        contentVo.setAppSecret(appSecret);
-        contentVo.setAppId(appId);
         contentVo.setFile(file);
         contentVo.setReceiveId(weeklyVo.getPmOu());
-        String fileKey = BaseFeishuJavaUtils.imUploadFile(contentVo);
+        String fileKey = BaseFeishu.message().imUploadFile(contentVo);
         JSONObject json = new JSONObject();
         json.put("file_key", fileKey);
         contentVo.setContent(json.toJSONString());
         contentVo.setMsgType("file");
-        BaseFeishuJavaUtils.sendContent(contentVo);
+        BaseFeishu.message().sendContent(contentVo);
         file.delete();
     }
 }

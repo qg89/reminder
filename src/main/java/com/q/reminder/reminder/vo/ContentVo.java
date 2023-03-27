@@ -1,6 +1,5 @@
 package com.q.reminder.reminder.vo;
 
-import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,7 +15,7 @@ import java.io.Serializable;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class ContentVo extends BaseFeishuVo implements Serializable {
+public class ContentVo extends MessageVo implements Serializable {
     private String receiveId;
     private String content;
     private String msgType;

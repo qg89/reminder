@@ -3,9 +3,8 @@ package com.q.reminder.reminder.util.feishu;
 import com.lark.oapi.Client;
 import com.q.reminder.reminder.config.SpringContextUtils;
 import com.q.reminder.reminder.service.impl.FeishuService;
-import com.q.reminder.reminder.util.feishu.cloud.documents.Documents;
-import com.q.reminder.reminder.util.feishu.cloud.space.Space;
-import com.q.reminder.reminder.util.feishu.cloud.table.Table;
+import com.q.reminder.reminder.util.feishu.cloud.Cloud;
+import com.q.reminder.reminder.util.feishu.cloud.documents.Upload;
 import com.q.reminder.reminder.util.feishu.group.GroupMessage;
 import com.q.reminder.reminder.util.feishu.message.Message;
 import com.q.reminder.reminder.util.feishu.wiki.Wiki;
@@ -32,17 +31,8 @@ public abstract class BaseFeishu {
      *
      * @return
      */
-    public static Space cloud() {
-        return Space.getInstance();
-    }
-
-    /**
-     * 云文档-文档
-     *
-     * @return
-     */
-    public static Documents block() {
-        return Documents.getInstance();
+    public static Cloud cloud() {
+        return Cloud.getInstance();
     }
 
     /**
@@ -72,12 +62,7 @@ public abstract class BaseFeishu {
         return GroupMessage.getInstance();
     }
 
-    /**
-     * 云文档-多维表格
-     *
-     * @return
-     */
-    public static Table table() {
-        return Table.getInstance();
+    public static Upload upload() {
+        return Upload.getInstance();
     }
 }

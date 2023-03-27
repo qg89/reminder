@@ -3,6 +3,7 @@ package com.q.reminder.reminder.task.base;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
@@ -12,8 +13,9 @@ import com.q.reminder.reminder.service.AdminInfoService;
 import com.q.reminder.reminder.service.OverdueTaskHistoryService;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.UserMemberService;
-import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
+import com.q.reminder.reminder.util.feishu.BaseFeishu;
+import com.q.reminder.reminder.vo.MessageVo;
 import com.q.reminder.reminder.vo.QueryVo;
 import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.SendVo;
@@ -24,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,7 +58,6 @@ public class QueryTasksToMemberBase {
      * @param contentStatus
      */
     public void feiShu(int expiredDay, List<String> noneStatusList, Boolean contentStatus) {
-        String authorization = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         StringBuilder contentAll = new StringBuilder();
         contentAll.append("当日执行情况如下(").append(new DateTime().toString("yyyy-MM-dd")).append("):\r\n");
 
@@ -77,7 +77,14 @@ public class QueryTasksToMemberBase {
         if (CollectionUtils.isEmpty(listMap)) {
             contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append("\r\n");
             contentAll.append("执行完成!");
-            FeiShuApi.sendAdmin(adminInfoList, contentAll.toString(), authorization);
+            adminInfoList.forEach(e -> {
+                MessageVo sendVo = new MessageVo();
+                sendVo.setReceiveId(e.getMemberId());
+                sendVo.setContent( contentAll.toString());
+                sendVo.setMsgType("text");
+                sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+                BaseFeishu.message().sendContent(sendVo);
+            });
             return;
         }
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append(" 查询redmine过期人员集合完成!").append("\r\n");
@@ -163,16 +170,24 @@ public class QueryTasksToMemberBase {
         }
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("发送飞书任务开始!").append("\r\n");
         sendMap.forEach((k, v) -> {
-            try {
-                FeiShuApi.sendPost(v, authorization, contentAll);
-            } catch (IOException e) {
-                FeiShuApi.sendAdmin(adminInfoList, "发送群消息异常！", authorization);
-            }
+            MessageVo sendVo = new MessageVo();
+            sendVo.setReceiveId(v.getMemberId());
+            sendVo.setContent(contentAll.toString());
+            sendVo.setMsgType("post");
+            sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+            BaseFeishu.message().sendContent(sendVo);
         });
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("发送飞书任务完成!").append("\r\n");
         overdueTaskHistoryService.saveOrUpdateBatch(historys);
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("执行完成!").append("\r\n");
-        FeiShuApi.sendAdmin(adminInfoList, contentAll.toString(), authorization);
+        adminInfoList.forEach(e -> {
+            MessageVo sendVo = new MessageVo();
+            sendVo.setReceiveId(e.getMemberId());
+            sendVo.setContent(contentAll.toString());
+            sendVo.setMsgType("text");
+            sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+            BaseFeishu.message().sendContent(sendVo);
+        });
         log.info("过期任务提醒个人,执行完成");
     }
 }

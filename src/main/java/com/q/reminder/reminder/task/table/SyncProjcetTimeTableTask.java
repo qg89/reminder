@@ -91,7 +91,7 @@ public class SyncProjcetTimeTableTask implements BasicProcessor {
      * @throws Exception
      */
     private void delRecords(TTableInfo tTableInfo) throws Exception {
-        List<String> list = BaseFeishu.table().listTableRecords(tTableInfo).stream().map(AppTableRecord::getRecordId).toList();
+        List<String> list = BaseFeishu.cloud().table().listTableRecords(tTableInfo).stream().map(AppTableRecord::getRecordId).toList();
         if (CollectionUtils.isEmpty(list)) {
             return;
         }

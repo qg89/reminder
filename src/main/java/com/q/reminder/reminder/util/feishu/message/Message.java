@@ -84,7 +84,7 @@ public class Message extends BaseFeishu {
                         .fileType(vo.getFileType())
                         .build())
                 .build();
-        CreateFileResp resp = CLIENT.im().file().create(req);
+        CreateFileResp resp = CLIENT.im().file().create(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
         return resp.getData().getFileKey();
     }
 }

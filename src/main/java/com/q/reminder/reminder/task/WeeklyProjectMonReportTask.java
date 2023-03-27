@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.docx.v1.model.ReplaceImageRequest;
 import com.lark.oapi.service.docx.v1.model.UpdateBlockRequest;
+import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.constant.WeeklyReportConstants;
 import com.q.reminder.reminder.service.ProjectInfoService;
@@ -12,7 +13,7 @@ import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.util.*;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.FeishuUploadImageVo;
-import com.q.reminder.reminder.vo.SendVo;
+import com.q.reminder.reminder.vo.MessageVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.taskadapter.redmineapi.bean.Issue;
 import org.apache.commons.lang3.StringUtils;
@@ -135,7 +136,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
                     }
                 }
             }
-            BaseFeishu.block().batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
+            BaseFeishu.cloud().documents().batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
 //            log.info("[{}]项目周报更新完成", projectShortName);
 
             sendFeishu(report);
@@ -224,7 +225,6 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
     }
 
     private void sendFeishu(WeeklyProjectVo vo) throws IOException {
-        String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         String weeklyReportUrl = vo.getWeeklyReportUrl();
         String fileName = vo.getFileName();
         JSONObject con = new JSONObject();
@@ -245,11 +245,12 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         subContentJsonArray.add(a);
         contentJsonArray.add(subContentJsonArray);
 
-        SendVo sendVo = new SendVo();
-        sendVo.setMemberId(vo.getPmOu());
+        MessageVo sendVo = new MessageVo();
+        sendVo.setReceiveId(vo.getPmOu());
         sendVo.setContent(con.toJSONString());
-        FeiShuApi.sendPost(sendVo, secret, new StringBuilder());
-//        log.info("[{}]-周报更新已通知PM", fileName);
+        sendVo.setMsgType("post");
+        sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+        BaseFeishu.message().sendContent(sendVo);
     }
 
     /**
@@ -259,7 +260,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
      * @param file
      * @param requests
      */
-    private void addRequests(WeeklyProjectVo vo, File file, List<UpdateBlockRequest> requests) {
+    private void addRequests(WeeklyProjectVo vo, File file, List<UpdateBlockRequest> requests) throws Exception {
         if (file == null) {
             return;
         }
@@ -274,7 +275,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         imageVo.setAppSecret(vo.getAppSecret());
         imageVo.setAppId(vo.getAppId());
         imageVo.setParentNode(blockId);
-        String fileToken = BaseFeishuJavaUtils.upload(imageVo);
+        String fileToken = BaseFeishu.upload().uploadFile(imageVo);
         if (StringUtils.isBlank(fileToken)) {
 //            log.info("飞书上传素材返回为空");
             return;
@@ -309,10 +310,10 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         imageVo.setAppSecret(vo.getAppSecret());
         imageVo.setAppId(vo.getAppId());
         imageVo.setParentNode(vo.getBlockId());
-        String fileToken = BaseFeishu.cloud().uploadFile(imageVo);
+        String fileToken = BaseFeishu.upload().uploadFile(imageVo);
         vo.setImageToken(fileToken);
         // 通过飞书替换图片至block_id
-        Boolean updateBlocks = BaseFeishu.block().updateBlocks(vo);
+        Boolean updateBlocks = BaseFeishu.cloud().documents().updateBlocks(vo);
         if (!updateBlocks) {
             System.out.println();
         }

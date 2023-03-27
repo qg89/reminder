@@ -12,7 +12,6 @@ import com.q.reminder.reminder.service.AdminInfoService;
 import com.q.reminder.reminder.service.OverdueTaskHistoryService;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.UserMemberService;
-import com.q.reminder.reminder.util.FeiShuApi;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.MessageVo;
@@ -73,7 +72,6 @@ public class OverdueTasksAgainToGroupBase {
     public void overdueTasksAgainToGroup(QueryVo vo) {
         List<OverdueTaskHistory> historys = new ArrayList<>();
         String redminderType = vo.getRedminderType();
-        String secret = FeiShuApi.getSecret(feishuProperties.getAppId(), feishuProperties.getAppSecret());
         // 组装数据， 通过人员，获取要发送的内容
         List<RProjectInfo> RProjectInfoList = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();
         List<RedmineVo> issueUserList = RedmineApi.queryUserByExpiredDayList(vo, RProjectInfoList);
@@ -143,13 +141,27 @@ public class OverdueTasksAgainToGroupBase {
             try {
                 BaseFeishu.message().sendContent(m);
             } catch (Exception ex) {
-                FeiShuApi.sendAdmin(adminInfoList, this.getClass().getName() + " 过期任务提醒群组,发送异常", secret);
+                adminInfoList.forEach(e -> {
+                    MessageVo sendVo = new MessageVo();
+                    sendVo.setReceiveId(e.getMemberId());
+                    sendVo.setContent("this.getClass().getName() + \" 过期任务提醒群组,发送异常\"");
+                    sendVo.setMsgType("text");
+                    sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+                    BaseFeishu.message().sendContent(sendVo);
+                });
             }
         }
 
         if (!overdueTask) {
             if (!overdueTaskHistoryService.saveOrUpdateBatch(historys)) {
-                FeiShuApi.sendAdmin(adminInfoList, "任务保存历史记录失败！", secret);
+                adminInfoList.forEach(e -> {
+                    MessageVo sendVo = new MessageVo();
+                    sendVo.setReceiveId(e.getMemberId());
+                    sendVo.setContent("任务保存历史记录失败！");
+                    sendVo.setMsgType("text");
+                    sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+                    BaseFeishu.message().sendContent(sendVo);
+                });
                 return;
             }
         }
