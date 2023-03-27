@@ -1,7 +1,6 @@
 package com.q.reminder.reminder.util.feishu.group;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.lark.oapi.Client;
 import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.im.v1.enums.GetChatMembersMemberIdTypeEnum;
 import com.lark.oapi.service.im.v1.enums.ListChatUserIdTypeEnum;
@@ -79,7 +78,7 @@ public class GroupMessage extends BaseFeishu {
             }
             String pageToken = data.getPageToken();
             if (data.getHasMore()) {
-                query(items, chatId, userGroupList, pageToken, req, CLIENT);
+                query(items, chatId, userGroupList, pageToken, req);
             }
         }
         return items.stream().distinct().toList();
@@ -100,11 +99,10 @@ public class GroupMessage extends BaseFeishu {
      * @param userGroupList
      * @param pageToken
      * @param req
-     * @param client
      */
-    private void query(List<UserMemgerInfo> lists, String chatId, List<UserGroup> userGroupList, String pageToken, GetChatMembersReq req, Client client) throws Exception {
+    private void query(List<UserMemgerInfo> lists, String chatId, List<UserGroup> userGroupList, String pageToken, GetChatMembersReq req) throws Exception {
         req.setPageToken(pageToken);
-        GetChatMembersResp resp = client.im().chatMembers().get(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+        GetChatMembersResp resp = CLIENT.im().chatMembers().get(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
         GetChatMembersRespBody data = resp.getData();
         ListMember[] dataItems = data.getItems();
         for (ListMember dataItem : dataItems) {
@@ -115,7 +113,7 @@ public class GroupMessage extends BaseFeishu {
         }
         if (data.getHasMore()) {
             pageToken = data.getPageToken();
-            query(lists, chatId, userGroupList, pageToken, req, client);
+            query(lists, chatId, userGroupList, pageToken, req);
         }
     }
 }
