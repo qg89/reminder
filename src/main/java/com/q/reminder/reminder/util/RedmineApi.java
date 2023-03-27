@@ -591,30 +591,26 @@ public abstract class RedmineApi {
             Float times = e.getTimes();
             Integer id = e.getId();
             Issue newIssue = issue;
+            newIssue.setSpentHours(times);
+            newIssue.setAssigneeId(id);
             if ("test".equals(name)) {
                 newIssue.setSubject(subject + "-测试用例");
-                newIssue.setSpentHours(times);
                 newIssue.setTracker(testTracker);
-                newIssue.setAssigneeId(id);
                 try {
                     createSubIssue = createSubIssue && newIssue.create().getId() != null;
                     newIssue.setSubject(subject + "-测试执行");
                     createSubIssue = createSubIssue && newIssue.create().getId() != null;
                 } catch (RedmineException ex) {
-                    ex.printStackTrace();
                     createSubIssue = false;
                     log.error(ex);
                 }
             } else {
                 newIssue.setSubject(subject + "-" + ROLE_MAP.get(name));
-                newIssue.setSpentHours(times);
                 newIssue.setTracker(devTracker);
-                newIssue.setAssigneeId(id);
                 try {
                     Issue issu = newIssue.create();
                     createSubIssue = createSubIssue && issu.getId() != null;
                 } catch (Exception ex) {
-                    ex.printStackTrace();
                     log.error(ex);
                     createSubIssue = false;
                 }
@@ -623,7 +619,7 @@ public abstract class RedmineApi {
         return createSubIssue;
     }
 
-    public static final Map<String, String> ROLE_MAP = Map.of(
+    private static final Map<String, String> ROLE_MAP = Map.of(
             "test", "测试",
             "front", "前端",
             "back", "后端",
