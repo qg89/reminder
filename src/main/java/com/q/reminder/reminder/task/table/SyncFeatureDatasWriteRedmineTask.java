@@ -22,7 +22,6 @@ import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -73,10 +72,6 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                 String recordsId = redmineDataVo.getRecordsId();
                 List<CustomField> customFieldList = redmineTypeStrategy.getCustomField(recordsId);
                 List<RequestParam> requestParams = redmineTypeStrategy.getFeatureIdParams(recordsId);
-                String mdl = redmineDataVo.getMdl();
-                String menuOne = redmineDataVo.getMenuOne();
-                String menuTwo = redmineDataVo.getMenuTwo();
-                String menuThree = redmineDataVo.getMenuThree();
                 String dscrptn = redmineDataVo.getDscrptn();
                 Float prdct = redmineDataVo.getPrdct();
                 LocalDate prodTime = redmineDataVo.getProdTime();
@@ -93,25 +88,9 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                 if (RedmineApi.checkIssue(transport, requestParams)) {
                     continue;
                 }
-                StringBuilder subject = new StringBuilder();
-                if (StringUtils.isNotBlank(mdl)) {
-                    subject.append("模块：").append(mdl).append("-");
-                }
-                if (StringUtils.isNotBlank(menuOne)) {
-                    subject.append("一级：").append(menuOne).append("-");
-                }
-                if (StringUtils.isNotBlank(menuTwo)) {
-                    subject.append("二级：").append(menuTwo).append("-");
-                }
-                if (StringUtils.isNotBlank(menuThree)) {
-                    subject.append("三级：").append(menuThree);
-                }
-                int lastChar = subject.lastIndexOf("-");
-                if (lastChar == subject.length() - 1) {
-                    subject.deleteCharAt(lastChar);
-                }
+                String subject = RedmineApi.createSubject(redmineDataVo);
                 Issue issue = new Issue();
-                issue.setSubject(subject.toString());
+                issue.setSubject(subject);
                 issue.setDescription(dscrptn);
                 issue.setAssigneeId(redmineDataVo.getPrdctId());
                 issue.setDueDate(dueDate);
