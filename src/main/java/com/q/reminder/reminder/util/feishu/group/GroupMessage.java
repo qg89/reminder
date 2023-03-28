@@ -1,7 +1,6 @@
 package com.q.reminder.reminder.util.feishu.group;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.im.v1.enums.GetChatMembersMemberIdTypeEnum;
 import com.lark.oapi.service.im.v1.enums.ListChatUserIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.*;
@@ -46,16 +45,18 @@ public class GroupMessage extends BaseFeishu {
      */
     public List<GroupInfo> getGroupToChats() throws Exception {
         ListChatReq req = ListChatReq.newBuilder().userIdType(ListChatUserIdTypeEnum.OPEN_ID).build();
-        ListChatResp resp = CLIENT.im().chat().list(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
-        ListChatRespBody data = resp.getData();
-        ListChat[] items = data.getItems();
-        ArrayList<ListChat> listChats = new ArrayList<>(Arrays.asList(items));
+        ListChatResp resp = CLIENT.im().chat().list(req, REQUEST_OPTIONS);
         List<GroupInfo> list = new ArrayList<>();
-        listChats.forEach(e -> {
-            GroupInfo groupInfo = new GroupInfo();
-            BeanUtil.copyProperties(e, groupInfo);
-            list.add(groupInfo);
-        });
+        if (resp.success()) {
+            ListChatRespBody data = resp.getData();
+            ListChat[] items = data.getItems();
+            ArrayList<ListChat> listChats = new ArrayList<>(Arrays.asList(items));
+            listChats.forEach(e -> {
+                GroupInfo groupInfo = new GroupInfo();
+                BeanUtil.copyProperties(e, groupInfo);
+                list.add(groupInfo);
+            });
+        }
         return list;
     }
 
@@ -68,7 +69,7 @@ public class GroupMessage extends BaseFeishu {
                     .memberIdType(GetChatMembersMemberIdTypeEnum.OPEN_ID)
                     .pageSize(20)
                     .build();
-            GetChatMembersResp resp = CLIENT.im().chatMembers().get(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+            GetChatMembersResp resp = CLIENT.im().chatMembers().get(req, REQUEST_OPTIONS);
             GetChatMembersRespBody data = resp.getData();
             for (ListMember dataItem : data.getItems()) {
                 UserMemgerInfo userMemgerInfo = new UserMemgerInfo();
@@ -102,7 +103,7 @@ public class GroupMessage extends BaseFeishu {
      */
     private void query(List<UserMemgerInfo> lists, String chatId, List<UserGroup> userGroupList, String pageToken, GetChatMembersReq req) throws Exception {
         req.setPageToken(pageToken);
-        GetChatMembersResp resp = CLIENT.im().chatMembers().get(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+        GetChatMembersResp resp = CLIENT.im().chatMembers().get(req, REQUEST_OPTIONS);
         GetChatMembersRespBody data = resp.getData();
         ListMember[] dataItems = data.getItems();
         for (ListMember dataItem : dataItems) {

@@ -58,7 +58,7 @@ public class Table extends BaseFeishu {
             if (StringUtils.isNotBlank(pageToken)) {
                 req.setPageToken(pageToken);
             }
-            resp = CLIENT.bitable().appTableRecord().list(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+            resp = CLIENT.bitable().appTableRecord().list(req, REQUEST_OPTIONS);
             if (resp.getCode() != 0) {
                 return resList;
             }
@@ -88,7 +88,7 @@ public class Table extends BaseFeishu {
                         .records(records)
                         .build())
                 .build();
-        BatchCreateAppTableRecordResp resp = client.bitable().appTableRecord().batchCreate(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+        BatchCreateAppTableRecordResp resp = client.bitable().appTableRecord().batchCreate(req, REQUEST_OPTIONS);
     }
 
     /**
@@ -103,7 +103,7 @@ public class Table extends BaseFeishu {
                 .tableId(vo.getTableId())
                 .batchDeleteAppTableRecordReqBody(BatchDeleteAppTableRecordReqBody.newBuilder().records(records).build())
                 .build();
-        CLIENT.bitable().appTableRecord().batchDelete(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+        CLIENT.bitable().appTableRecord().batchDelete(req, REQUEST_OPTIONS);
     }
 
     /**
@@ -120,7 +120,7 @@ public class Table extends BaseFeishu {
                 .userIdType(BatchUpdateAppTableRecordUserIdTypeEnum.OPEN_ID)
                 .batchUpdateAppTableRecordReqBody(reqBody)
                 .build();
-        BatchUpdateAppTableRecordResp resp = CLIENT.bitable().appTableRecord().batchUpdate(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+        BatchUpdateAppTableRecordResp resp = CLIENT.bitable().appTableRecord().batchUpdate(req, REQUEST_OPTIONS);
     }
 
     /**
@@ -138,6 +138,6 @@ public class Table extends BaseFeishu {
                         .records(records)
                         .build())
                 .build();
-        BatchCreateAppTableRecordResp resp = CLIENT.bitable().appTableRecord().batchCreate(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+        BatchCreateAppTableRecordResp resp = CLIENT.bitable().appTableRecord().batchCreate(req, REQUEST_OPTIONS);
     }
 }

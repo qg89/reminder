@@ -52,7 +52,7 @@ public class Space extends BaseFeishu {
                         .extra(new Property[]{})
                         .build())
                 .build();
-        CopyFileResp resp = CLIENT.drive().file().copy(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+        CopyFileResp resp = CLIENT.drive().file().copy(req, REQUEST_OPTIONS);
         if (resp.success()) {
             JSONObject result = JSONObject.parseObject(Jsons.DEFAULT.toJson(resp.getData()));
             WeeklyProjectReport file = JSONObject.parseObject(result.getString("file"), WeeklyProjectReport.class);
@@ -77,7 +77,7 @@ public class Space extends BaseFeishu {
                 .spreadsheetToken(spreadsheetToken)
                 .build();
         // 发起请求
-        QuerySpreadsheetSheetResp resp = CLIENT.sheets().spreadsheetSheet().query(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+        QuerySpreadsheetSheetResp resp = CLIENT.sheets().spreadsheetSheet().query(req, REQUEST_OPTIONS);
         List<SheetVo> list = new ArrayList<>();
         Sheet[] sheets = resp.getData().getSheets();
         for (Sheet sheet : sheets) {

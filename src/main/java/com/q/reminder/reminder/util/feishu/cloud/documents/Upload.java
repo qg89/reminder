@@ -46,7 +46,7 @@ public class Upload extends BaseFeishu {
                         .file(vo.getFile())
                         .build()
                 ).build()
-                , RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build()
+                , REQUEST_OPTIONS
         );
         if (uploadAllMediaResp.success()) {
             UploadAllMediaRespBody data = uploadAllMediaResp.getData();

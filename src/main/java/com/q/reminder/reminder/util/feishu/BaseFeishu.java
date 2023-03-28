@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.util.feishu;
 
 import com.lark.oapi.Client;
+import com.lark.oapi.core.request.RequestOptions;
 import com.q.reminder.reminder.config.SpringContextUtils;
 import com.q.reminder.reminder.service.impl.FeishuService;
 import com.q.reminder.reminder.util.feishu.cloud.Cloud;
@@ -17,12 +18,12 @@ import com.q.reminder.reminder.util.feishu.wiki.Wiki;
  */
 public abstract class BaseFeishu {
     protected Client CLIENT;
-    protected String TENANT_ACCESS_TOKEN;
+    protected RequestOptions REQUEST_OPTIONS;
 
     protected BaseFeishu() {
         FeishuService feishuService = SpringContextUtils.getBean(FeishuService.class);
         CLIENT = feishuService.client();
-        TENANT_ACCESS_TOKEN = feishuService.tenantAccessToken();
+        REQUEST_OPTIONS = RequestOptions.newBuilder().tenantAccessToken(feishuService.tenantAccessToken()).build();
     }
 
     /**

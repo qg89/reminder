@@ -49,7 +49,7 @@ public class Documents extends BaseFeishu {
                 .documentRevisionId(-1)
                 .userIdType(PatchDocumentBlockUserIdTypeEnum.USER_ID)
                 .updateBlockRequest(update)
-                .build(), RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+                .build(), REQUEST_OPTIONS);
         if (patch.success()) {
             return Boolean.TRUE;
         }
@@ -71,7 +71,7 @@ public class Documents extends BaseFeishu {
                 .batchUpdateDocumentBlockReqBody(BatchUpdateDocumentBlockReqBody.newBuilder().requests(updateBlockRequests).build())
                 .build();
 
-        BatchUpdateDocumentBlockResp resp = CLIENT.docx().documentBlock().batchUpdate(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+        BatchUpdateDocumentBlockResp resp = CLIENT.docx().documentBlock().batchUpdate(req, REQUEST_OPTIONS);
         if (resp.success()) {
             return Boolean.TRUE;
         } else {
@@ -100,7 +100,7 @@ public class Documents extends BaseFeishu {
                 .build();
 
         // 发起请求
-        ListDocumentBlockResp resp = CLIENT.docx().documentBlock().list(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+        ListDocumentBlockResp resp = CLIENT.docx().documentBlock().list(req, REQUEST_OPTIONS);
         // 业务数据处理
         if (resp != null && resp.getCode() == 0) {
             JSONObject result = JSONObject.parseObject(Jsons.DEFAULT.toJson(resp.getData()));

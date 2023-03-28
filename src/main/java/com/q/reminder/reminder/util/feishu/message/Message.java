@@ -53,7 +53,7 @@ public class Message extends BaseFeishu {
         CreateMessageResp resp = new CreateMessageResp();
         ImService.Message message = CLIENT.im().message();
         try {
-            message.create(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+            message.create(req, REQUEST_OPTIONS);
         } catch (Exception e) {
             int i = 0;
             while (!resp.success() && i <= 3) {
@@ -84,7 +84,7 @@ public class Message extends BaseFeishu {
                         .fileType(vo.getFileType())
                         .build())
                 .build();
-        CreateFileResp resp = CLIENT.im().file().create(req, RequestOptions.newBuilder().tenantAccessToken(TENANT_ACCESS_TOKEN).build());
+        CreateFileResp resp = CLIENT.im().file().create(req, REQUEST_OPTIONS);
         return resp.getData().getFileKey();
     }
 }
