@@ -6,8 +6,8 @@ import com.q.reminder.reminder.mapper.SDateConfigMapping;
 import com.q.reminder.reminder.service.SDateConfigService;
 import org.springframework.stereotype.Service;
 
+import java.lang.annotation.Retention;
 
-import javax.annotation.Resource;
 
 /**
  * 日期表(SDateConfig)表服务实现类
@@ -17,5 +17,4 @@ import javax.annotation.Resource;
  */
 @Service
 public class SDateConfigServiceImpl extends ServiceImpl<SDateConfigMapping, SDateConfig> implements SDateConfigService {
-    
 }
