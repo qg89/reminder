@@ -26,7 +26,6 @@ public class RProjectInfo extends Model<RProjectInfo> implements Serializable {
     
         
     @TableId(type = IdType.AUTO)
-    @TableField(value = "id")
     private Long id;
     /**
      * redmine项目ID

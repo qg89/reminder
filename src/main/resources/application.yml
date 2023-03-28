@@ -18,26 +18,19 @@ spring:
       pool:
         size: 5
   datasource:
-    druid:
-      driver-class-name: com.mysql.cj.jdbc.Driver
-      url: mpw:YAU7VUQTQlBTP/D7DYdMI5A5u1zqyh85JI/hVpPjrLzCpZnihi+gruSUQTzq8hl9p8mY2czOCrvHMrNNn5hE2869zSbitJStXAKwXQKs6yzl2JhuHSDinw5IyD2v7td4WFtaEQNW8VYwfi1CT17S4/Zf44Yht4Y0Pm/gaRPgSokkAa2s5qe1tu3m1oF4nCFiWsPOwe2hWdR6b6hI5L1Dca0CZCVTVW4dBM+ceuRmoEHR68ILnwSrc+jk7STgvjU+aQ3O/dFxmN7D2qLattxa5wEJjr9Xg5hxczIrC75/SBfst0IOmzqpQdgOyplnL6VGc7KZmcqxKunLwVhdNZqpCQ==
-      username: mpw:Jrfx9m/vVYtI1PLKUIeYlA==
-      password: mpw:tZLGHiKWlhtIyjhAlDJgQw==
-      initialSize: 5
-      minIdle: 5
-      maxActive: 20
-      maxWait: 60000
-      timeBetweenEvictionRunsMillis: 60000
-      minEvictableIdleTimeMillis: 300000
-      validationQuery: SELECT 1 FROM DUAL
-      testWhileIdle: true
-      testOnBorrow: false
-      testOnReturn: false
-      poolPreparedStatements: true
-      maxPoolPreparedStatementPerConnectionSize: 20
-      useGlobalDataSourceStat: true
-      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
-      db-type: mysql
+    type: com.zaxxer.hikari.HikariDataSource
+    username: mpw:Jrfx9m/vVYtI1PLKUIeYlA==
+    password: mpw:tZLGHiKWlhtIyjhAlDJgQw==
+    url: mpw:YAU7VUQTQlBTP/D7DYdMI5A5u1zqyh85JI/hVpPjrLzCpZnihi+gruSUQTzq8hl9p8mY2czOCrvHMrNNn5hE2869zSbitJStXAKwXQKs6yzl2JhuHSDinw5IyD2v7td4WFtaEQNW8VYwfi1CT17S4/Zf44Yht4Y0Pm/gaRPgSokkAa2s5qe1tu3m1oF4nCFiWsPOwe2hWdR6b6hI5L1Dca0CZCVTVW4dBM+ceuRmoEHR68ILnwSrc+jk7STgvjU+aQ3O/dFxmN7D2qLattxa5wEJjr9Xg5hxczIrC75/SBfst0IOmzqpQdgOyplnL6VGc7KZmcqxKunLwVhdNZqpCQ==
+    hikari:
+      connection-timeout: 30000     # 等待连接池分配链接的最大时长（毫秒），超过这个时长还没有可用的连接则发生 SQLException，默认：30 秒
+      minimum-idle: 2               # 最小空闲连接数
+      maximum-pool-size: 10         # 最大连接数
+      auto-commit: true             # 自动提交
+      idle-timeout: 600000          # 连接超时的最大时长（毫秒），超时则被释放（retired），默认：10 分钟
+      max-lifetime: 1800000         # 连接的生命时长（毫秒），超时而且没被使用则被释放（retired），默认： 30 分钟
+      connection-test-query: SELECT 1
+      pool-name: MakuHikariCP_Reminder
   cache:
     redis:
       time-to-live: 1800000
@@ -88,8 +81,8 @@ powerjob:
   worker:
     enabled: true
     app-name: admin
-    server-address: 192.168.3.46:7700
-#    server-address: 127.0.0.1:7700
+#    server-address: 192.168.3.46:7700
+    server-address: 127.0.0.1:7700
     protocol: akka
     store-strategy: disk
     max-result-length: 4096
