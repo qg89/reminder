@@ -1,32 +1,17 @@
 buildscript {
 	repositories {
-		maven {
-//			credentials {
-//				username '5ed0b855f3cfd0d0e769882d'
-//				password '2ifmpNunm]NO' }
-//			url 'https://packages.aliyun.com/maven/repository/2005435-snapshot-ENKNHJ/'
-
-			url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/'
-		}
-		maven {
-//			credentials {
-//				username '5ed0b855f3cfd0d0e769882d'
-//				password '2ifmpNunm]NO' }
-//			url 'https://packages.aliyun.com/maven/repository/2005435-release-5QlEJm/'
-
-			url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/'
-		}
 		maven { url "https://maven.aliyun.com/repository/central"}
+		maven { url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/' }
 		mavenCentral()
 	}
 	dependencies {
 		classpath "io.spring.gradle:dependency-management-plugin:1.0.15.RELEASE"
-		classpath "org.springframework.boot:spring-boot-gradle-plugin:2.7.5"
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:2.7.10"
 	}
 }
 
 plugins {
-	id 'org.springframework.boot' version '2.7.5'
+	id 'org.springframework.boot' version '2.7.10'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 	id 'java'
 }
@@ -38,6 +23,10 @@ sourceCompatibility = '17'
 
 configurations {
 	compile.exclude module: 'io.lettuce:lettuce-core'
+	compile.exclude module: 'spring-tx'
+	compile.exclude module: 'spring-bean'
+	compile.exclude module: 'spring-core'
+	compile.exclude module: 'spring-context'
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
@@ -48,30 +37,30 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
-	compileOnly 'redis.clients:jedis'
-	compileOnly 'org.projectlombok:lombok'
+	compileOnly 'redis.clients:jedis:4.3.1'
+	compileOnly 'org.projectlombok:lombok:1.18.26'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 //	runtimeOnly 'com.mysql:mysql-connector-j:8.0.31'
 //	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok:1.18.26'
 
-	implementation 'mysql:mysql-connector-java:8.0.30'
-	implementation 'com.alibaba:druid-spring-boot-starter:1.2.15'
-	implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.2'
-	implementation 'com.github.jeffreyning:mybatisplus-plus:1.7.2-RELEASE'
+	implementation 'mysql:mysql-connector-java:8.0.32'
+	implementation 'com.alibaba:druid-spring-boot-starter:1.2.16'
+	implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3.1'
+	implementation 'com.github.jeffreyning:mybatisplus-plus:1.7.3-RELEASE'
 
 
 	// 工具
-	implementation 'cn.hutool:hutool-all:5.8.11'
+	implementation 'cn.hutool:hutool-all:5.8.15'
 	implementation 'joda-time:joda-time:2.12.2'
 	implementation 'org.apache.commons:commons-lang3:3.12.0'
-	implementation 'com.alibaba.fastjson2:fastjson2:2.0.22'
+	implementation 'com.alibaba.fastjson2:fastjson2:2.0.25'
 
 	implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 	// redmine
 	implementation 'com.taskadapter:redmine-java-api:4.0.0.rc4'
 	//	飞书
-	implementation 'com.larksuite.oapi:oapi-sdk:2.0.10'
+	implementation 'com.larksuite.oapi:oapi-sdk:2.0.16'
 	// lark 飞书
 //	implementation 'com.larksuite.oapi:larksuite-oapi:1.0.18-rc4'
 
@@ -93,13 +82,17 @@ dependencies {
 //	powerjob
 	implementation 'tech.powerjob:powerjob-worker-spring-boot-starter:4.3.1-bugfix'
 //	implementation 'tech.powerjob:powerjob-official-processors:4.3.1-bugfix'
-	implementation 'org.agrona:agrona:1.4.0'
-	implementation 'javax.xml.bind:jaxb-api:2.3.1'
+	implementation 'org.agrona:agrona:1.17.1'
+	implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
 
 //	git
-	implementation 'org.eclipse.jgit:org.eclipse.jgit:6.4.0.202211300538-r'
+	implementation 'org.eclipse.jgit:org.eclipse.jgit:6.5.0.202303070854-r'
 	implementation 'org.gitective:gitective-core:0.9.9'
 
+//	drools
+//	implementation 'org.drools:drools-compiler:8.34.0.Final'
+//	implementation 'org.kie:kie-api:8.34.0.Final'
+//	implementation 'org.kie:kie-spring:7.73.0.Final'
 }
 
 
@@ -109,27 +102,17 @@ configure(allprojects) {
 
 	repositories {
 		mavenLocal()
-		maven {
-//			credentials {
-//				username '5ed0b855f3cfd0d0e769882d'
-//				password '2ifmpNunm]NO' }
-//			url 'https://packages.aliyun.com/maven/repository/2005435-snapshot-ENKNHJ/'
-
-			url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/'
-		}
-		maven {
-//			credentials {
-//				username '5ed0b855f3cfd0d0e769882d'
-//				password '2ifmpNunm]NO' }
-//			url 'https://packages.aliyun.com/maven/repository/2005435-release-5QlEJm/'
-
-			url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/'
-		}
+		maven { url "https://maven.aliyun.com/repository/central"}
+		maven { url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/' }
 	}
 
 	dependencyManagement {
 		imports {
-			mavenBom "org.springframework.boot:spring-boot-dependencies:2.7.5"
+			mavenBom "org.springframework.boot:spring-boot-dependencies:2.7.10"
 		}
 	}
+}
+
+repositories {
+    mavenCentral()
 }
