@@ -45,7 +45,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok:1.18.26'
 
 	implementation 'mysql:mysql-connector-java:8.0.32'
-	implementation 'com.alibaba:druid-spring-boot-starter:1.2.16'
+//	implementation 'com.alibaba:druid-spring-boot-starter:1.2.16'
 	implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3.1'
 	implementation 'com.github.jeffreyning:mybatisplus-plus:1.7.3-RELEASE'
 
