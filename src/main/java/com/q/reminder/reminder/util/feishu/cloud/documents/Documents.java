@@ -2,12 +2,12 @@ package com.q.reminder.reminder.util.feishu.cloud.documents;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.core.utils.Jsons;
 import com.lark.oapi.service.docx.v1.enums.BatchUpdateDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.enums.ListDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.enums.PatchDocumentBlockUserIdTypeEnum;
 import com.lark.oapi.service.docx.v1.model.*;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 
@@ -38,18 +38,23 @@ public class Documents extends BaseFeishu {
      * @return
      * @throws Exception
      */
-    public Boolean updateBlocks( WeeklyProjectVo vo) throws Exception {
+    public Boolean updateBlocks( WeeklyProjectVo vo) {
         UpdateBlockRequest update = UpdateBlockRequest.newBuilder().build();
         update.setReplaceImage(ReplaceImageRequest.newBuilder()
                 .token(vo.getImageToken())
                 .build());
-        PatchDocumentBlockResp patch = CLIENT.docx().documentBlock().patch(PatchDocumentBlockReq.newBuilder()
-                .documentId(vo.getFileToken())
-                .blockId(vo.getBlockId())
-                .documentRevisionId(-1)
-                .userIdType(PatchDocumentBlockUserIdTypeEnum.USER_ID)
-                .updateBlockRequest(update)
-                .build(), REQUEST_OPTIONS);
+        PatchDocumentBlockResp patch;
+        try {
+            patch = CLIENT.docx().documentBlock().patch(PatchDocumentBlockReq.newBuilder()
+                    .documentId(vo.getFileToken())
+                    .blockId(vo.getBlockId())
+                    .documentRevisionId(-1)
+                    .userIdType(PatchDocumentBlockUserIdTypeEnum.USER_ID)
+                    .updateBlockRequest(update)
+                    .build(), REQUEST_OPTIONS);
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 更新块异常");
+        }
         if (patch.success()) {
             return Boolean.TRUE;
         }
@@ -63,7 +68,7 @@ public class Documents extends BaseFeishu {
      * @return
      * @throws Exception
      */
-    public Boolean batchUpdateBlocks(WeeklyProjectVo vo, UpdateBlockRequest[] updateBlockRequests) throws Exception {
+    public Boolean batchUpdateBlocks(WeeklyProjectVo vo, UpdateBlockRequest[] updateBlockRequests) {
         BatchUpdateDocumentBlockReq req = BatchUpdateDocumentBlockReq.newBuilder()
                 .documentId(vo.getFileToken())
                 .documentRevisionId(-1)
@@ -71,13 +76,14 @@ public class Documents extends BaseFeishu {
                 .batchUpdateDocumentBlockReqBody(BatchUpdateDocumentBlockReqBody.newBuilder().requests(updateBlockRequests).build())
                 .build();
 
-        BatchUpdateDocumentBlockResp resp = CLIENT.docx().documentBlock().batchUpdate(req, REQUEST_OPTIONS);
+        BatchUpdateDocumentBlockResp resp;
+        try {
+            resp = CLIENT.docx().documentBlock().batchUpdate(req, REQUEST_OPTIONS);
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 批量更新块异常");
+        }
         if (resp.success()) {
             return Boolean.TRUE;
-        } else {
-            JSONObject json = new JSONObject();
-            json.put("text", "项目名称： " + vo.getProjectShortName() + "，msg：" + resp.getMsg() + ", error：" + resp.getError());
-//                sendAdmin(client, json, List.of("ou_35e03d4d8754dd35fed26c26849c85ab"));
         }
         return Boolean.FALSE;
     }
@@ -88,7 +94,7 @@ public class Documents extends BaseFeishu {
      * @param vo
      * @return
      */
-    public JSONArray blocks(WeeklyProjectVo vo) throws Exception {
+    public JSONArray blocks(WeeklyProjectVo vo) {
         // 构建client
 
         // 创建请求对象
@@ -100,7 +106,12 @@ public class Documents extends BaseFeishu {
                 .build();
 
         // 发起请求
-        ListDocumentBlockResp resp = CLIENT.docx().documentBlock().list(req, REQUEST_OPTIONS);
+        ListDocumentBlockResp resp = null;
+        try {
+            resp = CLIENT.docx().documentBlock().list(req, REQUEST_OPTIONS);
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 获取文档所有块异常");
+        }
         // 业务数据处理
         if (resp != null && resp.getCode() == 0) {
             JSONObject result = JSONObject.parseObject(Jsons.DEFAULT.toJson(resp.getData()));

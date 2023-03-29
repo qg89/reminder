@@ -1,12 +1,12 @@
 package com.q.reminder.reminder.util.feishu.cloud.table;
 
 import com.lark.oapi.Client;
-import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.bitable.v1.enums.BatchCreateAppTableRecordUserIdTypeEnum;
 import com.lark.oapi.service.bitable.v1.enums.BatchUpdateAppTableRecordUserIdTypeEnum;
 import com.lark.oapi.service.bitable.v1.enums.ListAppTableRecordUserIdTypeEnum;
 import com.lark.oapi.service.bitable.v1.model.*;
 import com.q.reminder.reminder.entity.TTableInfo;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import org.apache.commons.lang3.StringUtils;
 
@@ -42,7 +42,7 @@ public class Table extends BaseFeishu {
      * @param client
      * @return
      */
-    public List<AppTableRecord> listTableRecords(TTableInfo vo) throws Exception {
+    public List<AppTableRecord> listTableRecords(TTableInfo vo) {
         List<AppTableRecord> resList = new ArrayList<>();
         ListAppTableRecordReq req = ListAppTableRecordReq.newBuilder()
                 .appToken(vo.getAppToken())
@@ -58,8 +58,12 @@ public class Table extends BaseFeishu {
             if (StringUtils.isNotBlank(pageToken)) {
                 req.setPageToken(pageToken);
             }
-            resp = CLIENT.bitable().appTableRecord().list(req, REQUEST_OPTIONS);
-            if (resp.getCode() != 0) {
+            try {
+                resp = CLIENT.bitable().appTableRecord().list(req, REQUEST_OPTIONS);
+            } catch (Exception e) {
+                throw new FeishuException(e, this.getClass().getName() + " 多为表格-记录-列出视图记录异常");
+            }
+            if (!resp.success()) {
                 return resList;
             }
             respData = resp.getData();
@@ -79,7 +83,7 @@ public class Table extends BaseFeishu {
      * @param vo
      * @throws Exception
      */
-    public void batchCreateTableRecords(Client client, TTableInfo vo, AppTableRecord[] records) throws Exception {
+    public void batchCreateTableRecords(Client client, TTableInfo vo, AppTableRecord[] records) {
         BatchCreateAppTableRecordReq req = BatchCreateAppTableRecordReq.newBuilder()
                 .appToken(vo.getAppToken())
                 .tableId(vo.getTableId())
@@ -88,7 +92,11 @@ public class Table extends BaseFeishu {
                         .records(records)
                         .build())
                 .build();
-        BatchCreateAppTableRecordResp resp = client.bitable().appTableRecord().batchCreate(req, REQUEST_OPTIONS);
+        try {
+            client.bitable().appTableRecord().batchCreate(req, REQUEST_OPTIONS);
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 多为表格-记录-批量创建记录异常");
+        }
     }
 
     /**
@@ -96,14 +104,18 @@ public class Table extends BaseFeishu {
      *
      * @param records
      */
-    public void batchDeleteTableRecords(TTableInfo vo, String[] records) throws Exception {
+    public void batchDeleteTableRecords(TTableInfo vo, String[] records) {
         // 创建请求对象
         BatchDeleteAppTableRecordReq req = BatchDeleteAppTableRecordReq.newBuilder()
                 .appToken(vo.getAppToken())
                 .tableId(vo.getTableId())
                 .batchDeleteAppTableRecordReqBody(BatchDeleteAppTableRecordReqBody.newBuilder().records(records).build())
                 .build();
-        CLIENT.bitable().appTableRecord().batchDelete(req, REQUEST_OPTIONS);
+        try {
+            CLIENT.bitable().appTableRecord().batchDelete(req, REQUEST_OPTIONS);
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 多为表格-记录-批量删除记录异常");
+        }
     }
 
     /**
@@ -112,7 +124,7 @@ public class Table extends BaseFeishu {
      * @param vo
      * @throws Exception
      */
-    public void batchUpdateTableRecords(TTableInfo vo, AppTableRecord[] records) throws Exception {
+    public void batchUpdateTableRecords(TTableInfo vo, AppTableRecord[] records) {
         BatchUpdateAppTableRecordReqBody reqBody = BatchUpdateAppTableRecordReqBody.newBuilder().records(records).build();
         BatchUpdateAppTableRecordReq req = BatchUpdateAppTableRecordReq.newBuilder()
                 .appToken(vo.getAppToken())
@@ -120,7 +132,11 @@ public class Table extends BaseFeishu {
                 .userIdType(BatchUpdateAppTableRecordUserIdTypeEnum.OPEN_ID)
                 .batchUpdateAppTableRecordReqBody(reqBody)
                 .build();
-        BatchUpdateAppTableRecordResp resp = CLIENT.bitable().appTableRecord().batchUpdate(req, REQUEST_OPTIONS);
+        try {
+            CLIENT.bitable().appTableRecord().batchUpdate(req, REQUEST_OPTIONS);
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 多为表格-记录-批量更新记录异常");
+        }
     }
 
     /**
@@ -129,7 +145,7 @@ public class Table extends BaseFeishu {
      * @param vo
      * @throws Exception
      */
-    public void batchCreateTableRecords(TTableInfo vo, AppTableRecord[] records) throws Exception {
+    public void batchCreateTableRecords(TTableInfo vo, AppTableRecord[] records) {
         BatchCreateAppTableRecordReq req = BatchCreateAppTableRecordReq.newBuilder()
                 .appToken(vo.getAppToken())
                 .tableId(vo.getTableId())
@@ -138,6 +154,10 @@ public class Table extends BaseFeishu {
                         .records(records)
                         .build())
                 .build();
-        BatchCreateAppTableRecordResp resp = CLIENT.bitable().appTableRecord().batchCreate(req, REQUEST_OPTIONS);
+        try {
+            CLIENT.bitable().appTableRecord().batchCreate(req, REQUEST_OPTIONS);
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 多为表格-记录-批量创建记录异常");
+        }
     }
 }

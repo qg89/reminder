@@ -1,7 +1,7 @@
 package com.q.reminder.reminder.util.feishu.wiki;
 
-import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.wiki.v2.model.*;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 
 /**
@@ -34,7 +34,7 @@ public class Wiki extends BaseFeishu {
      * @return
      * @throws Exception
      */
-    public Node syncSpacesWiki(String projectToken, String title) throws Exception {
+    public Node syncSpacesWiki(String projectToken, String title) {
         CopySpaceNodeReq req = CopySpaceNodeReq.newBuilder()
                 .copySpaceNodeReqBody(CopySpaceNodeReqBody.newBuilder()
                         .targetParentToken(projectToken)
@@ -44,7 +44,12 @@ public class Wiki extends BaseFeishu {
                 .nodeToken("wikcnXpXCgmL3E7vdbM1TiwXiGc")
                 .spaceId("7046680616087126018")
                 .build();
-        CopySpaceNodeResp resp = CLIENT.wiki().spaceNode().copy(req, REQUEST_OPTIONS);
+        CopySpaceNodeResp resp = null;
+        try {
+            resp = CLIENT.wiki().spaceNode().copy(req, REQUEST_OPTIONS);
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 复制知识空间节点异常");
+        }
         return resp.getData().getNode();
     }
 
@@ -55,12 +60,21 @@ public class Wiki extends BaseFeishu {
      * @return
      * @throws Exception
      */
-    public Node getSpacesNode(String token) throws Exception {
+    public Node getSpacesNode(String token) {
         GetNodeSpaceReq req = GetNodeSpaceReq.newBuilder()
                 .token(token)
                 .build();
-        GetNodeSpaceResp resp = CLIENT.wiki().space().getNode(req, REQUEST_OPTIONS);
-        return resp.getData().getNode();
+        GetNodeSpaceResp resp;
+        try {
+            resp = CLIENT.wiki().space().getNode(req, REQUEST_OPTIONS);
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 获取知识空间节点信息异常");
+        }
+
+        if (resp.success()) {
+            resp.getData().getNode();
+        }
+        return null;
     }
 
     /**
@@ -70,11 +84,16 @@ public class Wiki extends BaseFeishu {
      * @return
      * @throws Exception
      */
-    public Node getNodeSpace(String wikiToken) throws Exception {
+    public Node getNodeSpace(String wikiToken) {
         GetNodeSpaceReq req = GetNodeSpaceReq.newBuilder()
                 .token(wikiToken)
                 .build();
-        GetNodeSpaceResp resp = CLIENT.wiki().space().getNode(req, REQUEST_OPTIONS);
+        GetNodeSpaceResp resp;
+        try {
+            resp = CLIENT.wiki().space().getNode(req, REQUEST_OPTIONS);
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 知识空间获取文件详情异常");
+        }
         if (resp.success()) {
             return resp.getData().getNode();
         }

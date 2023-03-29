@@ -7,6 +7,7 @@ import com.lark.oapi.service.im.v1.model.*;
 import com.q.reminder.reminder.entity.GroupInfo;
 import com.q.reminder.reminder.entity.UserGroup;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 
 import java.util.ArrayList;
@@ -43,9 +44,14 @@ public class GroupMessage extends BaseFeishu {
      * @return
      * @throws Exception
      */
-    public List<GroupInfo> getGroupToChats() throws Exception {
+    public List<GroupInfo> getGroupToChats() {
         ListChatReq req = ListChatReq.newBuilder().userIdType(ListChatUserIdTypeEnum.OPEN_ID).build();
-        ListChatResp resp = CLIENT.im().chat().list(req, REQUEST_OPTIONS);
+        ListChatResp resp;
+        try {
+            resp = CLIENT.im().chat().list(req, REQUEST_OPTIONS);
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 获取机器人所在群组异常");
+        }
         List<GroupInfo> list = new ArrayList<>();
         if (resp.success()) {
             ListChatRespBody data = resp.getData();
@@ -60,7 +66,7 @@ public class GroupMessage extends BaseFeishu {
         return list;
     }
 
-    public List<UserMemgerInfo> getMembersByChats(List<GroupInfo> chats, List<UserGroup> userGroupList) throws Exception {
+    public List<UserMemgerInfo> getMembersByChats(List<GroupInfo> chats, List<UserGroup> userGroupList) {
         List<UserMemgerInfo> items = new ArrayList<>();
         for (GroupInfo chat : chats) {
             String chatId = chat.getChatId();
@@ -69,7 +75,12 @@ public class GroupMessage extends BaseFeishu {
                     .memberIdType(GetChatMembersMemberIdTypeEnum.OPEN_ID)
                     .pageSize(20)
                     .build();
-            GetChatMembersResp resp = CLIENT.im().chatMembers().get(req, REQUEST_OPTIONS);
+            GetChatMembersResp resp;
+            try {
+                resp = CLIENT.im().chatMembers().get(req, REQUEST_OPTIONS);
+            } catch (Exception e) {
+                throw new FeishuException(e, this.getClass().getName() + " 通过机器人获取人员异常");
+            }
             GetChatMembersRespBody data = resp.getData();
             for (ListMember dataItem : data.getItems()) {
                 UserMemgerInfo userMemgerInfo = new UserMemgerInfo();
@@ -101,9 +112,14 @@ public class GroupMessage extends BaseFeishu {
      * @param pageToken
      * @param req
      */
-    private void query(List<UserMemgerInfo> lists, String chatId, List<UserGroup> userGroupList, String pageToken, GetChatMembersReq req) throws Exception {
+    private void query(List<UserMemgerInfo> lists, String chatId, List<UserGroup> userGroupList, String pageToken, GetChatMembersReq req) {
         req.setPageToken(pageToken);
-        GetChatMembersResp resp = CLIENT.im().chatMembers().get(req, REQUEST_OPTIONS);
+        GetChatMembersResp resp;
+        try {
+            resp = CLIENT.im().chatMembers().get(req, REQUEST_OPTIONS);
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 通过机器人获取人员分页查询异常");
+        }
         GetChatMembersRespBody data = resp.getData();
         ListMember[] dataItems = data.getItems();
         for (ListMember dataItem : dataItems) {

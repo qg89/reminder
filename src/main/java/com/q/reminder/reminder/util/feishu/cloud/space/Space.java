@@ -2,7 +2,6 @@ package com.q.reminder.reminder.util.feishu.cloud.space;
 
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONObject;
-import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.core.utils.Jsons;
 import com.lark.oapi.service.drive.v1.model.CopyFileReq;
 import com.lark.oapi.service.drive.v1.model.CopyFileReqBody;
@@ -12,6 +11,7 @@ import com.lark.oapi.service.sheets.v3.model.QuerySpreadsheetSheetReq;
 import com.lark.oapi.service.sheets.v3.model.QuerySpreadsheetSheetResp;
 import com.lark.oapi.service.sheets.v3.model.Sheet;
 import com.q.reminder.reminder.entity.WeeklyProjectReport;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.SheetVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
@@ -41,7 +41,7 @@ public class Space extends BaseFeishu {
         return instance;
     }
 
-    public WeeklyProjectReport copyFile(WeeklyProjectVo vo) throws Exception {
+    public WeeklyProjectReport copyFile(WeeklyProjectVo vo) {
         String weekNum = String.valueOf(DateUtil.thisWeekOfYear());
         CopyFileReq req = CopyFileReq.newBuilder()
                 .fileToken(vo.getFileToken())
@@ -52,7 +52,12 @@ public class Space extends BaseFeishu {
                         .extra(new Property[]{})
                         .build())
                 .build();
-        CopyFileResp resp = CLIENT.drive().file().copy(req, REQUEST_OPTIONS);
+        CopyFileResp resp = null;
+        try {
+            resp = CLIENT.drive().file().copy(req, REQUEST_OPTIONS);
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 复制文件异常");
+        }
         if (resp.success()) {
             JSONObject result = JSONObject.parseObject(Jsons.DEFAULT.toJson(resp.getData()));
             WeeklyProjectReport file = JSONObject.parseObject(result.getString("file"), WeeklyProjectReport.class);
@@ -71,13 +76,18 @@ public class Space extends BaseFeishu {
      * @param spreadsheetToken
      * @return
      */
-    public List<SheetVo> getSpredsheets(String spreadsheetToken) throws Exception {
+    public List<SheetVo> getSpredsheets(String spreadsheetToken) {
         // 创建请求对象
         QuerySpreadsheetSheetReq req = QuerySpreadsheetSheetReq.newBuilder()
                 .spreadsheetToken(spreadsheetToken)
                 .build();
         // 发起请求
-        QuerySpreadsheetSheetResp resp = CLIENT.sheets().spreadsheetSheet().query(req, REQUEST_OPTIONS);
+        QuerySpreadsheetSheetResp resp = null;
+        try {
+            resp = CLIENT.sheets().spreadsheetSheet().query(req, REQUEST_OPTIONS);
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 获取电子表格sheets异常");
+        }
         List<SheetVo> list = new ArrayList<>();
         Sheet[] sheets = resp.getData().getSheets();
         for (Sheet sheet : sheets) {
