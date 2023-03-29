@@ -88,7 +88,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                     project.setPmKey(redmineDataVo.getPmKey());
                     Transport transport = RedmineApi.getTransportByProject(project);
                     if (RedmineApi.checkIssue(transport, requestParams)) {
-                        log.info("[需求管理表写入redmine] 已存在");
+                        log.info("[需求管理表写入redmine] 已存在，recordsId {}", recordsId);
                         continue;
                     }
                     String subject = RedmineApi.createSubject(redmineDataVo);
