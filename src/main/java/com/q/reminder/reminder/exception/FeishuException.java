@@ -20,7 +20,7 @@ public class FeishuException extends RuntimeException {
     }
 
     public FeishuException(Exception e, String message) {
-        super(message);
+        super(message, e);
         JSONObject content = new JSONObject();
         JSONObject all = new JSONObject();
         JSONArray contentJsonArray = new JSONArray();
