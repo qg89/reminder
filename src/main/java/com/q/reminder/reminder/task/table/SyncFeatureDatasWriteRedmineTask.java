@@ -65,6 +65,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
         List<AppTableRecord> records = new ArrayList<>();
         List<TTableFeatureTmp> featureTmps = new ArrayList<>();
         featureDataList.stream().collect(Collectors.groupingBy(RedmineDataVo::getRedmineType)).forEach((type, list) -> {
+            log.info("[需求管理表写入redmine] type : {}", type);
             RedmineTypeStrategy redmineTypeStrategy = HandlerTypeContext.getInstance(Integer.parseInt(type));
             Tracker devTracker = redmineTypeStrategy.getDevTracker();
             Tracker testTracker = redmineTypeStrategy.getTestTracker();
@@ -86,6 +87,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                 project.setPmKey(redmineDataVo.getPmKey());
                 Transport transport = RedmineApi.getTransportByProject(project);
                 if (RedmineApi.checkIssue(transport, requestParams)) {
+                    log.info("[需求管理表写入redmine] 已存在");
                     continue;
                 }
                 String subject = RedmineApi.createSubject(redmineDataVo);
@@ -97,6 +99,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                 if (prodTime != null) {
                     dueDate = Date.from(prodTime.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
                     issue.setDueDate(dueDate);
+                    log.info("[需求管理表写入redmine] 生产发布时间:{}", prodTime);
                 }
                 issue.setSpentHours(prdct);
                 issue.setProjectId(redmineDataVo.getPId());
@@ -109,22 +112,26 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                     if (!RedmineApi.createSubIssue(issue, transport, customFieldList, true, feautreTimeVos, testTracker, devTracker)) {
                         redmineDataVo.setWriteRedmine("3");
                     }
+                    log.info("[需求管理表写入redmine] 创建子任务结束, {} 功能需求", ftrType);
                 } else {
                     issue.setTracker(featureTracker);
                     try {
                         parentIssue = RedmineApi.createIssue(issue, transport);
                     } catch (RedmineException e) {
-                        log.error("[多维表格-创建redmine任务]父任务异常", e);
                         processResult.setMsg("创建子任务异常");
                         processResult.setSuccess(false);
+                        log.error("[多维表格-创建redmine任务]父任务异常", e);
                     }
                     if (parentIssue.getId() == null) {
                         redmineDataVo.setWriteRedmine("2");
+                        log.info("[需求管理表写入redmine] 创建父任务失败, {} 功能需求", ftrType);
                     } else {
                         if (!RedmineApi.createSubIssue(parentIssue, transport, customFieldList, false, feautreTimeVos, testTracker, devTracker)) {
                             redmineDataVo.setWriteRedmine("3");
+                            log.info("[需求管理表写入redmine] 创建子任务失败, {} 功能需求", ftrType);
                         }
                     }
+                    log.info("[需求管理表写入redmine] 创建子任务结束, {} 功能需求", ftrType);
                 }
 
                 if ("1".equals(redmineDataVo.getWriteRedmine())) {
@@ -135,7 +142,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
         });
         if (!CollectionUtils.isEmpty(featureTmps)) {
             tTableFeatureTmpService.updateBatchById(featureTmps);
-            log.info("[需求管理表写入redmine] update : {}", featureTmps);
+            log.info("[需求管理表写入redmine] update size: {}", featureTmps.size());
         }
 
         LambdaQueryWrapper<TTableInfo> lq = Wrappers.lambdaQuery();
@@ -143,7 +150,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
         TTableInfo tTableInfo = tTableInfoService.getOne(lq);
         if (!CollectionUtils.isEmpty(records)) {
             BaseFeishu.cloud().table().batchUpdateTableRecords(tTableInfo, records.toArray(new AppTableRecord[0]));
-            log.info("[需求管理表写入redmine] 更新成功");
+            log.info("[需求管理表写入redmine] 更新多维表格 完成， size：{}", records.size());
         }
 
         if (DateUtil.dayOfWeek(new Date()) == 1) {
