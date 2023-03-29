@@ -10,7 +10,9 @@ import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.constant.WeeklyReportConstants;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.task.base.HoldayBase;
-import com.q.reminder.reminder.util.*;
+import com.q.reminder.reminder.util.ResourceUtils;
+import com.q.reminder.reminder.util.WeeklyProjectRedmineUtils;
+import com.q.reminder.reminder.util.WeeklyProjectUtils;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.FeishuUploadImageVo;
 import com.q.reminder.reminder.vo.MessageVo;
@@ -25,7 +27,6 @@ import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 import tech.powerjob.worker.log.OmsLogger;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -230,7 +231,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         return i;
     }
 
-    private void sendFeishu(WeeklyProjectVo vo) throws IOException {
+    private void sendFeishu(WeeklyProjectVo vo) {
         String weeklyReportUrl = vo.getWeeklyReportUrl();
         String fileName = vo.getFileName();
         JSONObject con = new JSONObject();
