@@ -57,7 +57,8 @@ public class OverdueTasksAgainToGroupTask implements BasicProcessor {
         }
         if (!CollectionUtils.isEmpty(noneStatusList)) {
             // 组装数据， 通过人员，获取要发送的内容
-            overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(vo);
+            overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(vo, log);
+            log.info("[每天9点半提醒，群提醒] - 非[Resolved]执行成功");
         }
         if (statusMap.containsKey("2")) {
             vo.setNoneStatusList(statusMap.get("2").stream().map(NoneStatus::getNoneStatus).collect(Collectors.toList()));
@@ -65,7 +66,7 @@ public class OverdueTasksAgainToGroupTask implements BasicProcessor {
         vo.setExpiredDay(2);
         vo.setContainsStatus(Boolean.TRUE);
         vo.setRedminderType("(Resolved)");
-        overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(vo);
+        overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(vo, log);
         return result;
     }
 }

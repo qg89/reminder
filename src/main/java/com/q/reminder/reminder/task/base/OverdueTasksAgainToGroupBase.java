@@ -3,7 +3,6 @@ package com.q.reminder.reminder.task.base;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
-import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
 import com.q.reminder.reminder.entity.RProjectInfo;
@@ -18,11 +17,11 @@ import com.q.reminder.reminder.vo.MessageVo;
 import com.q.reminder.reminder.vo.QueryVo;
 import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.SendUserByGroupVo;
-import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.*;
 import java.util.function.Function;
@@ -35,7 +34,6 @@ import java.util.stream.Collectors;
  * @Description : 每天9点半提醒，群提醒
  * @date :  2022.09.27 19:13
  */
-@Log4j2
 @Component
 public class OverdueTasksAgainToGroupBase {
 
@@ -47,8 +45,6 @@ public class OverdueTasksAgainToGroupBase {
     private OverdueTaskHistoryService overdueTaskHistoryService;
     @Autowired
     private AdminInfoService adminInfoService;
-    @Autowired
-    private FeishuProperties feishuProperties;
 
     /**
      * 无任务提醒
@@ -68,8 +64,9 @@ public class OverdueTasksAgainToGroupBase {
      * 过期任务发送群提醒
      *
      * @param vo
+     * @param log
      */
-    public void overdueTasksAgainToGroup(QueryVo vo) {
+    public void overdueTasksAgainToGroup(QueryVo vo, OmsLogger log) {
         List<OverdueTaskHistory> historys = new ArrayList<>();
         String redminderType = vo.getRedminderType();
         // 组装数据， 通过人员，获取要发送的内容
