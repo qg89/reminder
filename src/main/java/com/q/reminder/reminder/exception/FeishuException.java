@@ -19,8 +19,12 @@ public class FeishuException extends RuntimeException {
         super();
     }
 
-    public FeishuException(Exception e, String message) {
+    public FeishuException(Throwable e, String message) {
         super(message, e);
+        sendContent(message, e);
+    }
+
+    private void sendContent(String message, Throwable e) {
         JSONObject content = new JSONObject();
         JSONObject all = new JSONObject();
         JSONArray contentJsonArray = new JSONArray();
@@ -40,9 +44,5 @@ public class FeishuException extends RuntimeException {
         vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
         vo.setReceiveId("ou_35e03d4d8754dd35fed26c26849c85ab");
         BaseFeishu.message().sendContent(vo);
-    }
-
-    public FeishuException(String message, Throwable cause) {
-        super(message, cause);
     }
 }
