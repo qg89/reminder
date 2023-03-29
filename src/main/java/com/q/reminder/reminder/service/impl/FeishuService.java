@@ -35,7 +35,11 @@ public class FeishuService {
         String post = HttpUtil.post("https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal", Map.of("app_id", feishuProperties.getAppId(), "app_secret", feishuProperties.getAppSecret()));
         JSONObject token = JSONObject.parseObject(post);
         String tenantAccessToken = token.getString("tenant_access_token");
-        redisTemplate.opsForValue().set(RedisKeyContents.FEISHU_TENANT_ACCESS_TOKEN, tenantAccessToken, token.getInteger("expire") - 10, TimeUnit.SECONDS);
+        int expire = token.getIntValue("expire");
+        if (expire > 30) {
+            expire = expire - 30;
+        }
+        redisTemplate.opsForValue().set(RedisKeyContents.FEISHU_TENANT_ACCESS_TOKEN, tenantAccessToken, expire, TimeUnit.SECONDS);
         return tenantAccessToken;
     }
 
