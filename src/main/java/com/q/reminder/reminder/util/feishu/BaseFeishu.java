@@ -8,6 +8,7 @@ import com.q.reminder.reminder.util.feishu.cloud.Cloud;
 import com.q.reminder.reminder.util.feishu.group.GroupMessage;
 import com.q.reminder.reminder.util.feishu.message.Message;
 import com.q.reminder.reminder.util.feishu.wiki.Wiki;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author : saiko
@@ -23,7 +24,18 @@ public abstract class BaseFeishu {
     protected BaseFeishu() {
         FeishuService feishuService = SpringContextUtils.getBean(FeishuService.class);
         CLIENT = feishuService.client();
-        REQUEST_OPTIONS = RequestOptions.newBuilder().tenantAccessToken(feishuService.tenantAccessToken()).build();
+        String tenantAccessToken;
+        if (StringUtils.isBlank(tenantAccessToken = feishuService.tenantAccessToken())) {
+            int i = 0;
+            while (StringUtils.isBlank(tenantAccessToken) && (i++) <= 5) {
+                try {
+                    Thread.sleep(1000 * 30);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        REQUEST_OPTIONS = RequestOptions.newBuilder().tenantAccessToken(tenantAccessToken).build();
     }
 
     /**
