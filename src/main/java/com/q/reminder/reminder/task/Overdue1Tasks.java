@@ -30,16 +30,22 @@ public class Overdue1Tasks implements BasicProcessor {
     private HoldayBase holdayBase;
 
     @Override
-    public ProcessResult process(TaskContext context) throws Exception {
+    public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         ProcessResult result = new ProcessResult(true);
-        if (holdayBase.queryHoliday()) {
-            log.info("节假日放假!!!!");
-            return result;
+        try {
+            if (holdayBase.queryHoliday()) {
+                log.info("节假日放假!!!!");
+                return result;
+            }
+            int expiredDay = Integer.parseInt(context.getJobParams());
+            List<String> noneStatusList = noneStatusService.queryUnInStatus(0);
+            queryTasksToMemberBase.feiShu(expiredDay, noneStatusList, Boolean.FALSE);
+        } catch (Exception e) {
+            log.error("任务处理异常", e);
+            result.setSuccess(false);
+            result.setMsg("[当天8点个人提醒，不发群]异常");
         }
-        int expiredDay = Integer.parseInt(context.getJobParams());
-        List<String> noneStatusList = noneStatusService.queryUnInStatus(0);
-        queryTasksToMemberBase.feiShu(expiredDay, noneStatusList, Boolean.FALSE);
         return result;
     }
 }

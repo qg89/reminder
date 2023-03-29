@@ -42,46 +42,53 @@ public class SyncProjcetTimeTableTask implements BasicProcessor {
 
     //    @XxlJob("syncProjcetTimeTableTask")
     @Override
-    public ProcessResult process(TaskContext context) throws Exception {
+    public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         String jobParam = context.getJobParams();
+        ProcessResult processResult = new ProcessResult(true);
         String day = "";
+        try {
+            LambdaQueryWrapper<TTableInfo> qw = Wrappers.lambdaQuery();
+            qw.eq(TTableInfo::getTableType, TableTypeContants.PROJECT_TIME);
+            Map<String, TTableInfo> tableMap = tTableInfoService.list(qw).stream().collect(Collectors.toMap(TTableInfo::getViewType, Function.identity(), (v1, v2) -> v1));
+            // 获取全部列
+            TTableInfo tableInfo = tableMap.get(TableTypeContants.ViewType.ALL);
+            Integer tableInfoId = tableInfo.getId();
 
-        LambdaQueryWrapper<TTableInfo> qw = Wrappers.lambdaQuery();
-        qw.eq(TTableInfo::getTableType, TableTypeContants.PROJECT_TIME);
-        Map<String, TTableInfo> tableMap = tTableInfoService.list(qw).stream().collect(Collectors.toMap(TTableInfo::getViewType, Function.identity(), (v1, v2) -> v1));
-        // 获取全部列
-        TTableInfo tableInfo = tableMap.get(TableTypeContants.ViewType.ALL);
-        Integer tableInfoId = tableInfo.getId();
+            DateTime yesterday = DateUtil.yesterday();
+            if (Objects.equals(jobParam, TableTypeContants.ViewType.YESTDAY)) {
+                day = yesterday.toString("YYYY-MM-dd");
+                delRecords(tableMap.get(TableTypeContants.ViewType.YESTDAY));
+            }
+            if (Objects.equals(jobParam, TableTypeContants.ViewType.LAST_MONTH)) {
+                day = DateUtil.lastMonth().toString("YYYY-MM");
+                delRecords(tableMap.get(TableTypeContants.ViewType.LAST_MONTH));
+            }
+            if (Objects.equals(jobParam, TableTypeContants.ViewType.THIS_MONTH)) {
+                day = yesterday.toString("YYYY-MM");
+                delRecords(tableMap.get(TableTypeContants.ViewType.THIS_MONTH));
+            }
+            List<Map<String, Object>> userTimeMap = wUserTimesService.listByTable(day, jobParam);
 
-        DateTime yesterday = DateUtil.yesterday();
-        if (Objects.equals(jobParam, TableTypeContants.ViewType.YESTDAY)) {
-            day = yesterday.toString("YYYY-MM-dd");
-            delRecords(tableMap.get(TableTypeContants.ViewType.YESTDAY));
+            LambdaQueryWrapper<TTableUserTime> tableUserQW = Wrappers.lambdaQuery();
+            tableUserQW.eq(TTableUserTime::getTableId, tableInfoId);
+            Map<String, String> columnMap = tTableUserTimeService.list(tableUserQW).stream().collect(Collectors.toMap(TTableUserTime::getColumnEntity, TTableUserTime::getTableColumnName));
+            List<AppTableRecord> records = new ArrayList<>();
+            for (Map<String, Object> m : userTimeMap) {
+                Map<String, Object> data = new HashMap<>();
+                m.forEach((k, v) -> {
+                    data.put(columnMap.get(k), v);
+                });
+                records.add(AppTableRecord.newBuilder().fields(data).build());
+            }
+            BaseFeishu.cloud().table().batchCreateTableRecords(tableInfo, records.toArray(new AppTableRecord[0]));
+            log.info("同步工时到多维表格-将数据库中的数据同步到多维表格中成功");
+        } catch (Exception e) {
+            log.error("同步工时到多维表格-将数据库中的数据同步到多维表格中异常", e);
+            processResult.setSuccess(false);
+            processResult.setMsg("同步工时到多维表格-将数据库中的数据同步到多维表格中异常");
         }
-        if (Objects.equals(jobParam, TableTypeContants.ViewType.LAST_MONTH)) {
-            day = DateUtil.lastMonth().toString("YYYY-MM");
-            delRecords(tableMap.get(TableTypeContants.ViewType.LAST_MONTH));
-        }
-        if (Objects.equals(jobParam, TableTypeContants.ViewType.THIS_MONTH)) {
-            day = yesterday.toString("YYYY-MM");
-            delRecords(tableMap.get(TableTypeContants.ViewType.THIS_MONTH));
-        }
-        List<Map<String, Object>> userTimeMap = wUserTimesService.listByTable(day, jobParam);
-
-        LambdaQueryWrapper<TTableUserTime> tableUserQW = Wrappers.lambdaQuery();
-        tableUserQW.eq(TTableUserTime::getTableId, tableInfoId);
-        Map<String, String> columnMap = tTableUserTimeService.list(tableUserQW).stream().collect(Collectors.toMap(TTableUserTime::getColumnEntity, TTableUserTime::getTableColumnName));
-        List<AppTableRecord> records = new ArrayList<>();
-        for (Map<String, Object> m : userTimeMap) {
-            Map<String, Object> data = new HashMap<>();
-            m.forEach((k, v) -> {
-                data.put(columnMap.get(k), v);
-            });
-            records.add(AppTableRecord.newBuilder().fields(data).build());
-        }
-        BaseFeishu.cloud().table().batchCreateTableRecords(tableInfo, records.toArray(new AppTableRecord[0]));
-        return new ProcessResult(true);
+        return processResult;
     }
 
     /**

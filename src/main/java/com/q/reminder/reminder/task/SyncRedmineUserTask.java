@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,20 +31,28 @@ public class SyncRedmineUserTask implements BasicProcessor {
     @Autowired
     private ProjectInfoService projectInfoService;
 
-@Override
-public ProcessResult process(TaskContext context) throws Exception {
-        List<RedmineUserInfo> data = new ArrayList<>();
-        for (RProjectInfo info : projectInfoService.listAll()) {
-             RedmineApi.queryUserTime(info).stream().collect(Collectors.toMap(TimeEntry::getUserId, TimeEntry::getUserName, (v1, v2) -> v1)).forEach((userId, userName) -> {
-                 RedmineUserInfo userInfo = new RedmineUserInfo();
-                 userInfo.setRedmineType(info.getRedmineType());
-                 userInfo.setAssigneeId(userId);
-                 userInfo.setUserName(userName);
-                 userInfo.setAssigneeName(userName.replace(" ", ""));
-                 data.add(userInfo);
-             });
+    @Override
+    public ProcessResult process(TaskContext context) {
+        ProcessResult processResult = new ProcessResult(true);
+        OmsLogger log = context.getOmsLogger();
+        try {
+            List<RedmineUserInfo> data = new ArrayList<>();
+            for (RProjectInfo info : projectInfoService.listAll()) {
+                RedmineApi.queryUserTime(info).stream().collect(Collectors.toMap(TimeEntry::getUserId, TimeEntry::getUserName, (v1, v2) -> v1)).forEach((userId, userName) -> {
+                    RedmineUserInfo userInfo = new RedmineUserInfo();
+                    userInfo.setRedmineType(info.getRedmineType());
+                    userInfo.setAssigneeId(userId);
+                    userInfo.setUserName(userName);
+                    userInfo.setAssigneeName(userName.replace(" ", ""));
+                    data.add(userInfo);
+                });
+            }
+            redmineUserInfoService.saveOrupdateMultiIdAll(data);
+        } catch (Exception e) {
+            log.error("SyncRedmineUserTask error: {}", e.getMessage());
+            processResult.setSuccess(false);
+            processResult.setMsg("");
         }
-        redmineUserInfoService.saveOrupdateMultiIdAll(data);
-        return new ProcessResult(true);
+        return processResult;
     }
 }

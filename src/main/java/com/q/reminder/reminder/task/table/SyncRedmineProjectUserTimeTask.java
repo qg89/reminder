@@ -43,63 +43,69 @@ public class SyncRedmineProjectUserTimeTask implements BasicProcessor {
     private WUserTimesService wUserTimesService;
 
     @Override
-    public ProcessResult process(TaskContext context) throws Exception {
+    public ProcessResult process(TaskContext context)  {
         String jobParam = context.getJobParams();
-        JSONObject json = new JSONObject();
-        if (StringUtils.isNotBlank(jobParam)) {
-            json = JSONObject.parseObject(jobParam);
-        }
-        Date startDate = DateUtil.parse(DateUtil.today()).offset(DateField.DAY_OF_MONTH, -1);
-        Date endDate = DateUtil.parse(DateUtil.today()).offset(DateField.SECOND, -1);
-        if (json.containsKey("month")) {
-            startDate = DateUtil.beginOfMonth(new Date()).toJdkDate();
-        }
-
-        if (json.containsKey("startDate")) {
-            startDate = json.getDate("startDate");
-        }
-        if (json.containsKey("endDate")) {
-            endDate = json.getDate("endDate");
-        }
-        LambdaQueryWrapper<RProjectInfo> lq = Wrappers.lambdaQuery();
-        if (json.containsKey("pKey")) {
-            lq.eq(RProjectInfo::getPkey, json.getString("pKey"));
-        }
-        List<RProjectInfo> projectList = projectInfoService.list(lq);
-        List<WUserTimes> userTimesData = new ArrayList<>();
-        for (RProjectInfo info : projectList) {
-            Long id = info.getId();
-            Date finalStartDate = startDate;
-            Date finalEndDate = endDate;
-            if (finalEndDate != null) {
-                info.setStartDay(startDate);
+        ProcessResult processResult = new ProcessResult(true);
+        try {
+            JSONObject json = new JSONObject();
+            if (StringUtils.isNotBlank(jobParam)) {
+                json = JSONObject.parseObject(jobParam);
             }
-            List<TimeEntry> timeEntries = RedmineApi.queryTimes(info).stream().filter(e -> {
-                Date spentOn = e.getSpentOn();
-                boolean isDate = true;
-                if (finalStartDate != null) {
-                    isDate = spentOn.after(DateUtil.offsetSecond(finalStartDate, -1));
-                }
+            Date startDate = DateUtil.parse(DateUtil.today()).offset(DateField.DAY_OF_MONTH, -1);
+            Date endDate = DateUtil.parse(DateUtil.today()).offset(DateField.SECOND, -1);
+            if (json.containsKey("month")) {
+                startDate = DateUtil.beginOfMonth(new Date()).toJdkDate();
+            }
+
+            if (json.containsKey("startDate")) {
+                startDate = json.getDate("startDate");
+            }
+            if (json.containsKey("endDate")) {
+                endDate = json.getDate("endDate");
+            }
+            LambdaQueryWrapper<RProjectInfo> lq = Wrappers.lambdaQuery();
+            if (json.containsKey("pKey")) {
+                lq.eq(RProjectInfo::getPkey, json.getString("pKey"));
+            }
+            List<RProjectInfo> projectList = projectInfoService.list(lq);
+            List<WUserTimes> userTimesData = new ArrayList<>();
+            for (RProjectInfo info : projectList) {
+                Long id = info.getId();
+                Date finalStartDate = startDate;
+                Date finalEndDate = endDate;
                 if (finalEndDate != null) {
-                    isDate = isDate && spentOn.before(DateUtil.offsetDay(finalEndDate, 1));
+                    info.setStartDay(startDate);
                 }
-                return isDate;
-            }).toList();
+                List<TimeEntry> timeEntries = RedmineApi.queryTimes(info).stream().filter(e -> {
+                    Date spentOn = e.getSpentOn();
+                    boolean isDate = true;
+                    if (finalStartDate != null) {
+                        isDate = spentOn.after(DateUtil.offsetSecond(finalStartDate, -1));
+                    }
+                    if (finalEndDate != null) {
+                        isDate = isDate && spentOn.before(DateUtil.offsetDay(finalEndDate, 1));
+                    }
+                    return isDate;
+                }).toList();
 
-            // 正常工时
-            String timeType = "0";
-            Map<String, Map<String, Double>> map = timeEntries.stream().filter(e -> CollectionUtils.isEmpty(e.getCustomFields())).collect(Collectors.groupingBy(e -> String.valueOf(e.getUserId()), Collectors.groupingBy(e -> new DateTime(e.getSpentOn()).toString("yyyy-MM-dd"),
-                    Collectors.summingDouble(e -> BigDecimal.valueOf(e.getHours()).setScale(2, RoundingMode.HALF_UP).doubleValue()))));
-            time(userTimesData, id, timeType, map);
+                // 正常工时
+                String timeType = "0";
+                Map<String, Map<String, Double>> map = timeEntries.stream().filter(e -> CollectionUtils.isEmpty(e.getCustomFields())).collect(Collectors.groupingBy(e -> String.valueOf(e.getUserId()), Collectors.groupingBy(e -> new DateTime(e.getSpentOn()).toString("yyyy-MM-dd"),
+                        Collectors.summingDouble(e -> BigDecimal.valueOf(e.getHours()).setScale(2, RoundingMode.HALF_UP).doubleValue()))));
+                time(userTimesData, id, timeType, map);
 
-            // bug工时
-            String bugTimeType = "1";
-            Map<String, Map<String, Double>> mapBug = timeEntries.stream().filter(e -> !CollectionUtils.isEmpty(e.getCustomFields())).collect(Collectors.groupingBy(e -> String.valueOf(e.getUserId()), Collectors.groupingBy(e -> new DateTime(e.getSpentOn()).toString("yyyy-MM-dd"),
-                    Collectors.summingDouble(e -> BigDecimal.valueOf(e.getHours()).setScale(2, RoundingMode.HALF_UP).doubleValue()))));
-            time(userTimesData, id, bugTimeType, mapBug);
+                // bug工时
+                String bugTimeType = "1";
+                Map<String, Map<String, Double>> mapBug = timeEntries.stream().filter(e -> !CollectionUtils.isEmpty(e.getCustomFields())).collect(Collectors.groupingBy(e -> String.valueOf(e.getUserId()), Collectors.groupingBy(e -> new DateTime(e.getSpentOn()).toString("yyyy-MM-dd"),
+                        Collectors.summingDouble(e -> BigDecimal.valueOf(e.getHours()).setScale(2, RoundingMode.HALF_UP).doubleValue()))));
+                time(userTimesData, id, bugTimeType, mapBug);
+            }
+            wUserTimesService.saveOrUpdateBatch(userTimesData);
+        }catch (Exception e) {
+            processResult.setSuccess(false);
+            processResult.setMsg("同步redmine上工时同步到数据库异常");
         }
-        wUserTimesService.saveOrUpdateBatch(userTimesData);
-        return new ProcessResult(true);
+        return processResult;
     }
 
     /**

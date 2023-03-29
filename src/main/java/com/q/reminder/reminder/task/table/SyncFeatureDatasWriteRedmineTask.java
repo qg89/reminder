@@ -56,111 +56,117 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
     private Date dueDate = DateTime.now().plusDays(7).toDate();
 
     @Override
-    public ProcessResult process(TaskContext context) throws Exception {
+    public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         ProcessResult processResult = new ProcessResult(true);
-        List<RedmineDataVo> featureDataList = tTableFeatureTmpService.listByProject();
-        Map<String, List<FeautreTimeVo>> featureTimeMap = tTableFeatureTmpService.queryAllTimes().stream().collect(Collectors.groupingBy(FeautreTimeVo::getRecordsId));
-        Tracker featureTracker = new Tracker().setId(2).setName("需求");
-        List<AppTableRecord> records = new ArrayList<>();
-        List<TTableFeatureTmp> featureTmps = new ArrayList<>();
-        featureDataList.stream().collect(Collectors.groupingBy(RedmineDataVo::getRedmineType)).forEach((type, list) -> {
-            log.info("[需求管理表写入redmine] type : {}", type);
-            RedmineTypeStrategy redmineTypeStrategy = HandlerTypeContext.getInstance(Integer.parseInt(type));
-            Tracker devTracker = redmineTypeStrategy.getDevTracker();
-            Tracker testTracker = redmineTypeStrategy.getTestTracker();
-            for (RedmineDataVo redmineDataVo : list) {
-                String recordsId = redmineDataVo.getRecordsId();
-                List<CustomField> customFieldList = redmineTypeStrategy.getCustomField(recordsId);
-                List<RequestParam> requestParams = redmineTypeStrategy.getFeatureIdParams(recordsId);
-                String dscrptn = redmineDataVo.getDscrptn();
-                Float prdct = redmineDataVo.getPrdct();
-                LocalDate prodTime = redmineDataVo.getProdTime();
-                String featureType = redmineDataVo.getFeatureType();
-                List<FeautreTimeVo> feautreTimeVos = featureTimeMap.get(recordsId);
+        try {
+            List<RedmineDataVo> featureDataList = tTableFeatureTmpService.listByProject();
+            Map<String, List<FeautreTimeVo>> featureTimeMap = tTableFeatureTmpService.queryAllTimes().stream().collect(Collectors.groupingBy(FeautreTimeVo::getRecordsId));
+            Tracker featureTracker = new Tracker().setId(2).setName("需求");
+            List<AppTableRecord> records = new ArrayList<>();
+            List<TTableFeatureTmp> featureTmps = new ArrayList<>();
+            featureDataList.stream().collect(Collectors.groupingBy(RedmineDataVo::getRedmineType)).forEach((type, list) -> {
+                log.info("[需求管理表写入redmine] type : {}", type);
+                RedmineTypeStrategy redmineTypeStrategy = HandlerTypeContext.getInstance(Integer.parseInt(type));
+                Tracker devTracker = redmineTypeStrategy.getDevTracker();
+                Tracker testTracker = redmineTypeStrategy.getTestTracker();
+                for (RedmineDataVo redmineDataVo : list) {
+                    String recordsId = redmineDataVo.getRecordsId();
+                    List<CustomField> customFieldList = redmineTypeStrategy.getCustomField(recordsId);
+                    List<RequestParam> requestParams = redmineTypeStrategy.getFeatureIdParams(recordsId);
+                    String dscrptn = redmineDataVo.getDscrptn();
+                    Float prdct = redmineDataVo.getPrdct();
+                    LocalDate prodTime = redmineDataVo.getProdTime();
+                    String featureType = redmineDataVo.getFeatureType();
+                    List<FeautreTimeVo> feautreTimeVos = featureTimeMap.get(recordsId);
 
-                boolean ftrType = "非功能".equals(featureType);
+                    boolean ftrType = "非功能".equals(featureType);
 
-                RProjectInfo project = new RProjectInfo();
-                project.setRedmineUrl(redmineDataVo.getRedmineUrl());
-                project.setPkey(redmineDataVo.getPrjctKey());
-                project.setPmKey(redmineDataVo.getPmKey());
-                Transport transport = RedmineApi.getTransportByProject(project);
-                if (RedmineApi.checkIssue(transport, requestParams)) {
-                    log.info("[需求管理表写入redmine] 已存在");
-                    continue;
-                }
-                String subject = RedmineApi.createSubject(redmineDataVo);
-                Issue issue = new Issue();
-                issue.setSubject(subject);
-                issue.setDescription(dscrptn);
-                issue.setAssigneeId(redmineDataVo.getPrdctId());
-                issue.setDueDate(dueDate);
-                if (prodTime != null) {
-                    dueDate = Date.from(prodTime.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+                    RProjectInfo project = new RProjectInfo();
+                    project.setRedmineUrl(redmineDataVo.getRedmineUrl());
+                    project.setPkey(redmineDataVo.getPrjctKey());
+                    project.setPmKey(redmineDataVo.getPmKey());
+                    Transport transport = RedmineApi.getTransportByProject(project);
+                    if (RedmineApi.checkIssue(transport, requestParams)) {
+                        log.info("[需求管理表写入redmine] 已存在");
+                        continue;
+                    }
+                    String subject = RedmineApi.createSubject(redmineDataVo);
+                    Issue issue = new Issue();
+                    issue.setSubject(subject);
+                    issue.setDescription(dscrptn);
+                    issue.setAssigneeId(redmineDataVo.getPrdctId());
                     issue.setDueDate(dueDate);
-                    log.info("[需求管理表写入redmine] 生产发布时间:{}", prodTime);
-                }
-                issue.setSpentHours(prdct);
-                issue.setProjectId(redmineDataVo.getPId());
-                issue.addCustomFields(customFieldList);
-                Issue parentIssue = new Issue();
-                redmineDataVo.setWriteRedmine("1");
-                if (ftrType) {
-                    issue.setStatusId(1).setCreatedOn(new Date());
-                    issue.setTracker(devTracker);
-                    if (!RedmineApi.createSubIssue(issue, transport, customFieldList, true, feautreTimeVos, testTracker, devTracker)) {
-                        redmineDataVo.setWriteRedmine("3");
+                    if (prodTime != null) {
+                        dueDate = Date.from(prodTime.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+                        issue.setDueDate(dueDate);
+                        log.info("[需求管理表写入redmine] 生产发布时间:{}", prodTime);
                     }
-                    log.info("[需求管理表写入redmine] 创建子任务结束, {} 功能需求", ftrType);
-                } else {
-                    issue.setTracker(featureTracker);
-                    try {
-                        parentIssue = RedmineApi.createIssue(issue, transport);
-                    } catch (RedmineException e) {
-                        processResult.setMsg("创建子任务异常");
-                        processResult.setSuccess(false);
-                        log.error("[多维表格-创建redmine任务]父任务异常", e);
-                    }
-                    if (parentIssue.getId() == null) {
-                        redmineDataVo.setWriteRedmine("2");
-                        log.info("[需求管理表写入redmine] 创建父任务失败, {} 功能需求", ftrType);
-                    } else {
-                        if (!RedmineApi.createSubIssue(parentIssue, transport, customFieldList, false, feautreTimeVos, testTracker, devTracker)) {
+                    issue.setSpentHours(prdct);
+                    issue.setProjectId(redmineDataVo.getPId());
+                    issue.addCustomFields(customFieldList);
+                    Issue parentIssue = new Issue();
+                    redmineDataVo.setWriteRedmine("1");
+                    if (ftrType) {
+                        issue.setStatusId(1).setCreatedOn(new Date());
+                        issue.setTracker(devTracker);
+                        if (!RedmineApi.createSubIssue(issue, transport, customFieldList, true, feautreTimeVos, testTracker, devTracker)) {
                             redmineDataVo.setWriteRedmine("3");
-                            log.info("[需求管理表写入redmine] 创建子任务失败, {} 功能需求", ftrType);
                         }
+                        log.info("[需求管理表写入redmine] 创建子任务结束, {} 功能需求", ftrType);
+                    } else {
+                        issue.setTracker(featureTracker);
+                        try {
+                            parentIssue = RedmineApi.createIssue(issue, transport);
+                        } catch (RedmineException e) {
+                            processResult.setMsg("创建子任务异常");
+                            processResult.setSuccess(false);
+                            log.error("[多维表格-创建redmine任务]父任务异常", e);
+                        }
+                        if (parentIssue.getId() == null) {
+                            redmineDataVo.setWriteRedmine("2");
+                            log.info("[需求管理表写入redmine] 创建父任务失败, {} 功能需求", ftrType);
+                        } else {
+                            if (!RedmineApi.createSubIssue(parentIssue, transport, customFieldList, false, feautreTimeVos, testTracker, devTracker)) {
+                                redmineDataVo.setWriteRedmine("3");
+                                log.info("[需求管理表写入redmine] 创建子任务失败, {} 功能需求", ftrType);
+                            }
+                        }
+                        log.info("[需求管理表写入redmine] 创建子任务结束, {} 功能需求", ftrType);
                     }
-                    log.info("[需求管理表写入redmine] 创建子任务结束, {} 功能需求", ftrType);
-                }
 
-                if ("1".equals(redmineDataVo.getWriteRedmine())) {
-                    records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(Map.of("需求ID", recordsId)).build());
+                    if ("1".equals(redmineDataVo.getWriteRedmine())) {
+                        records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(Map.of("需求ID", recordsId)).build());
+                    }
+                    featureTmps.add(redmineDataVo);
                 }
-                featureTmps.add(redmineDataVo);
+            });
+            if (!CollectionUtils.isEmpty(featureTmps)) {
+                tTableFeatureTmpService.updateBatchById(featureTmps);
+                log.info("[需求管理表写入redmine] update size: {}", featureTmps.size());
             }
-        });
-        if (!CollectionUtils.isEmpty(featureTmps)) {
-            tTableFeatureTmpService.updateBatchById(featureTmps);
-            log.info("[需求管理表写入redmine] update size: {}", featureTmps.size());
-        }
 
-        LambdaQueryWrapper<TTableInfo> lq = Wrappers.lambdaQuery();
-        lq.eq(TTableInfo::getTableType, TableTypeContants.FEATURE);
-        TTableInfo tTableInfo = tTableInfoService.getOne(lq);
-        if (!CollectionUtils.isEmpty(records)) {
-            BaseFeishu.cloud().table().batchUpdateTableRecords(tTableInfo, records.toArray(new AppTableRecord[0]));
-            log.info("[需求管理表写入redmine] 更新多维表格 完成， size：{}", records.size());
-        }
+            LambdaQueryWrapper<TTableInfo> lq = Wrappers.lambdaQuery();
+            lq.eq(TTableInfo::getTableType, TableTypeContants.FEATURE);
+            TTableInfo tTableInfo = tTableInfoService.getOne(lq);
+            if (!CollectionUtils.isEmpty(records)) {
+                BaseFeishu.cloud().table().batchUpdateTableRecords(tTableInfo, records.toArray(new AppTableRecord[0]));
+                log.info("[需求管理表写入redmine] 更新多维表格 完成， size：{}", records.size());
+            }
 
-        if (DateUtil.dayOfWeek(new Date()) == 1) {
-            LambdaQueryWrapper<TTableFeatureTmp> query = Wrappers.lambdaQuery();
-            query.eq(TTableFeatureTmp::getWriteRedmine, "1");
-            List<TTableFeatureTmp> tempList = tTableFeatureTmpService.list(query);
-            tTableFeatureTmpService.removeBatchByIds(tempList);
-            log.info("[需求管理表写入redmine] 周一删除历史数据完成");
+            if (DateUtil.dayOfWeek(new Date()) == 1) {
+                LambdaQueryWrapper<TTableFeatureTmp> query = Wrappers.lambdaQuery();
+                query.eq(TTableFeatureTmp::getWriteRedmine, "1");
+                List<TTableFeatureTmp> tempList = tTableFeatureTmpService.list(query);
+                tTableFeatureTmpService.removeBatchByIds(tempList);
+                log.info("[需求管理表写入redmine] 周一删除历史数据完成");
+            }
+            log.info("[需求管理表写入redmine] 执行完成");
+        } catch (Exception e) {
+            processResult.setMsg("[需求管理表写入redmine] 执行异常");
+            processResult.setSuccess(false);
+            log.error("[需求管理表写入redmine] 执行异常", e);
         }
-        log.info("[需求管理表写入redmine] 执行完成");
         return processResult;
     }
 }

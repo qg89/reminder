@@ -31,9 +31,11 @@ public class Overdue0Tasks implements BasicProcessor {
 
 
     @Override
-    public ProcessResult process(TaskContext context) throws Exception {
+    public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         ProcessResult result = new ProcessResult(true);
+        try {
+
         if (holdayBase.queryHoliday()) {
             log.info("节假日放假!!!!");
             return result;
@@ -42,6 +44,11 @@ public class Overdue0Tasks implements BasicProcessor {
         List<String> noneStatusList = noneStatusService.queryUnInStatus(0);
         // 组装数据， 通过人员，获取要发送的内容
         queryTasksToMemberBase.feiShu(expiredDay, noneStatusList, Boolean.FALSE);
+        } catch (Exception e) {
+            log.error("任务处理失败", e);
+            result.setSuccess(false);
+            result.setMsg("[当天17点提醒，个人提醒]-任务处理失败");
+        }
         return result;
     }
 }

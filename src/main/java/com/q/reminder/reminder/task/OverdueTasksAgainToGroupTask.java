@@ -36,38 +36,44 @@ public class OverdueTasksAgainToGroupTask implements BasicProcessor {
     private HoldayBase holdayBase;
 
     @Override
-    public ProcessResult process(TaskContext context) throws Exception {
+    public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         ProcessResult result = new ProcessResult(true);
-        if (holdayBase.queryHoliday()) {
-            log.info("节假日放假!!!!");
-            return result;
-        }
+        try {
+            if (holdayBase.queryHoliday()) {
+                log.info("节假日放假!!!!");
+                return result;
+            }
 
-        LambdaQueryWrapper<NoneStatus> lq = new LambdaQueryWrapper<>();
-        lq.in(NoneStatus::getExpiredDays, 1, 2);
-        List<NoneStatus> noneStatusList = noneStatusService.list(lq);
-        Map<String, List<NoneStatus>> statusMap = noneStatusList.stream().collect(Collectors.groupingBy(e -> String.valueOf(e.getExpiredDays())));
+            LambdaQueryWrapper<NoneStatus> lq = new LambdaQueryWrapper<>();
+            lq.in(NoneStatus::getExpiredDays, 1, 2);
+            List<NoneStatus> noneStatusList = noneStatusService.list(lq);
+            Map<String, List<NoneStatus>> statusMap = noneStatusList.stream().collect(Collectors.groupingBy(e -> String.valueOf(e.getExpiredDays())));
 
-        QueryVo vo = new QueryVo();
-        vo.setExpiredDay(1);
-        vo.setContainsStatus(Boolean.FALSE);
-        if (statusMap.containsKey("1")) {
-            vo.setNoneStatusList(statusMap.get("1").stream().map(NoneStatus::getNoneStatus).collect(Collectors.toList()));
-        }
-        if (!CollectionUtils.isEmpty(noneStatusList)) {
-            // 组装数据， 通过人员，获取要发送的内容
+            QueryVo vo = new QueryVo();
+            vo.setExpiredDay(1);
+            vo.setContainsStatus(Boolean.FALSE);
+            if (statusMap.containsKey("1")) {
+                vo.setNoneStatusList(statusMap.get("1").stream().map(NoneStatus::getNoneStatus).collect(Collectors.toList()));
+            }
+            if (!CollectionUtils.isEmpty(noneStatusList)) {
+                // 组装数据， 通过人员，获取要发送的内容
+                overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(vo, log);
+                log.info("[每天9点半提醒，群提醒] - 非[Resolved]执行成功");
+            }
+            if (statusMap.containsKey("2")) {
+                vo.setNoneStatusList(statusMap.get("2").stream().map(NoneStatus::getNoneStatus).collect(Collectors.toList()));
+            }
+            vo.setExpiredDay(2);
+            vo.setContainsStatus(Boolean.TRUE);
+            vo.setRedminderType("(Resolved)");
             overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(vo, log);
-            log.info("[每天9点半提醒，群提醒] - 非[Resolved]执行成功");
+            log.info("[每天9点半提醒，群提醒] - 执行完成");
+        } catch (Exception e) {
+            log.error("每天9点半提醒，群提醒 - 执行失败", e);
+            result.setSuccess(false);
+            result.setMsg("每天9点半提群提醒 - 执行异常");
         }
-        if (statusMap.containsKey("2")) {
-            vo.setNoneStatusList(statusMap.get("2").stream().map(NoneStatus::getNoneStatus).collect(Collectors.toList()));
-        }
-        vo.setExpiredDay(2);
-        vo.setContainsStatus(Boolean.TRUE);
-        vo.setRedminderType("(Resolved)");
-        overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(vo, log);
-        log.info("[每天9点半提醒，群提醒] - 执行完成");
         return result;
     }
 }

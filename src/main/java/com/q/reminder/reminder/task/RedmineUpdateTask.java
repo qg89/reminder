@@ -44,37 +44,44 @@ public class RedmineUpdateTask implements BasicProcessor {
     private UserMemberService userMemberService;
 
     @Override
-    public ProcessResult process(TaskContext context) throws Exception {
+    public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
-        List<RProjectInfo> projectInfoList = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();
-        List<RedmineVo> issues = RedmineApi.queryUpdateIssue(projectInfoList);
-        Map<String, List<RedmineVo>> issueMap = issues.stream().filter(issue ->
-                DateUtil.between(issue.getUpdatedOn(), new Date(), DateUnit.MINUTE) <= 10 && StringUtils.isNotBlank(issue.getAssigneeName())
-        ).collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
+        ProcessResult processResult = new ProcessResult(true);
+        try {
+            List<RProjectInfo> projectInfoList = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();
+            List<RedmineVo> issues = RedmineApi.queryUpdateIssue(projectInfoList);
+            Map<String, List<RedmineVo>> issueMap = issues.stream().filter(issue ->
+                    DateUtil.between(issue.getUpdatedOn(), new Date(), DateUnit.MINUTE) <= 10 && StringUtils.isNotBlank(issue.getAssigneeName())
+            ).collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
 
-        Map<String, List<RedmineVo>> noneIssueMapByAuthorName = issues.stream().filter(issue ->
-                /*DateUtil.between(issue.getUpdatedOn(), new Date(), DateUnit.MINUTE) <= 10 &&*/ StringUtils.isBlank(issue.getAssigneeName())
-        ).collect(Collectors.groupingBy(RedmineVo::getAuthorName));
+            Map<String, List<RedmineVo>> noneIssueMapByAuthorName = issues.stream().filter(issue ->
+                    /*DateUtil.between(issue.getUpdatedOn(), new Date(), DateUnit.MINUTE) <= 10 &&*/ StringUtils.isBlank(issue.getAssigneeName())
+            ).collect(Collectors.groupingBy(RedmineVo::getAuthorName));
 
-        issueMap.forEach((ik, iv) -> noneIssueMapByAuthorName.forEach((k, v) -> {
-            if (ik.equals(k)) {
-                iv.addAll(v);
+            issueMap.forEach((ik, iv) -> noneIssueMapByAuthorName.forEach((k, v) -> {
+                if (ik.equals(k)) {
+                    iv.addAll(v);
+                }
+            }));
+            if (CollectionUtils.isEmpty(issueMap)) {
+                issueMap = noneIssueMapByAuthorName;
             }
-        }));
-        if (CollectionUtils.isEmpty(issueMap)) {
-            issueMap = noneIssueMapByAuthorName;
+
+            LambdaQueryWrapper<UserMemgerInfo> lqw = new LambdaQueryWrapper<>();
+            lqw.select(UserMemgerInfo::getName, UserMemgerInfo::getMemberId);
+            lqw.eq(UserMemgerInfo::getResign, "0");
+            Map<String, String> userNameMap = userMemberService.list(lqw).stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
+
+            issueMap.forEach((assigneeName, issueList) -> {
+                sendContexToMember(log, userNameMap, assigneeName, issueList);
+            });
+            log.info("变更提醒,任务执行完成!");
+        } catch (Exception e) {
+            log.error("变更提醒,任务执行异常!", e);
+            processResult.setSuccess(false);
+            processResult.setMsg("变更提醒,任务执行异常!");
         }
-
-        LambdaQueryWrapper<UserMemgerInfo> lqw = new LambdaQueryWrapper<>();
-        lqw.select(UserMemgerInfo::getName, UserMemgerInfo::getMemberId);
-        lqw.eq(UserMemgerInfo::getResign, "0");
-        Map<String, String> userNameMap = userMemberService.list(lqw).stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
-
-        issueMap.forEach((assigneeName, issueList) -> {
-            sendContexToMember(log, userNameMap, assigneeName, issueList);
-        });
-        log.info("变更提醒,任务执行完成!");
-        return new ProcessResult(true);
+        return processResult;
     }
 
     private static void sendContexToMember(OmsLogger log, Map<String, String> userNameMap, String assigneeName, List<RedmineVo> issueList) {

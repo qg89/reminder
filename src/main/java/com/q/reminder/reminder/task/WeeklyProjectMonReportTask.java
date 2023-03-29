@@ -51,28 +51,34 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
     private FeishuProperties feishuProperties;
 
     @Override
-    public ProcessResult process(TaskContext context) throws Exception {
+    public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         ProcessResult result = new ProcessResult(true);
-        if (holdayBase.queryHoliday()) {
-            result.setMsg("节假日放假!!!!");
-            return result;
-        }
-        String jobParam = context.getJobParams();
-        int weekNumber = 0;
-        String id = null;
-        if (StringUtils.isNotBlank(jobParam)) {
-            String[] param = jobParam.split(",");
-            String weekNum = param[0];
-            if (StringUtils.isNotBlank(weekNum) && NumberUtil.isInteger(weekNum)) {
-                weekNumber = Integer.parseInt(weekNum);
+        try {
+            if (holdayBase.queryHoliday()) {
+                result.setMsg("节假日放假!!!!");
+                return result;
             }
-            if (param.length > 1 && StringUtils.isNotBlank(param[1])) {
-                id = param[1];
+            String jobParam = context.getJobParams();
+            int weekNumber = 0;
+            String id = null;
+            if (StringUtils.isNotBlank(jobParam)) {
+                String[] param = jobParam.split(",");
+                String weekNum = param[0];
+                if (StringUtils.isNotBlank(weekNum) && NumberUtil.isInteger(weekNum)) {
+                    weekNumber = Integer.parseInt(weekNum);
+                }
+                if (param.length > 1 && StringUtils.isNotBlank(param[1])) {
+                    id = param[1];
+                }
             }
+            List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNumber, id);
+            this.writeReport(list);
+        } catch (Exception e) {
+            log.error("周一中午12点 写日报异常", e);
+            result.setMsg("周一中午12点 写日报异常");
+            result.setSuccess(false);
         }
-        List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNumber, id);
-        this.writeReport(list);
         return result;
     }
 

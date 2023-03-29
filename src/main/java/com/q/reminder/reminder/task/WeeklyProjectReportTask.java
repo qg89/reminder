@@ -40,40 +40,46 @@ public class WeeklyProjectReportTask implements BasicProcessor {
     private HoldayBase holdayBase;
 
     @Override
-    public ProcessResult process(TaskContext context) throws Exception {
+    public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         ProcessResult result = new ProcessResult(true);
-        if (holdayBase.queryHoliday()) {
-            log.info("节假日放假!!!!");
-            return result;
-        }
-        String jobParam = context.getJobParams();
-        WeeklyProjectVo vo = new WeeklyProjectVo();
-        vo.setAppSecret(feishuProperties.getAppSecret());
-        vo.setAppId(feishuProperties.getAppId());
-        vo.setFileToken(getFileToken());
-        LambdaQueryWrapper<RProjectInfo> wrapper = Wrappers.lambdaQuery();
-        wrapper.isNotNull(RProjectInfo::getFolderToken).isNotNull(RProjectInfo::getProjectShortName).isNotNull(RProjectInfo::getPmKey);
-        wrapper.eq(RProjectInfo::getWeeklyCopyType, "0");
-        if (StringUtils.isNotBlank(jobParam)) {
-            wrapper.eq(RProjectInfo::getId, jobParam);
-        }
-        List<RProjectInfo> list = projectInfoService.list(wrapper);
-        list.forEach(projectInfo -> {
-            vo.setProjectShortName(projectInfo.getProjectShortName());
-            vo.setFolderToken(projectInfo.getFolderToken());
-            WeeklyProjectReport projectReport = null;
-            try {
-                projectReport = BaseFeishu.cloud().space().copyFile(vo);
-            } catch (Exception e) {
-                log.error("复制文件异常", e);
+        try {
+            if (holdayBase.queryHoliday()) {
+                log.info("节假日放假!!!!");
+                return result;
             }
-            if (projectReport == null) {
-                return;
+            String jobParam = context.getJobParams();
+            WeeklyProjectVo vo = new WeeklyProjectVo();
+            vo.setAppSecret(feishuProperties.getAppSecret());
+            vo.setAppId(feishuProperties.getAppId());
+            vo.setFileToken(getFileToken());
+            LambdaQueryWrapper<RProjectInfo> wrapper = Wrappers.lambdaQuery();
+            wrapper.isNotNull(RProjectInfo::getFolderToken).isNotNull(RProjectInfo::getProjectShortName).isNotNull(RProjectInfo::getPmKey);
+            wrapper.eq(RProjectInfo::getWeeklyCopyType, "0");
+            if (StringUtils.isNotBlank(jobParam)) {
+                wrapper.eq(RProjectInfo::getId, jobParam);
             }
-            projectReport.setRPid(projectInfo.getId());
-            weeklyProjectReportService.save(projectReport);
-        });
+            List<RProjectInfo> list = projectInfoService.list(wrapper);
+            list.forEach(projectInfo -> {
+                vo.setProjectShortName(projectInfo.getProjectShortName());
+                vo.setFolderToken(projectInfo.getFolderToken());
+                WeeklyProjectReport projectReport = null;
+                try {
+                    projectReport = BaseFeishu.cloud().space().copyFile(vo);
+                } catch (Exception e) {
+                    log.error("复制文件异常", e);
+                }
+                if (projectReport == null) {
+                    return;
+                }
+                projectReport.setRPid(projectInfo.getId());
+                weeklyProjectReportService.save(projectReport);
+            });
+        } catch (Exception e) {
+            log.error("复制文件异常", e);
+            result.setSuccess(false);
+            result.setMsg("复制文件异常");
+        }
         return result;
     }
 
