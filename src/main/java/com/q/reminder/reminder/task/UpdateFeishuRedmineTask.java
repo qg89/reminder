@@ -76,7 +76,7 @@ public class UpdateFeishuRedmineTask implements BasicProcessor {
                     try {
                         vo.setReceiveId(e.getMemberId());
                         vo.setContent(content.toString());
-                        BaseFeishu.message().sendContent(vo);
+                        BaseFeishu.message().sendContentTask(vo, log);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }

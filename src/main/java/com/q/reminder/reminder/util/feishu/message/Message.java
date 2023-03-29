@@ -7,6 +7,7 @@ import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.ContentVo;
 import com.q.reminder.reminder.vo.MessageVo;
 import lombok.extern.log4j.Log4j2;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.io.File;
 import java.util.UUID;
@@ -65,6 +66,42 @@ public class Message extends BaseFeishu {
                 }
             }
             log.error("发送消息异常次数:【{}】：{}", i, e);
+            throw new FeishuException(e, this.getClass().getName() + " 发送消息异常,次数：" + i);
+        }
+        return resp;
+    }
+
+    /**
+     * 发送消息
+     *
+     * @param vo
+     * @param log
+     * @return
+     */
+    public CreateMessageResp sendContentTask(MessageVo vo, OmsLogger log) {
+        CreateMessageReq req = CreateMessageReq.newBuilder()
+                .createMessageReqBody(CreateMessageReqBody.newBuilder()
+                        .msgType(vo.getMsgType())
+                        .receiveId(vo.getReceiveId())
+                        .content(vo.getContent())
+                        .uuid(UUID.randomUUID().toString())
+                        .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
+        CreateMessageResp resp = new CreateMessageResp();
+        ImService.Message message = CLIENT.im().message();
+        try {
+            resp = message.create(req, REQUEST_OPTIONS);
+        } catch (Exception e) {
+            int i = 0;
+            while (!resp.success() && i <= 3) {
+                i++;
+                try {
+                    resp = message.create(req);
+                } catch (Exception ex) {
+                    log.error("发送消息异常次数:【{}】：{}", i, ex);
+                }
+            }
+            log.error("发送消息异常次数:【{}】：{}", i, e);
+            throw new FeishuException(e, this.getClass().getName() + " 发送消息异常,次数：" + i);
         }
         return resp;
     }

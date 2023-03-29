@@ -40,7 +40,7 @@ public class Overdue1Tasks implements BasicProcessor {
             }
             int expiredDay = Integer.parseInt(context.getJobParams());
             List<String> noneStatusList = noneStatusService.queryUnInStatus(0);
-            queryTasksToMemberBase.feiShu(expiredDay, noneStatusList, Boolean.FALSE);
+            queryTasksToMemberBase.feiShu(expiredDay, noneStatusList, Boolean.FALSE, log);
         } catch (Exception e) {
             log.error("任务处理异常", e);
             result.setSuccess(false);

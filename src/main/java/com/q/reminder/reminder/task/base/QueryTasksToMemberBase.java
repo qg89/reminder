@@ -4,7 +4,6 @@ import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
-import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
 import com.q.reminder.reminder.entity.RProjectInfo;
@@ -19,12 +18,12 @@ import com.q.reminder.reminder.vo.MessageVo;
 import com.q.reminder.reminder.vo.QueryVo;
 import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.SendVo;
-import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,7 +35,6 @@ import java.util.stream.Collectors;
  * @Description : 过期任务提醒个人，base版本
  * @date :  2022.09.27 08:38
  */
-@Log4j2
 @Component
 public class QueryTasksToMemberBase {
 
@@ -48,16 +46,15 @@ public class QueryTasksToMemberBase {
     private OverdueTaskHistoryService overdueTaskHistoryService;
     @Autowired
     private AdminInfoService adminInfoService;
-    @Autowired
-    private FeishuProperties feishuProperties;
 
 
     /**
      * @param expiredDay
      * @param noneStatusList
      * @param contentStatus
+     * @param log
      */
-    public void feiShu(int expiredDay, List<String> noneStatusList, Boolean contentStatus) {
+    public void feiShu(int expiredDay, List<String> noneStatusList, Boolean contentStatus, OmsLogger log) {
         StringBuilder contentAll = new StringBuilder();
         contentAll.append("当日执行情况如下(").append(new DateTime().toString("yyyy-MM-dd")).append("):\r\n");
 
@@ -77,14 +74,7 @@ public class QueryTasksToMemberBase {
         if (CollectionUtils.isEmpty(listMap)) {
             contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append("\r\n");
             contentAll.append("执行完成!");
-            adminInfoList.forEach(e -> {
-                MessageVo sendVo = new MessageVo();
-                sendVo.setReceiveId(e.getMemberId());
-                sendVo.setContent( contentAll.toString());
-                sendVo.setMsgType("text");
-                sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-                BaseFeishu.message().sendContent(sendVo);
-            });
+            sendAdmin(log, contentAll, adminInfoList);
             return;
         }
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append(" 查询redmine过期人员集合完成!").append("\r\n");
@@ -175,19 +165,23 @@ public class QueryTasksToMemberBase {
             sendVo.setContent(contentAll.toString());
             sendVo.setMsgType("post");
             sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-            BaseFeishu.message().sendContent(sendVo);
+            BaseFeishu.message().sendContentTask(sendVo, log);
         });
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("发送飞书任务完成!").append("\r\n");
         overdueTaskHistoryService.saveOrUpdateBatch(historys);
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("执行完成!").append("\r\n");
+        sendAdmin(log, contentAll, adminInfoList);
+        log.info("过期任务提醒个人,执行完成");
+    }
+
+    private void sendAdmin(OmsLogger log, StringBuilder contentAll, List<AdminInfo> adminInfoList) {
         adminInfoList.forEach(e -> {
             MessageVo sendVo = new MessageVo();
             sendVo.setReceiveId(e.getMemberId());
-            sendVo.setContent(contentAll.toString());
+            sendVo.setContent( contentAll.toString());
             sendVo.setMsgType("text");
             sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-            BaseFeishu.message().sendContent(sendVo);
+            BaseFeishu.message().sendContentTask(sendVo, log);
         });
-        log.info("过期任务提醒个人,执行完成");
     }
 }
