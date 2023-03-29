@@ -1,0 +1,28 @@
+# 数据源
+spring:
+  data:
+    redis:
+      database: 9
+      host: 192.168.3.46
+      port: 6379
+      password: Newm123@
+      jedis:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+logging:
+  level:
+    root: info
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger- %msg%n'
+powerjob:
+  worker:
+    enabled: true
+    app-name: admin
+    server-address: 127.0.0.1:7700
+    protocol: akka
+    store-strategy: disk
+    max-result-length: 4096
+    max-appended-wf-context-length: 4096

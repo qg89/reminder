@@ -2,10 +2,15 @@ server:
   port: 12315
 # 数据源
 spring:
+  profiles:
+    active: dev
   freemarker:
     check-template-location: false
   main:
     allow-circular-references: true
+  cache:
+    redis:
+      time-to-live: 1800000
   jackson:
     default-property-inclusion: non_null
     date-format: yyyy-MM-dd HH:mm:dd
@@ -13,10 +18,6 @@ spring:
     parser:
       allow-unquoted-control-chars: true
       allow-backslash-escaping-any-character: true
-  task:
-    scheduling:
-      pool:
-        size: 5
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     username: mpw:Jrfx9m/vVYtI1PLKUIeYlA==
@@ -31,23 +32,6 @@ spring:
       max-lifetime: 1800000         # 连接的生命时长（毫秒），超时而且没被使用则被释放（retired），默认： 30 分钟
       connection-test-query: SELECT 1
       pool-name: MakuHikariCP_Reminder
-  cache:
-    redis:
-      time-to-live: 1800000
-
-  data:
-    redis:
-      database: 9
-      host: 192.168.3.46
-      port: 6379
-      password: Newm123@
-      jedis:
-        pool:
-          max-active: 8
-          max-idle: 8
-          min-idle: 0
-          max-wait: -1ms
-
   jpa:
     open-in-view: false
 
@@ -60,30 +44,3 @@ mybatis-plus:
 feishu-config:
   app-id: mpw:XmOtdJZ/rrM7t+S1c9SV2nyu+ihCGM3sSfkWWWcW/TY=
   app-secret: mpw:1HSZ98TVPJZoFZr0aHkbIv+jIxmu1niV5I8bhkDtSe/ENC5S07lLG1LKoKhOAkyr
-
-#xxl:
-#  job:
-#    admin:
-#      addresses: http://192.168.3.46:11233/xxl-job-admin
-#    executor:
-#      appname: business-III-Robot #xxljob配置的执行器名称，
-#      ip:             #执行器IP，默认为空表示自动获取IP
-#      port: 233 #xxljob配置的端口号，默认为9999
-#      logpath: ./data/xxl-job/jobhandler  #执行器运行日志文件存储磁盘路径
-#      logretentiondays: 14  #调度中心日志表数据保存天数，过期日志自动清理；限制大于等于7时生效，否则, 如-1，关闭自动清理功能
-#    accessToken: default_token
-logging:
-#  level:
-#    root: debug
-  pattern:
-    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger- %msg%n'
-powerjob:
-  worker:
-    enabled: true
-    app-name: admin
-    server-address: 192.168.3.46:7700
-#    server-address: 127.0.0.1:7700
-    protocol: akka
-    store-strategy: disk
-    max-result-length: 4096
-    max-appended-wf-context-length: 4096
