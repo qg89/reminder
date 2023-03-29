@@ -42,7 +42,7 @@ public class Message extends BaseFeishu {
      * @return
      * @throws Exception
      */
-    public boolean sendContent(MessageVo vo) {
+    public CreateMessageResp sendContent(MessageVo vo) {
         CreateMessageReq req = CreateMessageReq.newBuilder()
                 .createMessageReqBody(CreateMessageReqBody.newBuilder()
                         .msgType(vo.getMsgType())
@@ -66,7 +66,7 @@ public class Message extends BaseFeishu {
             }
             log.error("发送消息异常次数:【{}】：{}", i, e);
         }
-        return resp.success();
+        return resp;
     }
 
     /**

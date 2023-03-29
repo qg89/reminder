@@ -6,6 +6,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
+import com.lark.oapi.service.im.v1.model.CreateMessageResp;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.service.ProjectInfoService;
@@ -119,7 +120,12 @@ public class RedmineUpdateTask implements BasicProcessor {
         vo.setReceiveId(userNameMap.get(assigneeName));
         vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
         vo.setContent(con.toJSONString());
-        boolean send = BaseFeishu.message().sendContent(vo);
-        log.info("[redmine]-变更提醒, 发送给: {}, 状态: {} ！", assigneeName, send);
+        CreateMessageResp resp = BaseFeishu.message().sendContent(vo);
+        boolean success = resp.success();
+        if (!success) {
+            log.info("[redmine]-变更提醒, 发送给: {}, error msg : {} ！", assigneeName, resp.getMsg());
+            log.info("[redmine]-变更提醒, 发送给: {}, error : {} ！", assigneeName, resp.getError());
+        }
+        log.info("[redmine]-变更提醒, 发送给: {}, success ！", assigneeName);
     }
 }

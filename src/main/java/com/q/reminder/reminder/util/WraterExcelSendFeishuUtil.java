@@ -5,6 +5,7 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.alibaba.fastjson2.JSONObject;
+import com.lark.oapi.service.im.v1.model.CreateMessageResp;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.*;
 import lombok.extern.log4j.Log4j2;
@@ -24,8 +25,6 @@ import java.util.Map;
 public class WraterExcelSendFeishuUtil {
 
     public static void wraterExcelSendFeishu(Map<String, List<ExcelVo>> map, WeeklyProjectVo weeklyVo, String name) throws Exception {
-        String appId = weeklyVo.getAppId();
-        String appSecret = weeklyVo.getAppSecret();
         String path = WeeklyProjectUtils.createDir() + weeklyVo.getFileName() + "-" + name + ".xls";
         File file = new File(path);
         ExcelWriter writer = ExcelUtil.getWriter();
@@ -61,13 +60,19 @@ public class WraterExcelSendFeishuUtil {
         json.put("file_key", fileKey);
         contentVo.setContent(json.toJSONString());
         contentVo.setMsgType("file");
-        BaseFeishu.message().sendContent(contentVo);
+        CreateMessageResp resp = BaseFeishu.message().sendContent(contentVo);
+        boolean success = resp.success();
+        if (!success) {
+            log.info("周报导出Excel, 发送给: {}, error msg : {} ！", name, resp.getMsg());
+            log.info("周报导出Excel, 发送给: {}, error : {} ！", name, resp.getError());
+        }
+        log.info("周报导出Excel, 发送给: {}, success ！", name);
+        log.info("周报导出Excel,发送结果:{}", name);
+
         file.delete();
     }
 
     public static void wraterExcelTimeSendFeishu(Map<String, List<ExcelVo.ExcelTimeVo>> map, WeeklyProjectVo weeklyVo, String name) throws Exception {
-        String appId = weeklyVo.getAppId();
-        String appSecret = weeklyVo.getAppSecret();
         String path = WeeklyProjectUtils.createDir() + weeklyVo.getFileName() + "-" + name + ".xls";
         File file = new File(path);
         ExcelWriter writer = ExcelUtil.getWriter();
@@ -101,7 +106,14 @@ public class WraterExcelSendFeishuUtil {
         json.put("file_key", fileKey);
         contentVo.setContent(json.toJSONString());
         contentVo.setMsgType("file");
-        BaseFeishu.message().sendContent(contentVo);
+        CreateMessageResp resp = BaseFeishu.message().sendContent(contentVo);
+        boolean success = resp.success();
+        if (!success) {
+            log.info("周报导出Excel, 发送给: {}, error msg : {} ！", name, resp.getMsg());
+            log.info("周报导出Excel, 发送给: {}, error : {} ！", name, resp.getError());
+        }
+        log.info("周报导出Excel, 发送给: {}, success ！", name);
+        log.info("周报导出Excel,发送结果:{}", name);
         file.delete();
     }
 }

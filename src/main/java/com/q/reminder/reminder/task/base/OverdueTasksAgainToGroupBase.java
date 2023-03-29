@@ -3,10 +3,12 @@ package com.q.reminder.reminder.task.base;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
+import com.lark.oapi.service.im.v1.model.CreateMessageResp;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.AdminInfoService;
 import com.q.reminder.reminder.service.OverdueTaskHistoryService;
 import com.q.reminder.reminder.service.ProjectInfoService;
@@ -136,17 +138,17 @@ public class OverdueTasksAgainToGroupBase {
             m.setContent(content.toJSONString());
             m.setMsgType("post");
             try {
-                boolean sendContent = BaseFeishu.message().sendContent(m);
-                log.info("群发送,过期任务提醒群组,发送结果:{}", sendContent);
+                String name = groupInfo.getName();
+                CreateMessageResp resp = BaseFeishu.message().sendContent(m);
+                boolean success = resp.success();
+                if (!success) {
+                    log.info("群发送,过期任务提醒群组, 发送给: {}, error msg : {} ！", name, resp.getMsg());
+                    log.info("群发送,过期任务提醒群组, 发送给: {}, error : {} ！", name, resp.getError());
+                }
+                log.info("群发送,过期任务提醒群组, 发送给: {}, success ！", name);
+                log.info("群发送,过期任务提醒群组,发送结果:{}", name);
             } catch (Exception ex) {
-                adminInfoList.forEach(e -> {
-                    MessageVo sendVo = new MessageVo();
-                    sendVo.setReceiveId(e.getMemberId());
-                    sendVo.setContent("this.getClass().getName() + \" 过期任务提醒群组,发送异常\"");
-                    sendVo.setMsgType("text");
-                    sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-                    BaseFeishu.message().sendContent(sendVo);
-                });
+               throw new FeishuException(ex, "群发送,过期任务提醒群组 异常");
             }
         }
 
