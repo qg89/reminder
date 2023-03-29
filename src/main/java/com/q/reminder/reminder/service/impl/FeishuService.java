@@ -37,7 +37,7 @@ public class FeishuService {
         String tenantAccessToken = token.getString("tenant_access_token");
         int expire = token.getIntValue("expire");
         if (expire > 30) {
-            expire = expire - 30;
+            expire = (expire - 30);
         }
         redisTemplate.opsForValue().set(RedisKeyContents.FEISHU_TENANT_ACCESS_TOKEN, tenantAccessToken, expire, TimeUnit.SECONDS);
         return tenantAccessToken;
