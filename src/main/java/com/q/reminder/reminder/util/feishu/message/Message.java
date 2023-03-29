@@ -1,8 +1,8 @@
 package com.q.reminder.reminder.util.feishu.message;
 
-import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.im.v1.ImService;
 import com.lark.oapi.service.im.v1.model.*;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.ContentVo;
 import com.q.reminder.reminder.vo.MessageVo;
@@ -75,7 +75,7 @@ public class Message extends BaseFeishu {
      * @return
      * @throws Exception
      */
-    public String imUploadFile(ContentVo vo) throws Exception {
+    public String imUploadFile(ContentVo vo) {
         File file = vo.getFile();
         CreateFileReq req = CreateFileReq.newBuilder()
                 .createFileReqBody(CreateFileReqBody.newBuilder()
@@ -84,7 +84,12 @@ public class Message extends BaseFeishu {
                         .fileType(vo.getFileType())
                         .build())
                 .build();
-        CreateFileResp resp = CLIENT.im().file().create(req, REQUEST_OPTIONS);
+        CreateFileResp resp;
+        try {
+            resp = CLIENT.im().file().create(req, REQUEST_OPTIONS);
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 消息上传文件异常");
+        }
         return resp.getData().getFileKey();
     }
 }
