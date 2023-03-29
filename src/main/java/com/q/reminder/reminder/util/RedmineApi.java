@@ -137,6 +137,11 @@ public abstract class RedmineApi {
         return issues;
     }
 
+    /**
+     * 获取指派给为空的任务
+     * @param projectInfos
+     * @return
+     */
     public static List<RedmineVo> queryUpdateIssueNameNone(List<RProjectInfo> projectInfos) {
         List<RedmineVo> issues = new ArrayList<>();
         for (RProjectInfo project : projectInfos) {

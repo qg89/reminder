@@ -71,42 +71,48 @@ public class RedmineUpdateTask implements BasicProcessor {
         Map<String, String> userNameMap = userMemberService.list(lqw).stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
 
         issueMap.forEach((assigneeName, issueList) -> {
-            JSONObject con = new JSONObject();
-            JSONObject all = new JSONObject();
-            con.put("zh_cn", all);
-            JSONArray contentJsonArray = new JSONArray();
-            all.put("content", contentJsonArray);
-            for (RedmineVo issue : issueList) {
-                String issueAssigneeName = issue.getAssigneeName();
-                JSONArray subContentJsonArray = new JSONArray();
-                JSONObject subject = new JSONObject();
-                subject.put("tag", "text");
-                if (StringUtils.isBlank(issueAssigneeName)) {
-                    all.put("title", "【任务指派人为空提醒 (" + DateUtil.now() + ")】");
-                    subject.put("text", "\r\n请及时更新指派人: ");
-                    assigneeName = assigneeName.replace(" ", "");
-                } else {
-                    all.put("title", "【任务变更提醒 (" + DateUtil.now() + ")】");
-                    subject.put("text", "\r\n任务主题: ");
-                }
-                subContentJsonArray.add(subject);
-                JSONObject a = new JSONObject();
-                a.put("tag", "a");
-                a.put("href", issue.getRedmineUrl() + "/issues/" + issue.getRedmineId());
-                a.put("text", issue.getSubject());
-                subContentJsonArray.add(a);
-                contentJsonArray.add(subContentJsonArray);
-            }
-
-            MessageVo vo = new MessageVo();
-            vo.setMsgType("post");
-            vo.setReceiveId(userNameMap.get(assigneeName));
-            vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-            vo.setContent(con.toJSONString());
-            boolean send = BaseFeishu.message().sendContent(vo);
-            log.info("[redmine]-变更提醒, 发送给: {}, 状态: {} ！", assigneeName, send);
+            sendContexToMember(log, userNameMap, assigneeName, issueList);
         });
         log.info("变更提醒,任务执行完成!");
         return new ProcessResult(true);
+    }
+
+    private static void sendContexToMember(OmsLogger log, Map<String, String> userNameMap, String assigneeName, List<RedmineVo> issueList) {
+        JSONObject con = new JSONObject();
+        JSONObject all = new JSONObject();
+        con.put("zh_cn", all);
+        JSONArray contentJsonArray = new JSONArray();
+        all.put("content", contentJsonArray);
+        for (RedmineVo issue : issueList) {
+            String issueAssigneeName = issue.getAssigneeName();
+            JSONArray subContentJsonArray = new JSONArray();
+            JSONObject subject = new JSONObject();
+            subject.put("tag", "text");
+            if (StringUtils.isBlank(issueAssigneeName)) {
+                all.put("title", "【任务指派人为空提醒 (" + DateUtil.now() + ")】");
+                subject.put("text", "\r\n请及时更新指派人: ");
+                assigneeName = assigneeName.replace(" ", "");
+                log.info("[redmine]-变更提醒, 任务指派人为空, 任务主题: {}, 任务ID: {}", assigneeName, issue.getRedmineId());
+            } else {
+                all.put("title", "【任务变更提醒 (" + DateUtil.now() + ")】");
+                subject.put("text", "\r\n任务主题: ");
+                log.info("[redmine]-变更提醒, 任务主题: {}, 任务ID: {}", issue.getSubject(), issue.getRedmineId());
+            }
+            subContentJsonArray.add(subject);
+            JSONObject a = new JSONObject();
+            a.put("tag", "a");
+            a.put("href", issue.getRedmineUrl() + "/issues/" + issue.getRedmineId());
+            a.put("text", issue.getSubject());
+            subContentJsonArray.add(a);
+            contentJsonArray.add(subContentJsonArray);
+        }
+
+        MessageVo vo = new MessageVo();
+        vo.setMsgType("post");
+        vo.setReceiveId(userNameMap.get(assigneeName));
+        vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+        vo.setContent(con.toJSONString());
+        boolean send = BaseFeishu.message().sendContent(vo);
+        log.info("[redmine]-变更提醒, 发送给: {}, 状态: {} ！", assigneeName, send);
     }
 }
