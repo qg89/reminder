@@ -136,7 +136,8 @@ public class OverdueTasksAgainToGroupBase {
             m.setContent(content.toJSONString());
             m.setMsgType("post");
             try {
-                BaseFeishu.message().sendContent(m);
+                boolean sendContent = BaseFeishu.message().sendContent(m);
+                log.info("群发送,过期任务提醒群组,发送结果:{}", sendContent);
             } catch (Exception ex) {
                 adminInfoList.forEach(e -> {
                     MessageVo sendVo = new MessageVo();

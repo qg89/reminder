@@ -67,6 +67,7 @@ public class OverdueTasksAgainToGroupTask implements BasicProcessor {
         vo.setContainsStatus(Boolean.TRUE);
         vo.setRedminderType("(Resolved)");
         overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(vo, log);
+        log.info("[每天9点半提醒，群提醒] - 执行完成");
         return result;
     }
 }
