@@ -73,6 +73,12 @@ public class RedmineUpdateTask implements BasicProcessor {
             lqw.eq(UserMemgerInfo::getResign, "0");
             Map<String, String> userNameMap = userMemberService.list(lqw).stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
 
+            if (CollectionUtils.isEmpty(issueMap)) {
+                log.info("[变更提醒] 任务列表为空");
+                processResult.setSuccess(true);
+                return processResult;
+            }
+
             issueMap.forEach((assigneeName, issueList) -> {
                 sendContexToMember(log, userNameMap, assigneeName, issueList);
             });
