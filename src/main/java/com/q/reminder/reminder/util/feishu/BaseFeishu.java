@@ -8,6 +8,7 @@ import com.q.reminder.reminder.util.feishu.cloud.Cloud;
 import com.q.reminder.reminder.util.feishu.group.GroupMessage;
 import com.q.reminder.reminder.util.feishu.message.Message;
 import com.q.reminder.reminder.util.feishu.wiki.Wiki;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
  * @Description :
  * @date :  2023.02.23 11:32
  */
+@Log4j2
 public abstract class BaseFeishu {
     protected Client CLIENT;
     protected RequestOptions REQUEST_OPTIONS;
@@ -35,6 +37,7 @@ public abstract class BaseFeishu {
                 }
             }
         }
+        log.info("==============={}", tenantAccessToken);
         REQUEST_OPTIONS = RequestOptions.newBuilder().tenantAccessToken(tenantAccessToken).build();
     }
 
