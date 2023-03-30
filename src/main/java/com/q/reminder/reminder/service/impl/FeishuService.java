@@ -30,7 +30,7 @@ public class FeishuService {
     @Autowired
     private FeishuProperties feishuProperties;
 
-    @Cacheable(cacheNames = RedisKeyContents.FEISHU_TENANT_ACCESS_TOKEN)
+    @Cacheable(cacheNames = RedisKeyContents.FEISHU_TENANT_ACCESS_TOKEN, key = "'expire'")
     public synchronized String tenantAccessToken() {
         String post = HttpUtil.post("https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal", Map.of("app_id", feishuProperties.getAppId(), "app_secret", feishuProperties.getAppSecret()));
         JSONObject token = JSONObject.parseObject(post);
