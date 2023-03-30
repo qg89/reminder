@@ -75,7 +75,6 @@ public class RedmineUpdateTask implements BasicProcessor {
 
             if (CollectionUtils.isEmpty(issueMap)) {
                 log.info("[变更提醒] 任务列表为空");
-                processResult.setSuccess(true);
                 return processResult;
             }
 
