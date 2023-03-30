@@ -105,11 +105,11 @@ public class RedmineUpdateTask implements BasicProcessor {
                 all.put("title", "【任务指派人为空提醒 (" + DateUtil.now() + ")】");
                 subject.put("text", "\r\n请及时更新指派人: ");
                 assigneeName = assigneeName.replace(" ", "");
-                log.info("[redmine]-变更提醒, 任务指派人为空, 任务主题: {}, 任务ID: {}", assigneeName, issue.getRedmineId());
+                log.info("[redmine]-变更提醒, 任务指派人为空, 创建人: 【{}】， 任务主题: {}, 任务ID: 【{}】", issue.getAuthorName(), subject, issue.getRedmineId());
             } else {
                 all.put("title", "【任务变更提醒 (" + DateUtil.now() + ")】");
                 subject.put("text", "\r\n任务主题: ");
-                log.info("[redmine]-变更提醒, 任务主题: {}, 任务ID: {}", issue.getSubject(), issue.getRedmineId());
+                log.info("[redmine]-变更提醒, 指派给给: 【{}】, 任务主题: {}, 任务ID: 【{}】", assigneeName, issue.getSubject(), issue.getRedmineId());
             }
             subContentJsonArray.add(subject);
             JSONObject a = new JSONObject();
