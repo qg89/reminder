@@ -128,7 +128,7 @@ public class RedmineUpdateTask implements BasicProcessor {
         CreateMessageResp resp = BaseFeishu.message().sendContentTask(vo, log);
         boolean success = resp.success();
         if (!success) {
-            log.info("[redmine]-变更提醒失败, 发送给: {}, error msg : {} , error： {}！", assigneeName, resp.getMsg(), resp.getError());
+            log.info("[redmine]-变更提醒失败, 发送给: {},error Code: {}, error msg : {} , error： {}！", assigneeName,resp.getCode(), resp.getMsg(), resp.getError());
             return;
         }
         log.info("[redmine]-变更提醒, 发送给: {}, success ！", assigneeName);
