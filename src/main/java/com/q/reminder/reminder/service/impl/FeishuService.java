@@ -31,7 +31,7 @@ public class FeishuService {
     private FeishuProperties feishuProperties;
 
     @Cacheable(cacheNames = RedisKeyContents.FEISHU_TENANT_ACCESS_TOKEN)
-    public String tenantAccessToken() {
+    public synchronized String tenantAccessToken() {
         String post = HttpUtil.post("https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal", Map.of("app_id", feishuProperties.getAppId(), "app_secret", feishuProperties.getAppSecret()));
         JSONObject token = JSONObject.parseObject(post);
         String tenantAccessToken = token.getString("tenant_access_token");
@@ -49,7 +49,7 @@ public class FeishuService {
                 .requestTimeout(5, TimeUnit.MINUTES)
                 .tokenCache(LocalCache.getInstance())
                 .openBaseUrl(BaseUrlEnum.FeiShu)
-                .disableTokenCache()
+//                .disableTokenCache()
                 .build();
     }
 }
