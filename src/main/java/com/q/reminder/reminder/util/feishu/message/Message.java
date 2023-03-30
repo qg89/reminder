@@ -23,6 +23,8 @@ import java.util.UUID;
 public class Message extends BaseFeishu {
 
     private static Message instance;
+    private static int index = 0;
+    private static int index_task = 0;
 
     private Message() {
         super();
@@ -44,6 +46,7 @@ public class Message extends BaseFeishu {
      * @throws Exception
      */
     public CreateMessageResp sendContent(MessageVo vo) {
+        index++;
         CreateMessageReq req = CreateMessageReq.newBuilder()
                 .createMessageReqBody(CreateMessageReqBody.newBuilder()
                         .msgType(vo.getMsgType())
@@ -56,18 +59,13 @@ public class Message extends BaseFeishu {
         try {
             resp = message.create(req, REQUEST_OPTIONS);
         } catch (Exception e) {
-            int i = 0;
-            while (!resp.success() && i <= 3) {
-                i++;
-                try {
-                    resp = message.create(req);
-                } catch (Exception ex) {
-                    log.error("发送消息异常次数:【{}】：{}", i, ex);
-                }
+            if (!resp.success() && index <= 5) {
+                log.error("发送消息异常次数:【{}】：error: {}", index, resp.getMsg());
+                sendContent(vo);
             }
-            log.error("发送消息异常次数:【{}】：{}", i, e);
-            throw new FeishuException(e, this.getClass().getName() + " 发送消息异常,次数：" + i);
+            throw new FeishuException(e, this.getClass().getName() + " 发送消息异常,次数：" + index);
         }
+        index = 0;
         return resp;
     }
 
@@ -79,6 +77,7 @@ public class Message extends BaseFeishu {
      * @return
      */
     public CreateMessageResp sendContentTask(MessageVo vo, OmsLogger log) {
+        index_task++;
         CreateMessageReq req = CreateMessageReq.newBuilder()
                 .createMessageReqBody(CreateMessageReqBody.newBuilder()
                         .msgType(vo.getMsgType())
@@ -87,32 +86,22 @@ public class Message extends BaseFeishu {
                         .uuid(UUID.randomUUID().toString())
                         .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
         CreateMessageResp resp = new CreateMessageResp();
-        ImService.Message message = CLIENT.im().message();
         try {
-            resp = message.create(req, REQUEST_OPTIONS);
+            Thread.sleep(1000 * 3);
+            resp = this.CLIENT.im().message().create(req, REQUEST_OPTIONS);
         } catch (Exception e) {
-            int i = sendFault(log, req, resp, message);
-            log.error("发送消息异常次数:【{}】：{}", i, e);
-            throw new FeishuException(e, this.getClass().getName() + " 发送消息异常,次数：" + i);
-        }
-        if (!resp.success()) {
-            sendFault(log, req, resp, message);
-        }
-        return resp;
-    }
-
-    private static int sendFault(OmsLogger log, CreateMessageReq req, CreateMessageResp resp, ImService.Message message) {
-        int i = 0;
-        while (!resp.success() && i <= 3) {
-            i++;
-            try {
-                Thread.sleep(1000 * 10);
-                resp = message.create(req);
-            } catch (Exception ex) {
-                log.error("发送消息异常次数:【{}】：{}", i, ex);
+            if (!resp.success() && index_task <= 5) {
+                log.error("发送消息异常次数:【{}】：error: {}", index_task, resp.getMsg());
+                sendContentTask(vo, log);
             }
+            throw new FeishuException(e, this.getClass().getName() + " 发送消息异常,次数：" + index_task);
         }
-        return i;
+        if (!resp.success() && index_task <= 5) {
+            log.error("发送消息异常次数:【{}】：error: {}", index_task, resp.getMsg());
+            sendContentTask(vo, log);
+        }
+        index_task = 0;
+        return resp;
     }
 
     /**

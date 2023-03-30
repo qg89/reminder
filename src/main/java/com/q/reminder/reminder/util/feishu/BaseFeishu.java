@@ -9,7 +9,6 @@ import com.q.reminder.reminder.util.feishu.group.GroupMessage;
 import com.q.reminder.reminder.util.feishu.message.Message;
 import com.q.reminder.reminder.util.feishu.wiki.Wiki;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author : saiko
@@ -20,25 +19,11 @@ import org.apache.commons.lang3.StringUtils;
  */
 @Log4j2
 public abstract class BaseFeishu {
-    protected Client CLIENT;
-    protected RequestOptions REQUEST_OPTIONS;
+    private FeishuService feishuService = SpringContextUtils.getBean("feishuService", FeishuService.class);
+    protected Client CLIENT = feishuService.client();
+    protected RequestOptions REQUEST_OPTIONS = RequestOptions.newBuilder().tenantAccessToken(feishuService.tenantAccessToken()).build();
 
     protected BaseFeishu() {
-        FeishuService feishuService = SpringContextUtils.getBean(FeishuService.class);
-        CLIENT = feishuService.client();
-        String tenantAccessToken;
-        if (StringUtils.isBlank(tenantAccessToken = feishuService.tenantAccessToken())) {
-            int i = 0;
-            while (StringUtils.isBlank(tenantAccessToken) && (i++) <= 5) {
-                try {
-                    Thread.sleep(1000 * 30);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-        log.info("==============={}", tenantAccessToken);
-        REQUEST_OPTIONS = RequestOptions.newBuilder().tenantAccessToken(tenantAccessToken).build();
     }
 
     /**
