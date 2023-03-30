@@ -52,7 +52,7 @@ public class RedmineUserInfoServiceImpl extends MppServiceImpl<RedmineUserInfoMa
     }
 
     @Override
-    @Cacheable(cacheNames = RedisKeyContents.REDMINE_USERINFO_REDMINE_ALL)
+    @Cacheable(cacheNames = RedisKeyContents.REDMINE_USERINFO_REDMINE_ALL, key = "'userAll'")
     public List<RedmineUserInfo> listUserAll() {
         return list(Wrappers.<RedmineUserInfo>lambdaQuery().isNotNull(RedmineUserInfo::getAssigneeName));
     }

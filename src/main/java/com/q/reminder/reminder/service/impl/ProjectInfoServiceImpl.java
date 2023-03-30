@@ -91,13 +91,13 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     }
 
     @Override
-    @Cacheable(cacheNames = RedisKeyContents.REDMINE_PROJECT_ALL)
+    @Cacheable(cacheNames = RedisKeyContents.REDMINE_PROJECT_ALL, key = "'projectAll'")
     public List<RProjectInfo> listAll() {
         return list();
     }
 
     @Override
-    @CacheEvict(cacheNames = RedisKeyContents.REDMINE_PROJECT_ALL)
+    @CacheEvict(cacheNames = RedisKeyContents.REDMINE_PROJECT_ALL, key = "#info.getPkey()")
     public void updateInfo(RProjectReaVo info) {
         update(info, Wrappers.<RProjectInfo>lambdaUpdate().eq(RProjectInfo::getPkey, info.getPkey()));
     }

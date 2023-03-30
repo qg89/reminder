@@ -22,13 +22,13 @@ import java.util.List;
 public class TTableUserConfigServiceImpl extends ServiceImpl<TTableUserConfigMapping, TTableUserConfig> implements TTableUserConfigService {
 
     @Override
-    @Cacheable(cacheNames = RedisKeyContents.TABLE_USER_CONFIG)
+    @Cacheable(cacheNames = RedisKeyContents.TABLE_USER_CONFIG, key = "'userConfig'")
     public List<TTableUserConfig> listAll() {
         return list();
     }
 
     @Override
-    @CacheEvict(cacheNames = RedisKeyContents.TABLE_USER_CONFIG)
+    @CacheEvict(cacheNames = RedisKeyContents.TABLE_USER_CONFIG, allEntries = true)
     public void saveInfo(TTableUserConfig entity) {
         saveOrUpdate(entity);
     }
