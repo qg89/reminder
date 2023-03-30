@@ -125,6 +125,7 @@ public class RedmineUpdateTask implements BasicProcessor {
         if (!success) {
             log.info("[redmine]-变更提醒, 发送给: {}, error msg : {} ！", assigneeName, resp.getMsg());
             log.info("[redmine]-变更提醒, 发送给: {}, error : {} ！", assigneeName, resp.getError());
+            return;
         }
         log.info("[redmine]-变更提醒, 发送给: {}, success ！", assigneeName);
     }
