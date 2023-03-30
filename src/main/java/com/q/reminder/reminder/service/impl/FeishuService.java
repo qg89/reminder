@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
  * @Description :
  * @date :  2023.03.16 14:33
  */
-@Service
+@Service("feishuService")
 public class FeishuService {
 
     @Autowired
@@ -49,7 +49,7 @@ public class FeishuService {
                 .requestTimeout(5, TimeUnit.MINUTES)
                 .tokenCache(LocalCache.getInstance())
                 .openBaseUrl(BaseUrlEnum.FeiShu)
-//                .disableTokenCache()
+                .disableTokenCache()
                 .build();
     }
 }
