@@ -91,19 +91,28 @@ public class Message extends BaseFeishu {
         try {
             resp = message.create(req, REQUEST_OPTIONS);
         } catch (Exception e) {
-            int i = 0;
-            while (!resp.success() && i <= 3) {
-                i++;
-                try {
-                    resp = message.create(req);
-                } catch (Exception ex) {
-                    log.error("发送消息异常次数:【{}】：{}", i, ex);
-                }
-            }
+            int i = sendFault(log, req, resp, message);
             log.error("发送消息异常次数:【{}】：{}", i, e);
             throw new FeishuException(e, this.getClass().getName() + " 发送消息异常,次数：" + i);
         }
+        if (!resp.success()) {
+            sendFault(log, req, resp, message);
+        }
         return resp;
+    }
+
+    private static int sendFault(OmsLogger log, CreateMessageReq req, CreateMessageResp resp, ImService.Message message) {
+        int i = 0;
+        while (!resp.success() && i <= 3) {
+            i++;
+            try {
+                Thread.sleep(1000 * 10);
+                resp = message.create(req);
+            } catch (Exception ex) {
+                log.error("发送消息异常次数:【{}】：{}", i, ex);
+            }
+        }
+        return i;
     }
 
     /**
