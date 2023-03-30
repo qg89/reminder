@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.util.feishu.cloud;
 
+import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.util.feishu.cloud.documents.Documents;
 import com.q.reminder.reminder.util.feishu.cloud.documents.Upload;
 import com.q.reminder.reminder.util.feishu.cloud.space.Space;
@@ -12,7 +13,7 @@ import com.q.reminder.reminder.util.feishu.cloud.table.Table;
  * @Description :
  * @date :  2023.03.27 17:13
  */
-public class Cloud {
+public class Cloud extends BaseFeishu {
 
     private  static Cloud instance;
     private Cloud(){
