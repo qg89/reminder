@@ -62,7 +62,7 @@ public class ProjectController {
         return ReturnT.SUCCESS;
     }
     @GetMapping("/t")
-    public List<GroupInfo> t() throws Exception {
+    public List<FsGroupInfo> t() throws Exception {
        return BaseFeishu.groupMessage().getGroupToChats();
     }
 
@@ -123,9 +123,9 @@ public class ProjectController {
     @GetMapping("/o")
     public ReturnT<Map<String, Object>> option() {
         Map<String, Object> map = new HashMap<>(4);
-        LambdaQueryWrapper<GroupInfo> gp = Wrappers.lambdaQuery();
-        gp.select(GroupInfo::getChatId, GroupInfo::getName);
-        List<GroupInfo> groupInfoList = groupInfoService.list(gp);
+        LambdaQueryWrapper<FsGroupInfo> gp = Wrappers.lambdaQuery();
+        gp.select(FsGroupInfo::getChatId, FsGroupInfo::getName);
+        List<FsGroupInfo> fsGroupInfoList = groupInfoService.list(gp);
 
         LambdaQueryWrapper<User> u = Wrappers.lambdaQuery();
         u.select(User::getId, User::getName);
@@ -134,7 +134,7 @@ public class ProjectController {
         LambdaQueryWrapper<Coverity> c = Wrappers.lambdaQuery();
         c.select(Coverity::getCProjectId, Coverity::getRProjectName);
         List<Coverity> coverityList = coverityService.list(c);
-        map.put("group", groupInfoList);
+        map.put("group", fsGroupInfoList);
         map.put("user", userList);
         map.put("coverity", coverityList);
         return new ReturnT<>(map);
@@ -142,9 +142,9 @@ public class ProjectController {
 
     @GetMapping("/group")
     public ReturnT<List<OptionVo>> group() {
-        LambdaQueryWrapper<GroupInfo> lq = Wrappers.lambdaQuery();
-        lq.select(GroupInfo::getChatId, GroupInfo::getName);
-        List<GroupInfo> list = groupInfoService.list(lq);
+        LambdaQueryWrapper<FsGroupInfo> lq = Wrappers.lambdaQuery();
+        lq.select(FsGroupInfo::getChatId, FsGroupInfo::getName);
+        List<FsGroupInfo> list = groupInfoService.list(lq);
         List<OptionVo> res = new ArrayList<>();
         list.forEach(i -> {
             OptionVo vo = new OptionVo();
