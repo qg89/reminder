@@ -563,7 +563,7 @@ public abstract class RedmineApi {
             subject.append("三级：").append(menuThree);
         }
         int lastChar = subject.lastIndexOf("-");
-        if (lastChar == subject.length() - 1) {
+        if (lastChar == subject.length() - 1 && subject.length() > 0) {
             subject.deleteCharAt(lastChar);
         }
         return subject.toString();

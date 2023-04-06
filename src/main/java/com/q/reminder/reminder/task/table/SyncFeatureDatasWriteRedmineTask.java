@@ -22,6 +22,7 @@ import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -94,6 +95,9 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                         continue;
                     }
                     String subject = RedmineApi.createSubject(redmineDataVo);
+                    if (StringUtils.isBlank(subject)) {
+                        subject = "默认主题";
+                    }
                     Issue issue = new Issue();
                     issue.setSubject(subject);
                     issue.setDescription(dscrptn);
