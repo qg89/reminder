@@ -9,6 +9,7 @@ import com.lark.oapi.service.im.v1.model.CreateMessageResp;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.*;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.util.List;
@@ -56,6 +57,11 @@ public class WraterExcelSendFeishuUtil {
         contentVo.setFile(file);
         contentVo.setReceiveId(weeklyVo.getPmOu());
         String fileKey = BaseFeishu.message().imUploadFile(contentVo);
+        if (StringUtils.isBlank(fileKey)) {
+            file.delete();
+            log.info("周报导出Excel,上传文件获取key为空");
+            return;
+        }
         JSONObject json = new JSONObject();
         json.put("file_key", fileKey);
         contentVo.setContent(json.toJSONString());
@@ -102,6 +108,11 @@ public class WraterExcelSendFeishuUtil {
         contentVo.setFile(file);
         contentVo.setReceiveId(weeklyVo.getPmOu());
         String fileKey = BaseFeishu.message().imUploadFile(contentVo);
+        if (StringUtils.isBlank(fileKey)) {
+            file.delete();
+            log.info("周报导出Excel,上传文件获取key为空");
+            return;
+        }
         JSONObject json = new JSONObject();
         json.put("file_key", fileKey);
         contentVo.setContent(json.toJSONString());

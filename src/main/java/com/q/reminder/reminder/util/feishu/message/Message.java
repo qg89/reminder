@@ -126,6 +126,9 @@ public class Message extends BaseFeishu {
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 消息上传文件异常");
         }
-        return resp.getData().getFileKey();
+        if (resp.success()) {
+            return resp.getData().getFileKey();
+        }
+        return null;
     }
 }
