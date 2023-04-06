@@ -114,7 +114,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     private Map<String, Object> radio() {
         List<Map<String, String>> radios = List.of(Map.of("0", "是"), Map.of("1", "否"));
         return Map.of(
-                "syncFeature", radios,
+//                "syncFeature", radios,
                 "isSendGroup", radios,
                 "weeklyCopyType", radios,
                 "weeklyType", radios,
@@ -129,8 +129,8 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         resMap.put("pid", "redmine项目ID");
         resMap.put("pkey", "redmine项目Key");
         resMap.put("pname", "redmine项目名称");
-        resMap.put("featureToken", "需求管理表Token");
-        resMap.put("syncFeature", "同步需求管理表");
+//        resMap.put("featureToken", "需求管理表Token");
+//        resMap.put("syncFeature", "同步需求管理表");
         resMap.put("projectShortName", "项目短名称");
         resMap.put("pmOu", "项目经理");
         resMap.put("pmKey", "项目经理RedmineKey");
