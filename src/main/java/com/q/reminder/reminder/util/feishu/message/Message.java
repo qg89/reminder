@@ -46,12 +46,13 @@ public class Message extends BaseFeishu {
      * @throws Exception
      */
     public CreateMessageResp sendContent(MessageVo vo) {
+        String content = vo.getContent();
         index++;
         CreateMessageReq req = CreateMessageReq.newBuilder()
                 .createMessageReqBody(CreateMessageReqBody.newBuilder()
                         .msgType(vo.getMsgType())
                         .receiveId(vo.getReceiveId())
-                        .content(vo.getContent())
+                        .content(content)
                         .uuid(UUID.randomUUID().toString())
                         .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
         CreateMessageResp resp = new CreateMessageResp();
@@ -60,7 +61,7 @@ public class Message extends BaseFeishu {
             resp = message.create(req, REQUEST_OPTIONS);
         } catch (Exception e) {
             if (!resp.success() && index <= 5) {
-                log.error("发送消息异常次数:【{}】：error: {}", index, resp.getMsg());
+                log.error("发送消息异常次数:【{}】：error: {}, content:{}", index, resp.getMsg(), content);
                 sendContent(vo);
             }
             throw new FeishuException(e, this.getClass().getName() + " 发送消息异常,次数：" + index);
@@ -78,11 +79,12 @@ public class Message extends BaseFeishu {
      */
     public CreateMessageResp sendContentTask(MessageVo vo, OmsLogger log) {
         index_task++;
+        String content = vo.getContent();
         CreateMessageReq req = CreateMessageReq.newBuilder()
                 .createMessageReqBody(CreateMessageReqBody.newBuilder()
                         .msgType(vo.getMsgType())
                         .receiveId(vo.getReceiveId())
-                        .content(vo.getContent())
+                        .content(content)
                         .uuid(UUID.randomUUID().toString())
                         .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
         CreateMessageResp resp = new CreateMessageResp();
@@ -91,13 +93,13 @@ public class Message extends BaseFeishu {
             resp = this.CLIENT.im().message().create(req, REQUEST_OPTIONS);
         } catch (Exception e) {
             if (!resp.success() && index_task <= 5) {
-                log.error("发送消息异常次数:【{}】：error: {}", index_task, resp.getMsg());
+                log.error("发送消息异常次数:【{}】：error: {}, content:{}", index_task, resp.getMsg(), content);
                 sendContentTask(vo, log);
             }
             throw new FeishuException(e, this.getClass().getName() + " 发送消息异常,次数：" + index_task);
         }
         if (!resp.success() && index_task <= 5) {
-            log.error("发送消息异常次数:【{}】：error: {}", index_task, resp.getMsg());
+            log.error("发送消息异常次数:【{}】：error: {}, content:{}", index_task, resp.getMsg(), content);
             sendContentTask(vo, log);
         }
         index_task = 0;
