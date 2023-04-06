@@ -43,16 +43,6 @@ public class RProjectInfo extends Model<RProjectInfo> implements Serializable {
      @TableField(value = "p_name")
      private String pname;
     /**
-     * 需求管理表token
-     */     
-     @TableField(value = "feature_token")
-     private String featureToken;
-    /**
-     * 同步需求管理表
-     */     
-     @TableField(value = "sync_feature")
-     private String syncFeature;
-    /**
      * 项目短名称
      */     
      @TableField(value = "project_short_name")
