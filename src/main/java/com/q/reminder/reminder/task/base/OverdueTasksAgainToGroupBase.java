@@ -154,15 +154,13 @@ public class OverdueTasksAgainToGroupBase {
 
         if (!overdueTask) {
             if (!overdueTaskHistoryService.saveOrUpdateBatch(historys)) {
-                JSONObject json = new JSONObject();
-                json.put("text", "任务保存历史记录失败！");
                 adminInfoList.forEach(e -> {
                     MessageVo sendVo = new MessageVo();
                     sendVo.setReceiveId(e.getMemberId());
-                    sendVo.setContent(json.toJSONString());
+                    sendVo.setContent("任务保存历史记录失败！");
                     sendVo.setMsgType("text");
                     sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-                    BaseFeishu.message().sendContentTask(sendVo, log);
+                    BaseFeishu.message().sendtext(sendVo, log);
                 });
                 return;
             }

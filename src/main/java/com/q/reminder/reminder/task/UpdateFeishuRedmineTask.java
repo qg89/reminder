@@ -1,6 +1,5 @@
 package com.q.reminder.reminder.task;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.FsGroupInfo;
@@ -70,16 +69,14 @@ public class UpdateFeishuRedmineTask implements BasicProcessor {
                 content.append("\r\n保存机器人所在群组和人员关系失败");
             }
             if (StringUtils.isNotBlank(content)) {
-                JSONObject json = new JSONObject();
-                json.put("text", content.toString());
                 MessageVo vo = new MessageVo();
                 vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
                 vo.setMsgType("text");
                 adminInfos.forEach(e -> {
                     try {
                         vo.setReceiveId(e.getMemberId());
-                        vo.setContent(json.toJSONString());
-                        BaseFeishu.message().sendContentTask(vo, log);
+                        vo.setContent(content.toString());
+                        BaseFeishu.message().sendtext(vo, log);
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }

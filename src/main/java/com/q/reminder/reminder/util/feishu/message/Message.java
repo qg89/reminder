@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.util.feishu.message;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.im.v1.ImService;
 import com.lark.oapi.service.im.v1.model.*;
 import com.q.reminder.reminder.exception.FeishuException;
@@ -85,6 +86,44 @@ public class Message extends BaseFeishu {
                         .msgType(vo.getMsgType())
                         .receiveId(vo.getReceiveId())
                         .content(content)
+                        .uuid(UUID.randomUUID().toString())
+                        .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
+        CreateMessageResp resp = new CreateMessageResp();
+        try {
+            Thread.sleep(1000 * 3);
+            resp = this.CLIENT.im().message().create(req, REQUEST_OPTIONS);
+        } catch (Exception e) {
+            if (!resp.success() && index_task <= 5) {
+                log.error("Task发送消息异常次数:【{}】：error: {}, content:{}", index_task, resp.getMsg(), content);
+                sendContentTask(vo, log);
+            }
+            throw new FeishuException(e, this.getClass().getName() + " Task发送消息异常,次数：" + index_task);
+        }
+        if (!resp.success() && index_task <= 5) {
+            log.error("Task发送消息异常次数:【{}】：error: {}, content:{}", index_task, resp.getMsg(), content);
+            sendContentTask(vo, log);
+        }
+        index_task = 0;
+        return resp;
+    }
+
+    /**
+     * 发送消息,文本
+     *
+     * @param vo
+     * @param log
+     * @return
+     */
+    public CreateMessageResp sendtext(MessageVo vo, OmsLogger log) {
+        index_task++;
+        JSONObject json = new JSONObject();
+        json.put("text", vo.getContent());
+        String content = vo.getContent();
+        CreateMessageReq req = CreateMessageReq.newBuilder()
+                .createMessageReqBody(CreateMessageReqBody.newBuilder()
+                        .msgType("text")
+                        .receiveId(vo.getReceiveId())
+                        .content(json.toJSONString())
                         .uuid(UUID.randomUUID().toString())
                         .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
         CreateMessageResp resp = new CreateMessageResp();
