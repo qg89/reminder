@@ -99,7 +99,7 @@ public class Message extends BaseFeishu {
             throw new FeishuException(e, this.getClass().getName() + " Task发送消息异常,次数：" + index_task);
         }
         if (!resp.success() && index_task <= 5) {
-            log.error("发Task送消息异常次数:【{}】：error: {}, content:{}", index_task, resp.getMsg(), content);
+            log.error("Task发送消息异常次数:【{}】：error: {}, content:{}", index_task, resp.getMsg(), content);
             sendContentTask(vo, log);
         }
         index_task = 0;
