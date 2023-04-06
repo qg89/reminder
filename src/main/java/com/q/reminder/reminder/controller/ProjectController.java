@@ -62,7 +62,7 @@ public class ProjectController {
         return ReturnT.SUCCESS;
     }
     @GetMapping("/t")
-    public List<FsGroupInfo> t() throws Exception {
+    public Object t() throws Exception {
        return BaseFeishu.groupMessage().getGroupToChats();
     }
 

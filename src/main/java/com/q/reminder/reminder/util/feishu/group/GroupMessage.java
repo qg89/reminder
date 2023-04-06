@@ -66,18 +66,17 @@ public class GroupMessage extends BaseFeishu {
         return list;
     }
 
-    public List<UserMemgerInfo> getMembersByChats(List<FsGroupInfo> chats, List<UserGroup> userGroupList) {
+    public List<UserMemgerInfo> getMembersInGroup( List<UserGroup> userGroupList) {
+        String chatId = "oc_92a0ac84a36bd7ea28a176e39adcac07";
         List<UserMemgerInfo> items = new ArrayList<>();
-        for (FsGroupInfo chat : chats) {
-            String chatId = chat.getChatId();
-            GetChatMembersReq req = GetChatMembersReq.newBuilder()
-                    .chatId(chatId)
-                    .memberIdType(GetChatMembersMemberIdTypeEnum.OPEN_ID)
-                    .pageSize(20)
-                    .build();
-            GetChatMembersResp resp;
-            try {
-                resp = CLIENT.im().chatMembers().get(req, REQUEST_OPTIONS);
+        GetChatMembersReq req = GetChatMembersReq.newBuilder()
+                .chatId(chatId)
+                .memberIdType(GetChatMembersMemberIdTypeEnum.OPEN_ID)
+                .pageSize(20)
+                .build();
+        GetChatMembersResp resp;
+        try {
+            resp = CLIENT.im().chatMembers().get(req, REQUEST_OPTIONS);
             } catch (Exception e) {
                 throw new FeishuException(e, this.getClass().getName() + " 通过机器人获取人员异常");
             }
@@ -92,7 +91,6 @@ public class GroupMessage extends BaseFeishu {
             if (data.getHasMore()) {
                 query(items, chatId, userGroupList, pageToken, req);
             }
-        }
         return items.stream().distinct().toList();
     }
 
