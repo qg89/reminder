@@ -24,6 +24,10 @@ public class FeishuException extends RuntimeException {
         sendContent(message, e);
     }
 
+    public FeishuException(String message) {
+        super(message);
+    }
+
     private void sendContent(String message, Throwable e) {
         JSONObject content = new JSONObject();
         JSONObject all = new JSONObject();
@@ -34,7 +38,11 @@ public class FeishuException extends RuntimeException {
         JSONArray atjsonArray = new JSONArray();
         JSONObject json = new JSONObject();
         json.put("tag", "text");
-        json.put("text", e.getMessage());
+        if (e != null) {
+            json.put("text", e.getMessage());
+        } else {
+            json.put("text", "");
+        }
         atjsonArray.add(json);
         contentJsonArray.add(atjsonArray);
 

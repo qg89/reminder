@@ -175,10 +175,12 @@ public class QueryTasksToMemberBase {
     }
 
     private void sendAdmin(OmsLogger log, StringBuilder contentAll, List<AdminInfo> adminInfoList) {
+        JSONObject json = new JSONObject();
+        json.put("text", contentAll.toString());
         adminInfoList.forEach(e -> {
             MessageVo sendVo = new MessageVo();
             sendVo.setReceiveId(e.getMemberId());
-            sendVo.setContent( contentAll.toString());
+            sendVo.setContent(json.toJSONString());
             sendVo.setMsgType("text");
             sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
             BaseFeishu.message().sendContentTask(sendVo, log);
