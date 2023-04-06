@@ -3,6 +3,7 @@ package com.q.reminder.reminder.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.vo.SendUserByGroupVo;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ import java.util.List;
  * @date :  2022.09.23 14:30
  */
 public interface UserMemberService extends IService<UserMemgerInfo> {
-    Boolean saveOrUpdateBatchAll(List<UserMemgerInfo> membersByChats);
+    Boolean saveOrUpdateBatchAll(List<UserMemgerInfo> membersByChats, OmsLogger log);
 
     /**
      * 查询可用发生群内的成员信息

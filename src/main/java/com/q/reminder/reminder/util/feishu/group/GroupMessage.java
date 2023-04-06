@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.lark.oapi.service.im.v1.enums.GetChatMembersMemberIdTypeEnum;
 import com.lark.oapi.service.im.v1.enums.ListChatUserIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.*;
-import com.q.reminder.reminder.entity.GroupInfo;
+import com.q.reminder.reminder.entity.FsGroupInfo;
 import com.q.reminder.reminder.entity.UserGroup;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.exception.FeishuException;
@@ -44,7 +44,7 @@ public class GroupMessage extends BaseFeishu {
      * @return
      * @throws Exception
      */
-    public List<GroupInfo> getGroupToChats() {
+    public List<FsGroupInfo> getGroupToChats() {
         ListChatReq req = ListChatReq.newBuilder().userIdType(ListChatUserIdTypeEnum.OPEN_ID).build();
         ListChatResp resp;
         try {
@@ -52,23 +52,23 @@ public class GroupMessage extends BaseFeishu {
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 获取机器人所在群组异常");
         }
-        List<GroupInfo> list = new ArrayList<>();
+        List<FsGroupInfo> list = new ArrayList<>();
         if (resp.success()) {
             ListChatRespBody data = resp.getData();
             ListChat[] items = data.getItems();
             ArrayList<ListChat> listChats = new ArrayList<>(Arrays.asList(items));
             listChats.forEach(e -> {
-                GroupInfo groupInfo = new GroupInfo();
-                BeanUtil.copyProperties(e, groupInfo);
-                list.add(groupInfo);
+                FsGroupInfo fsGroupInfo = new FsGroupInfo();
+                BeanUtil.copyProperties(e, fsGroupInfo);
+                list.add(fsGroupInfo);
             });
         }
         return list;
     }
 
-    public List<UserMemgerInfo> getMembersByChats(List<GroupInfo> chats, List<UserGroup> userGroupList) {
+    public List<UserMemgerInfo> getMembersByChats(List<FsGroupInfo> chats, List<UserGroup> userGroupList) {
         List<UserMemgerInfo> items = new ArrayList<>();
-        for (GroupInfo chat : chats) {
+        for (FsGroupInfo chat : chats) {
             String chatId = chat.getChatId();
             GetChatMembersReq req = GetChatMembersReq.newBuilder()
                     .chatId(chatId)

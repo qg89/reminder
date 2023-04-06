@@ -2,7 +2,7 @@ package com.q.reminder.reminder.task;
 
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.entity.AdminInfo;
-import com.q.reminder.reminder.entity.GroupInfo;
+import com.q.reminder.reminder.entity.FsGroupInfo;
 import com.q.reminder.reminder.entity.UserGroup;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.service.AdminInfoService;
@@ -46,7 +46,7 @@ public class UpdateFeishuRedmineTask implements BasicProcessor {
         OmsLogger log = context.getOmsLogger();
         ProcessResult processResult = new ProcessResult(true);
         try {
-            List<GroupInfo> groupToChats = BaseFeishu.groupMessage().getGroupToChats();
+            List<FsGroupInfo> groupToChats = BaseFeishu.groupMessage().getGroupToChats();
             List<AdminInfo> adminInfos = adminInfoService.list();
             log.info("获取机器人所在群组信息完成!");
             List<UserGroup> userGroupList = new ArrayList<>();
@@ -60,7 +60,7 @@ public class UpdateFeishuRedmineTask implements BasicProcessor {
                 content.append("\r\n更新机器人所在群组失败");
             }
             log.info("更新机器人所在群组完成!");
-            if (!userMemberService.saveOrUpdateBatchAll(membersByChats)) {
+            if (!userMemberService.saveOrUpdateBatchAll(membersByChats, log)) {
                 content.append("\r\n保存机器人所在群组和人员关系失败");
             }
             log.info("保存机器人所在群组和人员关系完成!");

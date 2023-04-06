@@ -1,7 +1,7 @@
 package com.q.reminder.reminder.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.q.reminder.reminder.entity.GroupInfo;
+import com.q.reminder.reminder.entity.FsGroupInfo;
 import com.q.reminder.reminder.mapper.GroupInfoMapping;
 import com.q.reminder.reminder.service.GroupInfoService;
 import com.q.reminder.reminder.vo.ChatProjectVo;
@@ -17,7 +17,7 @@ import java.util.List;
  * @date :  2022.09.27 13:24
  */
 @Service
-public class GroupInfoServiceImpl extends ServiceImpl<GroupInfoMapping, GroupInfo> implements GroupInfoService {
+public class GroupInfoServiceImpl extends ServiceImpl<GroupInfoMapping, FsGroupInfo> implements GroupInfoService {
 
     @Override
     public List<ChatProjectVo> listByProect(String pKey) {

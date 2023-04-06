@@ -6,14 +6,13 @@ import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.mapper.UserMapping;
 import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.vo.SendUserByGroupVo;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -23,11 +22,10 @@ import java.util.stream.Collectors;
  * @Description :
  * @date :  2022.09.23 14:32
  */
-@Log4j2
 @Service
 public class UserMemberServiceImpl extends ServiceImpl<UserMapping, UserMemgerInfo> implements UserMemberService {
     @Override
-    public Boolean saveOrUpdateBatchAll(List<UserMemgerInfo> membersByFeiShu) {
+    public Boolean saveOrUpdateBatchAll(List<UserMemgerInfo> membersByFeiShu, OmsLogger log) {
         List<UserMemgerInfo> data = new ArrayList<>(membersByFeiShu);
         // 现有在职人员
         List<UserMemgerInfo> userMemgerInfoList = this.list(Wrappers.<UserMemgerInfo>lambdaQuery().eq(UserMemgerInfo::getResign, "0"));

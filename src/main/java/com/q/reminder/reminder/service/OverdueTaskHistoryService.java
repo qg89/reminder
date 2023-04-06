@@ -1,7 +1,6 @@
 package com.q.reminder.reminder.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.q.reminder.reminder.entity.GroupInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
 
 /**

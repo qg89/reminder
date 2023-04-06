@@ -1,7 +1,7 @@
 package com.q.reminder.reminder.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.q.reminder.reminder.entity.GroupInfo;
+import com.q.reminder.reminder.entity.FsGroupInfo;
 import com.q.reminder.reminder.vo.ChatProjectVo;
 
 import java.util.List;
@@ -13,6 +13,6 @@ import java.util.List;
  * @Description :
  * @date :  2022.09.27 13:23
  */
-public interface GroupInfoService extends IService<GroupInfo> {
+public interface GroupInfoService extends IService<FsGroupInfo> {
     List<ChatProjectVo> listByProect(String pKey);
 }
