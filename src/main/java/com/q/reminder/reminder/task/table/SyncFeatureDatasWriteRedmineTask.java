@@ -158,7 +158,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
 
             if (DateUtil.dayOfWeek(new Date()) == 1) {
                 LambdaQueryWrapper<TTableFeatureTmp> query = Wrappers.lambdaQuery();
-                query.eq(TTableFeatureTmp::getWriteRedmine, "1");
+                query.in(TTableFeatureTmp::getWriteRedmine, "1", "4");
                 List<TTableFeatureTmp> tempList = tTableFeatureTmpService.list(query);
                 tTableFeatureTmpService.removeBatchByIds(tempList);
                 log.info("[需求管理表写入redmine] 周一删除历史数据完成");
