@@ -117,12 +117,16 @@ public abstract class RedmineApi {
 //                    new RequestParam("assigned_to_id", "*"),
                     new RequestParam("updated_on", DateUtil.today()));
             try {
-                transport.getObjectsList(Issue.class, params).forEach(e -> {
+                List<Issue> issueList = transport.getObjectsList(Issue.class, params);
+                if (CollectionUtils.isEmpty(issueList)) {
+                    continue;
+                }
+                issueList.forEach(e -> {
                     String assigneeName = e.getAssigneeName();
                     RedmineVo queryRedmineVo = new RedmineVo();
                     queryRedmineVo.setUpdatedOn(e.getUpdatedOn());
                     queryRedmineVo.setSubject(e.getSubject());
-                    queryRedmineVo.setRedmineId(e.getId() + "");
+                    queryRedmineVo.setRedmineId(String.valueOf(e.getId()));
                     queryRedmineVo.setAuthorName(e.getAuthorName());
                     if (StringUtils.isNotBlank(assigneeName)) {
                         queryRedmineVo.setAssigneeName(assigneeName.replace(" ", ""));
