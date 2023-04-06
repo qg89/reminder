@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * @author : saiko
  * @version : v1.0
  * @ClassName : com.q.reminder.reminder.task.SyncRedmineUserTask
- * @Description :
+ * @Description : 每10天同步各项目人员信息
  * @date :  2023.01.18 16:42
  */
 @Component
