@@ -14,6 +14,7 @@ import com.q.reminder.reminder.service.RedmineUserInfoService;
 import com.q.reminder.reminder.service.TTableFeatureTmpService;
 import com.q.reminder.reminder.service.TTableUserConfigService;
 import com.q.reminder.reminder.vo.table.FeatureUserConfigVo;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -60,6 +61,9 @@ public class TableFeatureController {
     @PostMapping("/user_config")
     public void userConfig(@RequestBody FeatureUserConfigVo vo) {
         String prjctKey = vo.getPrjctKey();
+        if (StringUtils.isBlank(prjctKey)) {
+            return;
+        }
         RProjectInfo RProjectInfo = projectInfoService.projectInfoByPrjctKey(prjctKey);
         LambdaQueryWrapper<RedmineUserInfo> lq = Wrappers.lambdaQuery();
         lq.eq(RedmineUserInfo::getRedmineType, RProjectInfo.getRedmineType());
