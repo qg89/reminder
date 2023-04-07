@@ -5,6 +5,7 @@ import com.q.reminder.reminder.entity.RedmineUserInfo;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RedmineUserInfoService;
 import com.q.reminder.reminder.util.RedmineApi;
+import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.bean.Issue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,25 +35,37 @@ public class SyncRedmineIssueToUserTask implements BasicProcessor {
     private RedmineUserInfoService redmineUserInfoService;
 
     @Override
-    public ProcessResult process(TaskContext context) throws Exception {
+    public ProcessResult process(TaskContext context) {
         String jobParams = context.getJobParams();
         OmsLogger log = context.getOmsLogger();
         log.info("[全部人员同步]-开始");
         List<RProjectInfo> projectList = projectInfoService.listAll();
-        List<RedmineUserInfo> data = new ArrayList<>();
-        for (RProjectInfo projectInfo : projectList) {
-            RedmineApi.queryIssues(projectInfo).stream().filter(e -> e.getAssigneeId() != null).collect(Collectors.toMap(Issue::getAssigneeName, Issue::getAssigneeId)).forEach((name, id) -> {
-                RedmineUserInfo user = new RedmineUserInfo();
-                user.setRedmineType(projectInfo.getRedmineType());
-                user.setAssigneeId(id);
-                user.setAssigneeName(name);
-                user.setUserName(name.replace(" ", ""));
-                data.add(user);
+        try {
+            projectList.stream().collect(Collectors.groupingBy(RProjectInfo::getRedmineType)).forEach((k, list) -> {
+                List<RedmineUserInfo> data = new ArrayList<>();
+                for (RProjectInfo projectInfo : list) {
+                    String redmineType = projectInfo.getRedmineType();
+                    try {
+                        RedmineApi.queryIssues(projectInfo).stream().filter(e -> e.getAssigneeId() != null).collect(Collectors.toMap(Issue::getAssigneeName, Issue::getAssigneeId)).forEach((name, id) -> {
+                            RedmineUserInfo user = new RedmineUserInfo();
+                            user.setRedmineType(redmineType);
+                            user.setAssigneeId(id);
+                            user.setAssigneeName(name);
+                            user.setUserName(name.replace(" ", ""));
+                            data.add(user);
+                        });
+                    } catch (RedmineException e) {
+                        log.error("[全部人员同步]-获取Issue异常", e);
+                    }
+                    ArrayList<RedmineUserInfo> collect = data.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(RedmineUserInfo::getAssigneeId))), ArrayList::new));
+                    redmineUserInfoService.saveOrupdateMultiIdAll(collect);
+                    log.info("[全部人员同步]-完成，redmineType：{} ", redmineType);
+                }
             });
+        } catch (Exception e) {
+            log.error("[全部人员同步]-异常", e);
+            return new ProcessResult(false);
         }
-        ArrayList<RedmineUserInfo> collect = data.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(RedmineUserInfo::getAssigneeId))), ArrayList::new));
-        redmineUserInfoService.saveOrupdateMultiIdAll(collect);
-        log.info("[全部人员同步]-完成");
         return new ProcessResult(true);
     }
 }
