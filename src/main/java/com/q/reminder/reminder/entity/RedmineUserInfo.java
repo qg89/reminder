@@ -23,12 +23,12 @@ public class RedmineUserInfo implements Serializable {
     @TableField(value = "assignee_name", fill = FieldFill.INSERT_UPDATE)
     private String assigneeName;
 
-    @TableField(value = "user_name", fill = FieldFill.INSERT_UPDATE)
-    private String userName;
-
     @TableField(value = "redmine_type", fill = FieldFill.INSERT_UPDATE)
     @MppMultiId
     private String redmineType;
+
+    @TableField(value = "user_name", fill = FieldFill.INSERT_UPDATE)
+    private String userName;
 
     @TableField("is_delete")
     @TableLogic(value = "0", delval = "1")

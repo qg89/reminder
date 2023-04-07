@@ -35,6 +35,7 @@ public class SyncRedmineIssueToUserTask implements BasicProcessor {
     public ProcessResult process(TaskContext context) throws Exception {
         String jobParams = context.getJobParams();
         OmsLogger log = context.getOmsLogger();
+        log.info("[全部人员同步]-开始");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RedmineUserInfo> data = new ArrayList<>();
         for (RProjectInfo projectInfo : projectList) {
@@ -50,7 +51,7 @@ public class SyncRedmineIssueToUserTask implements BasicProcessor {
             }
         }
         redmineUserInfoService.saveOrupdateMultiIdAll(data);
-        log.info("全部更新完成");
+        log.info("[全部人员同步]-完成");
         return new ProcessResult(true);
     }
 }
