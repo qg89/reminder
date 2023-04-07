@@ -14,8 +14,8 @@ import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author : saiko
@@ -39,16 +39,14 @@ public class SyncRedmineIssueToUserTask implements BasicProcessor {
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RedmineUserInfo> data = new ArrayList<>();
         for (RProjectInfo projectInfo : projectList) {
-            Collection<? extends Issue> issues = RedmineApi.queryIssues(projectInfo).stream().filter(e -> e.getAssigneeId() != null).toList();
-            for (Issue issue : issues) {
-                String assigneeName = issue.getAssigneeName();
+            RedmineApi.queryIssues(projectInfo).stream().filter(e -> e.getAssigneeId() != null).collect(Collectors.toMap(Issue::getAssigneeName, Issue::getAssigneeId)).forEach((name, id) -> {
                 RedmineUserInfo user = new RedmineUserInfo();
                 user.setRedmineType(projectInfo.getRedmineType());
-                user.setAssigneeId(issue.getAssigneeId());
-                user.setAssigneeName(assigneeName);
-                user.setUserName(assigneeName.replace(" ", ""));
+                user.setAssigneeId(id);
+                user.setAssigneeName(name);
+                user.setUserName(name.replace(" ", ""));
                 data.add(user);
-            }
+            });
         }
         redmineUserInfoService.saveOrupdateMultiIdAll(data);
         log.info("[全部人员同步]-完成");
