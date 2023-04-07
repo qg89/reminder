@@ -7,8 +7,8 @@ import com.lark.oapi.core.cache.LocalCache;
 import com.lark.oapi.core.enums.BaseUrlEnum;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.constant.RedisKeyContents;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +30,11 @@ public class FeishuService {
     @Autowired
     private FeishuProperties feishuProperties;
 
-    @Cacheable(cacheNames = RedisKeyContents.FEISHU_TENANT_ACCESS_TOKEN, key = "'expire'")
     public synchronized String tenantAccessToken() {
+        Object tenantToken = redisTemplate.opsForValue().get(RedisKeyContents.FEISHU_TENANT_ACCESS_TOKEN_KEY);
+        if (tenantToken != null && StringUtils.isNotBlank(tenantToken.toString())) {
+            return tenantToken.toString();
+        }
         String post = HttpUtil.post("https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal", Map.of("app_id", feishuProperties.getAppId(), "app_secret", feishuProperties.getAppSecret()));
         JSONObject token = JSONObject.parseObject(post);
         String tenantAccessToken = token.getString("tenant_access_token");
