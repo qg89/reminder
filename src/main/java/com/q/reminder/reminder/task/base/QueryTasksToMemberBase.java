@@ -58,8 +58,8 @@ public class QueryTasksToMemberBase {
      * @param log
      */
     public void feiShu(int expiredDay, List<String> noneStatusList, Boolean contentStatus, OmsLogger log) {
-        StringBuilder contentAll = new StringBuilder();
-        contentAll.append("当日执行情况如下(").append(new DateTime().toString("yyyy-MM-dd")).append("):\r\n");
+        StringBuilder sendAdminContent = new StringBuilder();
+        sendAdminContent.append("当日执行情况如下(").append(new DateTime().toString("yyyy-MM-dd")).append("):\r\n");
 
         // 通过人员查看对应redmine人员关系，并返回redmine姓名和飞书member_id关系
         List<UserMemgerInfo> list = userMemberService.list(Wrappers.<UserMemgerInfo>lambdaQuery().eq(UserMemgerInfo::getResign, 0));
@@ -75,16 +75,13 @@ public class QueryTasksToMemberBase {
         vo.setContainsStatus(contentStatus);
         Map<String, List<RedmineVo>> listMap = RedmineApi.queryUserByExpiredDayList(vo, projectInfos).stream().collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
         if (CollectionUtils.isEmpty(listMap)) {
-            contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(0).append("\r\n");
-            contentAll.append("执行完成!");
-            sendAdmin(log, contentAll, adminInfoList);
+            sendAdminContent.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(0).append("\r\n");
+            sendAdminContent.append("执行完成!");
+            sendAdmin(log, sendAdminContent, adminInfoList);
             return;
         }
-        contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append(" 查询redmine过期人员集合完成!").append("\r\n");
-        // key: member_id, value: content
-        List<MessageVo> sendVoList = new ArrayList<>();
+        sendAdminContent.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append(" 查询redmine过期人员集合完成!").append("\r\n");
         List<OverdueTaskHistory> historys = new ArrayList<>();
-
         listMap.forEach((assigneeName, issueList) -> {
             JSONObject con = new JSONObject();
             JSONObject all = new JSONObject();
@@ -157,20 +154,14 @@ public class QueryTasksToMemberBase {
             sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
             sendVo.setMsgType("post");
             sendVo.setReceiveId(memberId);
-            sendVoList.add(sendVo);
-        });
-        if (CollectionUtils.isEmpty(sendVoList)) {
-            contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("当日暂无过期任务!").append("\r\n");
-        }
-        contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("发送飞书任务开始!").append("\r\n");
-        sendVoList.forEach(sendVo -> {
             BaseFeishu.message().sendContentTask(sendVo, log);
-            log.info("[过期任务提醒个人]-发送飞书任务完成, 人员MemberId：{}", sendVo.getReceiveId());
+            log.info("[过期任务提醒个人]-发送飞书任务, 人员MemberId：{}", sendVo.getReceiveId());
         });
-        contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("发送飞书任务完成!").append("\r\n");
+
+        sendAdminContent.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("发送飞书任务完成!").append("\r\n");
         overdueTaskHistoryService.saveOrUpdateBatch(historys);
-        contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("执行完成!").append("\r\n");
-        sendAdmin(log, contentAll, adminInfoList);
+        sendAdminContent.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("执行完成!").append("\r\n");
+        sendAdmin(log, sendAdminContent, adminInfoList);
         log.info("过期任务提醒个人,执行完成");
     }
 
