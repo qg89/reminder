@@ -172,7 +172,7 @@ public class QueryTasksToMemberBase {
             sendVo.setContent(contentAll.toString());
             sendVo.setMsgType("text");
             sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-            BaseFeishu.message().sendtext(sendVo, log);
+            BaseFeishu.message().sendText(sendVo, log);
         });
     }
 }

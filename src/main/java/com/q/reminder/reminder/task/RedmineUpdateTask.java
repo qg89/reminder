@@ -125,7 +125,7 @@ public class RedmineUpdateTask implements BasicProcessor {
         vo.setReceiveId(userNameMap.get(assigneeName));
         vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
         vo.setContent(con.toJSONString());
-        CreateMessageResp resp = BaseFeishu.message().sendContentTask(vo, log);
+        CreateMessageResp resp = BaseFeishu.message().sendContent(vo, log);
         boolean success = resp.success();
         if (!success) {
             log.info("[redmine]-变更提醒失败, 发送给: {},error Code: {}, error msg : {} , error： {}！", assigneeName,resp.getCode(), resp.getMsg(), resp.getError());
