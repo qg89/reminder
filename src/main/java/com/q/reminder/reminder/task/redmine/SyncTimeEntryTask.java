@@ -6,7 +6,6 @@ import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdTimeEntryService;
 import com.q.reminder.reminder.util.RedmineApi;
-import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,37 +33,39 @@ public class SyncTimeEntryTask implements BasicProcessor {
     private RdTimeEntryService rdTimeEntryService;
 
     @Override
-    public ProcessResult process(TaskContext context) throws Exception {
+    public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
+        log.info("【redmine】同步redmine工时-start");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<TimeEntry> timeData = new ArrayList<>();
-        projectList.forEach(projectInfo -> {
-            projectInfo.setStartDay(DateUtil.beginOfWeek(DateTime.now().minusWeeks(1).toDate()));
-            try {
+        try {
+            for (RProjectInfo projectInfo : projectList) {
+                projectInfo.setStartDay(DateUtil.beginOfWeek(DateTime.now().minusWeeks(1).toDate()));
                 timeData.addAll(RedmineApi.queryTimes(projectInfo));
-            } catch (RedmineException e) {
-                log.error("【redmine】同步redmine工时-查询工时异常", e.getMessage());
             }
-        });
-        List<RdTimeEntry> data = new ArrayList<>();
-        for (TimeEntry timeEntry : timeData) {
-            RdTimeEntry time = new RdTimeEntry();
-            time.setId(timeEntry.getId());
-            time.setActivityId(timeEntry.getActivityId());
-            time.setComment(timeEntry.getComment());
-            time.setActivityName(timeEntry.getActivityName());
-            time.setHours(timeEntry.getHours());
-            time.setCreatedOn(timeEntry.getCreatedOn());
-            time.setIssueId(timeEntry.getIssueId());
-            time.setProjectId(timeEntry.getProjectId());
-            time.setProjectName(timeEntry.getProjectName());
-            time.setSpentOn(timeEntry.getSpentOn());
-            time.setUserid(timeEntry.getUserId());
-            time.setUpdatedOn(timeEntry.getUpdatedOn());
-            time.setUserName(timeEntry.getUserName());
-            data.add(time);
+            log.info("【redmine】同步redmine工时-查询完成，size:{}", timeData.size());
+            List<RdTimeEntry> data = new ArrayList<>();
+            for (TimeEntry timeEntry : timeData) {
+                RdTimeEntry time = new RdTimeEntry();
+                time.setId(timeEntry.getId());
+                time.setActivityId(timeEntry.getActivityId());
+                time.setComment(timeEntry.getComment());
+                time.setActivityName(timeEntry.getActivityName());
+                time.setHours(timeEntry.getHours());
+                time.setCreatedOn(timeEntry.getCreatedOn());
+                time.setIssueId(timeEntry.getIssueId());
+                time.setProjectId(timeEntry.getProjectId());
+                time.setProjectName(timeEntry.getProjectName());
+                time.setSpentOn(timeEntry.getSpentOn());
+                time.setUserid(timeEntry.getUserId());
+                time.setUpdatedOn(timeEntry.getUpdatedOn());
+                time.setUserName(timeEntry.getUserName());
+                data.add(time);
+            }
+            rdTimeEntryService.saveOrUpdateBatchByMultiId(data);
+        } catch (Exception e) {
+            log.error("【redmine】同步redmine工时-查询工时异常", e);
         }
-        rdTimeEntryService.saveOrUpdateBatchByMultiId(data);
         return new ProcessResult(true);
     }
 }
