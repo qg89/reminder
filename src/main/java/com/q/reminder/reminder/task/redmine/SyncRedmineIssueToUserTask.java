@@ -46,7 +46,7 @@ public class SyncRedmineIssueToUserTask implements BasicProcessor {
                 for (RProjectInfo projectInfo : list) {
                     String redmineType = projectInfo.getRedmineType();
                     try {
-                        RedmineApi.queryIssues(projectInfo).stream().filter(e -> e.getAssigneeId() != null).collect(Collectors.toMap(Issue::getAssigneeName, Issue::getAssigneeId)).forEach((name, id) -> {
+                        RedmineApi.queryIssues(projectInfo).stream().filter(e -> e.getAssigneeId() != null).collect(Collectors.toMap(Issue::getAssigneeName, Issue::getAssigneeId, (v1, v2) -> v1)).forEach((name, id) -> {
                             RedmineUserInfo user = new RedmineUserInfo();
                             user.setRedmineType(redmineType);
                             user.setAssigneeId(id);
