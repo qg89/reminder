@@ -39,7 +39,7 @@ public class FeishuService {
         if (expire > 30) {
             expire = (expire - 30);
         }
-        redisTemplate.opsForValue().set(RedisKeyContents.FEISHU_TENANT_ACCESS_TOKEN_KEY, tenantAccessToken, expire, TimeUnit.SECONDS);
+        redisTemplate.opsForValue().set(RedisKeyContents.FEISHU_TENANT_ACCESS_TOKEN_KEY, tenantAccessToken, expire, TimeUnit.MINUTES);
         return tenantAccessToken;
     }
 
@@ -49,7 +49,7 @@ public class FeishuService {
                 .requestTimeout(5, TimeUnit.MINUTES)
                 .tokenCache(LocalCache.getInstance())
                 .openBaseUrl(BaseUrlEnum.FeiShu)
-                .disableTokenCache()
+//                .disableTokenCache()
                 .build();
     }
 }
