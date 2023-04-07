@@ -17,16 +17,16 @@ import java.io.Serializable;
 @Data
 public class RedmineUserInfo implements Serializable {
 
-    @TableField("assignee_id")
+    @TableField(value = "assignee_id", fill = FieldFill.INSERT_UPDATE)
     @MppMultiId
     private Integer assigneeId;
-    @TableField("assignee_name")
-
+    @TableField(value = "assignee_name", fill = FieldFill.INSERT_UPDATE)
     private String assigneeName;
-    @TableField("user_name")
+
+    @TableField(value = "user_name", fill = FieldFill.INSERT_UPDATE)
     private String userName;
 
-    @TableField("redmine_type")
+    @TableField(value = "redmine_type", fill = FieldFill.INSERT_UPDATE)
     @MppMultiId
     private String redmineType;
 
