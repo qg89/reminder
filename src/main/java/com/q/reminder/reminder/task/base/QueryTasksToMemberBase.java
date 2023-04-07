@@ -154,7 +154,7 @@ public class QueryTasksToMemberBase {
             sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
             sendVo.setMsgType("post");
             sendVo.setReceiveId(memberId);
-            BaseFeishu.message().sendContentTask(sendVo, log);
+            BaseFeishu.message().sendContent(sendVo, log);
             log.info("[过期任务提醒个人]-发送飞书任务, 人员MemberId：{}", sendVo.getReceiveId());
         });
 

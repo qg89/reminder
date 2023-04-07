@@ -137,7 +137,7 @@ public class OverdueTasksAgainToGroupBase {
             m.setMsgType("post");
             try {
                 String name = groupInfo.getName();
-                CreateMessageResp resp = BaseFeishu.message().sendContentTask(m, log);
+                CreateMessageResp resp = BaseFeishu.message().sendContent(m, log);
                 boolean success = resp.success();
                 if (!success) {
                     log.info("群发送,过期任务提醒群组, 发送给: {}, error msg : {} ！", name, resp.getMsg());
