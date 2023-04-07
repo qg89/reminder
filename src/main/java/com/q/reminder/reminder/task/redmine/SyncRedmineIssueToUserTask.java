@@ -41,16 +41,14 @@ public class SyncRedmineIssueToUserTask implements BasicProcessor {
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RedmineUserInfo> data = new ArrayList<>();
         for (RProjectInfo projectInfo : projectList) {
-            List<? extends Issue> li = RedmineApi.queryIssues(projectInfo).stream().filter(e -> e.getAssigneeId() != null).toList();
-            for (Issue issue : li) {
-                String name = issue.getAssigneeName();
+            RedmineApi.queryIssues(projectInfo).stream().filter(e -> e.getAssigneeId() != null).collect(Collectors.toMap(Issue::getAssigneeName, Issue::getAssigneeId)).forEach((name, id) -> {
                 RedmineUserInfo user = new RedmineUserInfo();
                 user.setRedmineType(projectInfo.getRedmineType());
-                user.setAssigneeId(issue.getAssigneeId());
+                user.setAssigneeId(id);
                 user.setAssigneeName(name);
                 user.setUserName(name.replace(" ", ""));
                 data.add(user);
-            }
+            });
         }
         ArrayList<RedmineUserInfo> collect = data.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(RedmineUserInfo::getAssigneeId))), ArrayList::new));
         redmineUserInfoService.saveOrupdateMultiIdAll(collect);
