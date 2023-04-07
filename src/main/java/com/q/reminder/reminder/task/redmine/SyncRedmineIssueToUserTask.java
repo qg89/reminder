@@ -39,7 +39,7 @@ public class SyncRedmineIssueToUserTask implements BasicProcessor {
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RedmineUserInfo> data = new ArrayList<>();
         for (RProjectInfo projectInfo : projectList) {
-            Collection<? extends Issue> issues = RedmineApi.queryIssues(projectInfo);
+            Collection<? extends Issue> issues = RedmineApi.queryIssues(projectInfo).stream().filter(e -> e.getAssigneeId() != null).toList();
             for (Issue issue : issues) {
                 String assigneeName = issue.getAssigneeName();
                 RedmineUserInfo user = new RedmineUserInfo();
