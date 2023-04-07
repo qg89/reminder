@@ -48,7 +48,7 @@ public class GroupMessage extends BaseFeishu {
         ListChatReq req = ListChatReq.newBuilder().userIdType(ListChatUserIdTypeEnum.OPEN_ID).build();
         ListChatResp resp;
         try {
-            resp = CLIENT.im().chat().list(req, REQUEST_OPTIONS);
+            resp = CLIENT.im().chat().list(req);
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 获取机器人所在群组异常");
         }
@@ -76,7 +76,7 @@ public class GroupMessage extends BaseFeishu {
                 .build();
         GetChatMembersResp resp;
         try {
-            resp = CLIENT.im().chatMembers().get(req, REQUEST_OPTIONS);
+            resp = CLIENT.im().chatMembers().get(req);
             } catch (Exception e) {
                 throw new FeishuException(e, this.getClass().getName() + " 通过机器人获取人员异常");
             }
@@ -114,7 +114,7 @@ public class GroupMessage extends BaseFeishu {
         req.setPageToken(pageToken);
         GetChatMembersResp resp;
         try {
-            resp = CLIENT.im().chatMembers().get(req, REQUEST_OPTIONS);
+            resp = CLIENT.im().chatMembers().get(req);
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 通过机器人获取人员分页查询异常");
         }

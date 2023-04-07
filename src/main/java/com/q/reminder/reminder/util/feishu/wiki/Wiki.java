@@ -46,7 +46,7 @@ public class Wiki extends BaseFeishu {
                 .build();
         CopySpaceNodeResp resp = null;
         try {
-            resp = CLIENT.wiki().spaceNode().copy(req, REQUEST_OPTIONS);
+            resp = CLIENT.wiki().spaceNode().copy(req);
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 复制知识空间节点异常");
         }
@@ -66,7 +66,7 @@ public class Wiki extends BaseFeishu {
                 .build();
         GetNodeSpaceResp resp;
         try {
-            resp = CLIENT.wiki().space().getNode(req, REQUEST_OPTIONS);
+            resp = CLIENT.wiki().space().getNode(req);
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 获取知识空间节点信息异常");
         }
@@ -90,7 +90,7 @@ public class Wiki extends BaseFeishu {
                 .build();
         GetNodeSpaceResp resp;
         try {
-            resp = CLIENT.wiki().space().getNode(req, REQUEST_OPTIONS);
+            resp = CLIENT.wiki().space().getNode(req);
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 知识空间获取文件详情异常");
         }

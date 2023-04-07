@@ -48,7 +48,7 @@ public class Upload extends BaseFeishu {
                             .file(vo.getFile())
                             .build()
                     ).build()
-                    , REQUEST_OPTIONS
+                    
             );
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 上传素材异常");

@@ -52,7 +52,7 @@ public class FeishuService {
                 .requestTimeout(5, TimeUnit.MINUTES)
                 .tokenCache(LocalCache.getInstance())
                 .openBaseUrl(BaseUrlEnum.FeiShu)
-                .disableTokenCache()
+//                .disableTokenCache()
                 .build();
     }
 }

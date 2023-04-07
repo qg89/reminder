@@ -54,7 +54,7 @@ public class Space extends BaseFeishu {
                 .build();
         CopyFileResp resp = null;
         try {
-            resp = CLIENT.drive().file().copy(req, REQUEST_OPTIONS);
+            resp = CLIENT.drive().file().copy(req);
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 复制文件异常");
         }
@@ -84,7 +84,7 @@ public class Space extends BaseFeishu {
         // 发起请求
         QuerySpreadsheetSheetResp resp = null;
         try {
-            resp = CLIENT.sheets().spreadsheetSheet().query(req, REQUEST_OPTIONS);
+            resp = CLIENT.sheets().spreadsheetSheet().query(req);
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 获取电子表格sheets异常");
         }

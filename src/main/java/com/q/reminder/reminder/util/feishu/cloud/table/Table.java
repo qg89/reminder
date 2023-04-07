@@ -59,7 +59,7 @@ public class Table extends BaseFeishu {
                 req.setPageToken(pageToken);
             }
             try {
-                resp = CLIENT.bitable().appTableRecord().list(req, REQUEST_OPTIONS);
+                resp = CLIENT.bitable().appTableRecord().list(req);
             } catch (Exception e) {
                 throw new FeishuException(e, this.getClass().getName() + " 多为表格-记录-列出视图记录异常");
             }
@@ -93,7 +93,7 @@ public class Table extends BaseFeishu {
                         .build())
                 .build();
         try {
-            client.bitable().appTableRecord().batchCreate(req, REQUEST_OPTIONS);
+            client.bitable().appTableRecord().batchCreate(req);
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 多为表格-记录-批量创建记录异常");
         }
@@ -112,7 +112,7 @@ public class Table extends BaseFeishu {
                 .batchDeleteAppTableRecordReqBody(BatchDeleteAppTableRecordReqBody.newBuilder().records(records).build())
                 .build();
         try {
-            CLIENT.bitable().appTableRecord().batchDelete(req, REQUEST_OPTIONS);
+            CLIENT.bitable().appTableRecord().batchDelete(req);
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 多为表格-记录-批量删除记录异常");
         }
@@ -133,7 +133,7 @@ public class Table extends BaseFeishu {
                 .batchUpdateAppTableRecordReqBody(reqBody)
                 .build();
         try {
-            CLIENT.bitable().appTableRecord().batchUpdate(req, REQUEST_OPTIONS);
+            CLIENT.bitable().appTableRecord().batchUpdate(req);
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 多为表格-记录-批量更新记录异常");
         }
@@ -155,7 +155,7 @@ public class Table extends BaseFeishu {
                         .build())
                 .build();
         try {
-            CLIENT.bitable().appTableRecord().batchCreate(req, REQUEST_OPTIONS);
+            CLIENT.bitable().appTableRecord().batchCreate(req);
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 多为表格-记录-批量创建记录异常");
         }

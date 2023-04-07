@@ -51,7 +51,7 @@ public class Documents extends BaseFeishu {
                     .documentRevisionId(-1)
                     .userIdType(PatchDocumentBlockUserIdTypeEnum.USER_ID)
                     .updateBlockRequest(update)
-                    .build(), REQUEST_OPTIONS);
+                    .build());
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 更新块异常");
         }
@@ -78,7 +78,7 @@ public class Documents extends BaseFeishu {
 
         BatchUpdateDocumentBlockResp resp;
         try {
-            resp = CLIENT.docx().documentBlock().batchUpdate(req, REQUEST_OPTIONS);
+            resp = CLIENT.docx().documentBlock().batchUpdate(req);
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 批量更新块异常");
         }
@@ -108,7 +108,7 @@ public class Documents extends BaseFeishu {
         // 发起请求
         ListDocumentBlockResp resp = null;
         try {
-            resp = CLIENT.docx().documentBlock().list(req, REQUEST_OPTIONS);
+            resp = CLIENT.docx().documentBlock().list(req);
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 获取文档所有块异常");
         }

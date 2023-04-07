@@ -58,7 +58,7 @@ public class Message extends BaseFeishu {
                         .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
         CreateMessageResp resp = new CreateMessageResp();
         try {
-            resp = CLIENT.im().message().create(req, REQUEST_OPTIONS);
+            resp = CLIENT.im().message().create(req);
         } catch (Exception e) {
             if (!resp.success() && index <= 5) {
                 log.error("发送消息异常次数:【{}】：error: {}, content:{}", index, resp.getMsg(), content);
@@ -98,7 +98,7 @@ public class Message extends BaseFeishu {
     private CreateMessageResp getCreateMessageResp(MessageVo vo, OmsLogger log, String content, CreateMessageReq req) {
         CreateMessageResp resp = new CreateMessageResp();
         try {
-            resp = this.CLIENT.im().message().create(req, REQUEST_OPTIONS);
+            resp = this.CLIENT.im().message().create(req);
         } catch (Exception e) {
             if (!resp.success() && index_task <= 5) {
                 log.error("Task发送消息异常次数:【{}】：error: {}, content:{}", index_task, resp.getMsg(), content);
@@ -154,7 +154,7 @@ public class Message extends BaseFeishu {
                 .build();
         CreateFileResp resp;
         try {
-            resp = CLIENT.im().file().create(req, REQUEST_OPTIONS);
+            resp = CLIENT.im().file().create(req);
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 消息上传文件异常");
         }
