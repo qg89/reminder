@@ -1,6 +1,5 @@
 package com.q.reminder.reminder.task.table;
 
-import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.service.bitable.v1.model.AppTableRecord;
@@ -160,19 +159,14 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                 log.info("[需求管理表写入redmine] 更新多维表格 完成， size：{}", records.size());
             }
 
-            if (DateUtil.dayOfWeek(new Date()) == 1) {
-                LambdaQueryWrapper<TTableFeatureTmp> query = Wrappers.lambdaQuery();
-                query.in(TTableFeatureTmp::getWriteRedmine, "1", "4");
-                List<TTableFeatureTmp> tempList = tTableFeatureTmpService.list(query);
-                tTableFeatureTmpService.removeBatchByIds(tempList);
-                log.info("[需求管理表写入redmine] 周一删除历史数据完成");
-            }
             log.info("[需求管理表写入redmine] 执行完成");
         } catch (Exception e) {
             processResult.setMsg("[需求管理表写入redmine] 执行异常");
             processResult.setSuccess(false);
             log.error("[需求管理表写入redmine] 执行异常", e);
         }
+        tTableFeatureTmpService.removeBatchByIds(tTableFeatureTmpService.list(Wrappers.<TTableFeatureTmp>lambdaQuery().in(TTableFeatureTmp::getWriteRedmine, "1", "4")));
+        log.info("[需求管理表写入redmine] 删除历史数据完成!");
         return processResult;
     }
 }
