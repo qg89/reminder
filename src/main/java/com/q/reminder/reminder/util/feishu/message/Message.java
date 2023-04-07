@@ -1,13 +1,13 @@
 package com.q.reminder.reminder.util.feishu.message;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.lark.oapi.service.im.v1.ImService;
 import com.lark.oapi.service.im.v1.model.*;
 import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.ContentVo;
 import com.q.reminder.reminder.vo.MessageVo;
 import lombok.extern.log4j.Log4j2;
+import org.jetbrains.annotations.NotNull;
 import tech.powerjob.worker.log.OmsLogger;
 
 import java.io.File;
@@ -57,15 +57,18 @@ public class Message extends BaseFeishu {
                         .uuid(UUID.randomUUID().toString())
                         .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
         CreateMessageResp resp = new CreateMessageResp();
-        ImService.Message message = CLIENT.im().message();
         try {
-            resp = message.create(req, REQUEST_OPTIONS);
+            resp = CLIENT.im().message().create(req, REQUEST_OPTIONS);
         } catch (Exception e) {
             if (!resp.success() && index <= 5) {
                 log.error("发送消息异常次数:【{}】：error: {}, content:{}", index, resp.getMsg(), content);
                 sendContent(vo);
             }
             throw new FeishuException(e, this.getClass().getName() + " 发送消息异常,次数：" + index);
+        }
+        if (!resp.success() && index <= 5) {
+            log.error("Task发送消息异常次数:【{}】：error: {}, content:{}", index, resp.getMsg(), content);
+            sendContent(vo);
         }
         index = 0;
         return resp;
@@ -88,9 +91,13 @@ public class Message extends BaseFeishu {
                         .content(content)
                         .uuid(UUID.randomUUID().toString())
                         .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
+        return getCreateMessageResp(vo, log, content, req);
+    }
+
+    @NotNull
+    private CreateMessageResp getCreateMessageResp(MessageVo vo, OmsLogger log, String content, CreateMessageReq req) {
         CreateMessageResp resp = new CreateMessageResp();
         try {
-            Thread.sleep(1000 * 3);
             resp = this.CLIENT.im().message().create(req, REQUEST_OPTIONS);
         } catch (Exception e) {
             if (!resp.success() && index_task <= 5) {
@@ -114,7 +121,7 @@ public class Message extends BaseFeishu {
      * @param log
      * @return
      */
-    public CreateMessageResp sendtext(MessageVo vo, OmsLogger log) {
+    public CreateMessageResp sendText(MessageVo vo, OmsLogger log) {
         index_task++;
         JSONObject json = new JSONObject();
         json.put("text", vo.getContent());
@@ -126,23 +133,7 @@ public class Message extends BaseFeishu {
                         .content(json.toJSONString())
                         .uuid(UUID.randomUUID().toString())
                         .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
-        CreateMessageResp resp = new CreateMessageResp();
-        try {
-            Thread.sleep(1000 * 3);
-            resp = this.CLIENT.im().message().create(req, REQUEST_OPTIONS);
-        } catch (Exception e) {
-            if (!resp.success() && index_task <= 5) {
-                log.error("Task发送消息异常次数:【{}】：error: {}, content:{}", index_task, resp.getMsg(), content);
-                sendContent(vo, log);
-            }
-            throw new FeishuException(e, this.getClass().getName() + " Task发送消息异常,次数：" + index_task);
-        }
-        if (!resp.success() && index_task <= 5) {
-            log.error("Task发送消息异常次数:【{}】：error: {}, content:{}", index_task, resp.getMsg(), content);
-            sendContent(vo, log);
-        }
-        index_task = 0;
-        return resp;
+        return getCreateMessageResp(vo, log, content, req);
     }
 
     /**
