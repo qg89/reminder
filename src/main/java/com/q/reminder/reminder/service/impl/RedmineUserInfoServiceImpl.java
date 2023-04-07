@@ -44,7 +44,6 @@ public class RedmineUserInfoServiceImpl extends MppServiceImpl<RedmineUserInfoMa
     }
 
     @Override
-    @Cacheable(cacheNames = RedisKeyContents.REDMINE_USERINFO_REDMINE_TYPE, key = "#redmineType", unless = "#redmineType == null")
     public List<RedmineUserInfo> listUsers(String redmineType) {
         LambdaQueryWrapper<RedmineUserInfo> lq = Wrappers.lambdaQuery();
         lq.eq(RedmineUserInfo::getRedmineType, redmineType);
