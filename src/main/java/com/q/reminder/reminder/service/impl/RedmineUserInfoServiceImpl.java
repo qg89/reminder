@@ -11,7 +11,6 @@ import com.q.reminder.reminder.util.RoleInvolvementUtils;
 import com.q.reminder.reminder.vo.RoleInvolvementVo;
 import com.q.reminder.reminder.vo.WorkloadParamsVo;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -48,12 +47,6 @@ public class RedmineUserInfoServiceImpl extends MppServiceImpl<RedmineUserInfoMa
         LambdaQueryWrapper<RedmineUserInfo> lq = Wrappers.lambdaQuery();
         lq.eq(RedmineUserInfo::getRedmineType, redmineType);
         return baseMapper.selectList(lq);
-    }
-
-    @Override
-    @Cacheable(cacheNames = RedisKeyContents.REDMINE_USERINFO_REDMINE_ALL, key = "'userAll'")
-    public List<RedmineUserInfo> listUserAll() {
-        return list(Wrappers.<RedmineUserInfo>lambdaQuery().isNotNull(RedmineUserInfo::getAssigneeName));
     }
 
     @Override

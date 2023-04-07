@@ -23,7 +23,5 @@ public interface RedmineUserInfoService extends IMppService<RedmineUserInfo> {
 
     List<RedmineUserInfo> listUsers(String redmineType);
 
-    List<RedmineUserInfo> listUserAll();
-
     void saveOrupdateMultiIdAll(List<RedmineUserInfo> data);
 }
