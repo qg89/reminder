@@ -3,6 +3,7 @@ package com.q.reminder.reminder.task.base;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
@@ -17,7 +18,6 @@ import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.MessageVo;
 import com.q.reminder.reminder.vo.QueryVo;
 import com.q.reminder.reminder.vo.RedmineVo;
-import com.q.reminder.reminder.vo.SendVo;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import tech.powerjob.worker.log.OmsLogger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -59,27 +62,27 @@ public class QueryTasksToMemberBase {
         contentAll.append("当日执行情况如下(").append(new DateTime().toString("yyyy-MM-dd")).append("):\r\n");
 
         // 通过人员查看对应redmine人员关系，并返回redmine姓名和飞书member_id关系
-        List<UserMemgerInfo> list = userMemberService.list();
+        List<UserMemgerInfo> list = userMemberService.list(Wrappers.<UserMemgerInfo>lambdaQuery().eq(UserMemgerInfo::getResign, 0));
         Map<String, String> memberIds = list.stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
 
         // 组装数据， 通过人员，获取要发送的内容
-        List<RProjectInfo> RProjectInfoList = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();
+        List<RProjectInfo> projectInfos = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();
         List<AdminInfo> adminInfoList = adminInfoService.list();
 
         QueryVo vo = new QueryVo();
         vo.setNoneStatusList(noneStatusList);
         vo.setExpiredDay(expiredDay);
         vo.setContainsStatus(contentStatus);
-        Map<String, List<RedmineVo>> listMap = RedmineApi.queryUserByExpiredDayList(vo, RProjectInfoList).stream().collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
+        Map<String, List<RedmineVo>> listMap = RedmineApi.queryUserByExpiredDayList(vo, projectInfos).stream().collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
         if (CollectionUtils.isEmpty(listMap)) {
-            contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append("\r\n");
+            contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(0).append("\r\n");
             contentAll.append("执行完成!");
             sendAdmin(log, contentAll, adminInfoList);
             return;
         }
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append(" 查询redmine过期人员集合完成!").append("\r\n");
         // key: member_id, value: content
-        Map<String, SendVo> sendMap = new HashMap<>();
+        List<MessageVo> sendVoList = new ArrayList<>();
         List<OverdueTaskHistory> historys = new ArrayList<>();
 
         listMap.forEach((assigneeName, issueList) -> {
@@ -149,23 +152,20 @@ public class QueryTasksToMemberBase {
             if (StringUtils.isBlank(memberId)) {
                 return;
             }
-            SendVo sendVo = new SendVo();
+            MessageVo sendVo = new MessageVo();
             sendVo.setContent(con.toJSONString());
-            sendVo.setAssigneeName(name);
-            sendVo.setMemberId(memberId);
-            sendMap.put(memberId, sendVo);
+            sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+            sendVo.setMsgType("post");
+            sendVo.setReceiveId(memberId);
+            sendVoList.add(sendVo);
         });
-        if (CollectionUtils.isEmpty(sendMap)) {
+        if (CollectionUtils.isEmpty(sendVoList)) {
             contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("当日暂无过期任务!").append("\r\n");
         }
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("发送飞书任务开始!").append("\r\n");
-        sendMap.forEach((k, v) -> {
-            MessageVo sendVo = new MessageVo();
-            sendVo.setReceiveId(v.getMemberId());
-            sendVo.setContent(contentAll.toString());
-            sendVo.setMsgType("post");
-            sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+        sendVoList.forEach(sendVo -> {
             BaseFeishu.message().sendContentTask(sendVo, log);
+            log.info("[过期任务提醒个人]-发送飞书任务完成, 人员MemberId：{}", sendVo.getReceiveId());
         });
         contentAll.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("发送飞书任务完成!").append("\r\n");
         overdueTaskHistoryService.saveOrUpdateBatch(historys);

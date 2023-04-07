@@ -56,19 +56,19 @@ public abstract class RedmineApi {
     /**
      * 通过项目读取redmine过期任务,只包含打开的状态
      *
-     * @param RProjectInfoList
+     * @param projectInfos
      * @return 按指派人员返回问题列表
      */
-    public static List<RedmineVo> queryUserByExpiredDayList(QueryVo vo, List<RProjectInfo> RProjectInfoList) {
+    public static List<RedmineVo> queryUserByExpiredDayList(QueryVo vo, List<RProjectInfo> projectInfos) {
         List<String> noneStatusList = vo.getNoneStatusList();
         Integer expiredDay = vo.getExpiredDay();
         List<RedmineVo> allIssueList = new ArrayList<>();
-        RProjectInfoList.forEach(p -> {
-            String redmineUrl = p.getRedmineUrl();
-            RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, p.getPmKey());
+        projectInfos.forEach(projectInfo -> {
+            String redmineUrl = projectInfo.getRedmineUrl();
+            RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, projectInfo.getPmKey());
             IssueManager issueManager = mgr.getIssueManager();
             try {
-                issueManager.getIssues(p.getPkey(), null).stream().filter(e -> {
+                issueManager.getIssues(projectInfo.getPkey(), null).stream().filter(e -> {
                     Date dueDate = e.getDueDate();
                     boolean filter = dueDate != null && new DateTime().minusDays(expiredDay).isAfter(new DateTime(dueDate)) && StringUtils.isNotBlank(e.getAssigneeName());
                     if (vo.getContainsStatus()) {

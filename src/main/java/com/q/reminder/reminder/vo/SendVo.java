@@ -2,6 +2,7 @@ package com.q.reminder.reminder.vo;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -14,8 +15,8 @@ import java.io.Serializable;
 @Data
 public class SendVo implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 6319674156399631789L;
-    private String memberId;
     private String assigneeName;
     private String content;
 
