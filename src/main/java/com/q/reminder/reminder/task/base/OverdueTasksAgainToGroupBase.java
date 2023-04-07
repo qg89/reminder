@@ -4,7 +4,6 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.CreateMessageResp;
-import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
@@ -118,7 +117,6 @@ public class OverdueTasksAgainToGroupBase {
 
         Map<String, SendUserByGroupVo> sendUserByGroupVoMap = sendUserByGroupVoList.stream().collect(Collectors.toMap(SendUserByGroupVo::getChatId, Function.identity(), (v1, v2) -> v1));
 
-        List<AdminInfo> adminInfoList = adminInfoService.list();
         for (Map.Entry<String, SendUserByGroupVo> map : sendUserByGroupVoMap.entrySet()) {
             JSONObject content = new JSONObject();
             SendUserByGroupVo groupInfo = map.getValue();
@@ -153,17 +151,17 @@ public class OverdueTasksAgainToGroupBase {
         }
 
         if (!overdueTask) {
-            if (!overdueTaskHistoryService.saveOrUpdateBatch(historys)) {
-                adminInfoList.forEach(e -> {
-                    MessageVo sendVo = new MessageVo();
-                    sendVo.setReceiveId(e.getMemberId());
-                    sendVo.setContent("任务保存历史记录失败！");
-                    sendVo.setMsgType("text");
-                    sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-                    BaseFeishu.message().sendtext(sendVo, log);
-                });
-                return;
-            }
+//            if (!overdueTaskHistoryService.saveOrUpdateBatch(historys)) {
+//                adminInfoList.forEach(e -> {
+//                    MessageVo sendVo = new MessageVo();
+//                    sendVo.setReceiveId(e.getMemberId());
+//                    sendVo.setContent("任务保存历史记录失败！");
+//                    sendVo.setMsgType("text");
+//                    sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+//                    BaseFeishu.message().sendtext(sendVo, log);
+//                });
+//                return;
+//            }
         }
         log.info("过期任务提醒群组,执行完成");
     }

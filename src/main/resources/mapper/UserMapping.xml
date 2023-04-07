@@ -13,7 +13,7 @@
             fs_user_member_info ui
             LEFT JOIN `fs_user_group` ug ON ui.member_id = ug.member_id
             LEFT JOIN fs_group_info gi ON gi.chat_id = ug.chat_id
-            LEFT JOIN r_redmine_user_info r ON ui.`name` = r.assignee_name
+            LEFT JOIN r_redmine_user_info r ON ui.`name` = r.user_name
         WHERE
             gi.send_type = 0
           AND gi.is_delete = 0
