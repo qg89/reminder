@@ -6,7 +6,7 @@ import com.q.reminder.reminder.service.NoneStatusService;
 import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.task.base.OverdueTasksAgainToGroupBase;
 import com.q.reminder.reminder.vo.QueryVo;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import tech.powerjob.worker.core.processor.ProcessResult;
@@ -26,14 +26,12 @@ import java.util.stream.Collectors;
  * @date :  2022.10.18 17:02
  */
 @Component
+@RequiredArgsConstructor
 public class OverdueTasksAgainToGroupTask implements BasicProcessor {
 
-    @Autowired
-    private OverdueTasksAgainToGroupBase overdueTasksAgainToGroupBase;
-    @Autowired
-    private NoneStatusService noneStatusService;
-    @Autowired
-    private HoldayBase holdayBase;
+    private final OverdueTasksAgainToGroupBase overdueTasksAgainToGroupBase;
+    private final NoneStatusService noneStatusService;
+    private final HoldayBase holdayBase;
 
     @Override
     public ProcessResult process(TaskContext context) {

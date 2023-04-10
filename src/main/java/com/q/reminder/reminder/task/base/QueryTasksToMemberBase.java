@@ -19,9 +19,9 @@ import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.MessageVo;
 import com.q.reminder.reminder.vo.QueryVo;
 import com.q.reminder.reminder.vo.RedmineVo;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import tech.powerjob.worker.log.OmsLogger;
@@ -40,16 +40,13 @@ import java.util.stream.Collectors;
  * @date :  2022.09.27 08:38
  */
 @Component
+@RequiredArgsConstructor
 public class QueryTasksToMemberBase {
 
-    @Autowired
-    private UserMemberService userMemberService;
-    @Autowired
-    private ProjectInfoService projectInfoService;
-    @Autowired
-    private OverdueTaskHistoryService overdueTaskHistoryService;
-    @Autowired
-    private AdminInfoService adminInfoService;
+    private final UserMemberService userMemberService;
+    private final ProjectInfoService projectInfoService;
+    private final OverdueTaskHistoryService overdueTaskHistoryService;
+    private final AdminInfoService adminInfoService;
 
 
     /**

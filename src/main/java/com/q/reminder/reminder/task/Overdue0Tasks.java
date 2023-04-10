@@ -3,7 +3,7 @@ package com.q.reminder.reminder.task;
 import com.q.reminder.reminder.service.NoneStatusService;
 import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.task.base.QueryTasksToMemberBase;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
@@ -20,14 +20,12 @@ import java.util.List;
  * @date :  2022.10.18 17:02
  */
 @Component
+@RequiredArgsConstructor
 public class Overdue0Tasks implements BasicProcessor {
 
-    @Autowired
-    private QueryTasksToMemberBase queryTasksToMemberBase;
-    @Autowired
-    private NoneStatusService noneStatusService;
-    @Autowired
-    private HoldayBase holdayBase;
+    private final QueryTasksToMemberBase queryTasksToMemberBase;
+    private final NoneStatusService noneStatusService;
+    private final HoldayBase holdayBase;
 
 
     @Override

@@ -11,9 +11,9 @@ import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WUserTimesService;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.taskadapter.redmineapi.bean.TimeEntry;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import tech.powerjob.worker.core.processor.ProcessResult;
@@ -36,11 +36,10 @@ import java.util.stream.Collectors;
  * @date :  2022.12.28 11:34
  */
 @Component
+@RequiredArgsConstructor
 public class SyncRedmineProjectUserTimeTask implements BasicProcessor {
-    @Autowired
-    private ProjectInfoService projectInfoService;
-    @Autowired
-    private WUserTimesService wUserTimesService;
+    private final ProjectInfoService projectInfoService;
+    private final WUserTimesService wUserTimesService;
 
     @Override
     public ProcessResult process(TaskContext context)  {

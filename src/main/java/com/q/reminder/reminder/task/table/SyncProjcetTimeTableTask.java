@@ -12,7 +12,7 @@ import com.q.reminder.reminder.service.TTableInfoService;
 import com.q.reminder.reminder.service.TTableUserTimeService;
 import com.q.reminder.reminder.service.WUserTimesService;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import tech.powerjob.worker.core.processor.ProcessResult;
@@ -32,13 +32,11 @@ import java.util.stream.Collectors;
  * @date :  2023.01.18 11:28
  */
 @Component
+@RequiredArgsConstructor
 public class SyncProjcetTimeTableTask implements BasicProcessor {
-    @Autowired
-    private TTableInfoService tTableInfoService;
-    @Autowired
-    private WUserTimesService wUserTimesService;
-    @Autowired
-    private TTableUserTimeService tTableUserTimeService;
+    private final TTableInfoService tTableInfoService;
+    private final WUserTimesService wUserTimesService;
+    private final TTableUserTimeService tTableUserTimeService;
 
     //    @XxlJob("syncProjcetTimeTableTask")
     @Override

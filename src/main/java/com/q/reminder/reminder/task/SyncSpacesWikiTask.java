@@ -9,9 +9,9 @@ import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.WikiSpace;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WikiSpaceService;
+import com.q.reminder.reminder.service.impl.FeishuService;
+import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
@@ -29,16 +29,11 @@ import java.util.List;
  * @date :  2022.11.18 14:34
  */
 @Component
+@RequiredArgsConstructor
 public class SyncSpacesWikiTask implements BasicProcessor {
-    @Autowired
-    private WikiSpaceService spaceWikoService;
-    @Autowired
-    private ProjectInfoService projectInfoService;
-    @Value("${feishu-config.weekly-report-token}")
-    private String weeklyReportToken;
-    @Value("${feishu-config.weekly-report-spaceId}")
-    private String weeklyReportSpaceId;
-
+    private final WikiSpaceService spaceWikoService;
+    private final ProjectInfoService projectInfoService;
+    private final FeishuService feishuService;
 
     @Override
     public ProcessResult process(TaskContext context) {
@@ -62,6 +57,8 @@ public class SyncSpacesWikiTask implements BasicProcessor {
                 log.info("当前周已复制");
                 return processResult;
             }
+            String weeklyReportSpaceId = feishuService.weeklyReportSpaceId();
+            String weeklyReportToken = feishuService.weeklyReportToken();
             WikiSpace wikiSpace = spaceWikoService.getSpacesNode(weeklyReportToken);
             String parentTitle = wikiSpace.getTitle();
             LambdaQueryWrapper<RProjectInfo> lq = Wrappers.<RProjectInfo>lambdaQuery().select(RProjectInfo::getWikiToken, RProjectInfo::getId).isNotNull(RProjectInfo::getWikiToken);

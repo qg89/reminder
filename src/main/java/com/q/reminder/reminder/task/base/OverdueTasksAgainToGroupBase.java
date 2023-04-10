@@ -8,8 +8,6 @@ import com.q.reminder.reminder.entity.OverdueTaskHistory;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.exception.FeishuException;
-import com.q.reminder.reminder.service.AdminInfoService;
-import com.q.reminder.reminder.service.OverdueTaskHistoryService;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.RedmineApi;
@@ -18,8 +16,8 @@ import com.q.reminder.reminder.vo.MessageVo;
 import com.q.reminder.reminder.vo.QueryVo;
 import com.q.reminder.reminder.vo.RedmineVo;
 import com.q.reminder.reminder.vo.SendUserByGroupVo;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import tech.powerjob.worker.log.OmsLogger;
@@ -36,16 +34,11 @@ import java.util.stream.Collectors;
  * @date :  2022.09.27 19:13
  */
 @Component
+@RequiredArgsConstructor
 public class OverdueTasksAgainToGroupBase {
 
-    @Autowired
-    private UserMemberService userMemberService;
-    @Autowired
-    private ProjectInfoService projectInfoService;
-    @Autowired
-    private OverdueTaskHistoryService overdueTaskHistoryService;
-    @Autowired
-    private AdminInfoService adminInfoService;
+    private final UserMemberService userMemberService;
+    private final ProjectInfoService projectInfoService;
 
     /**
      * 无任务提醒

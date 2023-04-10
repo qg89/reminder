@@ -10,8 +10,8 @@ import com.q.reminder.reminder.service.WeeklyProjectReportService;
 import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
@@ -28,16 +28,13 @@ import java.util.List;
  * @date :  2022.11.01 14:14
  */
 @Component
+@RequiredArgsConstructor
 public class WeeklyProjectReportTask implements BasicProcessor {
 
-    @Autowired
-    private WeeklyProjectReportService weeklyProjectReportService;
-    @Autowired
-    private ProjectInfoService projectInfoService;
-    @Autowired
-    private FeishuProperties feishuProperties;
-    @Autowired
-    private HoldayBase holdayBase;
+    private final WeeklyProjectReportService weeklyProjectReportService;
+    private final ProjectInfoService projectInfoService;
+    private final FeishuProperties feishuProperties;
+    private final HoldayBase holdayBase;
 
     @Override
     public ProcessResult process(TaskContext context) {

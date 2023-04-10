@@ -23,4 +23,6 @@ public class FeishuProperties implements Serializable {
     private static final long serialVersionUID = 6887391918318443784L;
     private String appId;
     private String appSecret;
+    private String weeklyReportToken;
+    private String weeklyReportSpaceId;
 }

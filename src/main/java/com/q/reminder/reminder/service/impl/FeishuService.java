@@ -46,6 +46,13 @@ public class FeishuService {
         return tenantAccessToken;
     }
 
+    public String weeklyReportSpaceId(){
+        return feishuProperties.getWeeklyReportSpaceId();
+    }
+    public String weeklyReportToken(){
+        return feishuProperties.getWeeklyReportToken();
+    }
+
     public Client client(){
         return Client.newBuilder(feishuProperties.getAppId(), feishuProperties.getAppSecret())
                 .logReqAtDebug(true)

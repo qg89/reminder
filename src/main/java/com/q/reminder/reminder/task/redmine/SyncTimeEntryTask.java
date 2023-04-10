@@ -7,8 +7,8 @@ import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdTimeEntryService;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.taskadapter.redmineapi.bean.TimeEntry;
+import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
@@ -26,11 +26,10 @@ import java.util.List;
  * @date :  2023.01.19 11:18
  */
 @Component
+@RequiredArgsConstructor
 public class SyncTimeEntryTask implements BasicProcessor {
-    @Autowired
-    private ProjectInfoService projectInfoService;
-    @Autowired
-    private RdTimeEntryService rdTimeEntryService;
+    private final ProjectInfoService projectInfoService;
+    private final RdTimeEntryService rdTimeEntryService;
 
     @Override
     public ProcessResult process(TaskContext context) {

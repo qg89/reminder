@@ -6,7 +6,7 @@ import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RedmineUserInfoService;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.taskadapter.redmineapi.bean.TimeEntry;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
@@ -25,11 +25,10 @@ import java.util.stream.Collectors;
  * @date :  2023.01.18 16:42
  */
 @Component
+@RequiredArgsConstructor
 public class SyncRedmineUserTask implements BasicProcessor {
-    @Autowired
-    private RedmineUserInfoService redmineUserInfoService;
-    @Autowired
-    private ProjectInfoService projectInfoService;
+    private final RedmineUserInfoService redmineUserInfoService;
+    private final ProjectInfoService projectInfoService;
 
     @Override
     public ProcessResult process(TaskContext context) {

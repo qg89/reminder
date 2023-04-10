@@ -21,9 +21,9 @@ import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import tech.powerjob.worker.core.processor.ProcessResult;
@@ -47,11 +47,10 @@ import java.util.stream.Collectors;
  * @date :  2023.01.17 11:40
  */
 @Component
+@RequiredArgsConstructor
 public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
-    @Autowired
-    private TTableFeatureTmpService tTableFeatureTmpService;
-    @Autowired
-    private TTableInfoService tTableInfoService;
+    private final TTableFeatureTmpService tTableFeatureTmpService;
+    private final TTableInfoService tTableInfoService;
 
     private Date dueDate = DateTime.now().plusDays(7).toDate();
 

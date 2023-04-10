@@ -11,8 +11,8 @@ import com.q.reminder.reminder.service.UserGroupService;
 import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.MessageVo;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import tech.powerjob.worker.core.processor.ProcessResult;
@@ -31,15 +31,12 @@ import java.util.List;
  * @date :  2022.09.27 20:11
  */
 @Component
+@RequiredArgsConstructor
 public class UpdateFeishuRedmineTask implements BasicProcessor {
-    @Autowired
-    private GroupInfoService groupInfoService;
-    @Autowired
-    private UserMemberService userMemberService;
-    @Autowired
-    private UserGroupService userGroupService;
-    @Autowired
-    private AdminInfoService adminInfoService;
+    private final GroupInfoService groupInfoService;
+    private final UserMemberService userMemberService;
+    private final UserGroupService userGroupService;
+    private final AdminInfoService adminInfoService;
 
     @Override
     public ProcessResult process(TaskContext context) {

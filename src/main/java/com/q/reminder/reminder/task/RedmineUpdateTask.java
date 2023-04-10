@@ -15,8 +15,8 @@ import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.MessageVo;
 import com.q.reminder.reminder.vo.RedmineVo;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import tech.powerjob.worker.core.processor.ProcessResult;
@@ -37,12 +37,11 @@ import java.util.stream.Collectors;
  * @date :  2022.10.19 13:42
  */
 @Component
+@RequiredArgsConstructor
 public class RedmineUpdateTask implements BasicProcessor {
 
-    @Autowired
-    private ProjectInfoService projectInfoService;
-    @Autowired
-    private UserMemberService userMemberService;
+    private final ProjectInfoService projectInfoService;
+    private final UserMemberService userMemberService;
 
     @Override
     public ProcessResult process(TaskContext context) {

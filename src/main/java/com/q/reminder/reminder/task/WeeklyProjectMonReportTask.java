@@ -18,8 +18,8 @@ import com.q.reminder.reminder.vo.FeishuUploadImageVo;
 import com.q.reminder.reminder.vo.MessageVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.taskadapter.redmineapi.bean.Issue;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
@@ -43,13 +43,11 @@ import static com.q.reminder.reminder.util.WeeklyProjectUtils.getWeekNumToSunday
  * @date :  2022.11.01 17:55
  */
 @Component
+@RequiredArgsConstructor
 public class WeeklyProjectMonReportTask implements BasicProcessor {
-    @Autowired
-    private HoldayBase holdayBase;
-    @Autowired
-    private ProjectInfoService projectInfoService;
-    @Autowired
-    private FeishuProperties feishuProperties;
+    private final HoldayBase holdayBase;
+    private final ProjectInfoService projectInfoService;
+    private final FeishuProperties feishuProperties;
 
     @Override
     public ProcessResult process(TaskContext context) {
