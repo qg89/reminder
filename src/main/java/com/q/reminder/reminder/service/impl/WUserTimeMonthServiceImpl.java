@@ -30,7 +30,6 @@ import java.util.List;
 public class WUserTimeMonthServiceImpl extends ServiceImpl<WUserTimeMonthMapping, WUserTimeMonth> implements WUserTimeMonthService {
 
     private final SDateConfigService sDateConfigService;
-    private final WUserTimeMonthService wUserTimeMonthService;
 
     @Override
     public List<RoleInvolvementVo> inputRatio(WorkloadParamsVo params) {
@@ -53,6 +52,6 @@ public class WUserTimeMonthServiceImpl extends ServiceImpl<WUserTimeMonthMapping
             entity.setPId(vo.getPId());
             data.add(entity);
         });
-        return wUserTimeMonthService.saveOrUpdateBatch(data);
+        return saveOrUpdateBatch(data);
     }
 }
