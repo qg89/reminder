@@ -11,6 +11,7 @@ import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WikiSpaceService;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
@@ -33,6 +34,11 @@ public class SyncSpacesWikiTask implements BasicProcessor {
     private WikiSpaceService spaceWikoService;
     @Autowired
     private ProjectInfoService projectInfoService;
+    @Value("${feishu-config.weekly-report-token}")
+    private String weeklyReportToken;
+    @Value("${feishu-config.weekly-report-spaceId}")
+    private String weeklyReportSpaceId;
+
 
     @Override
     public ProcessResult process(TaskContext context) {
@@ -56,14 +62,14 @@ public class SyncSpacesWikiTask implements BasicProcessor {
                 log.info("当前周已复制");
                 return processResult;
             }
-            WikiSpace wikiSpace = spaceWikoService.getSpacesNode("wikcnXpXCgmL3E7vdbM1TiwXiGc");
+            WikiSpace wikiSpace = spaceWikoService.getSpacesNode(weeklyReportToken);
             String parentTitle = wikiSpace.getTitle();
             LambdaQueryWrapper<RProjectInfo> lq = Wrappers.<RProjectInfo>lambdaQuery().select(RProjectInfo::getWikiToken, RProjectInfo::getId).isNotNull(RProjectInfo::getWikiToken);
             lq.eq(RProjectInfo::getWikiType, "0");
             List<RProjectInfo> list = projectInfoService.list(lq);
             for (RProjectInfo info : list) {
                 String title = parentTitle + "-" + DateTime.now().toString("yy") + "W" + weekOfYear;
-                WikiSpace space = spaceWikoService.syncSpacesWiki(info.getWikiToken(), title);
+                WikiSpace space = spaceWikoService.syncSpacesWiki(info.getWikiToken(), title, weeklyReportToken, weeklyReportSpaceId);
                 space.setPId(info.getId());
                 space.setWeekNum(weekOfYear);
                 wikiSpaceList.add(space);

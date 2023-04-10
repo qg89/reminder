@@ -31,18 +31,20 @@ public class Wiki extends BaseFeishu {
      *
      * @param projectToken
      * @param title
+     * @param weeklyReportToken
+     * @param weeklyReportSpaceId
      * @return
      * @throws Exception
      */
-    public Node syncSpacesWiki(String projectToken, String title) {
+    public Node syncSpacesWiki(String projectToken, String title, String weeklyReportToken, String weeklyReportSpaceId) {
         CopySpaceNodeReq req = CopySpaceNodeReq.newBuilder()
                 .copySpaceNodeReqBody(CopySpaceNodeReqBody.newBuilder()
                         .targetParentToken(projectToken)
-                        .targetSpaceId("7046680616087126018")
+                        .targetSpaceId(weeklyReportSpaceId)
                         .title(title)
                         .build())
-                .nodeToken("wikcnXpXCgmL3E7vdbM1TiwXiGc")
-                .spaceId("7046680616087126018")
+                .nodeToken(weeklyReportToken)
+                .spaceId(weeklyReportSpaceId)
                 .build();
         CopySpaceNodeResp resp;
         try {
