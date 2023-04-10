@@ -14,8 +14,8 @@ import com.q.reminder.reminder.service.RedmineUserInfoService;
 import com.q.reminder.reminder.service.TTableFeatureTmpService;
 import com.q.reminder.reminder.service.TTableUserConfigService;
 import com.q.reminder.reminder.vo.table.FeatureUserConfigVo;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,15 +34,12 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/table")
+@RequiredArgsConstructor
 public class TableFeatureController {
-    @Autowired
-    private TTableFeatureTmpService tTableFeatureTmpService;
-    @Autowired
-    private RedmineUserInfoService redmineUserInfoService;
-    @Autowired
-    private ProjectInfoService projectInfoService;
-    @Autowired
-    private TTableUserConfigService tTableUserConfigService;
+    private final TTableFeatureTmpService tTableFeatureTmpService;
+    private final RedmineUserInfoService redmineUserInfoService;
+    private final ProjectInfoService projectInfoService;
+    private final TTableUserConfigService tTableUserConfigService;
 
 
     @PostMapping("/records")

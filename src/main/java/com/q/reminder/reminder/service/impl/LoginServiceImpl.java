@@ -11,7 +11,7 @@ import com.q.reminder.reminder.vo.UserLogin;
 import com.q.reminder.reminder.vo.base.ResultUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,13 +27,11 @@ import java.util.Objects;
  * @date :  2022.11.17 14:18
  */
 @Service
+@RequiredArgsConstructor
 public class LoginServiceImpl extends ServiceImpl<UserInfoMapping, User> implements LoginService {
-    @Autowired
-    private JWTUtil jjwtUtil;
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private UserInfoMapping userInfoMapping;
+    private final JWTUtil jjwtUtil;
+    private final AuthenticationManager authenticationManager;
+    private final UserInfoMapping userInfoMapping;
 
     @Override
     public ResultUtil login(LoginParam loginParam) {

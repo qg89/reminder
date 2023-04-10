@@ -8,7 +8,7 @@ import com.q.reminder.reminder.service.LoginService;
 import com.q.reminder.reminder.vo.LoginParam;
 import com.q.reminder.reminder.vo.UpdatePasswordVo;
 import com.q.reminder.reminder.vo.base.ResultUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -27,14 +27,12 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/user")
+@RequiredArgsConstructor
 public class LoginController {
 
-    @Autowired
-    private LoginService loginService;
-    @Autowired
-    private UserInfoMapping userMapper;
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final LoginService loginService;
+    private final UserInfoMapping userMapper;
+    private final UserDetailsService userDetailsService;
 
     @PostMapping("/login")
     public ResultUtil login(@RequestBody LoginParam loginParam) {

@@ -12,8 +12,8 @@ import com.q.reminder.reminder.util.WeeklyProjectRedmineUtils;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.WeeklyVo;
 import com.taskadapter.redmineapi.bean.Issue;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -34,11 +34,10 @@ import static com.q.reminder.reminder.util.WeeklyProjectUtils.getWeekNumToSunday
  */
 @Log4j2
 @Service
+@RequiredArgsConstructor
 public class WeeklyServiceImpl implements WeeklyService {
-    @Autowired
-    private FeishuProperties feishuProperties;
-    @Autowired
-    private WeeklyProjectMonReportTask weeklyProjectMonReportTask;
+    private final FeishuProperties feishuProperties;
+    private final WeeklyProjectMonReportTask weeklyProjectMonReportTask;
 
     @Override
     public void resetReport(WeeklyVo vo) throws Exception {

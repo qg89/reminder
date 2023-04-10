@@ -10,8 +10,8 @@ import com.q.reminder.reminder.vo.OptionVo;
 import com.q.reminder.reminder.vo.ProjectInfoVo;
 import com.q.reminder.reminder.vo.RProjectReaVo;
 import com.q.reminder.reminder.vo.base.ReturnT;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -28,21 +28,16 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/p")
+@RequiredArgsConstructor
 public class ProjectController {
-    @Autowired
-    private ProjectInfoService projectInfoService;
-    @Autowired
-    private GroupProjectService groupProjectService;
-    @Autowired
-    private UserPService userPService;
-    @Autowired
-    private CoverityService coverityService;
-    @Autowired
-    private GroupInfoService groupInfoService;
-    @Autowired
-    private LoginService loginService;
-    @Autowired
-    private UserMemberService userMemberService;
+    
+    private final ProjectInfoService projectInfoService;
+    private final GroupProjectService groupProjectService;
+    private final UserPService userPService;
+    private final CoverityService coverityService;
+    private final GroupInfoService groupInfoService;
+    private final LoginService loginService;
+    private final UserMemberService userMemberService;
 
     @GetMapping("/i")
     public ReturnT<List<List<ProjectInfoVo>>> list() {

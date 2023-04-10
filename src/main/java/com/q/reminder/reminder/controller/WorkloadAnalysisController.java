@@ -10,8 +10,8 @@ import com.q.reminder.reminder.vo.RoleInvolvementVo;
 import com.q.reminder.reminder.vo.UserTimeMonthRatioVo;
 import com.q.reminder.reminder.vo.WorkloadParamsVo;
 import com.q.reminder.reminder.vo.base.ReturnT;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -26,20 +26,16 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/workload")
+@RequiredArgsConstructor
 public class WorkloadAnalysisController {
 
-    @Autowired
-    private WRoleService wRoleService;
-    @Autowired
-    private RedmineUserInfoService redmineUserInfoService;
-    @Autowired
-    private WGroupService wGroupService;
-    @Autowired
-    private WRoleGroupUserService wRoleGroupUserService;
-    @Autowired
-    private WUserTimeMonthService wUserTimeMonthService;
-    @Autowired
-    private ProjectInfoService projectInfoService;
+
+    private final WRoleService wRoleService;
+    private final RedmineUserInfoService redmineUserInfoService;
+    private final WGroupService wGroupService;
+    private final WRoleGroupUserService wRoleGroupUserService;
+    private final WUserTimeMonthService wUserTimeMonthService;
+    private final ProjectInfoService projectInfoService;
 
     @GetMapping("/option")
     public ReturnT<List<OptionVo>> option(WorkloadParamsVo paramsVo) {

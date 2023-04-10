@@ -11,7 +11,7 @@ import com.q.reminder.reminder.vo.WeeklyByProjectVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.q.reminder.reminder.vo.WeeklyVo;
 import com.q.reminder.reminder.vo.base.ReturnT;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,12 +29,11 @@ import static com.q.reminder.reminder.constant.WeeklyReportConstants.*;
  */
 @RestController
 @RequestMapping("/weekly")
+@RequiredArgsConstructor
 public class WeeklyProjectReportController {
 
-    @Autowired
-    private ProjectInfoService projectInfoService;
-    @Autowired
-    private WeeklyServiceImpl weeklyService;
+    private final ProjectInfoService projectInfoService;
+    private final WeeklyServiceImpl weeklyService;
 
     /**
      * 重新生成

@@ -1,7 +1,7 @@
 package com.q.reminder.reminder.config;
 
 import com.q.reminder.reminder.service.impl.UserDetailsServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,9 +21,9 @@ import org.springframework.security.web.SecurityFilterChain;
  * @date :  2022.11.17 12:04
  */
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig  {
-    @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     //获取AuthenticationManager（认证管理器），登录时认证使用
     @Bean

@@ -7,7 +7,7 @@ import com.q.reminder.reminder.service.WRoleService;
 import com.q.reminder.reminder.util.RoleInvolvementUtils;
 import com.q.reminder.reminder.vo.RoleInvolvementVo;
 import com.q.reminder.reminder.vo.WorkloadParamsVo;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -24,9 +24,9 @@ import java.util.stream.Collectors;
  * @since 2022-12-29 09:16:15
  */
 @Service
+@RequiredArgsConstructor
 public class WRoleServiceImpl extends ServiceImpl<WRoleMapping, WRole> implements WRoleService {
-    @Autowired
-    private WRoleService wRoleService;
+    private final WRoleService wRoleService;
 
     @Override
     public List<RoleInvolvementVo> roleInvolvement(WorkloadParamsVo params) {

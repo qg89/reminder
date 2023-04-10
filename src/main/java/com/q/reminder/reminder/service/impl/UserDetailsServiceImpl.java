@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.q.reminder.reminder.entity.User;
 import com.q.reminder.reminder.mapper.UserInfoMapping;
 import com.q.reminder.reminder.vo.UserLogin;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,10 +22,10 @@ import java.util.Objects;
  * @date :  2022.11.17 14:06
  */
 @Service
+@RequiredArgsConstructor
 public class UserDetailsServiceImpl extends ServiceImpl<UserInfoMapping, User> implements UserDetailsService {
 
-    @Autowired
-    private UserInfoMapping userMapper;
+    private final UserInfoMapping userMapper;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

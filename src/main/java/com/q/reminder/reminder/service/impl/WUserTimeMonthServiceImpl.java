@@ -12,9 +12,8 @@ import com.q.reminder.reminder.util.RoleInvolvementUtils;
 import com.q.reminder.reminder.vo.RoleInvolvementVo;
 import com.q.reminder.reminder.vo.UserTimeMonthRatioVo;
 import com.q.reminder.reminder.vo.WorkloadParamsVo;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -27,12 +26,11 @@ import java.util.List;
  * @since 2022-12-28 10:32:52
  */
 @Service
+@RequiredArgsConstructor
 public class WUserTimeMonthServiceImpl extends ServiceImpl<WUserTimeMonthMapping, WUserTimeMonth> implements WUserTimeMonthService {
 
-    @Autowired
-    private SDateConfigService sDateConfigService;
-    @Autowired
-    private WUserTimeMonthService wUserTimeMonthService;
+    private final SDateConfigService sDateConfigService;
+    private final WUserTimeMonthService wUserTimeMonthService;
 
     @Override
     public List<RoleInvolvementVo> inputRatio(WorkloadParamsVo params) {

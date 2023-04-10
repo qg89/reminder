@@ -7,8 +7,8 @@ import com.lark.oapi.core.cache.LocalCache;
 import com.lark.oapi.core.enums.BaseUrlEnum;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.constant.RedisKeyContents;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -23,12 +23,11 @@ import java.util.concurrent.TimeUnit;
  * @date :  2023.03.16 14:33
  */
 @Service("feishuService")
+@RequiredArgsConstructor
 public class FeishuService {
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
-    @Autowired
-    private FeishuProperties feishuProperties;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final FeishuProperties feishuProperties;
 
     public synchronized String tenantAccessToken() {
         Object tenantToken = redisTemplate.opsForValue().get(RedisKeyContents.FEISHU_TENANT_ACCESS_TOKEN_KEY);
