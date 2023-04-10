@@ -113,7 +113,7 @@ public class Documents extends BaseFeishu {
             throw new FeishuException(e, this.getClass().getName() + " 获取文档所有块异常");
         }
         // 业务数据处理
-        if (resp != null && resp.getCode() == 0) {
+        if (resp.success()) {
             JSONObject result = JSONObject.parseObject(Jsons.DEFAULT.toJson(resp.getData()));
             return result.getJSONArray("items");
         }
