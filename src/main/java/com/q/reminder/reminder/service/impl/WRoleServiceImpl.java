@@ -26,14 +26,13 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class WRoleServiceImpl extends ServiceImpl<WRoleMapping, WRole> implements WRoleService {
-    private final WRoleService wRoleService;
 
     @Override
     public List<RoleInvolvementVo> roleInvolvement(WorkloadParamsVo params) {
         List<RoleInvolvementVo> voList = baseMapper.roleInvolvement(params);
         List<RoleInvolvementVo> vos = RoleInvolvementUtils.getRoleInvolvementVos(voList).stream().sorted(Comparator.comparing(RoleInvolvementVo::getSort)).toList();
         Map<String, List<RoleInvolvementVo>> map = vos.stream().collect(Collectors.groupingBy(RoleInvolvementVo::getName));
-        List<String> list = wRoleService.list().stream().map(WRole::getRole).toList();
+        List<String> list = this.list().stream().map(WRole::getRole).toList();
         vos = new ArrayList<>();
         List<String> roleList = new ArrayList<>(list);
         roleList.add("合计");
