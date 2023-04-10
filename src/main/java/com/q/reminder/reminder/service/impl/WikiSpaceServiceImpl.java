@@ -7,7 +7,6 @@ import com.q.reminder.reminder.entity.WikiSpace;
 import com.q.reminder.reminder.mapper.WikiSpaceMapping;
 import com.q.reminder.reminder.service.WikiSpaceService;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,8 +28,8 @@ public class WikiSpaceServiceImpl extends ServiceImpl<WikiSpaceMapping, WikiSpac
     }
 
     @Override
-    public WikiSpace getSpacesNode(String token) throws Exception {
-        Node node =  BaseFeishu.wiki().getSpacesNode(token);
+    public WikiSpace getSpacesNode(String token) {
+        Node node =  BaseFeishu.wiki().getNodeSpace(token);
         WikiSpace space = new WikiSpace();
         BeanUtil.copyProperties(node, space);
         return space;

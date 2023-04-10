@@ -44,35 +44,14 @@ public class Wiki extends BaseFeishu {
                 .nodeToken("wikcnXpXCgmL3E7vdbM1TiwXiGc")
                 .spaceId("7046680616087126018")
                 .build();
-        CopySpaceNodeResp resp = null;
+        CopySpaceNodeResp resp;
         try {
             resp = CLIENT.wiki().spaceNode().copy(req);
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 复制知识空间节点异常");
         }
-        return resp.getData().getNode();
-    }
-
-    /**
-     * 获取知识空间节点信息
-     *
-     * @param token
-     * @return
-     * @throws Exception
-     */
-    public Node getSpacesNode(String token) {
-        GetNodeSpaceReq req = GetNodeSpaceReq.newBuilder()
-                .token(token)
-                .build();
-        GetNodeSpaceResp resp;
-        try {
-            resp = CLIENT.wiki().space().getNode(req);
-        } catch (Exception e) {
-            throw new FeishuException(e, this.getClass().getName() + " 获取知识空间节点信息异常");
-        }
-
         if (resp.success()) {
-            resp.getData().getNode();
+            return resp.getData().getNode();
         }
         return null;
     }
