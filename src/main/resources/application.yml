@@ -1,6 +1,5 @@
 server:
   port: 12315
-# 数据源
 spring:
   profiles:
     active: dev
@@ -18,6 +17,7 @@ spring:
     parser:
       allow-unquoted-control-chars: true
       allow-backslash-escaping-any-character: true
+# 数据源
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     username: mpw:Jrfx9m/vVYtI1PLKUIeYlA==
