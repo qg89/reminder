@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
+import com.lark.oapi.service.im.v1.model.CreateMessageResp;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
 import com.q.reminder.reminder.entity.RProjectInfo;
@@ -154,8 +155,10 @@ public class QueryTasksToMemberBase {
             sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
             sendVo.setMsgType("post");
             sendVo.setReceiveId(memberId);
-            BaseFeishu.message().sendContent(sendVo, log);
-            log.info("[过期任务提醒个人]-发送飞书任务, 人员MemberId：{}", sendVo.getReceiveId());
+            CreateMessageResp resp = BaseFeishu.message().sendContent(sendVo, log);
+            boolean success = resp.success();
+            log.info("[过期任务提醒个人]-发送飞书任务, 人员姓名：{},执行结果：{}", name, success);
+            sendAdminContent.append("[过期任务提醒个人]-发送飞书任务, 人员姓名: ").append(name).append("执行结果：").append(success);
         });
 
         sendAdminContent.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("发送飞书任务完成!").append("\r\n");
