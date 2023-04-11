@@ -46,7 +46,8 @@ public class SecurityConfig  {
                                         "/weekly/**",
                                         "/p/**",
                                         "/table/**",
-                                        "/workload/**"
+                                        "/workload/**",
+                                        "/event/**"
                                 )
                                 .permitAll()
                                 .anyRequest()
