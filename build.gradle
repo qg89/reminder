@@ -1,7 +1,7 @@
 buildscript {
 	repositories {
-		maven { url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/' }
 		maven { url "https://maven.aliyun.com/repository/central"}
+		maven { url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/' }
 		mavenCentral()
 	}
 	dependencies {
@@ -27,6 +27,7 @@ configurations {
 	compile.exclude module: 'spring-bean'
 	compile.exclude module: 'spring-core'
 	compile.exclude module: 'spring-context'
+	compile.exclude module: 'oapi-sdk:com.larksuite.oapi'
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
@@ -60,7 +61,9 @@ dependencies {
 	// redmine
 	implementation 'com.taskadapter:redmine-java-api:4.0.0.rc4'
 	//	飞书
-	implementation 'com.larksuite.oapi:oapi-sdk:2.0.16'
+	implementation 'com.larksuite.oapi:oapi-sdk:2.0.17'
+	implementation 'com.larksuite.oapi:oapi-sdk-servlet-ext:1.0.0-rc3'
+
 	// lark 飞书
 //	implementation 'com.larksuite.oapi:larksuite-oapi:1.0.18-rc4'
 
@@ -101,8 +104,8 @@ configure(allprojects) {
 	apply plugin: "io.spring.dependency-management"
 
 	repositories {
-		maven { url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/' }
 		maven { url "https://maven.aliyun.com/repository/central"}
+		maven { url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/' }
 		mavenLocal()
 	}
 
