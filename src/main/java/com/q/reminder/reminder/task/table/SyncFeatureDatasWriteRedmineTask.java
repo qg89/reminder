@@ -59,6 +59,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
+        log.info("[需求管理表写入redmine]-开始");
         ProcessResult processResult = new ProcessResult(true);
         StringBuffer sendAdmin = new StringBuffer();
         try {
@@ -67,6 +68,10 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
             Tracker featureTracker = new Tracker().setId(2).setName("需求");
             List<AppTableRecord> records = new ArrayList<>();
             List<TTableFeatureTmp> featureTmps = new ArrayList<>();
+            if (CollectionUtils.isEmpty(featureDataList)) {
+                log.info("[需求管理表写入redmine]-featureDataList is empty");
+                return processResult;
+            }
             featureDataList.stream().collect(Collectors.groupingBy(RedmineDataVo::getRedmineType)).forEach((type, list) -> {
                 log.info("[需求管理表写入redmine] type : {}", type);
                 RedmineTypeStrategy redmineTypeStrategy = HandlerTypeContext.getInstance(Integer.parseInt(type));
@@ -88,7 +93,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                     }
 
                     boolean ftrType = "非功能".equals(featureType);
-
+                    log.info("[需求管理表写入redmine]-开始执行，需求类型：{}", featureType);
                     RProjectInfo project = new RProjectInfo();
                     project.setRedmineUrl(redmineDataVo.getRedmineUrl());
                     project.setPkey(redmineDataVo.getPrjctKey());
@@ -125,7 +130,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                         if (!RedmineApi.createSubIssue(issue, transport, customFieldList, true, feautreTimeVos, testTracker, devTracker)) {
                             redmineDataVo.setWriteRedmine("3");
                         }
-                        log.info("[需求管理表写入redmine] 创建子任务结束, {} 功能需求", ftrType);
+                        log.info("[需求管理表写入redmine] 创建子任务结束, 需求类型：{}", featureType);
                     } else {
                         issue.setTracker(featureTracker);
                         try {
@@ -137,14 +142,14 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                         }
                         if (parentIssue.getId() == null) {
                             redmineDataVo.setWriteRedmine("2");
-                            log.info("[需求管理表写入redmine] 创建父任务失败, {} 功能需求", ftrType);
+                            log.info("[需求管理表写入redmine] 创建父任务失败, 需求类型：{}", featureType);
                         } else {
                             if (!RedmineApi.createSubIssue(parentIssue, transport, customFieldList, false, feautreTimeVos, testTracker, devTracker)) {
                                 redmineDataVo.setWriteRedmine("3");
-                                log.info("[需求管理表写入redmine] 创建子任务失败, {} 功能需求", ftrType);
+                                log.info("[需求管理表写入redmine] 创建子任务失败, 需求类型：{}", featureType);
                             }
                         }
-                        log.info("[需求管理表写入redmine] 创建子任务结束, {} 功能需求", ftrType);
+                        log.info("[需求管理表写入redmine] 创建子任务结束, 需求类型：{}", featureType);
                     }
 
                     if ("1".equals(redmineDataVo.getWriteRedmine())) {
@@ -160,6 +165,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                 vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
                 vo.setReceiveId("ou_35e03d4d8754dd35fed26c26849c85ab");
                 BaseFeishu.message().sendContent(vo);
+                log.info("[需求管理表写入redmine]-获取记录为空, 发送admin完成");
             }
             if (!CollectionUtils.isEmpty(featureTmps)) {
                 tTableFeatureTmpService.updateBatchById(featureTmps);
@@ -173,15 +179,14 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                 BaseFeishu.cloud().table().batchUpdateTableRecords(tTableInfo, records.toArray(new AppTableRecord[0]));
                 log.info("[需求管理表写入redmine] 更新多维表格 完成， size：{}", records.size());
             }
-
             log.info("[需求管理表写入redmine] 执行完成");
         } catch (Exception e) {
             processResult.setMsg("[需求管理表写入redmine] 执行异常");
             processResult.setSuccess(false);
             log.error("[需求管理表写入redmine] 执行异常", e);
+            return processResult;
         }
         tTableFeatureTmpService.remove(Wrappers.<TTableFeatureTmp>lambdaQuery().in(TTableFeatureTmp::getWriteRedmine, "1", "4"));
-//        tTableFeatureTmpService.removeBatchByIds(tTableFeatureTmpService.list(Wrappers.<TTableFeatureTmp>lambdaQuery().in(TTableFeatureTmp::getWriteRedmine, "1", "4")));
         log.info("[需求管理表写入redmine] 删除历史数据完成!");
         return processResult;
     }
