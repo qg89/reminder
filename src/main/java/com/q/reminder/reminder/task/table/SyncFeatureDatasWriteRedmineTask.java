@@ -156,7 +156,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
             if (!sendAdmin.isEmpty()) {
                 MessageVo vo = new MessageVo();
                 vo.setContent(sendAdmin.toString());
-                vo.setMsgType("post");
+                vo.setMsgType("text");
                 vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
                 vo.setReceiveId("ou_35e03d4d8754dd35fed26c26849c85ab");
                 BaseFeishu.message().sendContent(vo);
