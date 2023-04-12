@@ -180,7 +180,8 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
             processResult.setSuccess(false);
             log.error("[需求管理表写入redmine] 执行异常", e);
         }
-        tTableFeatureTmpService.removeBatchByIds(tTableFeatureTmpService.list(Wrappers.<TTableFeatureTmp>lambdaQuery().in(TTableFeatureTmp::getWriteRedmine, "1", "4")));
+        tTableFeatureTmpService.remove(Wrappers.<TTableFeatureTmp>lambdaQuery().in(TTableFeatureTmp::getWriteRedmine, "1", "4"));
+//        tTableFeatureTmpService.removeBatchByIds(tTableFeatureTmpService.list(Wrappers.<TTableFeatureTmp>lambdaQuery().in(TTableFeatureTmp::getWriteRedmine, "1", "4")));
         log.info("[需求管理表写入redmine] 删除历史数据完成!");
         return processResult;
     }
