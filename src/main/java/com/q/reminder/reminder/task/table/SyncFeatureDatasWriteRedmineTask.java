@@ -3,6 +3,7 @@ package com.q.reminder.reminder.task.table;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.service.bitable.v1.model.AppTableRecord;
+import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.constant.TableTypeContants;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.TTableFeatureTmp;
@@ -14,6 +15,7 @@ import com.q.reminder.reminder.strategys.service.RedmineTypeStrategy;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.FeautreTimeVo;
+import com.q.reminder.reminder.vo.MessageVo;
 import com.q.reminder.reminder.vo.RedmineDataVo;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.bean.CustomField;
@@ -58,6 +60,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         ProcessResult processResult = new ProcessResult(true);
+        StringBuffer sendAdmin = new StringBuffer();
         try {
             List<RedmineDataVo> featureDataList = tTableFeatureTmpService.listByProject();
             Map<String, List<FeautreTimeVo>> featureTimeMap = tTableFeatureTmpService.queryAllTimes().stream().collect(Collectors.groupingBy(FeautreTimeVo::getRecordsId));
@@ -78,6 +81,11 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                     LocalDate prodTime = redmineDataVo.getProdTime();
                     String featureType = redmineDataVo.getFeatureType();
                     List<FeautreTimeVo> feautreTimeVos = featureTimeMap.get(recordsId);
+                    if (CollectionUtils.isEmpty(feautreTimeVos)) {
+                        log.error("[需求管理表写入redmine] 获取记录为空");
+                        sendAdmin.append("[需求管理表写入redmine] 获取记录为空!\r\n recordId: ").append(recordsId).append(", type : ").append(type).append("  \r\n");
+                        continue;
+                    }
 
                     boolean ftrType = "非功能".equals(featureType);
 
@@ -145,6 +153,14 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                     featureTmps.add(redmineDataVo);
                 }
             });
+            if (!sendAdmin.isEmpty()) {
+                MessageVo vo = new MessageVo();
+                vo.setContent(sendAdmin.toString());
+                vo.setMsgType("post");
+                vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+                vo.setReceiveId("ou_35e03d4d8754dd35fed26c26849c85ab");
+                BaseFeishu.message().sendContent(vo);
+            }
             if (!CollectionUtils.isEmpty(featureTmps)) {
                 tTableFeatureTmpService.updateBatchById(featureTmps);
                 log.info("[需求管理表写入redmine] update size: {}", featureTmps.size());
