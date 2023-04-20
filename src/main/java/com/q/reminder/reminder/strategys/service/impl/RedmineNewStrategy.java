@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -55,6 +56,22 @@ public class RedmineNewStrategy extends AbstractRedmineStrategy {
         return List.of(new RequestParam("f[]", "cf_226"),
                 new RequestParam("op[cf_226]", "~"),
                 new RequestParam("v[cf_226][]", value));
+    }
+
+    /**
+     * 4:已关闭
+     * 3：已解决
+     * 1：新
+     * 2：处理中
+     * 5：已拒绝
+     * 6：专车是
+     * 7：转产品
+     * 8：重新打开
+     * @return
+     */
+    @Override
+    public Set<String> getIssueStatusIds() {
+        return Set.of("4");
     }
 
 }

@@ -6,7 +6,9 @@ import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.internal.RequestParam;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author : saiko
@@ -33,5 +35,9 @@ public abstract class AbstractRedmineStrategy implements RedmineTypeStrategy {
     @Override
     public List<RequestParam> getFeatureIdParams(String value){
         return new ArrayList<>();
+    }
+
+    public Set<String> getIssueStatusIds() {
+        return new HashSet<>();
     }
 }
