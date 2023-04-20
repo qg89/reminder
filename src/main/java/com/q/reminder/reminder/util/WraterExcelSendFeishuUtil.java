@@ -5,6 +5,7 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.alibaba.fastjson2.JSONObject;
+import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.CreateMessageResp;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.*;
@@ -66,6 +67,7 @@ public class WraterExcelSendFeishuUtil {
         json.put("file_key", fileKey);
         contentVo.setContent(json.toJSONString());
         contentVo.setMsgType("file");
+        contentVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
         CreateMessageResp resp = BaseFeishu.message().sendContent(contentVo);
         boolean success = resp.success();
         if (!success) {
