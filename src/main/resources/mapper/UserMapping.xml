@@ -8,15 +8,14 @@
             gi.chat_id AS chatId,
             r.assignee_id assigneeId,
             gi.reminder_none AS reminderNone,
-            CONCAT( ' (', CURDATE(), '）', gi.reminder_title ) AS reminderTitle
+            CONCAT( ' (', CURDATE(), ')', gi.reminder_title ) AS reminderTitle
         FROM
             fs_user_member_info ui
             LEFT JOIN `fs_user_group` ug ON ui.member_id = ug.member_id
             LEFT JOIN fs_group_info gi ON gi.chat_id = ug.chat_id
-            LEFT JOIN r_redmine_user_info r ON ui.`name` = r.user_name
+            LEFT JOIN r_redmine_user_info r ON REPLACE ( r.user_name, ' ', '' ) = ui.`name`
         WHERE
             gi.send_type = 0
-          AND gi.is_delete = 0
           AND ui.is_delete = 0
           AND ui.resign = '0'
           AND ui.`name` IS NOT NULL
