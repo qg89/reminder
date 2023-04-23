@@ -8,6 +8,7 @@ import com.q.reminder.reminder.entity.OverdueTaskHistory;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.exception.FeishuException;
+import com.q.reminder.reminder.service.OverdueTaskHistoryService;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.RedmineApi;
@@ -39,6 +40,7 @@ public class OverdueTasksAgainToGroupBase {
 
     private final UserMemberService userMemberService;
     private final ProjectInfoService projectInfoService;
+    private final OverdueTaskHistoryService overdueTaskHistoryService;
 
     /**
      * 无任务提醒
@@ -133,28 +135,24 @@ public class OverdueTasksAgainToGroupBase {
                 CreateMessageResp resp = BaseFeishu.message().sendContent(m, log);
                 boolean success = resp.success();
                 if (!success) {
-                    log.info("群发送,过期任务提醒群组, 发送给: {}, error msg : {} ！", name, resp.getMsg());
-                    log.info("群发送,过期任务提醒群组, 发送给: {}, error : {} ！", name, resp.getError());
+                    log.info("群发送,过期任务提醒群组, 发送给: {}, error msg : [{}] ！, error: [{}]", name, resp.getMsg(), resp.getError());
                 }
                 log.info("群发送,过期任务提醒群组, 发送给: {}, success ！", name);
-                log.info("群发送,过期任务提醒群组,发送结果:{}", name);
             } catch (Exception ex) {
                throw new FeishuException(ex, "群发送,过期任务提醒群组 异常");
             }
         }
 
         if (!overdueTask) {
-//            if (!overdueTaskHistoryService.saveOrUpdateBatch(historys)) {
-//                adminInfoList.forEach(e -> {
-//                    MessageVo sendVo = new MessageVo();
-//                    sendVo.setReceiveId(e.getMemberId());
-//                    sendVo.setContent("任务保存历史记录失败！");
-//                    sendVo.setMsgType("text");
-//                    sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-//                    BaseFeishu.message().sendtext(sendVo, log);
-//                });
-//                return;
-//            }
+            if (!overdueTaskHistoryService.saveOrUpdateBatch(historys)) {
+                MessageVo sendVo = new MessageVo();
+                sendVo.setReceiveId("ou_35e03d4d8754dd35fed26c26849c85ab");
+                sendVo.setContent("任务保存历史记录失败！");
+                sendVo.setMsgType("text");
+                sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+                BaseFeishu.message().sendContent(sendVo, log);
+                return;
+            }
         }
         log.info("过期任务提醒群组,执行完成");
     }
