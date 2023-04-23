@@ -181,33 +181,7 @@ public abstract class RedmineApi {
         return issues;
     }
 
-    /**
-     * 通过coverity扫描的问题，保存到redmine任务
-     *
-     * @param vo redmine保存的信息
-     */
-    public static Issue saveTask(CoverityAndRedmineSaveTaskVo vo) throws RedmineException {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(vo.getRedmineUrl(), vo.getApiAccessKey());
-        Transport transport = mgr.getTransport();
-        Tracker tracker = new Tracker();
-        // 评审问题
-        tracker.setId(38);
-        tracker.setName("评审问题");
-        DateTime now = DateTime.now();
-        Issue issue = new Issue()
-                .setTracker(tracker)
-                .setAssigneeId(vo.getAssigneeId())
-                .setCreatedOn(now.toDate())
-                .setDueDate(now.plusDays(6).toDate())
-                .setSubject(vo.getSubject())
-                // 状态 NEW
-                .setStatusId(1)
-                .setProjectId(vo.getRedmineProjectId())
-                .setDescription(vo.getDescription())
-                .setParentId(vo.getParentId());
-        issue.setTransport(transport);
-        return issue.create();
-    }
+
 
     /**
      * 创建redmine任务，并且返回需求ID
