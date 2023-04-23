@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * @date :  23/04/2023 10:07
  */
 public class RedisUtils {
-    private RedisTemplate<String, Object> redisTemplate = SpringContextUtils.getBean("redisTemplate", RedisTemplate.class);
+    private final RedisTemplate<String, Object> redisTemplate = SpringContextUtils.getBean("redisTemplate", RedisTemplate.class);
 
     private static RedisUtils instance;
 
