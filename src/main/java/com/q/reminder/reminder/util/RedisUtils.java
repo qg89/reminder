@@ -28,18 +28,18 @@ public class RedisUtils {
         return instance;
     }
 
-    public Boolean invokeExceededTimes(String key, int hours, int count) {
+    public Boolean invokeExceededTimes(String key, int hourses, int count) {
         Boolean hasKey = redisTemplate.hasKey(key);
         if (hasKey != null && hasKey) {
             int currentCount = Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(key)).toString());
             if (currentCount >= count) {
-                return true;
+                return false;
             }
             redisTemplate.opsForValue().increment(key, 1);
         } else {
-            redisTemplate.opsForValue().set(key, "1", hours, TimeUnit.HOURS);
+            redisTemplate.opsForValue().set(key, "1", hourses, TimeUnit.HOURS);
         }
-        return false;
+        return true;
     }
 
     public void removeKey(String key) {
