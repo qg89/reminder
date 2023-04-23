@@ -28,7 +28,7 @@ public class RedisUtils {
         return instance;
     }
 
-    public Boolean invokeExceededTimes(String key, int days, int count) {
+    public Boolean invokeExceededTimes(String key, int hours, int count) {
         Boolean hasKey = redisTemplate.hasKey(key);
         if (hasKey != null && hasKey) {
             int currentCount = Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(key)).toString());
@@ -38,7 +38,7 @@ public class RedisUtils {
             redisTemplate.opsForValue().increment(key, 1);
             return true;
         } else {
-            redisTemplate.opsForValue().set(key, "1", days, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set(key, "1", hours, TimeUnit.HOURS);
         }
         return true;
     }
