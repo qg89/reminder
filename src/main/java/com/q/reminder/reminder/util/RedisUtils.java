@@ -33,14 +33,13 @@ public class RedisUtils {
         if (hasKey != null && hasKey) {
             int currentCount = Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(key)).toString());
             if (currentCount >= count) {
-                return false;
+                return true;
             }
             redisTemplate.opsForValue().increment(key, 1);
-            return true;
         } else {
             redisTemplate.opsForValue().set(key, "1", hours, TimeUnit.HOURS);
         }
-        return true;
+        return false;
     }
 
     public void removeKey(String key) {
