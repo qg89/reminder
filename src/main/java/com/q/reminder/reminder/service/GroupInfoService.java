@@ -14,5 +14,4 @@ import java.util.List;
  * @date :  2022.09.27 13:23
  */
 public interface GroupInfoService extends IService<FsGroupInfo> {
-    List<ChatProjectVo> listByProect(String pKey);
 }

@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.q.reminder.reminder.entity.FsGroupInfo;
 import com.q.reminder.reminder.mapper.GroupInfoMapping;
 import com.q.reminder.reminder.service.GroupInfoService;
-import com.q.reminder.reminder.vo.ChatProjectVo;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 /**
  * @author : saiko
@@ -19,8 +16,4 @@ import java.util.List;
 @Service
 public class GroupInfoServiceImpl extends ServiceImpl<GroupInfoMapping, FsGroupInfo> implements GroupInfoService {
 
-    @Override
-    public List<ChatProjectVo> listByProect(String pKey) {
-        return baseMapper.listByProject(pKey);
-    }
 }

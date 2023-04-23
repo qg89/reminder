@@ -17,5 +17,4 @@ import java.util.List;
  */
 @Mapper
 public interface GroupInfoMapping extends BaseMapper<FsGroupInfo> {
-    List<ChatProjectVo> listByProject(@Param("pKey") String pKey);
 }

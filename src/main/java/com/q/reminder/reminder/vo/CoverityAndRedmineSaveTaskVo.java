@@ -1,10 +1,8 @@
 package com.q.reminder.reminder.vo;
 
-import com.q.reminder.reminder.entity.CoverityLog;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author : saiko
@@ -62,7 +60,5 @@ public class CoverityAndRedmineSaveTaskVo implements Serializable {
     private String memberId;
 
     private String name;
-
-    private List<CoverityLog> coverityLogs;
 
 }

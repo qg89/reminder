@@ -5,6 +5,10 @@ import com.lark.oapi.core.request.EventReq;
 import com.lark.oapi.core.response.EventResp;
 import com.lark.oapi.event.CustomEventHandler;
 import com.lark.oapi.event.EventDispatcher;
+import com.lark.oapi.service.approval.v4.ApprovalService;
+import com.lark.oapi.service.approval.v4.model.ApprovalEvent;
+import com.lark.oapi.service.approval.v4.model.P2ApprovalUpdatedV4;
+import com.lark.oapi.service.approval.v4.model.P2ApprovalUpdatedV4Data;
 import com.lark.oapi.service.drive.v1.DriveService;
 import com.lark.oapi.service.drive.v1.model.BitableTableFieldAction;
 import com.lark.oapi.service.drive.v1.model.BitableTableFieldActionValue;
@@ -125,6 +129,22 @@ public class FeishuEventController {
                         String recordId = j.getString("record_id");
 //                        System.out.println(j);
                     }
+                }
+            })
+            .onP2ApprovalUpdatedV4(new ApprovalService.P2ApprovalUpdatedV4Handler() {
+                @Override
+                public void handle(P2ApprovalUpdatedV4 event) throws Exception {
+                    P2ApprovalUpdatedV4Data eventEvent = event.getEvent();
+                    ApprovalEvent object = eventEvent.getObject();
+                }
+            })
+            .onCustomizedEvent("approval.approval.created_v4", new CustomEventHandler() {
+                @Override
+                public void handle(EventReq event) throws Exception {
+                    JSONObject jsonObject = JSONObject.parse(new String(event.getBody()));
+                    String json = jsonObject.getString("encrypt");
+                    String eventStr = EVENT_DISPATCHER.decryptEvent(json);
+                    JSONObject object = JSONObject.parseObject(eventStr);
                 }
             })
             .build();

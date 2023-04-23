@@ -1,11 +1,16 @@
 package com.q.reminder.reminder.controller;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.lark.oapi.core.request.RequestOptions;
+import com.lark.oapi.service.bitable.v1.model.AppTableField;
+import com.lark.oapi.service.bitable.v1.model.AppTableFieldProperty;
+import com.lark.oapi.service.bitable.v1.model.ListAppTableFieldReq;
+import com.lark.oapi.service.bitable.v1.model.ListAppTableFieldResp;
 import com.q.reminder.reminder.entity.*;
 import com.q.reminder.reminder.service.*;
-import com.q.reminder.reminder.util.feishu.BaseFeishu;
+import com.q.reminder.reminder.service.impl.FeishuService;
 import com.q.reminder.reminder.vo.OptionVo;
 import com.q.reminder.reminder.vo.ProjectInfoVo;
 import com.q.reminder.reminder.vo.RProjectReaVo;
@@ -34,10 +39,11 @@ public class ProjectController {
     private final ProjectInfoService projectInfoService;
     private final GroupProjectService groupProjectService;
     private final UserPService userPService;
-    private final CoverityService coverityService;
     private final GroupInfoService groupInfoService;
     private final LoginService loginService;
     private final UserMemberService userMemberService;
+    private final FeishuService feishuService;
+    private final TableFieldsFeatureService fieldsFeatureService;
 
     @GetMapping("/i")
     public ReturnT<List<List<ProjectInfoVo>>> list() {
@@ -58,7 +64,33 @@ public class ProjectController {
     }
     @GetMapping("/t")
     public Object t() throws Exception {
-       return BaseFeishu.groupMessage().getGroupToChats();
+        // 创建请求对象
+        ListAppTableFieldReq req = ListAppTableFieldReq.newBuilder()
+                .appToken("bascnrkdLGoUftLgM7fvME7ly5c")
+                .tableId("tbld61CFebNfZ6M6")
+                .viewId("vewk6iANmq")
+                .build();
+
+        // 发起请求
+        // 如开启了Sdk的token管理功能，就无需调用 RequestOptions.newBuilder().tenantAccessToken("t-xxx").build()来设置租户token了
+        ListAppTableFieldResp resp = feishuService.client().bitable().appTableField().list(req, RequestOptions.newBuilder()
+                .build());
+        List<TableFieldsFeature> data = new ArrayList<>() {
+        };
+        for (AppTableField item : resp.getData().getItems()) {
+            AppTableFieldProperty property = item.getProperty();
+            JSONObject from = JSONObject.from(property);
+            TableFieldsFeature feature = new TableFieldsFeature();
+            feature.setFieldId(item.getFieldId());
+            feature.setFieldName(item.getFieldName());
+            feature.setType(item.getType());
+            feature.setIsPrimary(String.valueOf(item.getIsPrimary()));
+            feature.setUiType(item.getUiType());
+            feature.setTableId("tbld61CFebNfZ6M6");
+//            feature.setProperty(from.toJSONString(JSONWriter.Feature.IgnoreNoneSerializable));
+            data.add(feature);
+        }
+       return fieldsFeatureService.saveOrUpdateBatch(data);
     }
 
     @PostMapping("/e")
@@ -87,7 +119,6 @@ public class ProjectController {
         String pId = vo.getPid();
         String chatId = vo.getChatId();
         String userId = vo.getUserId();
-        String cProjectId = vo.getCProjectId();
         if (StringUtils.isBlank(pId) || projectInfoService.getOne(Wrappers.<RProjectInfo>lambdaQuery().eq(RProjectInfo::getPid, pId)) == null) {
             return Boolean.FALSE;
         }
@@ -96,21 +127,6 @@ public class ProjectController {
         }
         if (StringUtils.isNotBlank(userId)) {
             userPService.saveOrUpdateByMultiId(new UserP(userId, pId));
-        }
-        if (StringUtils.isNotBlank(cProjectId)) {
-            LambdaQueryWrapper<Coverity> lq = Wrappers.lambdaQuery();
-            lq.eq(Coverity::getCProjectId, cProjectId);
-            lq.orderByDesc(Coverity::getUpdateTime);
-            List<Coverity> list = coverityService.list(lq);
-            LambdaUpdateWrapper<Coverity> lu = Wrappers.lambdaUpdate();
-            lu.eq(Coverity::getCProjectId, cProjectId);
-            lu.set(Coverity::getIsDelete, "1");
-            coverityService.update(lu);
-            Coverity coverity = list.get(0);
-            coverity.setIsDelete("0");
-            coverity.setRProjectId(pId);
-            coverity.setId(null);
-            coverityService.saveOrUpdate(coverity);
         }
         return Boolean.TRUE;
     }
@@ -121,17 +137,11 @@ public class ProjectController {
         LambdaQueryWrapper<FsGroupInfo> gp = Wrappers.lambdaQuery();
         gp.select(FsGroupInfo::getChatId, FsGroupInfo::getName);
         List<FsGroupInfo> fsGroupInfoList = groupInfoService.list(gp);
-
         LambdaQueryWrapper<User> u = Wrappers.lambdaQuery();
         u.select(User::getId, User::getName);
         List<User> userList = loginService.list(u);
-
-        LambdaQueryWrapper<Coverity> c = Wrappers.lambdaQuery();
-        c.select(Coverity::getCProjectId, Coverity::getRProjectName);
-        List<Coverity> coverityList = coverityService.list(c);
         map.put("group", fsGroupInfoList);
         map.put("user", userList);
-        map.put("coverity", coverityList);
         return new ReturnT<>(map);
     }
 
