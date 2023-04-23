@@ -2,7 +2,9 @@ package com.q.reminder.reminder.util.feishu.message;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.im.v1.model.*;
+import com.q.reminder.reminder.constant.RedisKeyContents;
 import com.q.reminder.reminder.exception.FeishuException;
+import com.q.reminder.reminder.util.RedisUtils;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.ContentVo;
 import com.q.reminder.reminder.vo.MessageVo;
@@ -24,8 +26,6 @@ import java.util.UUID;
 public class Message extends BaseFeishu {
 
     private static Message instance;
-    private static int index = 0;
-    private static int index_task = 0;
 
     private Message() {
         super();
@@ -47,8 +47,9 @@ public class Message extends BaseFeishu {
      * @throws Exception
      */
     public CreateMessageResp sendContent(MessageVo vo) {
+        String key = RedisKeyContents.FEISHU_MESSAGE_INVOKEEXCEEDEDTIMES;
+        RedisUtils redisUtils = RedisUtils.getInstance();
         String content = vo.getContent();
-        index++;
         CreateMessageReq req = CreateMessageReq.newBuilder()
                 .createMessageReqBody(CreateMessageReqBody.newBuilder()
                         .msgType(vo.getMsgType())
@@ -60,17 +61,17 @@ public class Message extends BaseFeishu {
         try {
             resp = CLIENT.im().message().create(req);
         } catch (Exception e) {
-            if (!resp.success() && index <= 5) {
-                log.error("发送消息异常次数:【{}】：error: {}, content:{}", index, resp.getMsg(), content);
+            if (!resp.success() && redisUtils.invokeExceededTimes(key, 1, 5)) {
+                log.error("发送消息异常：error: {}, content:{}", resp.getMsg(), content);
                 sendContent(vo);
             }
-            throw new FeishuException(e, this.getClass().getName() + " 发送消息异常,次数：" + index);
+            throw new FeishuException(e, this.getClass().getName() + " 发送消息异常");
         }
-        if (!resp.success() && index <= 5) {
-            log.error("Task发送消息异常次数:【{}】：error: {}, content:{}", index, resp.getMsg(), content);
+        if (!resp.success() && redisUtils.invokeExceededTimes(key, 1, 5)) {
+            log.error("发送消息异常：fault: {}, content:{}", resp.getMsg(), content);
             sendContent(vo);
         }
-        index = 0;
+        redisUtils.removeKey(key);
         return resp;
     }
 
@@ -82,7 +83,6 @@ public class Message extends BaseFeishu {
      * @return
      */
     public CreateMessageResp sendContent(MessageVo vo, OmsLogger log) {
-        index_task++;
         String content = vo.getContent();
         CreateMessageReq req = CreateMessageReq.newBuilder()
                 .createMessageReqBody(CreateMessageReqBody.newBuilder()
@@ -96,21 +96,23 @@ public class Message extends BaseFeishu {
 
     @NotNull
     private CreateMessageResp getCreateMessageResp(MessageVo vo, OmsLogger log, String content, CreateMessageReq req) {
+        String key = RedisKeyContents.FEISHU_MESSAGE_INVOKEEXCEEDEDTIMES;
+        RedisUtils redisUtils = RedisUtils.getInstance();
         CreateMessageResp resp = new CreateMessageResp();
         try {
             resp = this.CLIENT.im().message().create(req);
         } catch (Exception e) {
-            if (!resp.success() && index_task <= 5) {
-                log.error("Task发送消息异常次数:【{}】：error: {}, content:{}", index_task, resp.getMsg(), content);
+            if (!resp.success() && redisUtils.invokeExceededTimes(key, 1, 5)) {
+                log.error("Task发送消息异常：error: {}, content:{}",  resp.getMsg(), content);
                 sendContent(vo, log);
             }
-            throw new FeishuException(e, this.getClass().getName() + " Task发送消息异常,次数：" + index_task);
+            throw new FeishuException(e, this.getClass().getName() + " Task发送消息异常");
         }
-        if (!resp.success() && index_task <= 5) {
-            log.error("Task发送消息异常次数:【{}】：error: {}, content:{}", index_task, resp.getMsg(), content);
+        if (!resp.success() && redisUtils.invokeExceededTimes(key, 1, 5)) {
+            log.error("Task发送消息异常：error: {}, content:{}",  resp.getMsg(), content);
             sendContent(vo, log);
         }
-        index_task = 0;
+        redisUtils.removeKey(key);
         return resp;
     }
 
@@ -122,7 +124,6 @@ public class Message extends BaseFeishu {
      * @return
      */
     public CreateMessageResp sendText(MessageVo vo, OmsLogger log) {
-        index_task++;
         JSONObject json = new JSONObject();
         json.put("text", vo.getContent());
         String content = vo.getContent();

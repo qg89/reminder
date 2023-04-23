@@ -12,6 +12,6 @@ public interface RedisKeyContents {
     String REDMINE_PROJECT_ALL = "redmine:project:all";
     String REDMINE_PROJECT_KEY = "redmine:project";
     String TABLE_USER_CONFIG = "table:user:config";
-    String FEISHU_TENANT_ACCESS_TOKEN = "feishu:TENANT_ACCESS_TOKEN";
+    String FEISHU_MESSAGE_INVOKEEXCEEDEDTIMES = "feishu:message:invokeExceededTimes";
     String FEISHU_TENANT_ACCESS_TOKEN_KEY = "feishu:TENANT_ACCESS_TOKEN::expire";
 }
