@@ -33,6 +33,7 @@ public class HoldayBase {
         PublicHolidays holidayInfo = Optional.ofNullable(publicHolidaysService.getOne(holdayWrapper)).orElse(new PublicHolidays());
         String holidayType = holidayInfo.getType();
         boolean weekend = DateUtil.isWeekend(new Date());
+        // 0: 休息日，1上班
         if (Objects.equals("0", holidayType) || (weekend && !Objects.equals("1", holidayType))) {
             return Boolean.TRUE;
         }
