@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author : saiko
@@ -29,9 +30,10 @@ public class HoldayBase {
     public Boolean queryHoliday() {
         LambdaQueryWrapper<PublicHolidays> holdayWrapper = new LambdaQueryWrapper<>();
         holdayWrapper.eq(PublicHolidays::getHoliday, DateUtil.today());
-        PublicHolidays holidayInfo = publicHolidaysService.getOne(holdayWrapper);
+        PublicHolidays holidayInfo = Optional.ofNullable(publicHolidaysService.getOne(holdayWrapper)).orElse(new PublicHolidays());
+        String holidayType = holidayInfo.getType();
         boolean weekend = DateUtil.isWeekend(new Date());
-        if (holidayInfo != null && Objects.equals("0", holidayInfo.getType()) || (holidayInfo == null && weekend)) {
+        if (Objects.equals("0", holidayType) || (weekend && !Objects.equals("1", holidayType))) {
             return Boolean.TRUE;
         }
         return Boolean.FALSE;
