@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * @date :  23/04/2023 10:07
  */
 public class RedisUtils {
-    private final RedisTemplate<String, Object> redisTemplate = SpringContextUtils.getBean("redisTemplate", RedisTemplate.class);
+    private final RedisTemplate<String, Integer> redisTemplate = SpringContextUtils.getBean("redisTemplate", RedisTemplate.class);
 
     private static RedisUtils instance;
 
@@ -28,7 +28,7 @@ public class RedisUtils {
         return instance;
     }
 
-    public Boolean invokeExceededTimes(String key, int hourses, int count) {
+    public Boolean invokeExceededTimes(String key, int times, int count) {
         Boolean hasKey = redisTemplate.hasKey(key);
         if (hasKey != null && hasKey) {
             int currentCount = Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(key)).toString());
@@ -37,7 +37,7 @@ public class RedisUtils {
             }
             redisTemplate.opsForValue().increment(key, 1);
         } else {
-            redisTemplate.opsForValue().set(key, "1", hourses, TimeUnit.HOURS);
+            redisTemplate.opsForValue().set(key, 1, times, TimeUnit.MINUTES);
         }
         return true;
     }
