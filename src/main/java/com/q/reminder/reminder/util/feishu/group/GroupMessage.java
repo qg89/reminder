@@ -67,7 +67,7 @@ public class GroupMessage extends BaseFeishu {
     }
 
     public List<UserMemgerInfo> getMembersInGroup( List<UserGroup> userGroupList) {
-        String chatId = "oc_92a0ac84a36bd7ea28a176e39adcac07";
+        String chatId = "oc_68be4dc6c1143059ebeaa5d6699773a2";
         List<UserMemgerInfo> items = new ArrayList<>();
         GetChatMembersReq req = GetChatMembersReq.newBuilder()
                 .chatId(chatId)
