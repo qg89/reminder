@@ -87,6 +87,9 @@ public class OverdueTasksAgainToGroupBase {
 
         // 查询要群对应的人员信息
         List<SendUserByGroupVo> sendUserByGroupVoList = userMemberService.queryUserGroupList();
+        if (CollectionUtils.isEmpty(sendUserByGroupVoList)) {
+            throw new FeishuException("群发送,过期任务提醒群组, 未找到群内成员");
+        }
         // 群内人员
         Set<String> sendUsers = sendUserByGroupVoList.stream().map(SendUserByGroupVo::getAssigneeId).collect(Collectors.toSet());
         // 是否有过期任务
