@@ -134,13 +134,13 @@ public class OverdueTasksAgainToGroupBase {
             m.setContent(content.toJSONString());
             m.setMsgType("post");
             try {
-                String name = groupInfo.getName();
+                String chatName = groupInfo.getChatName();
                 CreateMessageResp resp = BaseFeishu.message().sendContent(m, log);
                 boolean success = resp.success();
                 if (!success) {
-                    log.info("群发送,过期任务提醒群组, 发送给: {}, error msg : [{}] ！, error: [{}]", name, resp.getMsg(), resp.getError());
+                    log.info("群发送,过期任务提醒群组, 发送给: {}, error msg : [{}] ！, error: [{}]", chatName, resp.getMsg(), resp.getError());
                 }
-                log.info("群发送,过期任务提醒群组, 发送给: {}, success ！", name);
+                log.info("群发送,过期任务提醒群组, 发送给: {}, success ！", chatName);
             } catch (Exception ex) {
                throw new FeishuException(ex, "群发送,过期任务提醒群组 异常");
             }

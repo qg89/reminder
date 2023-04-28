@@ -1,6 +1,5 @@
 package com.q.reminder.reminder.vo;
 
-import com.alibaba.fastjson2.JSONArray;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -19,6 +18,7 @@ public class SendUserByGroupVo implements Serializable {
     private String name;
     private String memberId;
     private String chatId;
+    private String chatName;
     private String reminderNone;
     private String assigneeId;
     private String reminderTitle;

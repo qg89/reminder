@@ -6,6 +6,7 @@
             ug.member_id AS memberId,
             ui.`name` AS `name`,
             gi.chat_id AS chatId,
+            gi.`name` chatName,
             r.assignee_id assigneeId,
             gi.reminder_none AS reminderNone,
             CONCAT( ' (', CURDATE(), ')', gi.reminder_title ) AS reminderTitle
