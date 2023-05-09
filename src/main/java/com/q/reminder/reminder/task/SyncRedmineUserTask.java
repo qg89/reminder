@@ -41,8 +41,8 @@ public class SyncRedmineUserTask implements BasicProcessor {
                     RedmineUserInfo userInfo = new RedmineUserInfo();
                     userInfo.setRedmineType(info.getRedmineType());
                     userInfo.setAssigneeId(userId);
-                    userInfo.setUserName(userName);
-                    userInfo.setAssigneeName(userName.replace(" ", ""));
+                    userInfo.setAssigneeName(userName);
+                    userInfo.setUserName(userName.replace(" ", ""));
                     data.add(userInfo);
                 });
             }
