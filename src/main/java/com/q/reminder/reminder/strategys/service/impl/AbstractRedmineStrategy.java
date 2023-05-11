@@ -40,4 +40,9 @@ public abstract class AbstractRedmineStrategy implements RedmineTypeStrategy {
     public Set<String> getIssueStatusIds() {
         return new HashSet<>();
     }
+
+    @Override
+    public List<RequestParam> getBugParams() {
+        return new ArrayList<>();
+    }
 }

@@ -614,4 +614,16 @@ public abstract class RedmineApi {
             "archtct", "架构",
             "implmntton", "实施"
     );
+
+    /**
+     * 查询BUG对应的issue
+     * @param projectInfo
+     * @param bugParams
+     * @return
+     * @throws RedmineException
+     */
+    public static List<Issue> queryIssueByBug(RProjectInfo projectInfo, List<RequestParam> bugParams) throws RedmineException {
+        Transport transport = RedmineApi.getTransportByProject(projectInfo);
+        return transport.getObjectsList(Issue.class, bugParams);
+    }
 }

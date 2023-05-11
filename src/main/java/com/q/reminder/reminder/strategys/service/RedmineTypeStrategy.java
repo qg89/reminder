@@ -21,4 +21,6 @@ public interface RedmineTypeStrategy {
     Tracker getTestTracker();
 
     List<RequestParam> getFeatureIdParams(String value);
+
+    List<RequestParam> getBugParams();
 }

@@ -62,6 +62,13 @@ public class RedmineOldStrategy extends AbstractRedmineStrategy {
                 new RequestParam("v[cf_5][]", value));
     }
 
+
+    @Override
+    public List<RequestParam> getBugParams() {
+        return List.of(new RequestParam("f[]", "cf_72"),
+                new RequestParam("op[cf_72]", "*"));
+    }
+
     /**
      * 1:New
      * 2:In Progress
