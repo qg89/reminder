@@ -10,6 +10,7 @@ import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 import tech.powerjob.worker.core.processor.ProcessResult;
@@ -36,12 +37,17 @@ public class SyncRedmineIssueBugTask implements BasicProcessor {
 
     @Override
     public ProcessResult process(TaskContext context) {
+        String jobParams = context.getJobParams();
         OmsLogger log = context.getOmsLogger();
         log.info("[通过redmine 同步bug issue]-开始");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdIssueBug> bugIssueData = new ArrayList<>();
         List<Issue> issueData = new ArrayList<>();
-        String threeDateAgo = DateTime.now().minusDays(3).toString("yyyy-MM-dd");
+        int index = 3;
+        if (StringUtils.isNotBlank(jobParams)) {
+            index = Integer.parseInt(jobParams);
+        }
+        String threeDateAgo = DateTime.now().minusDays(index).toString("yyyy-MM-dd");
         try {
             for (RProjectInfo projectInfo : projectList) {
                 List<RequestParam> requestParams = List.of(
