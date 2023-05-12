@@ -22,5 +22,4 @@ public interface RedmineTypeStrategy {
 
     List<RequestParam> getFeatureIdParams(String value);
 
-    List<RequestParam> getBugParams();
 }

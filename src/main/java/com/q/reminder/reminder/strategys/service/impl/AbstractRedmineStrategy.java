@@ -41,8 +41,4 @@ public abstract class AbstractRedmineStrategy implements RedmineTypeStrategy {
         return new HashSet<>();
     }
 
-    @Override
-    public List<RequestParam> getBugParams() {
-        return new ArrayList<>();
-    }
 }

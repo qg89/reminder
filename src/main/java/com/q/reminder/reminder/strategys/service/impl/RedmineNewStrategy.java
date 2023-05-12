@@ -59,12 +59,6 @@ public class RedmineNewStrategy extends AbstractRedmineStrategy {
     }
 
 
-    @Override
-    public List<RequestParam> getBugParams() {
-        return List.of(new RequestParam("f[]", "cf_232"),
-                new RequestParam("op[cf_232]", "*"));
-    }
-
     /**
      * 4:已关闭
      * 3：已解决

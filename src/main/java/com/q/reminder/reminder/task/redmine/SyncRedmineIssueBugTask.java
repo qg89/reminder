@@ -5,12 +5,12 @@ import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RdIssueBug;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdIssueBugService;
-import com.q.reminder.reminder.strategys.config.HandlerTypeContext;
-import com.q.reminder.reminder.strategys.service.RedmineTypeStrategy;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.Tracker;
+import com.taskadapter.redmineapi.internal.RequestParam;
 import lombok.RequiredArgsConstructor;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
@@ -19,6 +19,7 @@ import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * @author : saiko
@@ -40,10 +41,18 @@ public class SyncRedmineIssueBugTask implements BasicProcessor {
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdIssueBug> bugIssueData = new ArrayList<>();
         List<Issue> issueData = new ArrayList<>();
+        String threeDateAgo = DateTime.now().minusDays(3).toString("yyyy-MM-dd");
         try {
             for (RProjectInfo projectInfo : projectList) {
-                RedmineTypeStrategy redmineTypeStrategy = HandlerTypeContext.getInstance(Integer.parseInt(projectInfo.getRedmineType()));
-                List<Issue> list = RedmineApi.queryIssueByBug(projectInfo, redmineTypeStrategy.getBugParams());
+                List<RequestParam> requestParams = List.of(
+                        new RequestParam("f[]", "created_on"),
+                        new RequestParam("op[created_on]", ">="),
+                        new RequestParam("v[created_on][]", threeDateAgo)
+
+                );
+                List<Issue> list = RedmineApi.queryIssueByBug(projectInfo, requestParams).stream().filter(e ->
+                        e.getTracker().getName().toLowerCase(Locale.ROOT).contains("bug")
+                ).toList();
                 issueData.addAll(list);
             }
             for (Issue i : issueData) {
