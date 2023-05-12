@@ -8,6 +8,7 @@ import com.q.reminder.reminder.service.RdTimeEntryService;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 import tech.powerjob.worker.core.processor.ProcessResult;
@@ -34,10 +35,14 @@ public class SyncTimeEntryTask implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
+        String jobParams = context.getJobParams();
         log.info("【redmine】同步redmine工时-start");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdTimeEntry> data = new ArrayList<>();
         int index = 3;
+        if (StringUtils.isNotBlank(jobParams)) {
+            index = Integer.parseInt(jobParams);
+        }
         log.info("【redmine】同步redmine工时-时间{}天前", index);
         String timeAgo = DateTime.now().minusDays(index).toString("yyyy-MM-dd");
         try {
