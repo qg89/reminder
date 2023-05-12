@@ -35,7 +35,7 @@ public class SyncTimeEntryTask implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
-        String jobParams = context.getJobParams();
+        String jobParams = context.getInstanceParams();
         log.info("【redmine】同步redmine工时-start");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdTimeEntry> data = new ArrayList<>();

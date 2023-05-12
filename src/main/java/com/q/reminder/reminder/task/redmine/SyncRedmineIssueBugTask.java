@@ -37,7 +37,7 @@ public class SyncRedmineIssueBugTask implements BasicProcessor {
 
     @Override
     public ProcessResult process(TaskContext context) {
-        String jobParams = context.getJobParams();
+        String jobParams = context.getInstanceParams();
         OmsLogger log = context.getOmsLogger();
         log.info("[通过redmine 同步bug issue]-开始");
         List<RProjectInfo> projectList = projectInfoService.listAll();
