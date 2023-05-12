@@ -6,7 +6,6 @@ import com.q.reminder.reminder.entity.RdIssueBug;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdIssueBugService;
 import com.q.reminder.reminder.util.RedmineApi;
-import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +41,6 @@ public class SyncRedmineIssueBugTask implements BasicProcessor {
         log.info("[通过redmine 同步bug issue]-开始");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdIssueBug> bugIssueData = new ArrayList<>();
-        List<Issue> issueData = new ArrayList<>();
         int index = 3;
         if (StringUtils.isNotBlank(jobParams)) {
             index = Integer.parseInt(jobParams);
@@ -56,48 +54,48 @@ public class SyncRedmineIssueBugTask implements BasicProcessor {
                         new RequestParam("v[created_on][]", threeDateAgo)
 
                 );
-                List<Issue> list = RedmineApi.queryIssueByBug(projectInfo, requestParams).stream().filter(e ->
-                        e.getTracker().getName().toLowerCase(Locale.ROOT).contains("bug")
-                ).toList();
-                issueData.addAll(list);
-            }
-            for (Issue i : issueData) {
-                RdIssueBug issue = new RdIssueBug();
-                issue.setAssigneeId(i.getAssigneeId());
-                issue.setAssigneeName(i.getAssigneeName());
-                issue.setAuthorId(i.getAuthorId());
-                issue.setAuthorName(i.getAuthorName());
-                issue.setId(i.getId());
-                issue.setClosedOn(i.getClosedOn());
-                issue.setDescription(i.getDescription());
-                issue.setDueDate(i.getDueDate());
-                issue.setCreatedOn(i.getCreatedOn());
-                issue.setUpdatedOn(i.getUpdatedOn());
-                issue.setStartDate(i.getStartDate());
-                Float estimatedHours = i.getEstimatedHours();
-                if (estimatedHours != null) {
-                    issue.setEstimatedHours(estimatedHours.doubleValue());
-                }
-                issue.setDoneRatio(i.getDoneRatio());
-                issue.setParentId(i.getParentId());
-                issue.setPriorityId(i.getPriorityId());
-                issue.setPriorityText(i.getPriorityText());
-                issue.setProjectName(i.getProjectName());
-                issue.setProjectid(i.getProjectId());
-                issue.setStatusName(i.getStatusName());
-                issue.setStatusId(i.getStatusId());
-                Float spentHours = i.getSpentHours();
-                if (spentHours != null) {
-                    issue.setSpentHours(spentHours.doubleValue());
-                }
-                issue.setSubject(i.getSubject());
-                issue.setPrivateIssue(String.valueOf(i.isPrivateIssue()));
-                Tracker tracker = i.getTracker();
-                String customField = JSONObject.toJSONString(i.getCustomFields());
-                issue.setCustomField(customField);
-                issue.setTracker(tracker.getId());
-                issue.setTrackerName(tracker.getName());
-                bugIssueData.add(issue);
+                RedmineApi.queryIssueByBug(projectInfo, requestParams).forEach(iss -> {
+                            boolean isBug = iss.getTracker().getName().toLowerCase(Locale.ROOT).contains("bug");
+                            if (isBug) {
+                                RdIssueBug issue = new RdIssueBug();
+                                issue.setAssigneeId(iss.getAssigneeId());
+                                issue.setAssigneeName(iss.getAssigneeName());
+                                issue.setAuthorId(iss.getAuthorId());
+                                issue.setAuthorName(iss.getAuthorName());
+                                issue.setId(iss.getId());
+                                issue.setClosedOn(iss.getClosedOn());
+                                issue.setDescription(iss.getDescription());
+                                issue.setDueDate(iss.getDueDate());
+                                issue.setCreatedOn(iss.getCreatedOn());
+                                issue.setUpdatedOn(iss.getUpdatedOn());
+                                issue.setStartDate(iss.getStartDate());
+                                Float estimatedHours = iss.getEstimatedHours();
+                                if (estimatedHours != null) {
+                                    issue.setEstimatedHours(estimatedHours.doubleValue());
+                                }
+                                issue.setDoneRatio(iss.getDoneRatio());
+                                issue.setParentId(iss.getParentId());
+                                issue.setPriorityId(iss.getPriorityId());
+                                issue.setPriorityText(iss.getPriorityText());
+                                issue.setProjectName(iss.getProjectName());
+                                issue.setProjectid(iss.getProjectId());
+                                issue.setStatusName(iss.getStatusName());
+                                issue.setStatusId(iss.getStatusId());
+                                Float spentHours = iss.getSpentHours();
+                                if (spentHours != null) {
+                                    issue.setSpentHours(spentHours.doubleValue());
+                                }
+                                issue.setSubject(iss.getSubject());
+                                issue.setPrivateIssue(String.valueOf(iss.isPrivateIssue()));
+                                Tracker tracker = iss.getTracker();
+                                String customField = JSONObject.toJSONString(iss.getCustomFields());
+                                issue.setCustomField(customField);
+                                issue.setTracker(tracker.getId());
+                                issue.setTrackerName(tracker.getName());
+                                bugIssueData.add(issue);
+                            }
+                        }
+                );
             }
             rdIssueBugService.saveOrUpdateBatchByMultiId(bugIssueData);
         } catch (Exception e) {
