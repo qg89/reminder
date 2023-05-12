@@ -622,8 +622,13 @@ public abstract class RedmineApi {
      * @return
      * @throws RedmineException
      */
-    public static List<Issue> queryIssueByBug(RProjectInfo projectInfo, List<RequestParam> bugParams) throws RedmineException {
-        Transport transport = RedmineApi.getTransportByProject(projectInfo);
+    public static Collection<? extends Issue> queryIssueByBug(RProjectInfo projectInfo, List<RequestParam> bugParams) throws RedmineException {
+        Transport transport = getTransportByProject(projectInfo);
         return transport.getObjectsList(Issue.class, bugParams);
+    }
+
+    public static Collection<? extends TimeEntry> getTimeEntity(RProjectInfo projectInfo, List<RequestParam> requestParams) throws RedmineException {
+        Transport transport = getTransportByProject(projectInfo);
+        return transport.getObjectsList(TimeEntry.class, requestParams);
     }
 }

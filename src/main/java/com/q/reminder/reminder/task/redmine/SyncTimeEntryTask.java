@@ -1,13 +1,12 @@
 package com.q.reminder.reminder.task.redmine;
 
-import cn.hutool.core.date.DateUtil;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdTimeEntryService;
 import com.q.reminder.reminder.util.RedmineApi;
-import com.taskadapter.redmineapi.bean.TimeEntry;
+import com.taskadapter.redmineapi.internal.RequestParam;
 import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
@@ -37,32 +36,39 @@ public class SyncTimeEntryTask implements BasicProcessor {
         OmsLogger log = context.getOmsLogger();
         log.info("【redmine】同步redmine工时-start");
         List<RProjectInfo> projectList = projectInfoService.listAll();
-        List<TimeEntry> timeData = new ArrayList<>();
+        List<RdTimeEntry> data = new ArrayList<>();
+        int index = 3;
+        log.info("【redmine】同步redmine工时-时间{}天前", index);
+        String timeAgo = DateTime.now().minusDays(index).toString("yyyy-MM-dd");
         try {
             for (RProjectInfo projectInfo : projectList) {
-                projectInfo.setStartDay(DateUtil.beginOfWeek(DateTime.now().minusWeeks(1).toDate()));
-                timeData.addAll(RedmineApi.queryTimes(projectInfo));
-            }
-            log.info("【redmine】同步redmine工时-查询完成，size:{}", timeData.size());
-            List<RdTimeEntry> data = new ArrayList<>();
-            for (TimeEntry timeEntry : timeData) {
-                RdTimeEntry time = new RdTimeEntry();
-                time.setId(timeEntry.getId());
-                time.setActivityId(timeEntry.getActivityId());
-                time.setComment(timeEntry.getComment());
-                time.setActivityName(timeEntry.getActivityName());
-                time.setHours(timeEntry.getHours());
-                time.setCreatedOn(timeEntry.getCreatedOn());
-                time.setIssueId(timeEntry.getIssueId());
-                time.setProjectId(timeEntry.getProjectId());
-                time.setProjectName(timeEntry.getProjectName());
-                time.setSpentOn(timeEntry.getSpentOn());
-                time.setUserid(timeEntry.getUserId());
-                time.setUpdatedOn(timeEntry.getUpdatedOn());
-                time.setUserName(timeEntry.getUserName());
-                data.add(time);
+                List<RequestParam> requestParams = List.of(
+                        new RequestParam("f[]", "spent_on"),
+                        new RequestParam("op[spent_on]", ">="),
+                        new RequestParam("v[spent_on][]", timeAgo)
+
+                );
+                RedmineApi.getTimeEntity(projectInfo, requestParams).forEach(timeEntry -> {
+                    RdTimeEntry time = new RdTimeEntry();
+                    time.setId(timeEntry.getId());
+                    time.setActivityId(timeEntry.getActivityId());
+                    time.setComment(timeEntry.getComment());
+                    time.setActivityName(timeEntry.getActivityName());
+                    time.setHours(timeEntry.getHours());
+                    time.setCreatedOn(timeEntry.getCreatedOn());
+                    time.setIssueId(timeEntry.getIssueId());
+                    time.setProjectId(timeEntry.getProjectId());
+                    time.setProjectName(timeEntry.getProjectName());
+                    time.setSpentOn(timeEntry.getSpentOn());
+                    time.setUserid(timeEntry.getUserId());
+                    time.setUpdatedOn(timeEntry.getUpdatedOn());
+                    time.setUserName(timeEntry.getUserName());
+                    data.add(time);
+                });
+                log.info("【redmine】同步redmine工时-项目： {}", projectInfo.getProjectShortName());
             }
             rdTimeEntryService.saveOrUpdateBatchByMultiId(data);
+            log.info("【redmine】同步redmine工时-查询完成，size:{}", data.size());
         } catch (Exception e) {
             throw new FeishuException(e, "【redmine】同步redmine工时-查询工时异常");
         }
