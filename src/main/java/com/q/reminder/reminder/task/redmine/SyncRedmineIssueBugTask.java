@@ -46,6 +46,7 @@ public class SyncRedmineIssueBugTask implements BasicProcessor {
         if (StringUtils.isNotBlank(jobParams)) {
             index = Integer.parseInt(jobParams);
         }
+        log.info("[通过redmine 同步bug issue]-时间{}天前", index);
         String threeDateAgo = DateTime.now().minusDays(index).toString("yyyy-MM-dd");
         try {
             for (RProjectInfo projectInfo : projectList) {
@@ -97,11 +98,14 @@ public class SyncRedmineIssueBugTask implements BasicProcessor {
                             }
                         }
                 );
+                log.info("[通过redmine 同步bug issue]-项目： {}", projectInfo.getProjectShortName());
             }
             rdIssueBugService.saveOrUpdateBatchByMultiId(bugIssueData);
+            log.info("[通过redmine 同步bug issue]-更新完成");
         } catch (Exception e) {
             throw new FeishuException(e, "[通过redmine 同步bug issue]-异常");
         }
+        log.info("[通过redmine 同步bug issue]-success");
         return new ProcessResult(true);
     }
 }
