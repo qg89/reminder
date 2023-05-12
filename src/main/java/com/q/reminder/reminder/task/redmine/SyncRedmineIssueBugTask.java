@@ -3,6 +3,7 @@ package com.q.reminder.reminder.task.redmine;
 import com.alibaba.fastjson2.JSONObject;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RdIssueBug;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdIssueBugService;
 import com.q.reminder.reminder.util.RedmineApi;
@@ -99,8 +100,7 @@ public class SyncRedmineIssueBugTask implements BasicProcessor {
             }
             rdIssueBugService.saveOrUpdateBatchByMultiId(bugIssueData);
         } catch (Exception e) {
-            log.error("[通过redmine 同步bug issue]-异常", e);
-            return new ProcessResult(false);
+            throw new FeishuException(e, "[通过redmine 同步bug issue]-异常");
         }
         return new ProcessResult(true);
     }
