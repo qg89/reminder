@@ -5,6 +5,7 @@ import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.FsGroupInfo;
 import com.q.reminder.reminder.entity.UserGroup;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.AdminInfoService;
 import com.q.reminder.reminder.service.GroupInfoService;
 import com.q.reminder.reminder.service.UserGroupService;
@@ -82,9 +83,7 @@ public class UpdateFeishuRedmineTask implements BasicProcessor {
             log.info("保存机器人所在群组和人员关系完成!");
             log.info("每日更新当前群信息，人员信息，及人群关系, 任务执行成功!");
         } catch (Exception e) {
-            log.error("每日更新当前群信息，人员信息，及人群关系, 任务执行失败!", e);
-            processResult.setSuccess(false);
-            processResult.setMsg("每日更新当前群信息，人员信息，及人群关系, 任务执行失败!");
+            throw new FeishuException(e, "每日更新当前群信息，人员信息，及人群关系, 任务执行失败");
         }
         return processResult;
     }

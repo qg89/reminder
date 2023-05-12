@@ -8,6 +8,7 @@ import com.q.reminder.reminder.constant.TableTypeContants;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.TTableFeatureTmp;
 import com.q.reminder.reminder.entity.TTableInfo;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.TTableFeatureTmpService;
 import com.q.reminder.reminder.service.TTableInfoService;
 import com.q.reminder.reminder.strategys.config.HandlerTypeContext;
@@ -181,10 +182,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
             }
             log.info("[需求管理表写入redmine] 执行完成");
         } catch (Exception e) {
-            processResult.setMsg("[需求管理表写入redmine] 执行异常");
-            processResult.setSuccess(false);
-            log.error("[需求管理表写入redmine] 执行异常", e);
-            return processResult;
+            throw new FeishuException(e, "[需求管理表写入redmine] 执行异常");
         }
         tTableFeatureTmpService.remove(Wrappers.<TTableFeatureTmp>lambdaQuery().in(TTableFeatureTmp::getWriteRedmine, "1", "4"));
         log.info("[需求管理表写入redmine] 删除历史数据完成!");

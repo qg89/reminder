@@ -9,6 +9,7 @@ import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.CreateMessageResp;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.UserMemberService;
 import com.q.reminder.reminder.util.RedmineApi;
@@ -82,9 +83,7 @@ public class RedmineUpdateTask implements BasicProcessor {
             });
             log.info("变更提醒,任务执行完成!");
         } catch (Exception e) {
-            log.error("变更提醒,任务执行异常!", e);
-            processResult.setSuccess(false);
-            processResult.setMsg("变更提醒,任务执行异常!");
+            throw new FeishuException(e, "变更提醒,任务执行异常!");
         }
         return processResult;
     }

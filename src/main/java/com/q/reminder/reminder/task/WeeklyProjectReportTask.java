@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.WeeklyProjectReport;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WeeklyProjectReportService;
 import com.q.reminder.reminder.task.base.HoldayBase;
@@ -64,7 +65,7 @@ public class WeeklyProjectReportTask implements BasicProcessor {
                 try {
                     projectReport = BaseFeishu.cloud().space().copyFile(vo);
                 } catch (Exception e) {
-                    log.error("复制文件异常", e);
+                    throw new FeishuException(e, "复制文件异常");
                 }
                 if (projectReport == null) {
                     return;
@@ -73,9 +74,7 @@ public class WeeklyProjectReportTask implements BasicProcessor {
                 weeklyProjectReportService.save(projectReport);
             });
         } catch (Exception e) {
-            log.error("复制文件异常", e);
-            result.setSuccess(false);
-            result.setMsg("复制文件异常");
+            throw new FeishuException(e, "复制文件异常");
         }
         return result;
     }

@@ -8,6 +8,7 @@ import com.lark.oapi.service.bitable.v1.model.AppTableRecord;
 import com.q.reminder.reminder.constant.TableTypeContants;
 import com.q.reminder.reminder.entity.TTableInfo;
 import com.q.reminder.reminder.entity.TTableUserTime;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.TTableInfoService;
 import com.q.reminder.reminder.service.TTableUserTimeService;
 import com.q.reminder.reminder.service.WUserTimesService;
@@ -82,9 +83,7 @@ public class SyncProjcetTimeTableTask implements BasicProcessor {
             BaseFeishu.cloud().table().batchCreateTableRecords(tableInfo, records.toArray(new AppTableRecord[0]));
             log.info("同步工时到多维表格-将数据库中的数据同步到多维表格中成功");
         } catch (Exception e) {
-            log.error("同步工时到多维表格-将数据库中的数据同步到多维表格中异常", e);
-            processResult.setSuccess(false);
-            processResult.setMsg("同步工时到多维表格-将数据库中的数据同步到多维表格中异常");
+            throw new FeishuException(e, "同步工时到多维表格-将数据库中的数据同步到多维表格中异常");
         }
         return processResult;
     }

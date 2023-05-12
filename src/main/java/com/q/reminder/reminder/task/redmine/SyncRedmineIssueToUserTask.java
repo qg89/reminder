@@ -2,6 +2,7 @@ package com.q.reminder.reminder.task.redmine;
 
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RedmineUserInfo;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RedmineUserInfoService;
 import com.q.reminder.reminder.util.RedmineApi;
@@ -62,8 +63,7 @@ public class SyncRedmineIssueToUserTask implements BasicProcessor {
                 }
             });
         } catch (Exception e) {
-            log.error("[全部人员同步]-异常", e);
-            return new ProcessResult(false);
+            throw new FeishuException(e, "[全部人员同步]-异常");
         }
         return new ProcessResult(true);
     }

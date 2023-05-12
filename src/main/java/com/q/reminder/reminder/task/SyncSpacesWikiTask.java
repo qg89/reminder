@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.WikiSpace;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WikiSpaceService;
 import com.q.reminder.reminder.service.impl.FeishuService;
@@ -74,9 +75,7 @@ public class SyncSpacesWikiTask implements BasicProcessor {
             spaceWikoService.saveOrUpdateBatch(wikiSpaceList);
             log.error("同步知识库中标准过程复制完成");
         } catch (Exception e) {
-            log.error("同步知识库中标准过程复制失败");
-            processResult.setSuccess(false);
-            processResult.setMsg("同步知识库中标准过程复制失败");
+            throw new FeishuException(e, "同步知识库中标准过程复制,任务执行异常!");
         }
         return processResult;
     }

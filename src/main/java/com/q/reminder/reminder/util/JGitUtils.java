@@ -116,7 +116,6 @@ public class JGitUtils {
             checkoutCommand.call();
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
             return e.getMessage();
         }
     }
@@ -145,7 +144,6 @@ public class JGitUtils {
             checkoutCommand.call();
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
             return e.getMessage();
         }
     }
@@ -169,7 +167,6 @@ public class JGitUtils {
             }
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
             return e.getMessage();
         }
     }
@@ -194,7 +191,6 @@ public class JGitUtils {
             }
             return null;
         } catch (Exception e) {
-            e.printStackTrace();
             return e.getMessage();
         }
     }

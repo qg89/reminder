@@ -2,6 +2,7 @@ package com.q.reminder.reminder.task;
 
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RedmineUserInfo;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RedmineUserInfoService;
 import com.q.reminder.reminder.util.RedmineApi;
@@ -48,9 +49,7 @@ public class SyncRedmineUserTask implements BasicProcessor {
             }
             redmineUserInfoService.saveOrupdateMultiIdAll(data);
         } catch (Exception e) {
-            log.error("SyncRedmineUserTask error: {}", e.getMessage());
-            processResult.setSuccess(false);
-            processResult.setMsg("");
+            throw new FeishuException(e, "SyncRedmineUserTask,任务执行异常!");
         }
         return processResult;
     }

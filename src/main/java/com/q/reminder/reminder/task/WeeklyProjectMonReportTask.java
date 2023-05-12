@@ -8,6 +8,7 @@ import com.lark.oapi.service.docx.v1.model.UpdateBlockRequest;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.constant.WeeklyReportConstants;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.util.ResourceUtils;
@@ -74,9 +75,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
             List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNumber, id);
             this.writeReport(list);
         } catch (Exception e) {
-            log.error("周一中午12点 写日报异常", e);
-            result.setMsg("周一中午12点 写日报异常");
-            result.setSuccess(false);
+            throw new FeishuException(e, "周一中午12点 写日报异常");
         }
         return result;
     }

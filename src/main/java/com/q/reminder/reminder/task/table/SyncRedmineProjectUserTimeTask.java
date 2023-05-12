@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.WUserTimes;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WUserTimesService;
 import com.q.reminder.reminder.util.RedmineApi;
@@ -101,8 +102,7 @@ public class SyncRedmineProjectUserTimeTask implements BasicProcessor {
             }
             wUserTimesService.saveOrUpdateBatch(userTimesData);
         }catch (Exception e) {
-            processResult.setSuccess(false);
-            processResult.setMsg("同步redmine上工时同步到数据库异常");
+            throw new FeishuException(e, "同步redmine上工时同步到数据库异常");
         }
         return processResult;
     }

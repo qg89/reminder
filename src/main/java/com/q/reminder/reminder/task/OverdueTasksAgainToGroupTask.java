@@ -2,6 +2,7 @@ package com.q.reminder.reminder.task;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.q.reminder.reminder.entity.NoneStatus;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.NoneStatusService;
 import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.task.base.OverdueTasksAgainToGroupBase;
@@ -68,9 +69,7 @@ public class OverdueTasksAgainToGroupTask implements BasicProcessor {
             overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(vo, log);
             log.info("[每天9点半提醒，群提醒] - 执行完成");
         } catch (Exception e) {
-            log.error("每天9点半提醒，群提醒 - 执行失败", e);
-            result.setSuccess(false);
-            result.setMsg("每天9点半提群提醒 - 执行异常");
+            throw new FeishuException(e, "每天9点半提醒，群提醒 - 执行失败");
         }
         return result;
     }

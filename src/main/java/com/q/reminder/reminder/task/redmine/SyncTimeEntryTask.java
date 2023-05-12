@@ -3,6 +3,7 @@ package com.q.reminder.reminder.task.redmine;
 import cn.hutool.core.date.DateUtil;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RdTimeEntry;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdTimeEntryService;
 import com.q.reminder.reminder.util.RedmineApi;
@@ -63,7 +64,7 @@ public class SyncTimeEntryTask implements BasicProcessor {
             }
             rdTimeEntryService.saveOrUpdateBatchByMultiId(data);
         } catch (Exception e) {
-            log.error("【redmine】同步redmine工时-查询工时异常", e);
+            throw new FeishuException(e, "【redmine】同步redmine工时-查询工时异常");
         }
         return new ProcessResult(true);
     }
