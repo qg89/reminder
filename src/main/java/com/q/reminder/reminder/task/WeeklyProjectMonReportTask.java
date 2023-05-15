@@ -5,7 +5,6 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.docx.v1.model.ReplaceImageRequest;
 import com.lark.oapi.service.docx.v1.model.UpdateBlockRequest;
-import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.constant.WeeklyReportConstants;
 import com.q.reminder.reminder.exception.FeishuException;
@@ -267,7 +266,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         sendVo.setReceiveId(vo.getPmOu());
         sendVo.setContent(con.toJSONString());
         sendVo.setMsgType("post");
-        sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+//        sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
         BaseFeishu.message().sendContent(sendVo);
     }
 
