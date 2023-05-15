@@ -88,6 +88,7 @@ public class WraterExcelSendFeishuUtil {
         File file = new File(path);
         ExcelWriter writer = ExcelUtil.getWriter();
         writer.renameSheet(0, map.keySet().stream().findFirst().get());
+
         map.forEach((k, excelVoList) -> {
             writer.setSheet(k);
             writer.writeCellValue(0, 0, "周数");
@@ -99,6 +100,7 @@ public class WraterExcelSendFeishuUtil {
             writer.setFreezePane(1);
             writer.write(excelVoList, false);
         });
+
         writer.setDestFile(file);
         writer.close();
 
@@ -112,9 +114,13 @@ public class WraterExcelSendFeishuUtil {
         contentVo.setReceiveId(vo.getPmOu());
         contentVo.setFile(file);
         contentVo.setReceiveId(weeklyVo.getPmOu());
-        String fileKey = BaseFeishu.message().imUploadFile(contentVo);
-        if (StringUtils.isBlank(fileKey)) {
+        String fileKey;
+        try {
+            fileKey = BaseFeishu.message().imUploadFile(contentVo);
+        } finally {
             file.delete();
+        }
+        if (StringUtils.isBlank(fileKey)) {
             log.info("周报导出Excel,上传文件获取key为空");
             return;
         }
@@ -122,15 +128,12 @@ public class WraterExcelSendFeishuUtil {
         json.put("file_key", fileKey);
         contentVo.setContent(json.toJSONString());
         contentVo.setMsgType("file");
-        contentVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+//        contentVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
         CreateMessageResp resp = BaseFeishu.message().sendContent(contentVo);
         boolean success = resp.success();
         if (!success) {
-            log.info("周报导出Excel, 发送给: {}, error msg : {} ！", name, resp.getMsg());
-            log.info("周报导出Excel, 发送给: {}, error : {} ！", name, resp.getError());
+            log.info("周报导出Excel, 发送给: {}, error msg : {} , error: {}！", name, resp.getMsg(), resp.getError());
         }
         log.info("周报导出Excel, 发送给: {}, success ！", name);
-        log.info("周报导出Excel,发送结果:{}", name);
-        file.delete();
     }
 }
