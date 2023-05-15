@@ -70,7 +70,7 @@ public class WraterExcelSendFeishuUtil {
         json.put("file_key", fileKey);
         contentVo.setContent(json.toJSONString());
         contentVo.setMsgType("file");
-//        contentVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+        contentVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
         CreateMessageResp resp;
         try {
             resp = BaseFeishu.message().sendContent(contentVo);
