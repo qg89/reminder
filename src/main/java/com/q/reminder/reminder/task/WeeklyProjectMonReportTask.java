@@ -146,15 +146,16 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
      */
     public int reviewQuestions(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i, WeeklyLogVo<Logger, OmsLogger> objLog) throws Exception {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
+        String projectShortName = vo.getProjectShortName();
         vo.setBlockId(block.getString("block_id"));
         // 评审问题
         File file = WeeklyProjectUtils.reviewQuestions(vo, objLog);
         addRequests(vo, file, requests);
         OmsLogger omsLogger = objLog.getOmsLogger();
         if (omsLogger != null) {
-            omsLogger.info("[{}]项目周报，评审问题 执行完成", vo.getProjectShortName());
+            omsLogger.info("[{}]项目周报，评审问题 执行完成", projectShortName);
         } else {
-            log.info("[{}]项目周报，评审问题 执行完成", vo.getProjectShortName());
+            log.info("[{}]项目周报，评审问题 执行完成", projectShortName);
         }
         return i;
     }
@@ -171,8 +172,8 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
      * @return
      */
     public int openBug15(File logoFile, WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i, WeeklyLogVo<Logger, OmsLogger> logVo) throws Exception {
-        JSONObject block;
-        block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
+        JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
+        String projectShortName = vo.getProjectShortName();
         // open-Bug >15
         vo.setBlockId(block.getString("block_id"));
         File openBug15 = WeeklyProjectUtils.openBug15(vo.getAllBugList(), logVo);
@@ -182,9 +183,9 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         addRequests(vo, openBug15, requests);
         OmsLogger omsLogger = logVo.getOmsLogger();
         if (omsLogger != null) {
-            omsLogger.info("[{}]项目周报，open-Bug >15 执行完成", vo.getProjectShortName());
+            omsLogger.info("[{}]项目周报，open-Bug >15 执行完成", projectShortName);
         } else {
-            log.info("[{}]项目周报，open-Bug >15 执行完成", vo.getProjectShortName());
+            log.info("[{}]项目周报，open-Bug >15 执行完成", projectShortName);
         }
         return i;
     }
@@ -201,15 +202,16 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
      */
     public int openBugLevel(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i, WeeklyLogVo<Logger, OmsLogger> logVo) throws Exception {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
+        String projectShortName = vo.getProjectShortName();
         // Open-Bug等级
         vo.setBlockId(block.getString("block_id"));
         File openBug = WeeklyProjectUtils.openBug(vo.getAllBugList(), vo, logVo);
         addRequests(vo, openBug, requests);
         OmsLogger omsLogger = logVo.getOmsLogger();
         if (omsLogger != null) {
-            omsLogger.info("[{}]项目周报，Open-Bug等级分布 执行完成", vo.getProjectShortName());
+            omsLogger.info("[{}]项目周报，Open-Bug等级分布 执行完成", projectShortName);
         } else {
-            log.info("[{}]项目周报，Open-Bug等级分布 执行完成", vo.getProjectShortName());
+            log.info("[{}]项目周报，Open-Bug等级分布 执行完成", projectShortName);
         }
         return i;
     }
@@ -226,15 +228,16 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
      */
     public int allBugLevel(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i, WeeklyLogVo<Logger, OmsLogger> logVo) throws Exception {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
+        String projectShortName = vo.getProjectShortName();
         // All-bug等级
         vo.setBlockId(block.getString("block_id"));
         File bugLevel = WeeklyProjectUtils.AllBugLevel(vo.getAllBugList(), vo, logVo);
         addRequests(vo, bugLevel, requests);
         OmsLogger omsLogger = logVo.getOmsLogger();
         if (omsLogger != null) {
-            omsLogger.info("[{}]项目周报，All-bug等级分布 执行完成", vo.getProjectShortName());
+            omsLogger.info("[{}]项目周报，All-bug等级分布 执行完成", projectShortName);
         } else {
-            log.info("[{}]项目周报，All-bug等级分布 执行完成", vo.getProjectShortName());
+            log.info("[{}]项目周报，All-bug等级分布 执行完成", projectShortName);
         }
         return i;
     }
@@ -344,15 +347,16 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
 
     public int copq(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i, WeeklyLogVo<Logger, OmsLogger> logVo) throws Exception {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
+        String projectShortName = vo.getProjectShortName();
         vo.setBlockId(block.getString("block_id"));
         // 评审问题
         File file = WeeklyProjectUtils.copq(vo);
         addRequests(vo, file, requests);
         OmsLogger omsLogger = logVo.getOmsLogger();
         if (omsLogger != null) {
-            omsLogger.info("[{}]项目周报，COPQ 执行完成", vo.getProjectShortName());
+            omsLogger.info("[{}]项目周报，COPQ 执行完成", projectShortName);
         } else {
-            log.info("[{}]项目周报，COPQ 执行完成", vo.getProjectShortName());
+            log.info("[{}]项目周报，COPQ 执行完成", projectShortName);
         }
         return i;
     }
@@ -368,17 +372,17 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
      * @return
      */
     public int tends(WeeklyProjectVo weeklyVo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i, WeeklyLogVo<Logger, OmsLogger> logVo) throws Exception {
-        JSONObject block;
-        block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
+        JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
+        String projectShortName = weeklyVo.getProjectShortName();
         // 趋势
         weeklyVo.setBlockId(block.getString("block_id"));
         File file = WeeklyProjectUtils.trends(weeklyVo, logVo);
         addRequests(weeklyVo, file, requests);
         OmsLogger omsLogger = logVo.getOmsLogger();
         if (omsLogger != null) {
-            omsLogger.info("[{}]项目周报，趋势 执行完成", weeklyVo.getProjectShortName());
+            omsLogger.info("[{}]项目周报，趋势 执行完成", projectShortName);
         } else {
-            log.info("[{}]项目周报，趋势 执行完成", weeklyVo.getProjectShortName());
+            log.info("[{}]项目周报，趋势 执行完成", projectShortName);
         }
         return i;
     }
