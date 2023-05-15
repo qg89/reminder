@@ -136,7 +136,7 @@ public abstract class WeeklyProjectUtils {
         Map<String, List<ExcelVo>> excelMap = new LinkedHashMap<>();
         excelMap.put("open", openIssueList);
         excelMap.put("closed", closedIssueList);
-        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title, log);
+        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title, objLog);
         File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream out = new FileOutputStream(file);
         GenerateChartUtil.createStackedBarChart(out, title, legendNameList, categories, dataList, "", "", 950, 500);
