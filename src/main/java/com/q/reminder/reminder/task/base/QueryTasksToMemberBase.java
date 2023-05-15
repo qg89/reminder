@@ -54,8 +54,9 @@ public class QueryTasksToMemberBase {
      * @param noneStatusList
      * @param contentStatus
      * @param log
+     * @param taskName
      */
-    public void feiShu(int expiredDay, List<String> noneStatusList, Boolean contentStatus, OmsLogger log) {
+    public void feiShu(int expiredDay, List<String> noneStatusList, Boolean contentStatus, OmsLogger log, String taskName) {
         StringBuilder sendAdminContent = new StringBuilder();
         sendAdminContent.append("当日执行情况如下(").append(new DateTime().toString("yyyy-MM-dd")).append("):\r\n");
 
@@ -154,7 +155,7 @@ public class QueryTasksToMemberBase {
             sendVo.setReceiveId(memberId);
             CreateMessageResp resp = BaseFeishu.message().sendContent(sendVo, log);
             boolean success = resp.success();
-            log.info("[过期任务提醒个人]-发送飞书任务, 人员姓名：{},执行结果：{}", name, done);
+            log.info(taskName + "-发送飞书任务, 人员姓名：{},执行结果：{}", name, success);
             sendAdminContent.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("人员姓名: ").append(name).append(", 执行结果：").append(success).append("\r\n");
         });
 
@@ -162,7 +163,7 @@ public class QueryTasksToMemberBase {
         overdueTaskHistoryService.saveOrUpdateBatch(historys);
         sendAdminContent.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("执行完成!").append("\r\n");
         sendAdmin(log, sendAdminContent, adminInfoList);
-        log.info("过期任务提醒个人,执行完成");
+        log.info(taskName + "-done");
     }
 
     private void sendAdmin(OmsLogger log, StringBuilder contentAll, List<AdminInfo> adminInfoList) {

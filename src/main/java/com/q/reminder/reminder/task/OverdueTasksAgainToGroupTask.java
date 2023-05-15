@@ -58,7 +58,7 @@ public class OverdueTasksAgainToGroupTask implements BasicProcessor {
             }
             if (!CollectionUtils.isEmpty(noneStatusList)) {
                 // 组装数据， 通过人员，获取要发送的内容
-                overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(vo, log);
+                overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(vo, log, taskName);
                 log.info(taskName +" - 非[Resolved]执行成功");
             }
             if (statusMap.containsKey("2")) {
@@ -67,7 +67,7 @@ public class OverdueTasksAgainToGroupTask implements BasicProcessor {
             vo.setExpiredDay(2);
             vo.setContainsStatus(Boolean.TRUE);
             vo.setRedminderType("(Resolved)");
-            overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(vo, log);
+            overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(vo, log, taskName);
             log.info(taskName + " - 执行完成");
         } catch (Exception e) {
             throw new FeishuException(e, taskName + "-异常");

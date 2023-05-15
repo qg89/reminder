@@ -61,8 +61,9 @@ public class OverdueTasksAgainToGroupBase {
      *
      * @param vo
      * @param log
+     * @param taskName
      */
-    public void overdueTasksAgainToGroup(QueryVo vo, OmsLogger log) {
+    public void overdueTasksAgainToGroup(QueryVo vo, OmsLogger log, String taskName) {
         List<OverdueTaskHistory> historys = new ArrayList<>();
         String redminderType = vo.getRedminderType();
         // 组装数据， 通过人员，获取要发送的内容
@@ -88,7 +89,7 @@ public class OverdueTasksAgainToGroupBase {
         // 查询要群对应的人员信息
         List<SendUserByGroupVo> sendUserByGroupVoList = userMemberService.queryUserGroupList();
         if (CollectionUtils.isEmpty(sendUserByGroupVoList)) {
-            throw new FeishuException("群发送,过期任务提醒群组, 未找到群内成员");
+            throw new FeishuException(taskName + "-未找到群内成员");
         }
         // 群内人员
         Set<String> sendUsers = sendUserByGroupVoList.stream().map(SendUserByGroupVo::getAssigneeId).collect(Collectors.toSet());
@@ -100,13 +101,13 @@ public class OverdueTasksAgainToGroupBase {
             // 处理不在群内的成员
             issueUserList.removeIf(e -> !sendUsers.contains(e.getAssigneeId()));
             if (issueUserList.isEmpty()) {
-                log.info("群发送,过期任务人员为空!");
+                log.info(taskName + "-过期任务人员为空!");
                 overdueTask = true;
             } else {
                 Map<String, List<RedmineVo>> assigneeMap = issueUserList.stream().filter(e -> StringUtils.isNotBlank(e.getAssigneeId())).collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
                 Map<String, List<RedmineVo>> noneAssigneeMap = issueUserList.stream().filter(e -> StringUtils.isBlank(e.getAssigneeId()) && StringUtils.isNotBlank(e.getAuthorName())).collect(Collectors.groupingBy(RedmineVo::getAuthorName));
                 if (!CollectionUtils.isEmpty(noneAssigneeMap)) {
-                    log.info("[飞书群发提醒]-redmine =未指派人集合为 {}", noneAssigneeMap);
+                    log.info(taskName + "-redmine =未指派人集合为 {}", noneAssigneeMap);
                 }
                 assigneeMap.putAll(noneAssigneeMap);
                 contentJsonArray = extracted(assigneeMap);
@@ -138,11 +139,11 @@ public class OverdueTasksAgainToGroupBase {
                 CreateMessageResp resp = BaseFeishu.message().sendContent(m, log);
                 boolean success = resp.success();
                 if (!success) {
-                    log.info("群发送,过期任务提醒群组, 发送给: {}, error msg : [{}] ！, error: [{}]", chatName, resp.getMsg(), resp.getError());
+                    log.info(taskName + "-, 发送给: {}, error msg : [{}] ！, error: [{}]", chatName, resp.getMsg(), resp.getError());
                 }
-                log.info("群发送,过期任务提醒群组, 发送给: {}, done ！", chatName);
+                log.info(taskName + "-, 发送给: {}, done ！", chatName);
             } catch (Exception ex) {
-               throw new FeishuException(ex, "群发送,过期任务提醒群组 异常");
+               throw new FeishuException(ex, taskName + "-异常");
             }
         }
 
@@ -157,7 +158,7 @@ public class OverdueTasksAgainToGroupBase {
                 return;
             }
         }
-        log.info("过期任务提醒群组,执行完成");
+        log.info(taskName + "-done");
     }
 
     /**

@@ -33,6 +33,7 @@ public class Overdue0Tasks implements BasicProcessor {
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         String taskName = context.getTaskName();
+        String jobParams = context.getJobParams();
         log.info(taskName + "-start");
         ProcessResult result = new ProcessResult(true);
         try {
@@ -41,10 +42,10 @@ public class Overdue0Tasks implements BasicProcessor {
             log.info("节假日放假!!!!");
             return result;
         }
-        int expiredDay = Integer.parseInt(context.getJobParams());
+        int expiredDay = Integer.parseInt(jobParams);
         List<String> noneStatusList = noneStatusService.queryUnInStatus(0);
         // 组装数据， 通过人员，获取要发送的内容
-        queryTasksToMemberBase.feiShu(expiredDay, noneStatusList, Boolean.FALSE, log);
+        queryTasksToMemberBase.feiShu(expiredDay, noneStatusList, Boolean.FALSE, log, taskName);
         } catch (Exception e) {
             throw new FeishuException(e, taskName + "- 异常");
         }
