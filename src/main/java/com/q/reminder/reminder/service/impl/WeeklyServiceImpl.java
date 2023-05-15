@@ -10,11 +10,14 @@ import com.q.reminder.reminder.task.WeeklyProjectMonReportTask;
 import com.q.reminder.reminder.util.ResourceUtils;
 import com.q.reminder.reminder.util.WeeklyProjectRedmineUtils;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
+import com.q.reminder.reminder.vo.WeeklyLogVo;
 import com.q.reminder.reminder.vo.WeeklyVo;
 import com.taskadapter.redmineapi.bean.Issue;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -41,6 +44,7 @@ public class WeeklyServiceImpl implements WeeklyService {
 
     @Override
     public void resetReport(WeeklyVo vo) throws Exception {
+        WeeklyLogVo<Logger, OmsLogger> logVo = new WeeklyLogVo<>(log);
         File logoFile = new File(ResourceUtils.path());
         vo.setAppSecret(feishuProperties.getAppSecret());
         vo.setAppId(feishuProperties.getAppId());
@@ -49,25 +53,24 @@ public class WeeklyServiceImpl implements WeeklyService {
         String title = vo.getTitle();
         JSONArray jsonArray = BaseFeishu.cloud().documents().blocks(vo);
         ArrayList<UpdateBlockRequest> requests = new ArrayList<>();
-
         for (int i = 0; i < Objects.requireNonNull(jsonArray).size(); i++) {
             JSONObject block = JSONObject.parseObject(jsonArray.get(i).toString());
             Integer blockType = block.getInteger("block_type");
             if (4 == blockType) {
                 String heading2 = JSONObject.parseObject(block.getJSONObject("heading2").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
                 if (WeeklyReportConstants.REVIEW_QUESTIONS.equals(heading2) && WeeklyReportConstants.REVIEW_QUESTIONS.equals(title)) {
-                    weeklyProjectMonReportTask.reviewQuestions(vo, jsonArray, requests, i);
+                    weeklyProjectMonReportTask.reviewQuestions(vo, jsonArray, requests, i, logVo);
                     break;
                 }
                 if (WeeklyReportConstants.COPQ.equals(heading2) && WeeklyReportConstants.COPQ.equals(title)) {
-                    weeklyProjectMonReportTask.copq(vo, jsonArray, requests, i);
+                    weeklyProjectMonReportTask.copq(vo, jsonArray, requests, i, logVo);
                     break;
                 }
             }
             if (5 == blockType) {
                 String heading3 = JSONObject.parseObject(block.getJSONObject("heading3").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
                 if (WeeklyReportConstants.TRENDS.equals(heading3) && WeeklyReportConstants.TRENDS.equals(title)) {
-                    weeklyProjectMonReportTask.tends(vo, jsonArray, requests, i);
+                    weeklyProjectMonReportTask.tends(vo, jsonArray, requests, i, logVo);
                     break;
                 }
                 if (WeeklyReportConstants.BUG_LEVEL.equals(heading3) && WeeklyReportConstants.BUG_LEVEL.equals(title)) {
@@ -80,15 +83,15 @@ public class WeeklyServiceImpl implements WeeklyService {
                                         }).collect(Collectors.toList());
                     vo.setAllBugList(allBugList);
                     if ("All-Bug等级分布".equals(title)) {
-                        weeklyProjectMonReportTask.allBugLevel(vo, jsonArray, requests, i);
+                        weeklyProjectMonReportTask.allBugLevel(vo, jsonArray, requests, i, logVo);
                         break;
                     }
                     if ("Open-Bug等级分布".equals(title)) {
-                        weeklyProjectMonReportTask.openBugLevel(vo, jsonArray, requests, i);
+                        weeklyProjectMonReportTask.openBugLevel(vo, jsonArray, requests, i, logVo);
                         break;
                     }
                     if ("Open-Bug>15".equals(title)) {
-                        weeklyProjectMonReportTask.openBug15(logoFile, vo, jsonArray, requests, i);
+                        weeklyProjectMonReportTask.openBug15(logoFile, vo, jsonArray, requests, i, logVo);
                         break;
                     }
                 }

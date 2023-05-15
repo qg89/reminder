@@ -8,13 +8,16 @@ import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.util.jfree.GenerateChartUtil;
 import com.q.reminder.reminder.util.jfree.GeneratePieChartUtil;
 import com.q.reminder.reminder.vo.ExcelVo;
+import com.q.reminder.reminder.vo.WeeklyLogVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.taskadapter.redmineapi.bean.Issue;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.awt.*;
 import java.io.File;
@@ -51,9 +54,10 @@ public abstract class WeeklyProjectUtils {
      * 评审问题创建图片
      *
      * @param vo
+     * @param log
      * @return
      */
-    public static File reviewQuestions(WeeklyProjectVo vo) throws Exception {
+    public static File reviewQuestions(WeeklyProjectVo vo, WeeklyLogVo<Logger, OmsLogger> objLog) throws Exception {
         RProjectInfo RProjectInfo = new RProjectInfo();
         RProjectInfo.setRedmineUrl(vo.getRedmineUrl());
         RProjectInfo.setPmKey(vo.getPmKey());
@@ -132,7 +136,7 @@ public abstract class WeeklyProjectUtils {
         Map<String, List<ExcelVo>> excelMap = new LinkedHashMap<>();
         excelMap.put("open", openIssueList);
         excelMap.put("closed", closedIssueList);
-        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title);
+        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title, log);
         File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream out = new FileOutputStream(file);
         GenerateChartUtil.createStackedBarChart(out, title, legendNameList, categories, dataList, "", "", 950, 500);
@@ -205,7 +209,7 @@ public abstract class WeeklyProjectUtils {
         dataList.add(week);
         Map<String, List<ExcelVo>> excelMap = new LinkedHashMap<>();
         excelMap.put("all", allBugList);
-        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title);
+        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title, log);
 
         File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream out = new FileOutputStream(file);
@@ -312,7 +316,7 @@ public abstract class WeeklyProjectUtils {
         excelMap.put("b", bList);
         excelMap.put("c", cList);
         excelMap.put("d", dList);
-        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title);
+        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title, log);
 
         File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
@@ -384,7 +388,7 @@ public abstract class WeeklyProjectUtils {
         excelMap.put("b", bList);
         excelMap.put("c", cList);
         excelMap.put("d", dList);
-        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title);
+        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title, log);
         File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, COLOR_ARRAY_LIST);

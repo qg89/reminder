@@ -8,12 +8,11 @@ import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.CreateMessageResp;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
-import com.q.reminder.reminder.vo.ContentVo;
-import com.q.reminder.reminder.vo.ExcelVo;
-import com.q.reminder.reminder.vo.FeishuUploadImageVo;
-import com.q.reminder.reminder.vo.WeeklyProjectVo;
+import com.q.reminder.reminder.vo.*;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.io.File;
 import java.util.List;
@@ -29,7 +28,7 @@ import java.util.Map;
 @Log4j2
 public class WraterExcelSendFeishuUtil {
 
-    public static void wraterExcelSendFeishu(Map<String, List<ExcelVo>> map, WeeklyProjectVo weeklyVo, String name) throws Exception {
+    public static void wraterExcelSendFeishu(Map<String, List<ExcelVo>> map, WeeklyProjectVo weeklyVo, String name, WeeklyLogVo<Logger, OmsLogger> objLog) throws Exception {
         String path = WeeklyProjectUtils.createDir() + weeklyVo.getFileName() + "-" + name + ".xls";
         String pmName = weeklyVo.getPmName();
         File file = new File(path);
@@ -64,7 +63,7 @@ public class WraterExcelSendFeishuUtil {
         String fileKey = BaseFeishu.message().imUploadFile(contentVo);
         if (StringUtils.isBlank(fileKey)) {
             file.delete();
-            log.info("周报导出Excel,上传文件获取key为空");
+            WraterExcelSendFeishuUtil.log.info("周报导出Excel,上传文件获取key为空");
             return;
         }
         JSONObject json = new JSONObject();
@@ -74,13 +73,23 @@ public class WraterExcelSendFeishuUtil {
         contentVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
         CreateMessageResp resp = BaseFeishu.message().sendContent(contentVo);
         boolean success = resp.success();
+        OmsLogger omsLogger = objLog.getOmsLogger();
         if (!success) {
-            log.info("周报导出Excel, 发送给: {}, error msg : {} ！", pmName, resp.getMsg());
-            log.info("周报导出Excel, 发送给: {}, error : {} ！", pmName, resp.getError());
+            if (omsLogger != null) {
+                omsLogger.info("周报导出Excel, 发送给: {}, error msg : {} ！", pmName, resp.getMsg());
+                omsLogger.info("周报导出Excel, 发送给: {}, error : {} ！", pmName, resp.getError());
+            } else {
+                log.info("周报导出Excel, 发送给: {}, error msg : {} ！", pmName, resp.getMsg());
+                log.info("周报导出Excel, 发送给: {}, error : {} ！", pmName, resp.getError());
+            }
         }
-        log.info("周报导出Excel, 发送给: {}, success ！", pmName);
-        log.info("周报导出Excel,发送结果:{}", pmName);
-
+        if (omsLogger != null) {
+            omsLogger.info("周报导出Excel, 发送给: {}, success ！", pmName);
+            omsLogger.info("周报导出Excel,发送结果:{}", pmName);
+        } else {
+            log.info("周报导出Excel, 发送给: {}, success ！", pmName);
+            log.info("周报导出Excel,发送结果:{}", pmName);
+        }
         file.delete();
     }
 

@@ -17,10 +17,13 @@ import com.q.reminder.reminder.util.WeeklyProjectUtils;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.FeishuUploadImageVo;
 import com.q.reminder.reminder.vo.MessageVo;
+import com.q.reminder.reminder.vo.WeeklyLogVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.taskadapter.redmineapi.bean.Issue;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
@@ -43,6 +46,7 @@ import static com.q.reminder.reminder.util.WeeklyProjectUtils.getWeekNumToSunday
  * @Description : 周一中午12点 写日报
  * @date :  2022.11.01 17:55
  */
+@Log4j2
 @Component
 @RequiredArgsConstructor
 public class WeeklyProjectMonReportTask implements BasicProcessor {
@@ -73,14 +77,15 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
                 }
             }
             List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNumber, id);
-            this.writeReport(list);
+            this.writeReport(list, log);
         } catch (Exception e) {
             throw new FeishuException(e, "周一中午12点 写日报异常");
         }
         return result;
     }
 
-    private void writeReport(List<WeeklyProjectVo> list) throws Exception {
+    private void writeReport(List<WeeklyProjectVo> list, OmsLogger log) throws Exception {
+        WeeklyLogVo<Logger, OmsLogger> logVo = new WeeklyLogVo<>(log);
         File logoFile = new File(ResourceUtils.path());
         for (WeeklyProjectVo report : list) {
             Date sunday = getWeekNumToSunday(report.getWeekNum() - 1);
@@ -104,28 +109,28 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
                 if (4 == blockType) {
                     String heading2 = JSONObject.parseObject(block.getJSONObject("heading2").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
                     if (WeeklyReportConstants.REVIEW_QUESTIONS.equals(heading2)) {
-                        i = reviewQuestions(report, jsonArray, requests, i);
+                        i = reviewQuestions(report, jsonArray, requests, i, logVo);
                     }
                     if (WeeklyReportConstants.COPQ.equals(heading2)) {
-                        i = copq(report, jsonArray, requests, i);
+                        i = copq(report, jsonArray, requests, i, logVo);
                     }
                 }
                 if (5 == blockType) {
                     String heading3 = JSONObject.parseObject(block.getJSONObject("heading3").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
                     if (WeeklyReportConstants.TRENDS.equals(heading3)) {
-                        i = tends(report, jsonArray, requests, i);
+                        i = tends(report, jsonArray, requests, i, logVo);
                     }
                     if (WeeklyReportConstants.BUG_LEVEL.equals(heading3)) {
-                        i = allBugLevel(report, jsonArray, requests, i);
-                        i = openBugLevel(report, jsonArray, requests, i);
-                        i = openBug15(logoFile, report, jsonArray, requests, i);
+                        i = allBugLevel(report, jsonArray, requests, i, logVo);
+                        i = openBugLevel(report, jsonArray, requests, i, logVo);
+                        i = openBug15(logoFile, report, jsonArray, requests, i, logVo);
                     }
                 }
             }
             BaseFeishu.cloud().documents().batchUpdateBlocks(report, requests.toArray(new UpdateBlockRequest[0]));
-//            log.info("[{}]项目周报更新完成", projectShortName);
-
+            log.info("[{}]项目周报更新完成", report.getProjectShortName());
             sendFeishu(report);
+            log.info("[{}]项目周报飞书发送完成", report.getProjectShortName());
         }
     }
 
@@ -136,15 +141,21 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
      * @param jsonArray
      * @param requests
      * @param i
+     * @param objLog
      * @return
      */
-    public int reviewQuestions(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) throws Exception {
+    public int reviewQuestions(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i, WeeklyLogVo<Logger, OmsLogger> objLog) throws Exception {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
         vo.setBlockId(block.getString("block_id"));
         // 评审问题
-        File file = WeeklyProjectUtils.reviewQuestions(vo);
+        File file = WeeklyProjectUtils.reviewQuestions(vo, objLog);
         addRequests(vo, file, requests);
-//        log.info("[{}]项目周报，评审问题 执行完成", vo.getProjectShortName());
+        OmsLogger omsLogger = objLog.getOmsLogger();
+        if (omsLogger != null) {
+            omsLogger.info("[{}]项目周报，评审问题 执行完成", vo.getProjectShortName());
+        } else {
+            log.info("[{}]项目周报，评审问题 执行完成", vo.getProjectShortName());
+        }
         return i;
     }
 
@@ -156,9 +167,10 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
      * @param jsonArray
      * @param requests
      * @param i
+     * @param logVo
      * @return
      */
-    public int openBug15(File logoFile, WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) throws Exception {
+    public int openBug15(File logoFile, WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i, WeeklyLogVo<Logger, OmsLogger> logVo) throws Exception {
         JSONObject block;
         block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
         // open-Bug >15
@@ -168,7 +180,12 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
             openBug15 = logoFile;
         }
         addRequests(vo, openBug15, requests);
-//        log.info("[{}]项目周报，open-Bug >15 执行完成", vo.getProjectShortName());
+        OmsLogger omsLogger = logVo.getOmsLogger();
+        if (omsLogger != null) {
+            omsLogger.info("[{}]项目周报，open-Bug >15 执行完成", vo.getProjectShortName());
+        } else {
+            log.info("[{}]项目周报，open-Bug >15 执行完成", vo.getProjectShortName());
+        }
         return i;
     }
 
@@ -179,15 +196,21 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
      * @param jsonArray
      * @param requests
      * @param i
+     * @param logVo
      * @return
      */
-    public int openBugLevel(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) throws Exception {
+    public int openBugLevel(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i, WeeklyLogVo<Logger, OmsLogger> logVo) throws Exception {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
         // Open-Bug等级
         vo.setBlockId(block.getString("block_id"));
         File openBug = WeeklyProjectUtils.openBug(vo.getAllBugList(), vo);
         addRequests(vo, openBug, requests);
-//        log.info("[{}]项目周报，Open-Bug等级分布 执行完成", vo.getProjectShortName());
+        OmsLogger omsLogger = logVo.getOmsLogger();
+        if (omsLogger != null) {
+            omsLogger.info("[{}]项目周报，Open-Bug等级分布 执行完成", vo.getProjectShortName());
+        } else {
+            log.info("[{}]项目周报，Open-Bug等级分布 执行完成", vo.getProjectShortName());
+        }
         return i;
     }
 
@@ -198,15 +221,21 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
      * @param jsonArray
      * @param requests
      * @param i
+     * @param logVo
      * @return
      */
-    public int allBugLevel(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) throws Exception {
+    public int allBugLevel(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i, WeeklyLogVo<Logger, OmsLogger> logVo) throws Exception {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
         // All-bug等级
         vo.setBlockId(block.getString("block_id"));
         File bugLevel = WeeklyProjectUtils.AllBugLevel(vo.getAllBugList(), vo);
         addRequests(vo, bugLevel, requests);
-//        log.info("[{}]项目周报，All-bug等级分布 执行完成", vo.getProjectShortName());
+        OmsLogger omsLogger = logVo.getOmsLogger();
+        if (omsLogger != null) {
+            omsLogger.info("[{}]项目周报，All-bug等级分布 执行完成", vo.getProjectShortName());
+        } else {
+            log.info("[{}]项目周报，All-bug等级分布 执行完成", vo.getProjectShortName());
+        }
         return i;
     }
 
@@ -313,13 +342,18 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         }
     }
 
-    public int copq(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) throws Exception {
+    public int copq(WeeklyProjectVo vo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i, WeeklyLogVo<Logger, OmsLogger> logVo) throws Exception {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
         vo.setBlockId(block.getString("block_id"));
         // 评审问题
         File file = WeeklyProjectUtils.copq(vo);
         addRequests(vo, file, requests);
-//        log.info("{}项目周报，COPQ 执行完成", vo.getProjectShortName());
+        OmsLogger omsLogger = logVo.getOmsLogger();
+        if (omsLogger != null) {
+            omsLogger.info("[{}]项目周报，COPQ 执行完成", vo.getProjectShortName());
+        } else {
+            log.info("[{}]项目周报，COPQ 执行完成", vo.getProjectShortName());
+        }
         return i;
     }
 
@@ -330,16 +364,22 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
      * @param jsonArray
      * @param requests
      * @param i
+     * @param logVo
      * @return
      */
-    public int tends(WeeklyProjectVo weeklyVo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i) throws Exception {
+    public int tends(WeeklyProjectVo weeklyVo, JSONArray jsonArray, ArrayList<UpdateBlockRequest> requests, int i, WeeklyLogVo<Logger, OmsLogger> logVo) throws Exception {
         JSONObject block;
         block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
         // 趋势
         weeklyVo.setBlockId(block.getString("block_id"));
         File file = WeeklyProjectUtils.trends(weeklyVo);
         addRequests(weeklyVo, file, requests);
-//        log.info("[{}]项目周报，趋势 执行完成", weeklyVo.getProjectShortName());
+        OmsLogger omsLogger = logVo.getOmsLogger();
+        if (omsLogger != null) {
+            omsLogger.info("[{}]项目周报，趋势 执行完成", weeklyVo.getProjectShortName());
+        } else {
+            log.info("[{}]项目周报，趋势 执行完成", weeklyVo.getProjectShortName());
+        }
         return i;
     }
 }
