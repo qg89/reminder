@@ -88,7 +88,7 @@ public class WraterExcelSendFeishuUtil {
             }
             return;
         }
-        String msg = "周报导出Excel文件, 发送给项目经理: 【{}】, success ！";
+        String msg = "周报导出Excel文件, 发送给项目经理: 【{}】, done ！";
         if (omsLogger != null) {
             omsLogger.info(msg, pmName);
         } else {
@@ -148,6 +148,6 @@ public class WraterExcelSendFeishuUtil {
         if (!success) {
             log.info("周报导出Excel, 发送给: {}, error msg : {} , error: {}！", name, resp.getMsg(), resp.getError());
         }
-        log.info("周报导出Excel, 发送给: {}, success ！", name);
+        log.info("周报导出Excel, 发送给: {}, done ！", name);
     }
 }
