@@ -8,7 +8,10 @@ import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.CreateMessageResp;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
-import com.q.reminder.reminder.vo.*;
+import com.q.reminder.reminder.vo.ContentVo;
+import com.q.reminder.reminder.vo.ExcelVo;
+import com.q.reminder.reminder.vo.FeishuUploadImageVo;
+import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 
@@ -119,6 +122,7 @@ public class WraterExcelSendFeishuUtil {
         json.put("file_key", fileKey);
         contentVo.setContent(json.toJSONString());
         contentVo.setMsgType("file");
+        contentVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
         CreateMessageResp resp = BaseFeishu.message().sendContent(contentVo);
         boolean success = resp.success();
         if (!success) {
