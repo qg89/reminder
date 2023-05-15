@@ -43,13 +43,9 @@ public class FeishuException extends RuntimeException {
         if (e != null) {
             StringBuilder con = new StringBuilder();
             Arrays.stream(e.getStackTrace()).forEach(s -> {
-                con.append("FileName").append(s.getFileName()).append("\r\n")
-                        .append("ModuleName").append(s.getModuleName()).append("\r\n")
-                        .append("ModuleVersion").append(s.getModuleVersion()).append("\r\n")
-                        .append("ClassName").append(s.getClassName()).append("\r\n")
-                        .append("ClassLoaderName").append(s.getClassLoaderName()).append("\r\n")
-                        .append("MethodName").append(s.getMethodName()).append("\r\n")
-                        .append("LineNumber").append(s.getLineNumber());
+                JSONObject from = JSONObject.from(s);
+                con.append(from).append("\n");
+                con.append("------------------");
             });
             json.put("text", con);
         } else {
