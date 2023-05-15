@@ -7,6 +7,7 @@ import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.MessageVo;
 
 import java.util.Arrays;
+import java.util.Map;
 
 /**
  * @author : saiko
@@ -41,15 +42,16 @@ public class FeishuException extends RuntimeException {
         JSONObject json = new JSONObject();
         json.put("tag", "text");
         if (e != null) {
-            StringBuilder con = new StringBuilder("{");
+            JSONObject errorMsg = new JSONObject();
+            errorMsg.put("异常信息 概览", e.getMessage() + "\r\n");
+            JSONArray jsonArray = new JSONArray();
             Arrays.stream(e.getStackTrace()).forEach(s -> {
-                JSONObject from = JSONObject.from(s);
-                con.append(from).append(",").append("\n\r");
+                jsonArray.add(Map.of("className", s.getClassName(), "methodName", s.getMethodName(), "lineNumber", s.getLineNumber()));
             });
-            con.append("}");
-            json.put("text", con);
+            errorMsg.put("异常堆栈", jsonArray);
+            json.put("text", errorMsg.toJSONString());
         } else {
-            json.put("text", "");
+            json.put("text", "异常信息为空！");
         }
         atjsonArray.add(json);
         contentJsonArray.add(atjsonArray);
