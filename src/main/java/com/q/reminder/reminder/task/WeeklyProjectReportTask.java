@@ -14,6 +14,9 @@ import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import tech.powerjob.client.PowerJobClient;
+import tech.powerjob.common.response.JobInfoDTO;
+import tech.powerjob.common.response.ResultDTO;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
@@ -36,16 +39,20 @@ public class WeeklyProjectReportTask implements BasicProcessor {
     private final ProjectInfoService projectInfoService;
     private final FeishuProperties feishuProperties;
     private final HoldayBase holdayBase;
+    private final PowerJobClient client;
 
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         ProcessResult result = new ProcessResult(true);
+        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
+        String taskName = resultDTO.getData().getJobName();
         try {
             if (holdayBase.queryHoliday()) {
                 log.info("节假日放假!!!!");
                 return result;
             }
+            log.info(taskName + "-start");
             String jobParam = context.getInstanceParams();
             WeeklyProjectVo vo = new WeeklyProjectVo();
             vo.setAppSecret(feishuProperties.getAppSecret());
@@ -65,7 +72,7 @@ public class WeeklyProjectReportTask implements BasicProcessor {
                 try {
                     projectReport = BaseFeishu.cloud().space().copyFile(vo);
                 } catch (Exception e) {
-                    throw new FeishuException(e, context.getTaskName() + "-异常");
+                    throw new FeishuException(e, taskName + "-异常");
                 }
                 if (projectReport == null) {
                     return;
@@ -74,8 +81,9 @@ public class WeeklyProjectReportTask implements BasicProcessor {
                 weeklyProjectReportService.save(projectReport);
             });
         } catch (Exception e) {
-            throw new FeishuException(e, context.getTaskName() + "-异常");
+            throw new FeishuException(e, taskName + "-异常");
         }
+        log.info(taskName + "-done");
         return result;
     }
 

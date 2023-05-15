@@ -20,6 +20,9 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.client.PowerJobClient;
+import tech.powerjob.common.response.JobInfoDTO;
+import tech.powerjob.common.response.ResultDTO;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
@@ -43,12 +46,14 @@ public class RedmineUpdateTask implements BasicProcessor {
 
     private final ProjectInfoService projectInfoService;
     private final UserMemberService userMemberService;
+    private final PowerJobClient client;
 
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         ProcessResult processResult = new ProcessResult(true);
-        String taskName = context.getTaskName();
+        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
+        String taskName = resultDTO.getData().getJobName();
         try {
             List<RProjectInfo> projectInfoList = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();
             List<RedmineVo> issues = RedmineApi.queryUpdateIssue(projectInfoList);

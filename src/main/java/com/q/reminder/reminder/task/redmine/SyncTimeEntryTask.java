@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
+import tech.powerjob.client.PowerJobClient;
+import tech.powerjob.common.response.JobInfoDTO;
+import tech.powerjob.common.response.ResultDTO;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
@@ -31,12 +34,13 @@ import java.util.List;
 public class SyncTimeEntryTask implements BasicProcessor {
     private final ProjectInfoService projectInfoService;
     private final RdTimeEntryService rdTimeEntryService;
-
+    private final PowerJobClient client;
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         String instanceParams = context.getInstanceParams();
-        String taskName = context.getTaskName();
+        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
+        String taskName = resultDTO.getData().getJobName();
         log.info(taskName + "-start");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdTimeEntry> data = new ArrayList<>();
@@ -78,6 +82,7 @@ public class SyncTimeEntryTask implements BasicProcessor {
         } catch (Exception e) {
             throw new FeishuException(e, taskName + "-异常");
         }
+        log.info(taskName + "-done");
         return new ProcessResult(true);
     }
 }

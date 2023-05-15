@@ -29,6 +29,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.client.PowerJobClient;
+import tech.powerjob.common.response.JobInfoDTO;
+import tech.powerjob.common.response.ResultDTO;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
@@ -54,13 +57,15 @@ import java.util.stream.Collectors;
 public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
     private final TTableFeatureTmpService tTableFeatureTmpService;
     private final TTableInfoService tTableInfoService;
+    private final PowerJobClient client;
 
     private Date dueDate = DateTime.now().plusDays(7).toDate();
 
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
-        String taskName = context.getTaskName();
+        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
+        String taskName = resultDTO.getData().getJobName();
         log.info(taskName + "-开始");
         ProcessResult processResult = new ProcessResult(true);
         StringBuffer sendAdmin = new StringBuffer();
@@ -90,7 +95,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                     List<FeautreTimeVo> feautreTimeVos = featureTimeMap.get(recordsId);
                     if (CollectionUtils.isEmpty(feautreTimeVos)) {
                         log.error(taskName + " 获取记录为空");
-                        sendAdmin.append(taskName + " 获取记录为空!\r\n recordId: ").append(recordsId).append(", type : ").append(type).append("  \r\n");
+                        sendAdmin.append(taskName).append(" 获取记录为空!\r\n recordId: ").append(recordsId).append(", type : ").append(type).append("  \r\n");
                         continue;
                     }
 

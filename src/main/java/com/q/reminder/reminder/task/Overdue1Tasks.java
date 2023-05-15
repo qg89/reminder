@@ -6,6 +6,9 @@ import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.task.base.QueryTasksToMemberBase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import tech.powerjob.client.PowerJobClient;
+import tech.powerjob.common.response.JobInfoDTO;
+import tech.powerjob.common.response.ResultDTO;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
@@ -27,11 +30,13 @@ public class Overdue1Tasks implements BasicProcessor {
     private final QueryTasksToMemberBase queryTasksToMemberBase;
     private final NoneStatusService noneStatusService;
     private final HoldayBase holdayBase;
+    private final PowerJobClient client;
 
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
-        String taskName = context.getTaskName();
+        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
+        String taskName = resultDTO.getData().getJobName();
         ProcessResult result = new ProcessResult(true);
         try {
             if (holdayBase.queryHoliday()) {

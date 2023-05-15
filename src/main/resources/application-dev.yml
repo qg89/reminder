@@ -26,3 +26,4 @@ powerjob:
     store-strategy: disk
     max-result-length: 4096
     max-appended-wf-context-length: 4096
+    password: Qigang0211

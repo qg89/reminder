@@ -10,6 +10,9 @@ import com.q.reminder.reminder.vo.QueryVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.client.PowerJobClient;
+import tech.powerjob.common.response.JobInfoDTO;
+import tech.powerjob.common.response.ResultDTO;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
@@ -33,12 +36,14 @@ public class OverdueTasksAgainToGroupTask implements BasicProcessor {
     private final OverdueTasksAgainToGroupBase overdueTasksAgainToGroupBase;
     private final NoneStatusService noneStatusService;
     private final HoldayBase holdayBase;
+    private final PowerJobClient client;
 
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         ProcessResult result = new ProcessResult(true);
-        String taskName = context.getTaskName();
+        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
+        String taskName = resultDTO.getData().getJobName();
         try {
             if (holdayBase.queryHoliday()) {
                 log.info("节假日放假!!!!");

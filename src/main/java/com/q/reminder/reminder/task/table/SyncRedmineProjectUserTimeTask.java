@@ -17,6 +17,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.client.PowerJobClient;
+import tech.powerjob.common.response.JobInfoDTO;
+import tech.powerjob.common.response.ResultDTO;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
@@ -41,11 +44,14 @@ import java.util.stream.Collectors;
 public class SyncRedmineProjectUserTimeTask implements BasicProcessor {
     private final ProjectInfoService projectInfoService;
     private final WUserTimesService wUserTimesService;
+    private final PowerJobClient client;
 
     @Override
     public ProcessResult process(TaskContext context)  {
         String jobParam = context.getJobParams();
         ProcessResult processResult = new ProcessResult(true);
+        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
+        String taskName = resultDTO.getData().getJobName();
         try {
             JSONObject json = new JSONObject();
             if (StringUtils.isNotBlank(jobParam)) {
@@ -102,7 +108,7 @@ public class SyncRedmineProjectUserTimeTask implements BasicProcessor {
             }
             wUserTimesService.saveOrUpdateBatch(userTimesData);
         }catch (Exception e) {
-            throw new FeishuException(e, context.getTaskName() + "-异常");
+            throw new FeishuException(e, taskName + "-异常");
         }
         return processResult;
     }

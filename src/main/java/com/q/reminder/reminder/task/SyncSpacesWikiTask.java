@@ -14,6 +14,9 @@ import com.q.reminder.reminder.service.impl.FeishuService;
 import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
+import tech.powerjob.client.PowerJobClient;
+import tech.powerjob.common.response.JobInfoDTO;
+import tech.powerjob.common.response.ResultDTO;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
@@ -35,12 +38,14 @@ public class SyncSpacesWikiTask implements BasicProcessor {
     private final WikiSpaceService spaceWikoService;
     private final ProjectInfoService projectInfoService;
     private final FeishuService feishuService;
+    private final PowerJobClient client;
 
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         ProcessResult processResult = new ProcessResult(true);
-        String taskName = context.getTaskName();
+        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
+        String taskName = resultDTO.getData().getJobName();
         try {
             int weekOfYear = DateUtil.thisWeekOfYear() - 1;
             if (weekOfYear == 0) {

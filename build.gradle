@@ -84,6 +84,7 @@ dependencies {
 
 //	powerjob
 	implementation 'tech.powerjob:powerjob-worker-spring-boot-starter:4.3.2'
+	implementation 'tech.powerjob:powerjob-client:4.3.2'
 //	implementation 'tech.powerjob:powerjob-official-processors:4.3.1-bugfix'
 	implementation 'org.agrona:agrona:1.17.1'
 	implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'

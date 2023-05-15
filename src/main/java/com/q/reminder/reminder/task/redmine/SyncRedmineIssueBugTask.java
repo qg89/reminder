@@ -13,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
+import tech.powerjob.client.PowerJobClient;
+import tech.powerjob.common.response.JobInfoDTO;
+import tech.powerjob.common.response.ResultDTO;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
@@ -34,12 +37,15 @@ import java.util.Locale;
 public class SyncRedmineIssueBugTask implements BasicProcessor {
     private final ProjectInfoService projectInfoService;
     private final RdIssueBugService rdIssueBugService;
+    private final PowerJobClient client;
+
 
     @Override
     public ProcessResult process(TaskContext context) {
         String instanceParams = context.getInstanceParams();
         OmsLogger log = context.getOmsLogger();
-        String taskName = context.getTaskName();
+        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
+        String taskName = resultDTO.getData().getJobName();
         log.info(taskName + "-开始");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdIssueBug> bugIssueData = new ArrayList<>();

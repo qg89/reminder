@@ -24,6 +24,9 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
+import tech.powerjob.client.PowerJobClient;
+import tech.powerjob.common.response.JobInfoDTO;
+import tech.powerjob.common.response.ResultDTO;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
@@ -52,16 +55,20 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
     private final HoldayBase holdayBase;
     private final ProjectInfoService projectInfoService;
     private final FeishuProperties feishuProperties;
+    private final PowerJobClient client;
 
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
+        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
+        String taskName = resultDTO.getData().getJobName();
         ProcessResult result = new ProcessResult(true);
         try {
             if (holdayBase.queryHoliday()) {
                 result.setMsg("节假日放假!!!!");
                 return result;
             }
+            log.info(taskName + "-start");
             String instanceParams = context.getInstanceParams();
             int weekNumber = 0;
             String id = null;
@@ -78,8 +85,9 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
             List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNumber, id);
             this.writeReport(list, log);
         } catch (Exception e) {
-            throw new FeishuException(e, context.getTaskName() + "-异常");
+            throw new FeishuException(e, taskName + "-异常");
         }
+        log.info(taskName + "-done");
         return result;
     }
 

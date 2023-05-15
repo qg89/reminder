@@ -16,6 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.client.PowerJobClient;
+import tech.powerjob.common.response.JobInfoDTO;
+import tech.powerjob.common.response.ResultDTO;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
@@ -38,30 +41,33 @@ public class UpdateFeishuRedmineTask implements BasicProcessor {
     private final UserMemberService userMemberService;
     private final UserGroupService userGroupService;
     private final AdminInfoService adminInfoService;
+    private final PowerJobClient client;
 
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         ProcessResult processResult = new ProcessResult(true);
+        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
+        String taskName = resultDTO.getData().getJobName();
         try {
             List<FsGroupInfo> groupToChats = BaseFeishu.groupMessage().getGroupToChats();
             List<AdminInfo> adminInfos = adminInfoService.list();
-            log.info("获取机器人所在群组信息完成!");
+            log.info(taskName + "-获取机器人所在群组信息完成!");
             List<UserGroup> userGroupList = new ArrayList<>();
             List<UserMemgerInfo> membersByChats = BaseFeishu.groupMessage().getMembersInGroup(userGroupList);
             StringBuilder content = new StringBuilder();
             if (CollectionUtils.isEmpty(membersByChats)) {
                 content.append("\r\n获取机器人所在群组信息为空");
             }
-            log.info("开始数据保存!");
+            log.info(taskName + "-开始数据保存!");
             if (!groupInfoService.saveOrUpdateBatch(groupToChats)) {
                 content.append("\r\n更新机器人所在群组失败");
             }
-            log.info("更新机器人所在群组完成!");
+            log.info(taskName + "-更新机器人所在群组完成!");
             if (!userMemberService.saveOrUpdateBatchAll(membersByChats, log)) {
                 content.append("\r\n保存机器人所在群组和人员关系失败");
             }
-            log.info("保存机器人所在群组和人员关系完成!");
+            log.info(taskName + "-保存机器人所在群组和人员关系完成!");
 
             if (!userGroupService.saveOrUpdateBatchByMultiId(userGroupList)) {
                 content.append("\r\n保存机器人所在群组和人员关系失败");
@@ -80,11 +86,11 @@ public class UpdateFeishuRedmineTask implements BasicProcessor {
                     }
                 });
             }
-            log.info("保存机器人所在群组和人员关系完成!");
-            log.info("每日更新当前群信息，人员信息，及人群关系, 任务执行成功!");
+            log.info(taskName + "-保存机器人所在群组和人员关系完成!");
         } catch (Exception e) {
-            throw new FeishuException(e, context.getTaskName() + "-异常");
+            throw new FeishuException(e, taskName + "-异常");
         }
+        log.info(taskName + "-done");
         return processResult;
     }
 }

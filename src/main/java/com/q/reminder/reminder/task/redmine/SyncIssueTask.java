@@ -14,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
+import tech.powerjob.client.PowerJobClient;
+import tech.powerjob.common.response.JobInfoDTO;
+import tech.powerjob.common.response.ResultDTO;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
@@ -35,11 +38,13 @@ import java.util.List;
 public class SyncIssueTask implements BasicProcessor {
     private final ProjectInfoService projectInfoService;
     private final RdIssueService rdIssueService;
+    private final PowerJobClient client;
 
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
         OmsLogger log = context.getOmsLogger();
-        String taskName = context.getTaskName();
+        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
+        String taskName = resultDTO.getData().getJobName();
         String instanceParams = context.getInstanceParams();
         log.info(taskName + "-开始");
         List<Issue> issueData = new ArrayList<>();

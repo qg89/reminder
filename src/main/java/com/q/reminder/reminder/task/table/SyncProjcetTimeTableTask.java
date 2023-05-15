@@ -16,6 +16,9 @@ import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.client.PowerJobClient;
+import tech.powerjob.common.response.JobInfoDTO;
+import tech.powerjob.common.response.ResultDTO;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
@@ -39,12 +42,13 @@ public class SyncProjcetTimeTableTask implements BasicProcessor {
     private final WUserTimesService wUserTimesService;
     private final TTableUserTimeService tTableUserTimeService;
 
-    //    @XxlJob("syncProjcetTimeTableTask")
+    private final PowerJobClient client;
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         String jobParam = context.getInstanceParams();
-        String taskName = context.getTaskName();
+        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
+        String taskName = resultDTO.getData().getJobName();
         ProcessResult processResult = new ProcessResult(true);
         String day = "";
         try {

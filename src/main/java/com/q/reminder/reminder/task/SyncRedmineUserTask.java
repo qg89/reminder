@@ -9,6 +9,9 @@ import com.q.reminder.reminder.util.RedmineApi;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import tech.powerjob.client.PowerJobClient;
+import tech.powerjob.common.response.JobInfoDTO;
+import tech.powerjob.common.response.ResultDTO;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
@@ -30,11 +33,15 @@ import java.util.stream.Collectors;
 public class SyncRedmineUserTask implements BasicProcessor {
     private final RedmineUserInfoService redmineUserInfoService;
     private final ProjectInfoService projectInfoService;
+    private final PowerJobClient client;
 
     @Override
     public ProcessResult process(TaskContext context) {
         ProcessResult processResult = new ProcessResult(true);
+        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
+        String taskName = resultDTO.getData().getJobName();
         OmsLogger log = context.getOmsLogger();
+        log.info(taskName + "-start");
         try {
             List<RedmineUserInfo> data = new ArrayList<>();
             for (RProjectInfo info : projectInfoService.listAll()) {
@@ -49,8 +56,9 @@ public class SyncRedmineUserTask implements BasicProcessor {
             }
             redmineUserInfoService.saveOrupdateMultiIdAll(data);
         } catch (Exception e) {
-            throw new FeishuException(e, context.getTaskName() + "-异常");
+            throw new FeishuException(e, taskName + "-异常");
         }
+        log.info(taskName + "-done");
         return processResult;
     }
 }
