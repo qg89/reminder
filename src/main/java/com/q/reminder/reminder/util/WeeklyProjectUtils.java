@@ -54,7 +54,7 @@ public abstract class WeeklyProjectUtils {
      * 评审问题创建图片
      *
      * @param vo
-     * @param log
+     * @param logVo
      * @return
      */
     public static File reviewQuestions(WeeklyProjectVo vo, WeeklyLogVo<Logger, OmsLogger> objLog) throws Exception {
@@ -147,9 +147,10 @@ public abstract class WeeklyProjectUtils {
      * 趋势
      *
      * @param vo
+     * @param logVo
      * @return
      */
-    public static File trends(WeeklyProjectVo vo) throws Exception {
+    public static File trends(WeeklyProjectVo vo, WeeklyLogVo<Logger, OmsLogger> logVo) throws Exception {
         String fileName = vo.getFileName();
         Date startDay = vo.getStartDay();
         Date sunday = getWeekNumToSunday(vo.getWeekNum() - 1);
@@ -209,7 +210,7 @@ public abstract class WeeklyProjectUtils {
         dataList.add(week);
         Map<String, List<ExcelVo>> excelMap = new LinkedHashMap<>();
         excelMap.put("all", allBugList);
-        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title, log);
+        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title, logVo);
 
         File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream out = new FileOutputStream(file);
@@ -259,9 +260,10 @@ public abstract class WeeklyProjectUtils {
      *
      * @param allBug
      * @param vo
+     * @param logVo
      * @return
      */
-    public static File AllBugLevel(List<Issue> allBug, WeeklyProjectVo vo) throws Exception {
+    public static File AllBugLevel(List<Issue> allBug, WeeklyProjectVo vo, WeeklyLogVo<Logger, OmsLogger> logVo) throws Exception {
         String fileName = vo.getFileName();
         // 变量
         String title = "ALL-Bug等级分布";
@@ -316,7 +318,7 @@ public abstract class WeeklyProjectUtils {
         excelMap.put("b", bList);
         excelMap.put("c", cList);
         excelMap.put("d", dList);
-        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title, log);
+        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title, logVo);
 
         File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
@@ -330,9 +332,10 @@ public abstract class WeeklyProjectUtils {
      *
      * @param allBugList
      * @param vo
+     * @param logVo
      * @return
      */
-    public static File openBug(List<Issue> allBugList, WeeklyProjectVo vo) throws Exception {
+    public static File openBug(List<Issue> allBugList, WeeklyProjectVo vo, WeeklyLogVo<Logger, OmsLogger> logVo) throws Exception {
         String fileName = vo.getFileName();
         // 变量
         String title = "Open Bug等级分布";
@@ -388,7 +391,7 @@ public abstract class WeeklyProjectUtils {
         excelMap.put("b", bList);
         excelMap.put("c", cList);
         excelMap.put("d", dList);
-        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title, log);
+        WraterExcelSendFeishuUtil.wraterExcelSendFeishu(excelMap, vo, title, logVo);
         File file = new File(createDir() + fileName + "-" + title + ".jpeg");
         FileOutputStream fileOutputStream = new FileOutputStream(file);
         GeneratePieChartUtil.createPieChart(fileOutputStream, title, categories, dataList, 950, 500, COLOR_ARRAY_LIST);
@@ -400,9 +403,10 @@ public abstract class WeeklyProjectUtils {
      * open总数大于15人员
      *
      * @param allBugList
+     * @param logVo
      * @return
      */
-    public static File openBug15(List<Issue> allBugList) throws Exception {
+    public static File openBug15(List<Issue> allBugList, WeeklyLogVo<Logger, OmsLogger> logVo) throws Exception {
         // 变量
         String title = "Open bug数量>15";
 
@@ -427,38 +431,38 @@ public abstract class WeeklyProjectUtils {
             sortIssueMapByLevel(list).forEach((level, l) -> {
                 Map<String, List<Issue>> levelMap = l.stream().collect(Collectors.groupingBy(e -> e.getCustomFieldById(CustomFieldsEnum.BUG_LEVEL.getId()).getValue()));
                 switch (level) {
-                    case "S":
+                    case "S" -> {
                         List<Issue> ss = levelMap.get(level);
                         if (ss != null) {
                             sv.addAndGet(ss.size());
                         }
-                        break;
-                    case "A":
+                    }
+                    case "A" -> {
                         List<Issue> as = levelMap.get(level);
                         if (as != null) {
                             av.addAndGet(as.size());
                         }
-                        break;
-                    case "B":
+                    }
+                    case "B" -> {
                         List<Issue> bs = levelMap.get(level);
                         if (bs != null) {
                             bv.addAndGet(bs.size());
                         }
-                        break;
-                    case "C":
+                    }
+                    case "C" -> {
                         List<Issue> cs = levelMap.get(level);
                         if (cs != null) {
                             cv.addAndGet(cs.size());
                         }
-                        break;
-                    case "D":
+                    }
+                    case "D" -> {
                         List<Issue> ds = levelMap.get(level);
                         if (ds != null) {
                             dv.addAndGet(ds.size());
                         }
-                        break;
-                    default:
-                        break;
+                    }
+                    default -> {
+                    }
                 }
             });
             s.add(sv.intValue());

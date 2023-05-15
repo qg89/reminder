@@ -175,7 +175,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
         // open-Bug >15
         vo.setBlockId(block.getString("block_id"));
-        File openBug15 = WeeklyProjectUtils.openBug15(vo.getAllBugList());
+        File openBug15 = WeeklyProjectUtils.openBug15(vo.getAllBugList(), logVo);
         if (openBug15 == null) {
             openBug15 = logoFile;
         }
@@ -203,7 +203,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
         // Open-Bug等级
         vo.setBlockId(block.getString("block_id"));
-        File openBug = WeeklyProjectUtils.openBug(vo.getAllBugList(), vo);
+        File openBug = WeeklyProjectUtils.openBug(vo.getAllBugList(), vo, logVo);
         addRequests(vo, openBug, requests);
         OmsLogger omsLogger = logVo.getOmsLogger();
         if (omsLogger != null) {
@@ -228,7 +228,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         JSONObject block = JSONObject.parseObject(jsonArray.get((i = (i + 2))).toString());
         // All-bug等级
         vo.setBlockId(block.getString("block_id"));
-        File bugLevel = WeeklyProjectUtils.AllBugLevel(vo.getAllBugList(), vo);
+        File bugLevel = WeeklyProjectUtils.AllBugLevel(vo.getAllBugList(), vo, logVo);
         addRequests(vo, bugLevel, requests);
         OmsLogger omsLogger = logVo.getOmsLogger();
         if (omsLogger != null) {
@@ -372,7 +372,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         block = JSONObject.parseObject(jsonArray.get((i = (i + 1))).toString());
         // 趋势
         weeklyVo.setBlockId(block.getString("block_id"));
-        File file = WeeklyProjectUtils.trends(weeklyVo);
+        File file = WeeklyProjectUtils.trends(weeklyVo, logVo);
         addRequests(weeklyVo, file, requests);
         OmsLogger omsLogger = logVo.getOmsLogger();
         if (omsLogger != null) {
