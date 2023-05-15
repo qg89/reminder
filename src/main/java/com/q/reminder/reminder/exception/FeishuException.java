@@ -2,6 +2,7 @@ package com.q.reminder.reminder.exception;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.MessageVo;
 
@@ -57,7 +58,7 @@ public class FeishuException extends RuntimeException {
         MessageVo vo = new MessageVo();
         vo.setContent(content.toJSONString());
         vo.setMsgType("post");
-//        vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+        vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
         vo.setReceiveId("ou_35e03d4d8754dd35fed26c26849c85ab");
         BaseFeishu.message().sendContent(vo);
     }
