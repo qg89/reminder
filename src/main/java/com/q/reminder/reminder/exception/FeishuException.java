@@ -6,6 +6,8 @@ import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.MessageVo;
 
+import java.util.Arrays;
+
 /**
  * @author : saiko
  * @version : v1.0
@@ -39,7 +41,17 @@ public class FeishuException extends RuntimeException {
         JSONObject json = new JSONObject();
         json.put("tag", "text");
         if (e != null) {
-            json.put("text", e.getMessage());
+            StringBuilder con = new StringBuilder();
+            Arrays.stream(e.getStackTrace()).forEach(s -> {
+                con.append("FileName").append(s.getFileName()).append("\r\n")
+                        .append("ModuleName").append(s.getModuleName()).append("\r\n")
+                        .append("ModuleVersion").append(s.getModuleVersion()).append("\r\n")
+                        .append("ClassName").append(s.getClassName()).append("\r\n")
+                        .append("ClassLoaderName").append(s.getClassLoaderName()).append("\r\n")
+                        .append("MethodName").append(s.getMethodName()).append("\r\n")
+                        .append("LineNumber").append(s.getLineNumber());
+            });
+            json.put("text", con);
         } else {
             json.put("text", "");
         }
