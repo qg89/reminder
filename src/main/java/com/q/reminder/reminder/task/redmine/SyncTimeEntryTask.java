@@ -35,13 +35,13 @@ public class SyncTimeEntryTask implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
-        String jobParams = context.getInstanceParams();
+        String instanceParams = context.getInstanceParams();
         log.info("【redmine】同步redmine工时-start");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdTimeEntry> data = new ArrayList<>();
         int index = 3;
-        if (StringUtils.isNotBlank(jobParams)) {
-            index = Integer.parseInt(jobParams);
+        if (StringUtils.isNotBlank(instanceParams)) {
+            index = Integer.parseInt(instanceParams);
         }
         log.info("【redmine】同步redmine工时-时间{}天前", index);
         String timeAgo = DateTime.now().minusDays(index).toString("yyyy-MM-dd");

@@ -43,7 +43,7 @@ public class SyncProjcetTimeTableTask implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
-        String jobParam = context.getJobParams();
+        String jobParam = context.getInstanceParams();
         ProcessResult processResult = new ProcessResult(true);
         String day = "";
         try {

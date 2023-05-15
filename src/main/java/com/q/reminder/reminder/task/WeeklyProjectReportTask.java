@@ -46,7 +46,7 @@ public class WeeklyProjectReportTask implements BasicProcessor {
                 log.info("节假日放假!!!!");
                 return result;
             }
-            String jobParam = context.getJobParams();
+            String jobParam = context.getInstanceParams();
             WeeklyProjectVo vo = new WeeklyProjectVo();
             vo.setAppSecret(feishuProperties.getAppSecret());
             vo.setAppId(feishuProperties.getAppId());

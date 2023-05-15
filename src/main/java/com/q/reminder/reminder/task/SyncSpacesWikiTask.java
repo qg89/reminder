@@ -45,7 +45,7 @@ public class SyncSpacesWikiTask implements BasicProcessor {
             if (weekOfYear == 0) {
                 weekOfYear = 52;
             }
-            String jobParam = context.getJobParams();
+            String jobParam = context.getInstanceParams();
             if (StringUtils.isNotBlank(jobParam) && NumberUtil.isInteger(jobParam) && Integer.parseInt(jobParam) <= 52) {
                 weekOfYear = Integer.parseInt(jobParam);
             }

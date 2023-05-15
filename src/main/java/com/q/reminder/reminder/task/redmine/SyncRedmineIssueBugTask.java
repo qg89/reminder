@@ -37,14 +37,14 @@ public class SyncRedmineIssueBugTask implements BasicProcessor {
 
     @Override
     public ProcessResult process(TaskContext context) {
-        String jobParams = context.getInstanceParams();
+        String instanceParams = context.getInstanceParams();
         OmsLogger log = context.getOmsLogger();
         log.info("[通过redmine 同步bug issue]-开始");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdIssueBug> bugIssueData = new ArrayList<>();
         int index = 3;
-        if (StringUtils.isNotBlank(jobParams)) {
-            index = Integer.parseInt(jobParams);
+        if (StringUtils.isNotBlank(instanceParams)) {
+            index = Integer.parseInt(instanceParams);
         }
         log.info("[通过redmine 同步bug issue]-时间{}天前", index);
         String threeDateAgo = DateTime.now().minusDays(index).toString("yyyy-MM-dd");

@@ -36,7 +36,7 @@ public class SyncRedmineIssueToUserTask implements BasicProcessor {
 
     @Override
     public ProcessResult process(TaskContext context) {
-        String jobParams = context.getJobParams();
+        String instanceParams = context.getInstanceParams();
         OmsLogger log = context.getOmsLogger();
         log.info("[全部人员同步]-开始");
         List<RProjectInfo> projectList = projectInfoService.listAll();

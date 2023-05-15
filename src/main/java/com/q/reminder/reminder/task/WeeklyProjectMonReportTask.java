@@ -59,11 +59,11 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
                 result.setMsg("节假日放假!!!!");
                 return result;
             }
-            String jobParam = context.getInstanceParams();
+            String instanceParams = context.getInstanceParams();
             int weekNumber = 0;
             String id = null;
-            if (StringUtils.isNotBlank(jobParam)) {
-                String[] param = jobParam.split(",");
+            if (StringUtils.isNotBlank(instanceParams)) {
+                String[] param = instanceParams.split(",");
                 String weekNum = param[0];
                 if (StringUtils.isNotBlank(weekNum) && NumberUtil.isInteger(weekNum)) {
                     weekNumber = Integer.parseInt(weekNum);
