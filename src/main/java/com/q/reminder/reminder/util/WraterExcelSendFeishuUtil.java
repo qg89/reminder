@@ -31,6 +31,7 @@ public class WraterExcelSendFeishuUtil {
 
     public static void wraterExcelSendFeishu(Map<String, List<ExcelVo>> map, WeeklyProjectVo weeklyVo, String name) throws Exception {
         String path = WeeklyProjectUtils.createDir() + weeklyVo.getFileName() + "-" + name + ".xls";
+        String pmName = weeklyVo.getPmName();
         File file = new File(path);
         ExcelWriter writer = ExcelUtil.getWriter();
         writer.renameSheet(0, map.keySet().stream().findFirst().get());
@@ -74,11 +75,11 @@ public class WraterExcelSendFeishuUtil {
         CreateMessageResp resp = BaseFeishu.message().sendContent(contentVo);
         boolean success = resp.success();
         if (!success) {
-            log.info("周报导出Excel, 发送给: {}, error msg : {} ！", name, resp.getMsg());
-            log.info("周报导出Excel, 发送给: {}, error : {} ！", name, resp.getError());
+            log.info("周报导出Excel, 发送给: {}, error msg : {} ！", pmName, resp.getMsg());
+            log.info("周报导出Excel, 发送给: {}, error : {} ！", pmName, resp.getError());
         }
-        log.info("周报导出Excel, 发送给: {}, success ！", name);
-        log.info("周报导出Excel,发送结果:{}", name);
+        log.info("周报导出Excel, 发送给: {}, success ！", pmName);
+        log.info("周报导出Excel,发送结果:{}", pmName);
 
         file.delete();
     }

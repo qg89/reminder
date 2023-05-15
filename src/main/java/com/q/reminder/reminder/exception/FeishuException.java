@@ -43,7 +43,7 @@ public class FeishuException extends RuntimeException {
             StringBuilder con = new StringBuilder();
             Arrays.stream(e.getStackTrace()).forEach(s -> {
                 JSONObject from = JSONObject.from(s);
-                con.append(from).append("\n");
+                con.append(from).append("\n\r");
                 con.append("------------------");
             });
             json.put("text", con);

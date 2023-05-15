@@ -14,10 +14,12 @@
             fw.url AS weeklyReportUrl,
             fw.week_num weekNum,
             fw.file_name AS fileName,
-            fw.file_token AS fileToken
+            fw.file_token AS fileToken,
+            fs.`name` AS pmName
         FROM
             r_project_info p
             LEFT JOIN fs_weekly_project_report fw ON p.id = fw.r_pid
+            LEFT JOIN fs_user_member_info fs ON p.pm_ou = fs.member_id
         WHERE
             fw.file_token IS NOT NULL
             AND fw.is_delete = 0

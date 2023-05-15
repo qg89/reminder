@@ -84,37 +84,19 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         File logoFile = new File(ResourceUtils.path());
         for (WeeklyProjectVo report : list) {
             Date sunday = getWeekNumToSunday(report.getWeekNum() - 1);
-            String redmineUrl = report.getRedmineUrl();
-            String accessKey = report.getPmKey();
-            String pKey = report.getPKey();
-            String projectShortName = report.getProjectShortName();
-            String fileToken = report.getFileToken();
-            String fileName = report.getFileName();
-            Integer weekNum = report.getWeekNum();
             Date startDay = report.getStartDay();
-            WeeklyProjectVo vo = new WeeklyProjectVo();
-            String appId = feishuProperties.getAppId();
-            vo.setAppId(appId);
-            vo.setAppSecret(feishuProperties.getAppSecret());
-            vo.setFileToken(fileToken);
-            vo.setRedmineUrl(redmineUrl);
-            vo.setPmKey(accessKey);
-            vo.setPKey(pKey);
-            vo.setProjectShortName(projectShortName);
-            vo.setFileName(fileName);
-            vo.setWeekNum(weekNum);
-            vo.setStartDay(report.getStartDay());
-            vo.setPmOu(report.getPmOu());
-            List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(vo).stream().filter(e -> {
+            report.setAppId(feishuProperties.getAppId());
+            report.setAppSecret(feishuProperties.getAppSecret());
+            List<Issue> allBugList = WeeklyProjectRedmineUtils.OverallBug.allBug(report).stream().filter(e -> {
                 if (startDay == null) {
                     return true;
                 } else {
                     return e.getCreatedOn().after(startDay) && e.getCreatedOn().before(sunday);
                 }
             }).collect(Collectors.toList());
-            vo.setAllBugList(allBugList);
+            report.setAllBugList(allBugList);
 
-            JSONArray jsonArray = BaseFeishu.cloud().documents().blocks(vo);
+            JSONArray jsonArray = BaseFeishu.cloud().documents().blocks(report);
             ArrayList<UpdateBlockRequest> requests = new ArrayList<>();
             for (int i = 0; i < Objects.requireNonNull(jsonArray).size(); i++) {
                 JSONObject block = JSONObject.parseObject(jsonArray.get(i).toString());
@@ -122,25 +104,25 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
                 if (4 == blockType) {
                     String heading2 = JSONObject.parseObject(block.getJSONObject("heading2").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
                     if (WeeklyReportConstants.REVIEW_QUESTIONS.equals(heading2)) {
-                        i = reviewQuestions(vo, jsonArray, requests, i);
+                        i = reviewQuestions(report, jsonArray, requests, i);
                     }
                     if (WeeklyReportConstants.COPQ.equals(heading2)) {
-                        i = copq(vo, jsonArray, requests, i);
+                        i = copq(report, jsonArray, requests, i);
                     }
                 }
                 if (5 == blockType) {
                     String heading3 = JSONObject.parseObject(block.getJSONObject("heading3").getJSONArray("elements").get(0).toString()).getJSONObject("text_run").getString("content");
                     if (WeeklyReportConstants.TRENDS.equals(heading3)) {
-                        i = tends(vo, jsonArray, requests, i);
+                        i = tends(report, jsonArray, requests, i);
                     }
                     if (WeeklyReportConstants.BUG_LEVEL.equals(heading3)) {
-                        i = allBugLevel(vo, jsonArray, requests, i);
-                        i = openBugLevel(vo, jsonArray, requests, i);
-                        i = openBug15(logoFile, vo, jsonArray, requests, i);
+                        i = allBugLevel(report, jsonArray, requests, i);
+                        i = openBugLevel(report, jsonArray, requests, i);
+                        i = openBug15(logoFile, report, jsonArray, requests, i);
                     }
                 }
             }
-            BaseFeishu.cloud().documents().batchUpdateBlocks(vo, requests.toArray(new UpdateBlockRequest[0]));
+            BaseFeishu.cloud().documents().batchUpdateBlocks(report, requests.toArray(new UpdateBlockRequest[0]));
 //            log.info("[{}]项目周报更新完成", projectShortName);
 
             sendFeishu(report);

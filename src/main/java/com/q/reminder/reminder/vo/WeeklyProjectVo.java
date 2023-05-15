@@ -33,6 +33,7 @@ public class WeeklyProjectVo extends BaseFeishuVo implements Serializable {
     private String id;
     private String pKey;
     private Integer weekNum;
+    private String pmName;
 
     private String blockId;
     private String imageToken;
