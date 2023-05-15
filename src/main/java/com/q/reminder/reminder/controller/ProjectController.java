@@ -95,6 +95,10 @@ public class ProjectController {
 
     @PostMapping("/e")
     public ReturnT<String> edit(@RequestBody RProjectReaVo info) {
+        if ("1".equals(info.getIsDelete())) {
+            projectInfoService.removeById(info);
+            return ReturnT.SUCCESS;
+        }
         projectInfoService.updateInfo(info);
         if (!saveRea(info)) {
             return ReturnT.FAIL;
