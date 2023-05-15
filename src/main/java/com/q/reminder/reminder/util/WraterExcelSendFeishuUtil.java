@@ -70,27 +70,31 @@ public class WraterExcelSendFeishuUtil {
         json.put("file_key", fileKey);
         contentVo.setContent(json.toJSONString());
         contentVo.setMsgType("file");
-        contentVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-        CreateMessageResp resp = BaseFeishu.message().sendContent(contentVo);
+//        contentVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+        CreateMessageResp resp;
+        try {
+            resp = BaseFeishu.message().sendContent(contentVo);
+        } finally {
+            file.delete();
+        }
         boolean success = resp.success();
         OmsLogger omsLogger = objLog.getOmsLogger();
         if (!success) {
+            String msg = "周报导出Excel文件, 发送给: {}, error msg : {}  ,  error : {} ";
             if (omsLogger != null) {
-                omsLogger.info("周报导出Excel, 发送给: {}, error msg : {} ！", pmName, resp.getMsg());
-                omsLogger.info("周报导出Excel, 发送给: {}, error : {} ！", pmName, resp.getError());
+                omsLogger.info(msg, pmName, resp.getMsg(), resp.getError());
             } else {
-                log.info("周报导出Excel, 发送给: {}, error msg : {} ！", pmName, resp.getMsg());
-                log.info("周报导出Excel, 发送给: {}, error : {} ！", pmName, resp.getError());
+                log.info(msg, pmName, resp.getMsg(), resp.getError());
             }
+            return;
         }
+        String msg = "周报导出Excel文件, 发送给: {}, success ！";
         if (omsLogger != null) {
-            omsLogger.info("周报导出Excel, 发送给: {}, success ！", pmName);
-            omsLogger.info("周报导出Excel,发送结果:{}", pmName);
+            omsLogger.info(msg, pmName);
         } else {
-            log.info("周报导出Excel, 发送给: {}, success ！", pmName);
-            log.info("周报导出Excel,发送结果:{}", pmName);
+            log.info(msg, pmName);
         }
-        file.delete();
+
     }
 
     public static void wraterExcelTimeSendFeishu(Map<String, List<ExcelVo.ExcelTimeVo>> map, WeeklyProjectVo weeklyVo, String name) throws Exception {
