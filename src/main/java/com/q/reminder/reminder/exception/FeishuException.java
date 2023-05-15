@@ -43,8 +43,8 @@ public class FeishuException extends RuntimeException {
         json.put("tag", "text");
         if (e != null) {
             JSONObject errorMsg = new JSONObject();
-            errorMsg.put("异常信息 概览", e.getMessage());
             JSONArray jsonArray = new JSONArray();
+            errorMsg.put("异常信息 概览", e.getMessage() + "\\r\\n");
             Arrays.stream(e.getStackTrace()).forEach(s -> {
                 jsonArray.add(Map.of("className", s.getClassName(), "methodName", s.getMethodName(), "lineNumber", s.getLineNumber()));
             });
