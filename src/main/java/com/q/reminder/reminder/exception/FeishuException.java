@@ -41,19 +41,18 @@ public class FeishuException extends RuntimeException {
         JSONObject json = new JSONObject();
         json.put("tag", "text");
         if (e != null) {
-            StringBuilder con = new StringBuilder();
+            StringBuilder con = new StringBuilder("{");
             Arrays.stream(e.getStackTrace()).forEach(s -> {
                 JSONObject from = JSONObject.from(s);
-                con.append(from).append("\n\r");
-                con.append("------------------");
+                con.append(from).append(",").append("\n\r");
             });
+            con.append("}");
             json.put("text", con);
         } else {
             json.put("text", "");
         }
         atjsonArray.add(json);
         contentJsonArray.add(atjsonArray);
-
         MessageVo vo = new MessageVo();
         vo.setContent(content.toJSONString());
         vo.setMsgType("post");
