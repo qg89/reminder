@@ -38,6 +38,7 @@ public class OverdueTasksAgainToGroupTask implements BasicProcessor {
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         ProcessResult result = new ProcessResult(true);
+        String taskName = context.getTaskName();
         try {
             if (holdayBase.queryHoliday()) {
                 log.info("节假日放假!!!!");
@@ -58,7 +59,7 @@ public class OverdueTasksAgainToGroupTask implements BasicProcessor {
             if (!CollectionUtils.isEmpty(noneStatusList)) {
                 // 组装数据， 通过人员，获取要发送的内容
                 overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(vo, log);
-                log.info("[每天9点半提醒，群提醒] - 非[Resolved]执行成功");
+                log.info(taskName +" - 非[Resolved]执行成功");
             }
             if (statusMap.containsKey("2")) {
                 vo.setNoneStatusList(statusMap.get("2").stream().map(NoneStatus::getNoneStatus).collect(Collectors.toList()));
@@ -67,9 +68,9 @@ public class OverdueTasksAgainToGroupTask implements BasicProcessor {
             vo.setContainsStatus(Boolean.TRUE);
             vo.setRedminderType("(Resolved)");
             overdueTasksAgainToGroupBase.overdueTasksAgainToGroup(vo, log);
-            log.info("[每天9点半提醒，群提醒] - 执行完成");
+            log.info(taskName + " - 执行完成");
         } catch (Exception e) {
-            throw new FeishuException(e, "每天9点半提醒，群提醒 - 执行失败");
+            throw new FeishuException(e, taskName + "-异常");
         }
         return result;
     }

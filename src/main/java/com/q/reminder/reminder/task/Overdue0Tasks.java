@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.task;
 
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.NoneStatusService;
 import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.task.base.QueryTasksToMemberBase;
@@ -31,6 +32,8 @@ public class Overdue0Tasks implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
+        String taskName = context.getTaskName();
+        log.info(taskName + "-start");
         ProcessResult result = new ProcessResult(true);
         try {
 
@@ -43,10 +46,9 @@ public class Overdue0Tasks implements BasicProcessor {
         // 组装数据， 通过人员，获取要发送的内容
         queryTasksToMemberBase.feiShu(expiredDay, noneStatusList, Boolean.FALSE, log);
         } catch (Exception e) {
-            log.error("任务处理失败", e);
-            result.setSuccess(false);
-            result.setMsg("[当天17点提醒，个人提醒]-任务处理失败");
+            throw new FeishuException(e, taskName + "- 异常");
         }
+        log.info(taskName + "-done");
         return result;
     }
 }

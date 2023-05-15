@@ -65,7 +65,7 @@ public class WeeklyProjectReportTask implements BasicProcessor {
                 try {
                     projectReport = BaseFeishu.cloud().space().copyFile(vo);
                 } catch (Exception e) {
-                    throw new FeishuException(e, "复制文件异常");
+                    throw new FeishuException(e, context.getTaskName() + "-异常");
                 }
                 if (projectReport == null) {
                     return;
@@ -74,7 +74,7 @@ public class WeeklyProjectReportTask implements BasicProcessor {
                 weeklyProjectReportService.save(projectReport);
             });
         } catch (Exception e) {
-            throw new FeishuException(e, "复制文件异常");
+            throw new FeishuException(e, context.getTaskName() + "-异常");
         }
         return result;
     }

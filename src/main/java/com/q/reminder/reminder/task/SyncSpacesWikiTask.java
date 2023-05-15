@@ -40,6 +40,7 @@ public class SyncSpacesWikiTask implements BasicProcessor {
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         ProcessResult processResult = new ProcessResult(true);
+        String taskName = context.getTaskName();
         try {
             int weekOfYear = DateUtil.thisWeekOfYear() - 1;
             if (weekOfYear == 0) {
@@ -55,7 +56,7 @@ public class SyncSpacesWikiTask implements BasicProcessor {
             wikiLq.eq(WikiSpace::getWeekNum, weekOfYear);
             long count = spaceWikoService.count(wikiLq);
             if (count > 0) {
-                log.info("当前周已复制");
+                log.info(taskName + "-当前周已复制");
                 return processResult;
             }
             String weeklyReportSpaceId = feishuService.weeklyReportSpaceId();
@@ -73,9 +74,9 @@ public class SyncSpacesWikiTask implements BasicProcessor {
                 wikiSpaceList.add(space);
             }
             spaceWikoService.saveOrUpdateBatch(wikiSpaceList);
-            log.error("同步知识库中标准过程复制完成");
+            log.error(taskName + "-完成");
         } catch (Exception e) {
-            throw new FeishuException(e, "同步知识库中标准过程复制,任务执行异常!");
+            throw new FeishuException(e, taskName + "-异常");
         }
         return processResult;
     }

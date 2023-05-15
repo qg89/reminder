@@ -102,7 +102,7 @@ public class SyncRedmineProjectUserTimeTask implements BasicProcessor {
             }
             wUserTimesService.saveOrUpdateBatch(userTimesData);
         }catch (Exception e) {
-            throw new FeishuException(e, "同步redmine上工时同步到数据库异常");
+            throw new FeishuException(e, context.getTaskName() + "-异常");
         }
         return processResult;
     }

@@ -38,7 +38,8 @@ public class SyncRedmineIssueToUserTask implements BasicProcessor {
     public ProcessResult process(TaskContext context) {
         String instanceParams = context.getInstanceParams();
         OmsLogger log = context.getOmsLogger();
-        log.info("[全部人员同步]-开始");
+        String taskName = context.getTaskName();
+        log.info(taskName + "-开始");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         try {
             projectList.stream().collect(Collectors.groupingBy(RProjectInfo::getRedmineType)).forEach((k, list) -> {
@@ -55,15 +56,15 @@ public class SyncRedmineIssueToUserTask implements BasicProcessor {
                             data.add(user);
                         });
                     } catch (RedmineException e) {
-                        log.error("[全部人员同步]-获取Issue异常", e);
+                        log.error(taskName + "-获取Issue异常", e);
                     }
                     ArrayList<RedmineUserInfo> collect = data.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(RedmineUserInfo::getAssigneeId))), ArrayList::new));
                     redmineUserInfoService.saveOrupdateMultiIdAll(collect);
-                    log.info("[全部人员同步]-完成，redmineType：{} ", redmineType);
+                    log.info(taskName + "-完成，redmineType：{} ", redmineType);
                 }
             });
         } catch (Exception e) {
-            throw new FeishuException(e, "[全部人员同步]-异常");
+            throw new FeishuException(e, taskName + "-异常");
         }
         return new ProcessResult(true);
     }

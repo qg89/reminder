@@ -49,7 +49,7 @@ public class SyncRedmineUserTask implements BasicProcessor {
             }
             redmineUserInfoService.saveOrupdateMultiIdAll(data);
         } catch (Exception e) {
-            throw new FeishuException(e, "SyncRedmineUserTask,任务执行异常!");
+            throw new FeishuException(e, context.getTaskName() + "-异常");
         }
         return processResult;
     }

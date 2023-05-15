@@ -83,7 +83,7 @@ public class UpdateFeishuRedmineTask implements BasicProcessor {
             log.info("保存机器人所在群组和人员关系完成!");
             log.info("每日更新当前群信息，人员信息，及人群关系, 任务执行成功!");
         } catch (Exception e) {
-            throw new FeishuException(e, "每日更新当前群信息，人员信息，及人群关系, 任务执行失败");
+            throw new FeishuException(e, context.getTaskName() + "-异常");
         }
         return processResult;
     }

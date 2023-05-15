@@ -39,14 +39,15 @@ public class SyncRedmineIssueBugTask implements BasicProcessor {
     public ProcessResult process(TaskContext context) {
         String instanceParams = context.getInstanceParams();
         OmsLogger log = context.getOmsLogger();
-        log.info("[通过redmine 同步bug issue]-开始");
+        String taskName = context.getTaskName();
+        log.info(taskName + "-开始");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdIssueBug> bugIssueData = new ArrayList<>();
         int index = 3;
         if (StringUtils.isNotBlank(instanceParams)) {
             index = Integer.parseInt(instanceParams);
         }
-        log.info("[通过redmine 同步bug issue]-时间{}天前", index);
+        log.info(taskName + "-时间{}天前", index);
         String threeDateAgo = DateTime.now().minusDays(index).toString("yyyy-MM-dd");
         try {
             for (RProjectInfo projectInfo : projectList) {
@@ -98,14 +99,14 @@ public class SyncRedmineIssueBugTask implements BasicProcessor {
                             }
                         }
                 );
-                log.info("[通过redmine 同步bug issue]-项目： {}", projectInfo.getProjectShortName());
+                log.info(taskName + "-项目： {}", projectInfo.getProjectShortName());
             }
             rdIssueBugService.saveOrUpdateBatchByMultiId(bugIssueData);
-            log.info("[通过redmine 同步bug issue]-更新完成");
+            log.info(taskName + "-更新完成");
         } catch (Exception e) {
-            throw new FeishuException(e, "[通过redmine 同步bug issue]-异常");
+            throw new FeishuException(e, taskName + "-异常");
         }
-        log.info("[通过redmine 同步bug issue]-success");
+        log.info(taskName + "-done");
         return new ProcessResult(true);
     }
 }

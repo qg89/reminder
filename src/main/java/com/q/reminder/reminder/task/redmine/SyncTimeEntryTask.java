@@ -36,14 +36,15 @@ public class SyncTimeEntryTask implements BasicProcessor {
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         String instanceParams = context.getInstanceParams();
-        log.info("【redmine】同步redmine工时-start");
+        String taskName = context.getTaskName();
+        log.info(taskName + "-start");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdTimeEntry> data = new ArrayList<>();
         int index = 3;
         if (StringUtils.isNotBlank(instanceParams)) {
             index = Integer.parseInt(instanceParams);
         }
-        log.info("【redmine】同步redmine工时-时间{}天前", index);
+        log.info(taskName + "-时间{}天前", index);
         String timeAgo = DateTime.now().minusDays(index).toString("yyyy-MM-dd");
         try {
             for (RProjectInfo projectInfo : projectList) {
@@ -70,12 +71,12 @@ public class SyncTimeEntryTask implements BasicProcessor {
                     time.setUserName(timeEntry.getUserName());
                     data.add(time);
                 });
-                log.info("【redmine】同步redmine工时-项目： {}", projectInfo.getProjectShortName());
+                log.info(taskName + "-项目： {}", projectInfo.getProjectShortName());
             }
             rdTimeEntryService.saveOrUpdateBatchByMultiId(data);
-            log.info("【redmine】同步redmine工时-查询完成，size:{}", data.size());
+            log.info(taskName + "-查询完成，size:{}", data.size());
         } catch (Exception e) {
-            throw new FeishuException(e, "【redmine】同步redmine工时-查询工时异常");
+            throw new FeishuException(e, taskName + "-异常");
         }
         return new ProcessResult(true);
     }

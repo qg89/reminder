@@ -48,6 +48,7 @@ public class RedmineUpdateTask implements BasicProcessor {
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         ProcessResult processResult = new ProcessResult(true);
+        String taskName = context.getTaskName();
         try {
             List<RProjectInfo> projectInfoList = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();
             List<RedmineVo> issues = RedmineApi.queryUpdateIssue(projectInfoList);
@@ -74,16 +75,16 @@ public class RedmineUpdateTask implements BasicProcessor {
             Map<String, String> userNameMap = userMemberService.list(lqw).stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
 
             if (CollectionUtils.isEmpty(issueMap)) {
-                log.info("[变更提醒] 任务列表为空");
+                log.info(taskName + "-任务列表为空");
                 return processResult;
             }
 
             issueMap.forEach((assigneeName, issueList) -> {
                 sendContexToMember(log, userNameMap, assigneeName, issueList);
             });
-            log.info("变更提醒,任务执行完成!");
+            log.info(taskName + "-任务执行完成!");
         } catch (Exception e) {
-            throw new FeishuException(e, "变更提醒,任务执行异常!");
+            throw new FeishuException(e, taskName + "-异常");
         }
         return processResult;
     }
@@ -129,6 +130,6 @@ public class RedmineUpdateTask implements BasicProcessor {
             log.info("[redmine]-变更提醒失败, SendTo: {},error Code: {}, error msg : {} , error： {}！", assigneeName,resp.getCode(), resp.getMsg(), resp.getError());
             return;
         }
-        log.info("[redmine]-变更提醒, SendTo: {}, success ！", assigneeName);
+        log.info("[redmine]-变更提醒, SendTo: {}, done ！", assigneeName);
     }
 }

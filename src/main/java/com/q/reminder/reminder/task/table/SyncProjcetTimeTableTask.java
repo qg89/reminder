@@ -44,6 +44,7 @@ public class SyncProjcetTimeTableTask implements BasicProcessor {
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         String jobParam = context.getInstanceParams();
+        String taskName = context.getTaskName();
         ProcessResult processResult = new ProcessResult(true);
         String day = "";
         try {
@@ -81,9 +82,9 @@ public class SyncProjcetTimeTableTask implements BasicProcessor {
                 records.add(AppTableRecord.newBuilder().fields(data).build());
             }
             BaseFeishu.cloud().table().batchCreateTableRecords(tableInfo, records.toArray(new AppTableRecord[0]));
-            log.info("同步工时到多维表格-将数据库中的数据同步到多维表格中成功");
+            log.info(taskName + "-将数据库中的数据同步到多维表格中成功");
         } catch (Exception e) {
-            throw new FeishuException(e, "同步工时到多维表格-将数据库中的数据同步到多维表格中异常");
+            throw new FeishuException(e, taskName + "-异常");
         }
         return processResult;
     }

@@ -140,7 +140,7 @@ public class OverdueTasksAgainToGroupBase {
                 if (!success) {
                     log.info("群发送,过期任务提醒群组, 发送给: {}, error msg : [{}] ！, error: [{}]", chatName, resp.getMsg(), resp.getError());
                 }
-                log.info("群发送,过期任务提醒群组, 发送给: {}, success ！", chatName);
+                log.info("群发送,过期任务提醒群组, 发送给: {}, done ！", chatName);
             } catch (Exception ex) {
                throw new FeishuException(ex, "群发送,过期任务提醒群组 异常");
             }

@@ -154,7 +154,7 @@ public class QueryTasksToMemberBase {
             sendVo.setReceiveId(memberId);
             CreateMessageResp resp = BaseFeishu.message().sendContent(sendVo, log);
             boolean success = resp.success();
-            log.info("[过期任务提醒个人]-发送飞书任务, 人员姓名：{},执行结果：{}", name, success);
+            log.info("[过期任务提醒个人]-发送飞书任务, 人员姓名：{},执行结果：{}", name, done);
             sendAdminContent.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("人员姓名: ").append(name).append(", 执行结果：").append(success).append("\r\n");
         });
 
