@@ -65,6 +65,7 @@ public abstract class WeeklyProjectUtils {
         String fileName = vo.getFileName();
         Date startDay = vo.getStartDay();
         Date sunday = getWeekNumToSunday(vo.getWeekNum() - 1);
+        String pattern = "yyyy-MM-dd HH:mm:ss";
         List<Issue> issues = WeeklyProjectRedmineUtils.reviewQuestion(vo).stream().filter(e -> {
             if (startDay == null) {
                 return true;
@@ -114,8 +115,8 @@ public abstract class WeeklyProjectUtils {
                 excelVo.setSubject(issue.getSubject());
                 excelVo.setStatus(issue.getStatusName());
                 excelVo.setDescription(issue.getDescription());
-                excelVo.setCreateTime(new DateTime(issue.getCreatedOn()).toString("yyyy-MM-dd HH:mm:ss"));
-                excelVo.setEndTime(new DateTime(issue.getClosedOn()).toString("yyyy-MM-dd HH:mm:ss"));
+                excelVo.setCreateTime(new DateTime(issue.getCreatedOn()).toString(pattern));
+                excelVo.setEndTime(new DateTime(issue.getClosedOn()).toString(pattern));
                 openIssueList.add(excelVo);
             }
             issues.stream().filter(e -> 5 == e.getStatusId()).forEach(issue -> {
@@ -125,8 +126,8 @@ public abstract class WeeklyProjectUtils {
                 excelVo.setSubject(issue.getSubject());
                 excelVo.setStatus(issue.getStatusName());
                 excelVo.setDescription(issue.getDescription());
-                excelVo.setCreateTime(new DateTime(issue.getCreatedOn()).toString("yyyy-MM-dd HH:mm:ss"));
-                excelVo.setEndTime(new DateTime(issue.getClosedOn()).toString("yyyy-MM-dd HH:mm:ss"));
+                excelVo.setCreateTime(new DateTime(issue.getCreatedOn()).toString(pattern));
+                excelVo.setEndTime(new DateTime(issue.getClosedOn()).toString(pattern));
                 closedIssueList.add(excelVo);
             });
 

@@ -29,6 +29,7 @@ import java.util.Map;
 public class WraterExcelSendFeishuUtil {
 
     public static void wraterExcelSendFeishu(Map<String, List<ExcelVo>> map, WeeklyProjectVo weeklyVo, String name, WeeklyLogVo<Logger, OmsLogger> objLog) throws Exception {
+        OmsLogger omsLogger = objLog.getOmsLogger();
         String path = WeeklyProjectUtils.createDir() + weeklyVo.getFileName() + "-" + name + ".xls";
         String pmName = weeklyVo.getPmName();
         File file = new File(path);
@@ -62,8 +63,11 @@ public class WraterExcelSendFeishuUtil {
         contentVo.setReceiveId(weeklyVo.getPmOu());
         String fileKey = BaseFeishu.message().imUploadFile(contentVo);
         if (StringUtils.isBlank(fileKey)) {
-            file.delete();
-            WraterExcelSendFeishuUtil.log.info("周报导出Excel,上传文件获取key为空");
+            if (omsLogger != null) {
+                omsLogger.info("周报导出Excel,上传文件获取key为空");
+            } else {
+                log.info("周报导出Excel,上传文件获取key为空");
+            }
             return;
         }
         JSONObject json = new JSONObject();
@@ -78,7 +82,6 @@ public class WraterExcelSendFeishuUtil {
             file.delete();
         }
         boolean success = resp.success();
-        OmsLogger omsLogger = objLog.getOmsLogger();
         if (!success) {
             String msg = "周报导出Excel文件, 发送给项目经理: 【{}】, error msg : {}  ,  error : {} ";
             if (omsLogger != null) {
