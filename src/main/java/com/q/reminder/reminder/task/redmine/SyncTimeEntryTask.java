@@ -45,7 +45,7 @@ public class SyncTimeEntryTask implements BasicProcessor {
         log.info(taskName + "-start");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdTimeEntry> data = new ArrayList<>();
-        int index = 3;
+        int index = 10;
         if (StringUtils.isNotBlank(instanceParams)) {
             index = Integer.parseInt(instanceParams);
         }
@@ -54,8 +54,12 @@ public class SyncTimeEntryTask implements BasicProcessor {
         String endTime = DateTime.now().toString("yyyy-MM-dd");
         try {
             for (RProjectInfo projectInfo : projectList) {
-                rdTimeEntryService.remove(Wrappers.<RdTimeEntry>lambdaQuery().eq(RdTimeEntry::getProjectId, projectInfo.getPid()).between(RdTimeEntry::getSpentOn, timeAgo, endTime));
-                log.info(taskName + "-项目{}, delete start:{},end{}", projectInfo.getProjectShortName(), timeAgo, endTime);
+                boolean remove = rdTimeEntryService.remove(Wrappers.<RdTimeEntry>lambdaQuery().eq(RdTimeEntry::getProjectId, projectInfo.getPid()).between(RdTimeEntry::getSpentOn, timeAgo, endTime));
+                if (!remove) {
+                    log.info(taskName + "-项目{}, delete  start:{},end:{}  -fault", projectInfo.getProjectShortName(), timeAgo, endTime);
+                    continue;
+                }
+                log.info(taskName + "-项目{}, delete start:{},end:{}", projectInfo.getProjectShortName(), timeAgo, endTime);
                 List<RequestParam> requestParams = List.of(
                         new RequestParam("f[]", "spent_on"),
                         new RequestParam("op[spent_on]", ">="),
