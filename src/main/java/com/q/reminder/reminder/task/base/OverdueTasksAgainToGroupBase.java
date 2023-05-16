@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.CreateMessageResp;
+import com.q.reminder.reminder.constant.FeiShuContents;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
@@ -150,7 +151,7 @@ public class OverdueTasksAgainToGroupBase {
         if (!overdueTask) {
             if (!overdueTaskHistoryService.saveOrUpdateBatch(historys)) {
                 MessageVo sendVo = new MessageVo();
-                sendVo.setReceiveId("ou_35e03d4d8754dd35fed26c26849c85ab");
+                sendVo.setReceiveId(FeiShuContents.ADMIN_MEMBERS);
                 sendVo.setContent("任务保存历史记录失败！");
                 sendVo.setMsgType("text");
                 sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);

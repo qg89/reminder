@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.service.bitable.v1.model.AppTableRecord;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
+import com.q.reminder.reminder.constant.FeiShuContents;
 import com.q.reminder.reminder.constant.TableTypeContants;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.TTableFeatureTmp;
@@ -170,7 +171,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                 vo.setContent(sendAdmin.toString());
                 vo.setMsgType("text");
                 vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-                vo.setReceiveId("ou_35e03d4d8754dd35fed26c26849c85ab");
+                vo.setReceiveId(FeiShuContents.ADMIN_MEMBERS);
                 BaseFeishu.message().sendContent(vo);
                 log.info(taskName + "-获取记录为空, 发送admin完成");
             }
