@@ -54,11 +54,7 @@ public class SyncTimeEntryTask implements BasicProcessor {
         String endTime = DateTime.now().toString("yyyy-MM-dd");
         try {
             for (RProjectInfo projectInfo : projectList) {
-                boolean remove = rdTimeEntryService.remove(Wrappers.<RdTimeEntry>lambdaQuery().eq(RdTimeEntry::getProjectId, projectInfo.getPid()).between(RdTimeEntry::getSpentOn, timeAgo, endTime));
-                if (!remove) {
-                    log.info(taskName + "-项目{}, delete  start:{},end:{}  -fault", projectInfo.getProjectShortName(), timeAgo, endTime);
-                    continue;
-                }
+                rdTimeEntryService.remove(Wrappers.<RdTimeEntry>lambdaQuery().eq(RdTimeEntry::getProjectId, projectInfo.getPid()).between(RdTimeEntry::getSpentOn, timeAgo, endTime));
                 log.info(taskName + "-项目{}, delete start:{},end:{}", projectInfo.getProjectShortName(), timeAgo, endTime);
                 List<RequestParam> requestParams = List.of(
                         new RequestParam("f[]", "spent_on"),
