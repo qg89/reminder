@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.task.redmine;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.exception.FeishuException;
@@ -50,8 +51,11 @@ public class SyncTimeEntryTask implements BasicProcessor {
         }
         log.info(taskName + "-时间{}天前", index);
         String timeAgo = DateTime.now().minusDays(index).toString("yyyy-MM-dd");
+        String endTime = DateTime.now().toString("yyyy-MM-dd");
         try {
             for (RProjectInfo projectInfo : projectList) {
+                rdTimeEntryService.remove(Wrappers.<RdTimeEntry>lambdaQuery().eq(RdTimeEntry::getProjectId, projectInfo.getPid()).between(RdTimeEntry::getSpentOn, timeAgo, endTime));
+                log.info(taskName + "-项目{}, delete start:{},end{}", projectInfo.getProjectShortName(), timeAgo, endTime);
                 List<RequestParam> requestParams = List.of(
                         new RequestParam("f[]", "spent_on"),
                         new RequestParam("op[spent_on]", ">="),
