@@ -56,7 +56,8 @@ public class SyncTimeEntryTask implements BasicProcessor {
             rdTimeEntryService.remove(Wrappers.<RdTimeEntry>lambdaQuery().between(RdTimeEntry::getSpentOn, timeAgo, endTime));
             log.info(taskName + "-数据删除完成， sDate：{}，eDate：", timeAgo, endTime);
             for (RProjectInfo projectInfo : projectList) {
-                log.info(taskName + "-项目{}, delete start:{},end:{}", projectInfo.getProjectShortName(), timeAgo, endTime);
+                String projectShortName = projectInfo.getProjectShortName();
+                log.info(taskName + "-项目{}, delete start:{},end:{}", projectShortName, timeAgo, endTime);
                 List<RequestParam> requestParams = List.of(
                         new RequestParam("f[]", "spent_on"),
                         new RequestParam("op[spent_on]", ">="),
@@ -80,7 +81,7 @@ public class SyncTimeEntryTask implements BasicProcessor {
                     time.setUserName(timeEntry.getUserName());
                     data.add(time);
                 });
-                log.info(taskName + "-项目： {}", projectInfo.getProjectShortName());
+                log.info(taskName + "-项目： {}", projectShortName);
             }
             rdTimeEntryService.saveOrUpdateBatchByMultiId(data);
             log.info(taskName + "-查询完成，size:{}", data.size());
