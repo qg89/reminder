@@ -1,12 +1,11 @@
 package com.q.reminder.reminder.task;
 
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
-import com.q.reminder.reminder.entity.AdminInfo;
+import com.q.reminder.reminder.constant.FeiShuContents;
 import com.q.reminder.reminder.entity.FsGroupInfo;
 import com.q.reminder.reminder.entity.UserGroup;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.exception.FeishuException;
-import com.q.reminder.reminder.service.AdminInfoService;
 import com.q.reminder.reminder.service.GroupInfoService;
 import com.q.reminder.reminder.service.UserGroupService;
 import com.q.reminder.reminder.service.UserMemberService;
@@ -40,7 +39,6 @@ public class UpdateFeishuRedmineTask implements BasicProcessor {
     private final GroupInfoService groupInfoService;
     private final UserMemberService userMemberService;
     private final UserGroupService userGroupService;
-    private final AdminInfoService adminInfoService;
     private final PowerJobClient client;
 
     @Override
@@ -51,7 +49,6 @@ public class UpdateFeishuRedmineTask implements BasicProcessor {
         String taskName = resultDTO.getData().getJobName();
         try {
             List<FsGroupInfo> groupToChats = BaseFeishu.groupMessage().getGroupToChats();
-            List<AdminInfo> adminInfos = adminInfoService.list();
             log.info(taskName + "-获取机器人所在群组信息完成!");
             List<UserGroup> userGroupList = new ArrayList<>();
             List<UserMemgerInfo> membersByChats = BaseFeishu.groupMessage().getMembersInGroup(userGroupList);
@@ -76,15 +73,9 @@ public class UpdateFeishuRedmineTask implements BasicProcessor {
                 MessageVo vo = new MessageVo();
                 vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
                 vo.setMsgType("text");
-                adminInfos.forEach(e -> {
-                    try {
-                        vo.setReceiveId(e.getMemberId());
-                        vo.setContent(content.toString());
-                        BaseFeishu.message().sendText(vo, log);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                });
+                vo.setReceiveId(FeiShuContents.ADMIN_MEMBERS);
+                vo.setContent(content.toString());
+                BaseFeishu.message().sendText(vo, log);
             }
             log.info(taskName + "-保存机器人所在群组和人员关系完成!");
         } catch (Exception e) {
