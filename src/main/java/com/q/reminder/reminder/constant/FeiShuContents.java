@@ -9,5 +9,5 @@ package com.q.reminder.reminder.constant;
  */
 public interface FeiShuContents {
 
-    String ADMIN_MEMBERS = FeiShuContents.ADMIN_MEMBERID;
+    String ADMIN_MEMBERS = "ou_35e03d4d8754dd35fed26c26849c85ab";
 }
