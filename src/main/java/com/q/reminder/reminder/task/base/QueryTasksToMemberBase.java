@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.CreateMessageResp;
 import com.q.reminder.reminder.constant.FeiShuContents;
-import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
@@ -172,16 +171,5 @@ public class QueryTasksToMemberBase {
         sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
         BaseFeishu.message().sendText(sendVo, log);
         log.info(taskName + "-done");
-    }
-
-    private void sendAdmin(OmsLogger log, StringBuilder contentAll, List<AdminInfo> adminInfoList) {
-        adminInfoList.forEach(e -> {
-            MessageVo sendVo = new MessageVo();
-            sendVo.setReceiveId(e.getMemberId());
-            sendVo.setContent(contentAll.toString());
-            sendVo.setMsgType("text");
-            sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-            BaseFeishu.message().sendText(sendVo, log);
-        });
     }
 }
