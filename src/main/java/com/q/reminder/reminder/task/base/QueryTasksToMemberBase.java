@@ -6,11 +6,11 @@ import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.CreateMessageResp;
+import com.q.reminder.reminder.constant.FeiShuContents;
 import com.q.reminder.reminder.entity.AdminInfo;
 import com.q.reminder.reminder.entity.OverdueTaskHistory;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
-import com.q.reminder.reminder.service.AdminInfoService;
 import com.q.reminder.reminder.service.OverdueTaskHistoryService;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.UserMemberService;
@@ -46,7 +46,6 @@ public class QueryTasksToMemberBase {
     private final UserMemberService userMemberService;
     private final ProjectInfoService projectInfoService;
     private final OverdueTaskHistoryService overdueTaskHistoryService;
-    private final AdminInfoService adminInfoService;
 
 
     /**
@@ -66,7 +65,6 @@ public class QueryTasksToMemberBase {
 
         // 组装数据， 通过人员，获取要发送的内容
         List<RProjectInfo> projectInfos = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();
-        List<AdminInfo> adminInfoList = adminInfoService.list();
 
         QueryVo vo = new QueryVo();
         vo.setNoneStatusList(noneStatusList);
@@ -76,7 +74,12 @@ public class QueryTasksToMemberBase {
         if (CollectionUtils.isEmpty(listMap)) {
             sendAdminContent.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(0).append("\r\n");
             sendAdminContent.append("执行完成!");
-            sendAdmin(log, sendAdminContent, adminInfoList);
+            MessageVo sendVo = new MessageVo();
+            sendVo.setReceiveId(FeiShuContents.ADMIN_MEMBERS);
+            sendVo.setContent(sendAdminContent.toString());
+            sendVo.setMsgType("text");
+            sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+            BaseFeishu.message().sendText(sendVo, log);
             return;
         }
         sendAdminContent.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("过期人员数量:").append(listMap.size()).append(" 查询redmine过期人员集合完成!").append("\r\n");
@@ -162,7 +165,12 @@ public class QueryTasksToMemberBase {
         sendAdminContent.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("发送飞书任务完成!").append("\r\n");
         overdueTaskHistoryService.saveOrUpdateBatch(historys);
         sendAdminContent.append("当前步骤时间:").append(DateUtil.now()).append("→→").append("执行完成!").append("\r\n");
-        sendAdmin(log, sendAdminContent, adminInfoList);
+        MessageVo sendVo = new MessageVo();
+        sendVo.setReceiveId(FeiShuContents.ADMIN_MEMBERS);
+        sendVo.setContent(sendAdminContent.toString());
+        sendVo.setMsgType("text");
+        sendVo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+        BaseFeishu.message().sendText(sendVo, log);
         log.info(taskName + "-done");
     }
 
