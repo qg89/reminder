@@ -45,7 +45,7 @@ public class SyncTimeEntryTask implements BasicProcessor {
         log.info(taskName + "-start");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdTimeEntry> data = new ArrayList<>();
-        int index = 10;
+        int index = 8;
         if (StringUtils.isNotBlank(instanceParams)) {
             index = Integer.parseInt(instanceParams);
         }
