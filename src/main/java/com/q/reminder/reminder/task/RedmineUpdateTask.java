@@ -54,6 +54,7 @@ public class RedmineUpdateTask implements BasicProcessor {
         ProcessResult processResult = new ProcessResult(true);
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
+        log.info(taskName + "-start");
         try {
             List<RProjectInfo> projectInfoList = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();
             List<RedmineVo> issues = RedmineApi.queryUpdateIssue(projectInfoList);
@@ -72,6 +73,7 @@ public class RedmineUpdateTask implements BasicProcessor {
             }));
             if (CollectionUtils.isEmpty(issueMap)) {
                 issueMap = noneIssueMapByAuthorName;
+                log.info(taskName + "-IssueMap 为空， noneIssueMapByAuthorName size：", noneIssueMapByAuthorName.size());
             }
 
             LambdaQueryWrapper<UserMemgerInfo> lqw = new LambdaQueryWrapper<>();
@@ -83,14 +85,13 @@ public class RedmineUpdateTask implements BasicProcessor {
                 log.info(taskName + "-任务列表为空");
                 return processResult;
             }
-
             issueMap.forEach((assigneeName, issueList) -> {
                 sendContexToMember(log, userNameMap, assigneeName, issueList);
             });
-            log.info(taskName + "-任务执行完成!");
         } catch (Exception e) {
             throw new FeishuException(e, taskName + "-异常");
         }
+        log.info(taskName + "-done!");
         return processResult;
     }
 
