@@ -102,7 +102,10 @@ public class RedmineUpdateTask implements BasicProcessor {
         JSONArray contentJsonArray = new JSONArray();
         all.put("content", contentJsonArray);
         for (RedmineVo issue : issueList) {
+            String redmineId = issue.getRedmineId();
             String issueAssigneeName = issue.getAssigneeName();
+            String authorName = issue.getAuthorName();
+            String subjectStr = issue.getSubject();
             JSONArray subContentJsonArray = new JSONArray();
             JSONObject subject = new JSONObject();
             subject.put("tag", "text");
@@ -110,17 +113,17 @@ public class RedmineUpdateTask implements BasicProcessor {
                 all.put("title", "【任务指派人为空提醒 (" + DateUtil.now() + ")】");
                 subject.put("text", "\r\n请及时更新指派人: ");
                 assigneeName = assigneeName.replace(" ", "");
-                log.info("[redmine]-变更提醒, 任务指派人为空, AuthorName: {}， Subject: {}, IssueId: {}", issue.getAuthorName(), subject, issue.getRedmineId());
+                log.info("[redmine]-变更提醒, 任务指派人为空-AuthorName: {} -IssueId: {} \r\n Subject: {}", authorName, redmineId, subject);
             } else {
                 all.put("title", "【任务变更提醒 (" + DateUtil.now() + ")】");
                 subject.put("text", "\r\n任务主题: ");
-                log.info("[redmine]-变更提醒, AssigneeName: {}, Subject: {}, IssueId: {}", assigneeName, issue.getSubject(), issue.getRedmineId());
+                log.info("[redmine]-变更提醒-AssigneeName: {} -IssueId: {} \r\n Subject: {}", assigneeName, redmineId, subjectStr);
             }
             subContentJsonArray.add(subject);
             JSONObject a = new JSONObject();
             a.put("tag", "a");
-            a.put("href", issue.getRedmineUrl() + "/issues/" + issue.getRedmineId());
-            a.put("text", issue.getSubject());
+            a.put("href", issue.getRedmineUrl() + "/issues/" + redmineId);
+            a.put("text", subjectStr);
             subContentJsonArray.add(a);
             contentJsonArray.add(subContentJsonArray);
         }
