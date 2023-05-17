@@ -73,7 +73,7 @@ public class RedmineUpdateTask implements BasicProcessor {
             }));
             if (CollectionUtils.isEmpty(issueMap)) {
                 issueMap = noneIssueMapByAuthorName;
-                log.info(taskName + "-IssueMap 为空， noneIssueMapByAuthorName size：", noneIssueMapByAuthorName.size());
+                log.info(taskName + "-IssueMap 为空， noneIssueMapByAuthorName size：{}", noneIssueMapByAuthorName.size());
             }
 
             LambdaQueryWrapper<UserMemgerInfo> lqw = new LambdaQueryWrapper<>();
