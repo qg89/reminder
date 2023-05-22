@@ -52,18 +52,18 @@ public class SyncTimeEntryTask implements BasicProcessor {
         log.info(taskName + "-时间{}天前", index);
         String timeAgo = DateTime.now().minusDays(index).toString("yyyy-MM-dd");
         String endTime = DateTime.now().toString("yyyy-MM-dd");
+        List<RequestParam> requestParams = List.of(
+                new RequestParam("f[]", "spent_on"),
+                new RequestParam("op[spent_on]", ">t-"),
+                new RequestParam("v[spent_on][]", String.valueOf(index))
+
+        );
         try {
             rdTimeEntryService.remove(Wrappers.<RdTimeEntry>lambdaQuery().between(RdTimeEntry::getSpentOn, timeAgo, endTime));
             log.info(taskName + "-数据删除完成， sDate：{}，eDate：", timeAgo, endTime);
             for (RProjectInfo projectInfo : projectList) {
                 String projectShortName = projectInfo.getProjectShortName();
                 log.info(taskName + "-项目{}, delete start:{},end:{}", projectShortName, timeAgo, endTime);
-                List<RequestParam> requestParams = List.of(
-                        new RequestParam("f[]", "spent_on"),
-                        new RequestParam("op[spent_on]", ">="),
-                        new RequestParam("v[spent_on][]", timeAgo)
-
-                );
                 RedmineApi.getTimeEntity(projectInfo, requestParams).forEach(timeEntry -> {
                     RdTimeEntry time = new RdTimeEntry();
                     time.setId(timeEntry.getId());
