@@ -50,7 +50,6 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
                 ProjectInfoVo vo = new ProjectInfoVo();
                 vo.setValue(v);
                 extracted(k, vo);
-                vo.setShowEdit(0);
                 res.add(vo);
             });
             ProjectInfoVo pm = new ProjectInfoVo();
@@ -74,6 +73,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         vo.setKey(k);
         vo.setLabel(map().get(k));
         vo.setColumnType("input");
+        vo.setShowEdit(0);
         Object radio = radio().get(k);
         if (!Objects.equals(radio, null)) {
             vo.setColumnType("radio");
@@ -90,7 +90,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         if ("startDay".equals(k)) {
             vo.setColumnType("date");
         }
-        List<String> enable = List.of("id", "updateTime");
+        List<String> enable = List.of("id", "updateTime", "isDelete");
         if (enable.contains(k)) {
             vo.setShowEdit(1);
         }
