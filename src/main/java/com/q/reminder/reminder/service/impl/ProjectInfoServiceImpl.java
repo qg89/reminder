@@ -40,7 +40,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     @Override
     public List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list, Map<String, String> userMap, Map<String, String> groupMap) {
         List<List<ProjectInfoVo>> resDate = new ArrayList<>();
-        List<String> removeColumn = List.of("updateTime", "createTime", "isDelete");
+        List<String> removeColumn = List.of("createTime", "isDelete");
         list.forEach(info -> {
             List<ProjectInfoVo> res = new ArrayList<>();
             BeanUtil.beanToMap(info).forEach((k, v) -> {
@@ -90,7 +90,8 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         if ("startDay".equals(k)) {
             vo.setColumnType("date");
         }
-        if ("id".equals(k)) {
+        List<String> enable = List.of("id", "updateTime");
+        if (enable.contains(k)) {
             vo.setShowEdit(1);
         }
     }
