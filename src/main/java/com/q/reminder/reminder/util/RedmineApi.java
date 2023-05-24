@@ -35,13 +35,8 @@ import java.util.*;
 @Log4j2
 public abstract class RedmineApi {
 
-    public static Date dueDate = DateTime.now().plusDays(7).toDate();
+    private final static Date dueDate = DateTime.now().plusDays(7).toDate();
 
-    public static void main(String[] args) throws RedmineException {
-        RedmineManager rmn = RedmineManagerFactory.createWithApiKey("http://redmine-pa.mxnavi.com/", "e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
-        RedmineManager rm = RedmineManagerFactory.createWithApiKey("http://redmine-qa.mxnavi.com/", "1f905383da4f783bad92e22f430c7db0b15ae258");
-        System.out.println();
-    }
 
     /**
      * 检查任务是否创建
