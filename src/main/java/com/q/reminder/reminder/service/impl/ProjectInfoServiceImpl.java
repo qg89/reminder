@@ -61,7 +61,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             res.add(pm);
             ProjectInfoVo gm = new ProjectInfoVo();
             gm.setKey("groupName");
-            gm.setValue(groupMap.get(info.getIsSendGroup()));
+            gm.setValue(groupMap.get(info.getSendGroupChatId()));
             gm.setColumnType("input");
             pm.setShowEdit(1);
             res.add(gm);
