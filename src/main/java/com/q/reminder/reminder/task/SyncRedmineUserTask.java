@@ -17,11 +17,9 @@ import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 import tech.powerjob.worker.log.OmsLogger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toCollection;
 
 /**
  * @author : saiko
@@ -58,14 +56,7 @@ public class SyncRedmineUserTask implements BasicProcessor {
                     data.add(userInfo);
                 });
             }
-            ArrayList<RedmineUserInfo> collect = data.stream().collect(
-                    collectingAndThen(
-                            toCollection(
-                                    () -> new TreeSet<>(Comparator.comparing(e -> e.getAssigneeId() + "-" + e.getRedmineType()))
-                            ), ArrayList::new)
-            );
-            List<RedmineUserInfo> li = new ArrayList<>(new HashSet<>(data));
-            redmineUserInfoService.saveOrupdateMultiIdAll(collect);
+            redmineUserInfoService.saveOrupdateMultiIdAll(data);
         } catch (Exception e) {
             throw new FeishuException(e, taskName + "-异常");
         }
