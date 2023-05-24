@@ -54,6 +54,11 @@ public class ProjectController {
         return new ReturnT<>(res);
     }
 
+    @GetMapping("/d/{id}")
+    public ReturnT<Boolean> del(@PathVariable("id") String id) {
+        return new ReturnT<>(projectInfoService.removeById(id));
+    }
+
     @PostMapping("/s")
     public ReturnT<String> save(@RequestBody RProjectReaVo info) {
         projectInfoService.save(info);

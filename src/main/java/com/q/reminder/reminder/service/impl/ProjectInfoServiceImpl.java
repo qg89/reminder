@@ -40,7 +40,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     @Override
     public List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list) {
         List<List<ProjectInfoVo>> resDate = new ArrayList<>();
-        List<String> removeColumn = List.of("id", "updateTime", "createTime");
+        List<String> removeColumn = List.of("updateTime", "createTime", "isDelete");
         list.forEach(info -> {
             List<ProjectInfoVo> res = new ArrayList<>();
             BeanUtil.beanToMap(info).forEach((k, v) -> {
