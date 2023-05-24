@@ -19,4 +19,5 @@ public class ProjectInfoVo implements Serializable {
     private Object value;
     private String columnType;
     private Object columnDesc;
+    private Integer showEdit;
 }
