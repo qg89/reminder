@@ -38,7 +38,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     }
 
     @Override
-    public List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list) {
+    public List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list, Map<String, String> userMap, Map<String, String> groupMap) {
         List<List<ProjectInfoVo>> resDate = new ArrayList<>();
         List<String> removeColumn = List.of("updateTime", "createTime", "isDelete");
         list.forEach(info -> {
@@ -52,6 +52,16 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
                 extracted(k, vo);
                 res.add(vo);
             });
+            ProjectInfoVo pm = new ProjectInfoVo();
+            pm.setKey("pmName");
+            pm.setValue(userMap.get(info.getPmOu()));
+            pm.setColumnType("input");
+            res.add(pm);
+            ProjectInfoVo gm = new ProjectInfoVo();
+            gm.setKey("groupName");
+            gm.setValue(groupMap.get(info.getIsSendGroup()));
+            gm.setColumnType("input");
+            res.add(gm);
             resDate.add(res);
         });
         return resDate;

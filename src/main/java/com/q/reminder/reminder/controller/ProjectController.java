@@ -19,10 +19,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author : saiko
@@ -50,7 +48,9 @@ public class ProjectController {
         LambdaQueryWrapper<RProjectInfo> lq = Wrappers.lambdaQuery();
         lq.orderByDesc(RProjectInfo::getUpdateTime);
         List<RProjectInfo> list = projectInfoService.list(lq);
-        List<List<ProjectInfoVo>> res = projectInfoService.listToArray(list);
+        Map<String, String> userMap = userMemberService.list().stream().collect(Collectors.toMap(UserMemgerInfo::getMemberId, UserMemgerInfo::getName));
+        Map<String, String> groupMap = groupInfoService.list().stream().collect(Collectors.toMap(FsGroupInfo::getChatId, FsGroupInfo::getName));
+        List<List<ProjectInfoVo>> res = projectInfoService.listToArray(list, userMap, groupMap);
         return new ReturnT<>(res);
     }
 
