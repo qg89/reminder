@@ -84,6 +84,7 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
                 }
             }
             List<WeeklyProjectVo> list = projectInfoService.getWeeklyDocxList(weekNumber, id);
+            log.info(taskName + "-start write");
             this.writeReport(list, log);
         } catch (Exception e) {
             throw new FeishuException(e, taskName + "-异常");

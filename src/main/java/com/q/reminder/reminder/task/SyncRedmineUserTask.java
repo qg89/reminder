@@ -17,9 +17,11 @@ import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 import tech.powerjob.worker.log.OmsLogger;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
 
 /**
  * @author : saiko
@@ -45,16 +47,25 @@ public class SyncRedmineUserTask implements BasicProcessor {
         try {
             List<RedmineUserInfo> data = new ArrayList<>();
             for (RProjectInfo info : projectInfoService.listAll()) {
-                RedmineApi.queryUserTime(info).stream().collect(Collectors.toMap(TimeEntry::getUserId, TimeEntry::getUserName, (v1, v2) -> v1)).forEach((userId, userName) -> {
+                String redmineType = info.getRedmineType();
+                List<TimeEntry> timeEntries = RedmineApi.queryProjectUsers(info);
+                timeEntries.stream().collect(Collectors.toMap(TimeEntry::getUserName, TimeEntry::getUserId, (v1, v2) -> v1)).forEach((userName, userId) -> {
                     RedmineUserInfo userInfo = new RedmineUserInfo();
-                    userInfo.setRedmineType(info.getRedmineType());
+                    userInfo.setRedmineType(redmineType);
                     userInfo.setAssigneeId(userId);
                     userInfo.setAssigneeName(userName);
                     userInfo.setUserName(userName.replace(" ", ""));
                     data.add(userInfo);
                 });
             }
-            redmineUserInfoService.saveOrupdateMultiIdAll(data);
+            ArrayList<RedmineUserInfo> collect = data.stream().collect(
+                    collectingAndThen(
+                            toCollection(
+                                    () -> new TreeSet<>(Comparator.comparing(e -> e.getAssigneeId() + "-" + e.getRedmineType()))
+                            ), ArrayList::new)
+            );
+            List<RedmineUserInfo> li = new ArrayList<>(new HashSet<>(data));
+            redmineUserInfoService.saveOrupdateMultiIdAll(collect);
         } catch (Exception e) {
             throw new FeishuException(e, taskName + "-异常");
         }
