@@ -90,6 +90,9 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         if ("startDay".equals(k)) {
             vo.setColumnType("date");
         }
+        if ("id".equals(k)) {
+            vo.setShowEdit(1);
+        }
     }
 
     @Override
