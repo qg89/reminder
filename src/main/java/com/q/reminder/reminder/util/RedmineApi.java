@@ -37,6 +37,12 @@ public abstract class RedmineApi {
 
     public static Date dueDate = DateTime.now().plusDays(7).toDate();
 
+    public static void main(String[] args) throws RedmineException {
+        RedmineManager rmn = RedmineManagerFactory.createWithApiKey("http://redmine-pa.mxnavi.com/", "e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
+        RedmineManager rm = RedmineManagerFactory.createWithApiKey("http://redmine-qa.mxnavi.com/", "1f905383da4f783bad92e22f430c7db0b15ae258");
+        System.out.println();
+    }
+
     /**
      * 检查任务是否创建
      *
@@ -179,13 +185,15 @@ public abstract class RedmineApi {
      * @return
      * @throws RedmineException
      */
-    public static List<TimeEntry> queryUserTime(RProjectInfo info) throws RedmineException {
+    public static List<TimeEntry> queryProjectUsers(RProjectInfo info) throws RedmineException {
         Transport transport = getTransportByProject(info);
-        Collection<RequestParam> params = new ArrayList<>();
-        params.add(new RequestParam("f[]", "spent_on"));
-        params.add(new RequestParam("op[spent_on]", ">="));
-        params.add(new RequestParam("v[spent_on][]", new DateTime().minusDays(7).toString("yyyy-MM-dd")));
-        return transport.getObjectsList(TimeEntry.class, params);
+        List<RequestParam> requestParams = List.of(
+                new RequestParam("f[]", "spent_on"),
+                new RequestParam("op[spent_on]", ">t-"),
+                new RequestParam("v[spent_on][]", "5")
+
+        );
+        return transport.getObjectsList(TimeEntry.class, requestParams);
     }
 
     public static Collection<? extends Issue> queryIssues(RProjectInfo info) throws RedmineException {
