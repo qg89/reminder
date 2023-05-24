@@ -60,10 +60,9 @@ public class SyncTimeEntryTask implements BasicProcessor {
         );
         try {
             rdTimeEntryService.remove(Wrappers.<RdTimeEntry>lambdaQuery().between(RdTimeEntry::getSpentOn, timeAgo, endTime));
-            log.info(taskName + "-数据删除完成， sDate：{}，eDate：", timeAgo, endTime);
+            log.info(taskName + "-数据删除完成， sDate：{}，eDate：{}", timeAgo, endTime);
             for (RProjectInfo projectInfo : projectList) {
                 String projectShortName = projectInfo.getProjectShortName();
-                log.info(taskName + "-项目{}, delete start:{},end:{}", projectShortName, timeAgo, endTime);
                 RedmineApi.getTimeEntity(projectInfo, requestParams).forEach(timeEntry -> {
                     RdTimeEntry time = new RdTimeEntry();
                     time.setId(timeEntry.getId());
@@ -81,7 +80,7 @@ public class SyncTimeEntryTask implements BasicProcessor {
                     time.setUserName(timeEntry.getUserName());
                     data.add(time);
                 });
-                log.info(taskName + "-项目： {}", projectShortName);
+                log.info(taskName + "-项目： {}.  Redmine 查询完成，dataSize：{}", projectShortName, data.size());
             }
             rdTimeEntryService.saveOrUpdateBatchByMultiId(data);
             log.info(taskName + "-查询完成，size:{}", data.size());
