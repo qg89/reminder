@@ -1,5 +1,7 @@
 package com.q.reminder.reminder.task.redmine;
 
+import cn.hutool.core.lang.Validator;
+import cn.hutool.core.util.ReUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RdTimeEntry;
@@ -22,6 +24,7 @@ import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author : saiko
@@ -40,12 +43,16 @@ public class SyncTimeEntryTask implements BasicProcessor {
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         String instanceParams = context.getInstanceParams();
+        String jobParams = Optional.ofNullable(context.getJobParams()).orElse("0");
+        int index = 8;
+        if (ReUtil.isMatch(Validator.NUMBERS, jobParams)) {
+            index = Integer.parseInt(jobParams);
+        }
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
         log.info(taskName + "-start");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdTimeEntry> data = new ArrayList<>();
-        int index = 8;
         if (StringUtils.isNotBlank(instanceParams)) {
             index = Integer.parseInt(instanceParams);
         }
