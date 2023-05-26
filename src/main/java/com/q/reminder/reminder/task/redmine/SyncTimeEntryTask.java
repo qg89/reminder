@@ -3,11 +3,14 @@ package com.q.reminder.reminder.task.redmine;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.ReUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.nlf.calendar.Holiday;
+import com.nlf.calendar.util.HolidayUtil;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdTimeEntryService;
+import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import lombok.RequiredArgsConstructor;
@@ -39,17 +42,26 @@ public class SyncTimeEntryTask implements BasicProcessor {
     private final ProjectInfoService projectInfoService;
     private final RdTimeEntryService rdTimeEntryService;
     private final PowerJobClient client;
+    private final HoldayBase holdayBase;
+
     @Override
     public ProcessResult process(TaskContext context) {
+        ProcessResult processResult = new ProcessResult(true);
         OmsLogger log = context.getOmsLogger();
-        String instanceParams = context.getInstanceParams();
+        DateTime now = new DateTime();
+        Holiday holiday = HolidayUtil.getHoliday(now.toString("yyyy-MM-dd"));
+        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
+        String taskName = resultDTO.getData().getJobName();
+        if (holiday == null || holdayBase.queryHoliday()) {
+            log.info(taskName + "-周末/节假日放假咯！！！！");
+            return processResult;
+        }
         String jobParams = Optional.ofNullable(context.getJobParams()).orElse("0");
+        String instanceParams = context.getInstanceParams();
         int index = 8;
         if (ReUtil.isMatch(Validator.NUMBERS, jobParams)) {
             index = Integer.parseInt(jobParams);
         }
-        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
-        String taskName = resultDTO.getData().getJobName();
         log.info(taskName + "-start");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdTimeEntry> data = new ArrayList<>();
@@ -95,6 +107,6 @@ public class SyncTimeEntryTask implements BasicProcessor {
             throw new FeishuException(e, taskName + "-异常");
         }
         log.info(taskName + "-done");
-        return new ProcessResult(true);
+        return processResult;
     }
 }
