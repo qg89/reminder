@@ -52,7 +52,7 @@ public class SyncTimeEntryTask implements BasicProcessor {
         Holiday holiday = HolidayUtil.getHoliday(now.toString("yyyy-MM-dd"));
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
-        if (holiday == null || holdayBase.queryHoliday()) {
+        if (holiday != null || holdayBase.queryHoliday()) {
             log.info(taskName + "-周末/节假日放假咯！！！！");
             return processResult;
         }
