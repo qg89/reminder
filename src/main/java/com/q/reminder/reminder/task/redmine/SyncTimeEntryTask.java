@@ -72,9 +72,9 @@ public class SyncTimeEntryTask implements BasicProcessor {
         String timeAgo = DateTime.now().minusDays(index).toString("yyyy-MM-dd");
         String endTime = DateTime.now().toString("yyyy-MM-dd");
         List<RequestParam> requestParams = List.of(
-                new RequestParam("f[]", "spent_on"),
-                new RequestParam("op[spent_on]", ">t-"),
-                new RequestParam("v[spent_on][]", String.valueOf(index))
+                new RequestParam("f[]", "create_on"),
+                new RequestParam("op[create_on]", ">t-"),
+                new RequestParam("v[create_on][]", String.valueOf(index))
 
         );
         try {
