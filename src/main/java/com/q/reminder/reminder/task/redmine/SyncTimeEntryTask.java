@@ -59,15 +59,15 @@ public class SyncTimeEntryTask implements BasicProcessor {
         String jobParams = Optional.ofNullable(context.getJobParams()).orElse("0");
         String instanceParams = context.getInstanceParams();
         int index = 8;
-        if (ReUtil.isMatch(Validator.NUMBERS, jobParams)) {
+        if (StringUtils.isNotBlank(jobParams) && ReUtil.isMatch(Validator.NUMBERS, jobParams)) {
             index = Integer.parseInt(jobParams);
+        }
+        if (StringUtils.isNotBlank(instanceParams) && ReUtil.isMatch(Validator.NUMBERS, instanceParams)) {
+            index = Integer.parseInt(instanceParams);
         }
         log.info(taskName + "-start");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdTimeEntry> data = new ArrayList<>();
-        if (StringUtils.isNotBlank(instanceParams)) {
-            index = Integer.parseInt(instanceParams);
-        }
         log.info(taskName + "-时间{}天前", index);
         String timeAgo = DateTime.now().minusDays(index).toString("yyyy-MM-dd");
         String endTime = DateTime.now().toString("yyyy-MM-dd");
