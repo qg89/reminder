@@ -329,9 +329,8 @@ public abstract class RedmineApi {
         return transport.getObjectsList(TimeEntry.class, requestParams);
     }
 
-    public static Integer queryProjectByKey(RProjectReaVo info) throws RedmineException {
+    public static Project queryProjectByKey(RProjectReaVo info) throws RedmineException {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(info.getRedmineUrl(), info.getPmKey());
-        Project projectByKey = mgr.getProjectManager().getProjectByKey(info.getPkey());
-        return projectByKey.getId();
+        return mgr.getProjectManager().getProjectByKey(info.getPkey());
     }
 }

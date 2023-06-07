@@ -17,6 +17,7 @@ import com.q.reminder.reminder.vo.ProjectInfoVo;
 import com.q.reminder.reminder.vo.RProjectReaVo;
 import com.q.reminder.reminder.vo.base.ReturnT;
 import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.bean.Project;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -64,17 +65,19 @@ public class ProjectController {
     @PostMapping("/s")
     public ReturnT<String> save(@RequestBody RProjectReaVo info) {
         try {
-            Integer pId = RedmineApi.queryProjectByKey(info);
-            if (pId == null){
+            Project project = RedmineApi.queryProjectByKey(info);
+            if (project == null){
                 return ReturnT.FAIL;
             }
-            info.setPid(String.valueOf(pId));
+            info.setPid(String.valueOf(project.getId()));
+            String name = project.getName();
+            info.setPname(name);
+            projectInfoService.save(info);
+            if (!saveRea(info)) {
+                return ReturnT.FAIL;
+            }
         } catch (RedmineException e) {
             throw new RuntimeException(e);
-        }
-        projectInfoService.save(info);
-        if (!saveRea(info)) {
-            return ReturnT.FAIL;
         }
         return ReturnT.SUCCESS;
     }
