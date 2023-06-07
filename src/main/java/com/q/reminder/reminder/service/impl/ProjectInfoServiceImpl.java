@@ -143,7 +143,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
 
     private Map<String, String> map() {
         Map<String, String> resMap = new LinkedHashMap<>();
-        resMap.put("pid", "redmine项目ID");
+//        resMap.put("pid", "redmine项目ID");
         resMap.put("pkey", "redmine项目Key");
         resMap.put("pname", "redmine项目名称");
 //        resMap.put("featureToken", "需求管理表Token");
