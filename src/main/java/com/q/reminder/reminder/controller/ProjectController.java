@@ -11,10 +11,12 @@ import com.lark.oapi.service.bitable.v1.model.ListAppTableFieldResp;
 import com.q.reminder.reminder.entity.*;
 import com.q.reminder.reminder.service.*;
 import com.q.reminder.reminder.service.impl.FeishuService;
+import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.vo.OptionVo;
 import com.q.reminder.reminder.vo.ProjectInfoVo;
 import com.q.reminder.reminder.vo.RProjectReaVo;
 import com.q.reminder.reminder.vo.base.ReturnT;
+import com.taskadapter.redmineapi.RedmineException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -61,6 +63,15 @@ public class ProjectController {
 
     @PostMapping("/s")
     public ReturnT<String> save(@RequestBody RProjectReaVo info) {
+        try {
+            Integer pId = RedmineApi.queryProjectByKey(info);
+            if (pId == null){
+                return ReturnT.FAIL;
+            }
+            info.setPid(String.valueOf(pId));
+        } catch (RedmineException e) {
+            throw new RuntimeException(e);
+        }
         projectInfoService.save(info);
         if (!saveRea(info)) {
             return ReturnT.FAIL;
