@@ -54,11 +54,7 @@ public class FeishuEventController {
 
     public void write(HttpServletResponse response, EventResp eventResp) throws IOException {
         response.setStatus(eventResp.getStatusCode());
-        eventResp.getHeaders().entrySet().forEach(keyValues -> {
-            String key = keyValues.getKey();
-            List<String> values = keyValues.getValue();
-            values.forEach(v -> response.addHeader(key, v));
-        });
+        eventResp.getHeaders().forEach((key, values) -> values.forEach(v -> response.addHeader(key, v)));
         if (eventResp.getBody() != null) {
             response.getWriter().write(new String(eventResp.getBody()));
         }
