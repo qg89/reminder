@@ -11,6 +11,7 @@ import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WikiSpaceService;
 import com.q.reminder.reminder.service.impl.FeishuService;
+import com.q.reminder.reminder.util.HolidayUtils;
 import lombok.RequiredArgsConstructor;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
@@ -46,6 +47,10 @@ public class SyncSpacesWikiTask implements BasicProcessor {
         ProcessResult processResult = new ProcessResult(true);
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
+        if (HolidayUtils.isHoliday()) {
+            log.info(taskName + "-放假咯");
+            return processResult;
+        }
         try {
             int weekOfYear = DateUtil.thisWeekOfYear() - 1;
             if (weekOfYear == 0) {

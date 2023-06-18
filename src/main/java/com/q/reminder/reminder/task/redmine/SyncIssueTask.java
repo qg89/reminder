@@ -47,7 +47,6 @@ public class SyncIssueTask implements BasicProcessor {
         String taskName = resultDTO.getData().getJobName();
         String instanceParams = context.getInstanceParams();
         log.info(taskName + "-开始");
-        List<Issue> issueData = new ArrayList<>();
         List<RdIssue> data = new ArrayList<>();
         List<RProjectInfo> projectList = projectInfoService.listAll();
 

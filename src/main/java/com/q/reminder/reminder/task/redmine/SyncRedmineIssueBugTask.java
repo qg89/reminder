@@ -6,6 +6,7 @@ import com.q.reminder.reminder.entity.RdIssueBug;
 import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdIssueBugService;
+import com.q.reminder.reminder.util.HolidayUtils;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.internal.RequestParam;
@@ -43,9 +44,14 @@ public class SyncRedmineIssueBugTask implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) {
         String instanceParams = context.getInstanceParams();
+        ProcessResult processResult = new ProcessResult(true);
         OmsLogger log = context.getOmsLogger();
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
+        if (HolidayUtils.isHoliday()) {
+            log.info(taskName + "-放假咯");
+            return processResult;
+        }
         log.info(taskName + "-开始");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdIssueBug> bugIssueData = new ArrayList<>();
@@ -113,6 +119,6 @@ public class SyncRedmineIssueBugTask implements BasicProcessor {
             throw new FeishuException(e, taskName + "-异常");
         }
         log.info(taskName + "-done");
-        return new ProcessResult(true);
+        return processResult;
     }
 }

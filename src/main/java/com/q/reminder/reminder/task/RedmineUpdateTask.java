@@ -12,6 +12,7 @@ import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.UserMemberService;
+import com.q.reminder.reminder.util.HolidayUtils;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.MessageVo;
@@ -54,6 +55,10 @@ public class RedmineUpdateTask implements BasicProcessor {
         ProcessResult processResult = new ProcessResult(true);
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
+        if (HolidayUtils.isHoliday()) {
+            log.info(taskName + "-放假咯");
+            return processResult;
+        }
         log.info(taskName + "-start");
         try {
             List<RProjectInfo> projectInfoList = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();

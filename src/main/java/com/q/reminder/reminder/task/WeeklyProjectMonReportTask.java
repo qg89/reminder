@@ -10,7 +10,7 @@ import com.q.reminder.reminder.config.FeishuProperties;
 import com.q.reminder.reminder.constant.WeeklyReportConstants;
 import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
-import com.q.reminder.reminder.task.base.HoldayBase;
+import com.q.reminder.reminder.util.HolidayUtils;
 import com.q.reminder.reminder.util.ResourceUtils;
 import com.q.reminder.reminder.util.WeeklyProjectRedmineUtils;
 import com.q.reminder.reminder.util.WeeklyProjectUtils;
@@ -53,7 +53,6 @@ import static com.q.reminder.reminder.util.WeeklyProjectUtils.getWeekNumToSunday
 @Component
 @RequiredArgsConstructor
 public class WeeklyProjectMonReportTask implements BasicProcessor {
-    private final HoldayBase holdayBase;
     private final ProjectInfoService projectInfoService;
     private final FeishuProperties feishuProperties;
     private final PowerJobClient client;
@@ -64,11 +63,11 @@ public class WeeklyProjectMonReportTask implements BasicProcessor {
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
         ProcessResult result = new ProcessResult(true);
+        if (HolidayUtils.isHoliday()) {
+            log.info(taskName + "-放假咯");
+            return result;
+        }
         try {
-            if (holdayBase.queryHoliday()) {
-                result.setMsg("节假日放假!!!!");
-                return result;
-            }
             log.info(taskName + "-start");
             String instanceParams = context.getInstanceParams();
             int weekNumber = 0;

@@ -8,7 +8,7 @@ import com.q.reminder.reminder.entity.WeeklyProjectReport;
 import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.WeeklyProjectReportService;
-import com.q.reminder.reminder.task.base.HoldayBase;
+import com.q.reminder.reminder.util.HolidayUtils;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,6 @@ public class WeeklyProjectReportTask implements BasicProcessor {
     private final WeeklyProjectReportService weeklyProjectReportService;
     private final ProjectInfoService projectInfoService;
     private final FeishuProperties feishuProperties;
-    private final HoldayBase holdayBase;
     private final PowerJobClient client;
 
     @Override
@@ -47,11 +46,11 @@ public class WeeklyProjectReportTask implements BasicProcessor {
         ProcessResult result = new ProcessResult(true);
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
+        if (HolidayUtils.isHoliday()) {
+            log.info(taskName + "-放假咯");
+            return result;
+        }
         try {
-            if (holdayBase.queryHoliday()) {
-                log.info("节假日放假!!!!");
-                return result;
-            }
             log.info(taskName + "-start");
             String jobParam = context.getInstanceParams();
             WeeklyProjectVo vo = new WeeklyProjectVo();

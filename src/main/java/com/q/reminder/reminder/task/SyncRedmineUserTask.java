@@ -5,6 +5,7 @@ import com.q.reminder.reminder.entity.RedmineUserInfo;
 import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RedmineUserInfoService;
+import com.q.reminder.reminder.util.HolidayUtils;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,10 @@ public class SyncRedmineUserTask implements BasicProcessor {
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
         OmsLogger log = context.getOmsLogger();
+        if (HolidayUtils.isHoliday()) {
+            log.info(taskName + "-放假咯");
+            return processResult;
+        }
         log.info(taskName + "-start");
         try {
             List<RedmineUserInfo> data = new ArrayList<>();

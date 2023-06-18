@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.q.reminder.reminder.entity.NoneStatus;
 import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.NoneStatusService;
-import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.task.base.OverdueTasksAgainToGroupBase;
+import com.q.reminder.reminder.util.HolidayUtils;
 import com.q.reminder.reminder.vo.QueryVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -35,7 +35,6 @@ public class OverdueTasksAgainToGroupTask implements BasicProcessor {
 
     private final OverdueTasksAgainToGroupBase overdueTasksAgainToGroupBase;
     private final NoneStatusService noneStatusService;
-    private final HoldayBase holdayBase;
     private final PowerJobClient client;
 
     @Override
@@ -44,11 +43,11 @@ public class OverdueTasksAgainToGroupTask implements BasicProcessor {
         ProcessResult result = new ProcessResult(true);
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
+        if (HolidayUtils.isHoliday()) {
+            log.info("节假日放假!!!!");
+            return result;
+        }
         try {
-            if (holdayBase.queryHoliday()) {
-                log.info("节假日放假!!!!");
-                return result;
-            }
 
             LambdaQueryWrapper<NoneStatus> lq = new LambdaQueryWrapper<>();
             lq.in(NoneStatus::getExpiredDays, 1, 2);

@@ -2,8 +2,8 @@ package com.q.reminder.reminder.task;
 
 import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.NoneStatusService;
-import com.q.reminder.reminder.task.base.HoldayBase;
 import com.q.reminder.reminder.task.base.QueryTasksToMemberBase;
+import com.q.reminder.reminder.util.HolidayUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tech.powerjob.client.PowerJobClient;
@@ -29,7 +29,6 @@ public class Overdue1Tasks implements BasicProcessor {
 
     private final QueryTasksToMemberBase queryTasksToMemberBase;
     private final NoneStatusService noneStatusService;
-    private final HoldayBase holdayBase;
     private final PowerJobClient client;
 
     @Override
@@ -38,11 +37,11 @@ public class Overdue1Tasks implements BasicProcessor {
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
         ProcessResult result = new ProcessResult(true);
+        if (HolidayUtils.isHoliday()) {
+            log.info("节假日放假!!!!");
+            return result;
+        }
         try {
-            if (holdayBase.queryHoliday()) {
-                log.info("节假日放假!!!!");
-                return result;
-            }
             log.info(taskName + "-start");
             int expiredDay = Integer.parseInt(context.getJobParams());
             List<String> noneStatusList = noneStatusService.queryUnInStatus(0);
