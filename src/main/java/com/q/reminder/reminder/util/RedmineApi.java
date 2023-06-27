@@ -1,6 +1,5 @@
 package com.q.reminder.reminder.util;
 
-import cn.hutool.core.date.DateUtil;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.vo.*;
@@ -106,12 +105,10 @@ public abstract class RedmineApi {
     public static List<RedmineVo> queryUpdateIssue(List<RProjectInfo> RProjectInfoList) {
         List<RedmineVo> issues = new ArrayList<>();
         for (RProjectInfo project : RProjectInfoList) {
-            RedmineManager mgr = RedmineManagerFactory.createWithApiKey(project.getRedmineUrl(), project.getPmKey());
-            Transport transport = mgr.getTransport();
+            Transport transport = getTransportByProject(project);
             List<RequestParam> params = List.of(
-                    new RequestParam("project_id", project.getPid()),
                     new RequestParam("status_id", "*"),
-                    new RequestParam("updated_on", DateUtil.today()));
+                    new RequestParam("updated_on", "t"));
             try {
                 List<Issue> issueList = transport.getObjectsList(Issue.class, params);
                 if (CollectionUtils.isEmpty(issueList)) {

@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class RedisUtils {
     private final RedisTemplate<String, Integer> redisTemplate = SpringContextUtils.getBean("redisTemplate", RedisTemplate.class);
-
     private static RedisUtils instance;
 
     private RedisUtils() {
