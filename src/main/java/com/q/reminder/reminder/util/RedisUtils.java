@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.util;
 
 import com.q.reminder.reminder.config.SpringContextUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Objects;
@@ -13,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * @Description :
  * @date :  23/04/2023 10:07
  */
-public class RedisUtils {
+public final class RedisUtils {
     private final RedisTemplate<String, Integer> redisTemplate = SpringContextUtils.getBean("redisTemplate", RedisTemplate.class);
     private static RedisUtils instance;
 
@@ -27,7 +28,7 @@ public class RedisUtils {
         return instance;
     }
 
-    public Boolean invokeExceededTimes(String key, int times, int count) {
+    public Boolean invokeExceededTimes(@NotNull String key, int times, int count) {
         Boolean hasKey = redisTemplate.hasKey(key);
         if (hasKey != null && hasKey) {
             int currentCount = Integer.parseInt(Objects.requireNonNull(redisTemplate.opsForValue().get(key)).toString());
@@ -41,7 +42,9 @@ public class RedisUtils {
         return true;
     }
 
-    public void removeKey(String key) {
-        redisTemplate.delete(key);
+    public void removeKey(@NotNull String key) {
+        if (!Objects.equals(null, redisTemplate.hasKey(key))) {
+            redisTemplate.delete(key);
+        }
     }
 }

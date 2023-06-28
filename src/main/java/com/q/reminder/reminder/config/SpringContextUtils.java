@@ -9,7 +9,7 @@ import org.springframework.context.ApplicationContext;
  * @Description :
  * @date :  2023.03.16 13:16
  */
-public class SpringContextUtils {
+public final class SpringContextUtils {
     public static ApplicationContext applicationContext;
 
     public static ApplicationContext getApplicationContext() {
