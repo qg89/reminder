@@ -8,7 +8,6 @@ import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdTimeEntryService;
-import com.q.reminder.reminder.util.HolidayUtils;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import lombok.RequiredArgsConstructor;
@@ -49,10 +48,6 @@ public class SyncTimeEntryTask implements BasicProcessor {
         OmsLogger log = context.getOmsLogger();
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
-        if (HolidayUtils.isHoliday()) {
-            log.info(taskName + "-周末/节假日放假咯！！！！");
-            return processResult;
-        }
         int index = 8;
         if (StringUtils.isNotBlank(jobParams) && ReUtil.isMatch(Validator.NUMBERS, jobParams)) {
             index = Integer.parseInt(jobParams);
