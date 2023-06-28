@@ -21,14 +21,14 @@ public final class SpringContextUtils {
     }
 
     public static Object getBean(String name) {
-        return getApplicationContext().getBean(name);
+        return applicationContext.getBean(name);
     }
 
     public static <T> T getBean(Class<T> requiredType) {
-        return getApplicationContext().getBean(requiredType);
+        return applicationContext.getBean(requiredType);
     }
 
     public static <T> T getBean(String name, Class<T> clazz) {
-        return getApplicationContext().getBean(name, clazz);
+        return applicationContext.getBean(name, clazz);
     }
 }
