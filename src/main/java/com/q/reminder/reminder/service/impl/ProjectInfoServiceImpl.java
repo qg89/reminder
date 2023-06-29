@@ -62,7 +62,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             res.add(pm);
             ProjectInfoVo gm = new ProjectInfoVo();
             gm.setKey("groupName");
-            gm.setValue(BigDecimal.valueOf(Double.parseDouble(groupMap.get(info.getSendGroupChatId()))).setScale(2).doubleValue());
+            gm.setValue(groupMap.get(info.getSendGroupChatId()));
             gm.setColumnType("input");
             pm.setShowEdit(1);
             res.add(gm);
@@ -70,7 +70,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             // 成本
             ProjectInfoVo cost = new ProjectInfoVo();
             cost.setKey("groupName");
-            cost.setValue(projectMap.get(info.getPid()));
+            cost.setValue(BigDecimal.valueOf(projectMap.get(info.getPid())).setScale(2).doubleValue());
             cost.setColumnType("input");
             cost.setShowEdit(1);
             res.add(cost);
