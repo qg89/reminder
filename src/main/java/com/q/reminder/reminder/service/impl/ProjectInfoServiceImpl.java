@@ -75,10 +75,10 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             if (costDouble == null) {
                 costDouble = 0.0;
             }
-            cost.setValue(BigDecimal.valueOf(costDouble).setScale(2, RoundingMode.HALF_UP).doubleValue() + " 万元");
+            cost.setValue(BigDecimal.valueOf(costDouble).setScale(2, RoundingMode.HALF_UP).doubleValue());
             cost.setColumnType("input");
             cost.setShowEdit(1);
-            cost.setLabel("目前成本");
+            cost.setLabel("目前成本(万元)");
             res.add(cost);
             resDate.add(res);
         });
@@ -172,7 +172,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
 //        resMap.put("syncFeature", "同步需求管理表");
         resMap.put("projectShortName", "项目短名称");
         resMap.put("pmOu", "项目经理");
-        resMap.put("costName", "目前成本");
+        resMap.put("costName", "目前成本(万元)");
         resMap.put("pmKey", "项目经理RedmineKey");
         resMap.put("redmineUrl", "RedmineURL");
         resMap.put("startDay", "项目开始时间");
