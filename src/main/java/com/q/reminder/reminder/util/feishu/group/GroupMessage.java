@@ -131,4 +131,28 @@ public class GroupMessage extends BaseFeishu {
             query(lists, chatId, userGroupList, pageToken, req);
         }
     }
+
+    public List<ListMember> listUsersToChats(String chatId) {
+        List<ListMember> result = new ArrayList<>();
+        GetChatMembersReq req = GetChatMembersReq.newBuilder()
+                .chatId(chatId)
+                .memberIdType(GetChatMembersMemberIdTypeEnum.OPEN_ID)
+                .pageSize(20)
+                .build();
+        GetChatMembersResp resp;
+        boolean flag = true;
+        while (flag) {
+            try {
+                resp = CLIENT.im().chatMembers().get(req);
+                result.addAll(List.of(resp.getData().getItems()));
+                flag = resp.getData().getHasMore();
+                if (flag) {
+                    req.setPageToken(resp.getData().getPageToken());
+                }
+            } catch (Exception e) {
+                throw new FeishuException(e, this.getClass().getName() + " 通过机器人获取人员异常");
+            }
+        }
+        return result;
+    }
 }
