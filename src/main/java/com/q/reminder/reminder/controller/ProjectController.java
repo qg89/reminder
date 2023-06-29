@@ -53,7 +53,8 @@ public class ProjectController {
         List<RProjectInfo> list = projectInfoService.list(lq);
         Map<String, String> userMap = userMemberService.list().stream().collect(Collectors.toMap(UserMemgerInfo::getMemberId, UserMemgerInfo::getName, (v1, v2) -> v1));
         Map<String, String> groupMap = groupInfoService.list().stream().collect(Collectors.toMap(FsGroupInfo::getChatId, FsGroupInfo::getName, (v1, v2) -> v1));
-        List<List<ProjectInfoVo>> res = projectInfoService.listToArray(list, userMap, groupMap);
+        Map<String, Double> projectMap = projectInfoService.getProjectCost();
+        List<List<ProjectInfoVo>> res = projectInfoService.listToArray(list, userMap, groupMap, projectMap);
         return new ReturnT<>(res);
     }
 

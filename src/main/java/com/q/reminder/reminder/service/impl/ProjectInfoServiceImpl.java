@@ -17,6 +17,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author : saiko
@@ -38,7 +39,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     }
 
     @Override
-    public List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list, Map<String, String> userMap, Map<String, String> groupMap) {
+    public List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list, Map<String, String> userMap, Map<String, String> groupMap, Map<String, Double> projectMap) {
         List<List<ProjectInfoVo>> resDate = new ArrayList<>();
         List<String> removeColumn = List.of("createTime", "isDelete");
         list.forEach(info -> {
@@ -64,6 +65,14 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             gm.setColumnType("input");
             pm.setShowEdit(1);
             res.add(gm);
+
+            // 成本
+            ProjectInfoVo cost = new ProjectInfoVo();
+            cost.setKey("groupName");
+            cost.setValue(projectMap.get(info.getPid()));
+            cost.setColumnType("input");
+            cost.setShowEdit(1);
+            res.add(cost);
             resDate.add(res);
         });
         return resDate;
@@ -125,6 +134,12 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         LambdaQueryWrapper<RProjectInfo> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.eq(RProjectInfo::getPkey, prjctKey);
         return getOne(lambdaQueryWrapper);
+    }
+
+    @Override
+    public Map<String, Double> getProjectCost() {
+        List<Map<String, Double>> map = baseMapper.getProjectCost();
+        return map.stream().collect(Collectors.toMap(e -> String.valueOf(e.get("projectId")), f -> Double.valueOf(String.valueOf(f.get("cost"))), (v1, v2) -> v1));
     }
 
 

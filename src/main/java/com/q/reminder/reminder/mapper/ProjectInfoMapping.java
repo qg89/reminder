@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author : saiko
@@ -22,4 +23,6 @@ public interface ProjectInfoMapping extends BaseMapper<RProjectInfo> {
     List<WeeklyProjectVo> getWeeklyDocxList(@Param("weekNumber") int weekNumber, @Param("id") String id);
 
     List<WeeklyByProjectVo> weeklyByProjectList(@Param("id") String id,  @Param("name") String name);
+
+    List<Map<String, Double>> getProjectCost();
 }

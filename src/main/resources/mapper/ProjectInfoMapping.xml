@@ -57,4 +57,69 @@
         ORDER BY
             week_num DESC
     </select>
+
+    <select id="getProjectCost" resultType="java.util.Map">
+        SELECT
+            a.projectId,
+            IFNULL(sum( a.cost ),0) cost
+        FROM
+            (
+                SELECT
+                    ( sc.cost * up.hours ) AS cost,
+                    up.projectId,
+                    up.ym
+                FROM
+                    s_user_cost sc,
+                    (
+                        SELECT
+                            sum( userByHours.hours )/ sum( userByYM.hours ) hours,
+                            userByHours.projectId,
+                            userByHours.ym,
+                            userByHours.userId
+                        FROM
+                            (
+                                SELECT
+                                    SUM( re.hours ) hours,
+                                    re.userId,
+                                    re.projectId,
+                                    DATE_FORMAT( re.spentOn, '%Y%m' ) ym
+                                FROM
+                                    rd_time_entry re,
+                                    r_project_info rp
+                                WHERE
+                                    rp.is_delete = 0
+                                  AND rp.p_id = re.projectId
+                                GROUP BY
+                                    re.userId,
+                                    re.projectId,
+                                    DATE_FORMAT( re.spentOn, '%Y%m' )
+                            ) AS userByHours,
+                            (
+                                SELECT
+                                    SUM( re.hours ) hours,
+                                    re.userId,
+                                    DATE_FORMAT( re.spentOn, '%Y%m' ) ym
+                                FROM
+                                    rd_time_entry re,
+                                    r_project_info rp
+                                WHERE
+                                    rp.is_delete = 0
+                                  AND rp.p_id = re.projectId
+                                GROUP BY
+                                    re.userId,
+                                    DATE_FORMAT( re.spentOn, '%Y%m' )) AS userByYM
+                        WHERE
+                            userByHours.userId = userByYM.userId
+                          AND userByHours.ym = userByYM.ym
+                        GROUP BY
+                            userByHours.projectId,
+                            userByHours.ym,
+                            userByHours.userId
+                    ) up
+                WHERE
+                    up.userId = sc.user_id
+            ) a
+        GROUP BY
+            a.projectId
+    </select>
 </mapper>
