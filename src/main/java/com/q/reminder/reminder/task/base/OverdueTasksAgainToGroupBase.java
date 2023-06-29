@@ -174,7 +174,7 @@ public class OverdueTasksAgainToGroupBase {
         }
         // 通过人员查看对应redmine人员关系，并返回redmine姓名和飞书member_id关系
         List<UserMemgerInfo> list = userMemberService.list();
-        Map<String, String> memberIds = list.stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
+        Map<String, String> memberIds = list.stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId, (v1, v2) -> v1));
         listMap.forEach((k, redmineVoList) -> {
             List<RedmineVo> issueList = redmineVoList.stream().collect(Collectors.collectingAndThen(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(RedmineVo::getRedmineId))), ArrayList::new));
             String name = k.replace(" ", "");

@@ -49,7 +49,7 @@ public class TableFeatureController {
         if (!"是".equals(featureTmp.getWriteType())) {
             return;
         }
-        Map<String, String> userConfigMap = tTableUserConfigService.listAll().stream().collect(Collectors.toMap(TTableUserConfig::getPrjctName, TTableUserConfig::getPrjctKey));
+        Map<String, String> userConfigMap = tTableUserConfigService.listAll().stream().collect(Collectors.toMap(TTableUserConfig::getPrjctName, TTableUserConfig::getPrjctKey, (v1, v2) -> v1));
         String prjct = featureTmp.getPrjct();
         featureTmp.setPrjctKey(userConfigMap.get(prjct));
         tTableFeatureTmpService.saveOrUpdate(featureTmp);
@@ -65,7 +65,7 @@ public class TableFeatureController {
         LambdaQueryWrapper<RedmineUserInfo> lq = Wrappers.lambdaQuery();
         lq.eq(RedmineUserInfo::getRedmineType, RProjectInfo.getRedmineType());
         List<RedmineUserInfo> userInfoList = redmineUserInfoService.listUsers(RProjectInfo.getRedmineType());
-        Map<String, Integer> userMap = userInfoList.stream().collect(Collectors.toMap(RedmineUserInfo::getAssigneeName, RedmineUserInfo::getAssigneeId));
+        Map<String, Integer> userMap = userInfoList.stream().collect(Collectors.toMap(RedmineUserInfo::getAssigneeName, RedmineUserInfo::getAssigneeId, (v1, v2) -> v1));
         TTableUserConfig entity = new TTableUserConfig();
         entity.setPrdctId(userMap.get(vo.getPrdct()));
         entity.setAlgrthmId(userMap.get(vo.getAlgrthm()));

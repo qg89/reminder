@@ -76,7 +76,7 @@ public class SyncProjcetTimeTableTask implements BasicProcessor {
 
             LambdaQueryWrapper<TTableUserTime> tableUserQW = Wrappers.lambdaQuery();
             tableUserQW.eq(TTableUserTime::getTableId, tableInfoId);
-            Map<String, String> columnMap = tTableUserTimeService.list(tableUserQW).stream().collect(Collectors.toMap(TTableUserTime::getColumnEntity, TTableUserTime::getTableColumnName));
+            Map<String, String> columnMap = tTableUserTimeService.list(tableUserQW).stream().collect(Collectors.toMap(TTableUserTime::getColumnEntity, TTableUserTime::getTableColumnName, (v1, v2) -> v1));
             List<AppTableRecord> records = new ArrayList<>();
             for (Map<String, Object> m : userTimeMap) {
                 Map<String, Object> data = new HashMap<>();
