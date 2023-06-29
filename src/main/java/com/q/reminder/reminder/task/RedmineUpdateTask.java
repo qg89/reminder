@@ -84,7 +84,7 @@ public class RedmineUpdateTask implements BasicProcessor {
             LambdaQueryWrapper<UserMemgerInfo> lqw = new LambdaQueryWrapper<>();
             lqw.select(UserMemgerInfo::getName, UserMemgerInfo::getMemberId);
             lqw.eq(UserMemgerInfo::getResign, "0");
-            Map<String, String> userNameMap = userMemberService.list(lqw).stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
+            Map<String, String> userNameMap = userMemberService.list(lqw).stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId, (v1, v2) -> v1));
 
             if (CollectionUtils.isEmpty(issueMap)) {
                 log.info(taskName + "-任务列表为空");

@@ -60,7 +60,7 @@ public class QueryTasksToMemberBase {
 
         // 通过人员查看对应redmine人员关系，并返回redmine姓名和飞书member_id关系
         List<UserMemgerInfo> list = userMemberService.list(Wrappers.<UserMemgerInfo>lambdaQuery().eq(UserMemgerInfo::getResign, 0));
-        Map<String, String> memberIds = list.stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId));
+        Map<String, String> memberIds = list.stream().collect(Collectors.toMap(UserMemgerInfo::getName, UserMemgerInfo::getMemberId, (v1, v2) -> v1));
 
         // 组装数据， 通过人员，获取要发送的内容
         List<RProjectInfo> projectInfos = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();
