@@ -17,6 +17,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -74,7 +75,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             if (costDouble == null) {
                 costDouble = 0.0;
             }
-            cost.setValue(BigDecimal.valueOf(costDouble).setScale(2).doubleValue() + " 万元");
+            cost.setValue(BigDecimal.valueOf(costDouble).setScale(2, RoundingMode.HALF_UP).doubleValue() + " 万元");
             cost.setColumnType("input");
             cost.setShowEdit(1);
             cost.setLabel("目前成本");
