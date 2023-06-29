@@ -69,10 +69,11 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
 
             // 成本
             ProjectInfoVo cost = new ProjectInfoVo();
-            cost.setKey("groupName");
-            cost.setValue(BigDecimal.valueOf(projectMap.get(info.getPid())).setScale(2).doubleValue());
+            cost.setKey("costName");
+            cost.setValue(BigDecimal.valueOf(projectMap.get(info.getPid())).setScale(2).doubleValue() + " 万元");
             cost.setColumnType("input");
             cost.setShowEdit(1);
+            cost.setLabel("目前成本");
             res.add(cost);
             resDate.add(res);
         });
