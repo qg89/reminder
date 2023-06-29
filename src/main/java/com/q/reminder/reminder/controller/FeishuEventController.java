@@ -121,9 +121,7 @@ public class FeishuEventController {
                     tableFieldsFeatureService.saveOrUpdateBatch(data);
                 }
             })
-            /**
-             * 多维表格记录变更，回调事件
-             */
+            // 多维表格记录变更，回调事件
             .onCustomizedEvent("drive.file.bitable_record_changed_v1", new CustomEventHandler() {
                 @Override
                 public void handle(EventReq event) throws Exception {
@@ -140,6 +138,7 @@ public class FeishuEventController {
                     }
                 }
             })
+            // 审批事件
             .onP2ApprovalUpdatedV4(new ApprovalService.P2ApprovalUpdatedV4Handler() {
                 @Override
                 public void handle(P2ApprovalUpdatedV4 event) throws Exception {
@@ -147,6 +146,7 @@ public class FeishuEventController {
                     ApprovalEvent object = eventEvent.getObject();
                 }
             })
+            // 自定义事件
             .onCustomizedEvent("approval.approval.created_v4", new CustomEventHandler() {
                 @Override
                 public void handle(EventReq event) throws Exception {
@@ -156,7 +156,7 @@ public class FeishuEventController {
                     JSONObject object = JSONObject.parseObject(eventStr);
                 }
             })
-            // 会话成员变更
+            // 会话成员变更事件
             .onP2ChatMemberUserAddedV1(new ImService.P2ChatMemberUserAddedV1Handler() {
                 @Override
                 public void handle(P2ChatMemberUserAddedV1 event) throws Exception {
@@ -174,7 +174,7 @@ public class FeishuEventController {
                     }
                 }
             })
-            // 会话成员删除
+            // 会话成员删除事件
             .onP2ChatMemberUserDeletedV1(new ImService.P2ChatMemberUserDeletedV1Handler() {
                 @Override
                 public void handle(P2ChatMemberUserDeletedV1 event) throws Exception {
