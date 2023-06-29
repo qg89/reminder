@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.controller;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.core.request.EventReq;
 import com.lark.oapi.core.response.EventResp;
 import com.lark.oapi.event.CustomEventHandler;
@@ -14,8 +15,15 @@ import com.lark.oapi.service.drive.v1.model.BitableTableFieldAction;
 import com.lark.oapi.service.drive.v1.model.BitableTableFieldActionValue;
 import com.lark.oapi.service.drive.v1.model.P2FileBitableFieldChangedV1;
 import com.lark.oapi.service.drive.v1.model.P2FileBitableFieldChangedV1Data;
+import com.lark.oapi.service.im.v1.ImService;
+import com.lark.oapi.service.im.v1.model.*;
+import com.q.reminder.reminder.constant.GroupInfoType;
+import com.q.reminder.reminder.entity.FsGroupInfo;
 import com.q.reminder.reminder.entity.TableFieldsFeature;
+import com.q.reminder.reminder.entity.UserMemgerInfo;
+import com.q.reminder.reminder.service.GroupInfoService;
 import com.q.reminder.reminder.service.TableFieldsFeatureService;
+import com.q.reminder.reminder.service.UserMemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +48,11 @@ public class FeishuEventController {
 
     @Autowired
     private TableFieldsFeatureService tableFieldsFeatureService;
+    @Autowired
+    private GroupInfoService groupInfoService;
+    @Autowired
+    private UserMemberService userMemberService;
+    private static String CHAT_ID = null;
 
     @PostMapping("/event")
     public void event(HttpServletRequest request, HttpServletResponse response) throws Throwable {
@@ -48,6 +61,8 @@ public class FeishuEventController {
         req.setHeaders(toHeaderMap(request));
         req.setBody(bodyStr.getBytes(StandardCharsets.UTF_8));
         req.setHttpPath(request.getRequestURI());
+        FsGroupInfo groupInfo = groupInfoService.getOne(Wrappers.<FsGroupInfo>lambdaQuery().eq(FsGroupInfo::getSendType, GroupInfoType.DEP_GROUP));
+        CHAT_ID = groupInfo.getChatId();
         EventResp resp = EVENT_DISPATCHER.handle(req);
         write(response, resp);
     }
@@ -77,9 +92,7 @@ public class FeishuEventController {
 
     //1. 注册消息处理器
     private final EventDispatcher EVENT_DISPATCHER = EventDispatcher.newBuilder("hW3E10lr0QH7u22Twj0NqcYSoh5hCeCr", "ofkRjv6TQe4q8ATLDyOYNfyHnFrkRIFA")
-            /**
-             * 字段变更
-             */
+            // 字段变更
             .onP2FileBitableFieldChangedV1(new DriveService.P2FileBitableFieldChangedV1Handler() {
                 @Override
                 public void handle(P2FileBitableFieldChangedV1 event) throws Exception {
@@ -141,6 +154,37 @@ public class FeishuEventController {
                     String json = jsonObject.getString("encrypt");
                     String eventStr = EVENT_DISPATCHER.decryptEvent(json);
                     JSONObject object = JSONObject.parseObject(eventStr);
+                }
+            })
+            // 会话成员变更
+            .onP2ChatMemberUserAddedV1(new ImService.P2ChatMemberUserAddedV1Handler() {
+                @Override
+                public void handle(P2ChatMemberUserAddedV1 event) throws Exception {
+                    P2ChatMemberUserAddedV1Data eventData = event.getEvent();
+                    String chatId = eventData.getChatId();
+                    if (Objects.equals(CHAT_ID, chatId)) {
+                        ChatMemberUser[] users = eventData.getUsers();
+                        for (ChatMemberUser user : users) {
+                            UserMemgerInfo info = new UserMemgerInfo();
+                            info.setName(user.getName());
+                            info.setMemberId(user.getUserId().getOpenId());
+                            info.setTenantKey(user.getTenantKey());
+                            userMemberService.saveOrUpdate(info);
+                        }
+                    }
+                }
+            })
+            // 会话成员删除
+            .onP2ChatMemberUserDeletedV1(new ImService.P2ChatMemberUserDeletedV1Handler() {
+                @Override
+                public void handle(P2ChatMemberUserDeletedV1 event) throws Exception {
+                    P2ChatMemberUserDeletedV1Data eventData = event.getEvent();
+                    String chatId = eventData.getChatId();
+                    if (Objects.equals(CHAT_ID, chatId)) {
+                        for (ChatMemberUser user : eventData.getUsers()) {
+                            userMemberService.remove(Wrappers.<UserMemgerInfo>lambdaUpdate().eq(UserMemgerInfo::getMemberId, user.getUserId().getOpenId()));
+                        }
+                    }
                 }
             })
             .build();
