@@ -158,7 +158,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         if ("startDay".equals(k)) {
             vo.setColumnType("date");
         }
-        List<String> enable = List.of("id", "updateTime", "isDelete", "costName");
+        List<String> enable = List.of("id", "updateTime", "isDelete", "costName", "peopleTotal", "overtimeTotal", "workTotal");
         if (enable.contains(k)) {
             vo.setShowEdit(1);
         }
