@@ -6,12 +6,15 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.q.reminder.reminder.constant.RedisKeyContents;
 import com.q.reminder.reminder.entity.RProjectInfo;
+import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.mapper.ProjectInfoMapping;
 import com.q.reminder.reminder.service.ProjectInfoService;
+import com.q.reminder.reminder.service.RdTimeEntryService;
 import com.q.reminder.reminder.vo.ProjectInfoVo;
 import com.q.reminder.reminder.vo.RProjectReaVo;
 import com.q.reminder.reminder.vo.WeeklyByProjectVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -30,6 +33,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RProjectInfo> implements ProjectInfoService {
+
+    @Autowired
+    private RdTimeEntryService rdTimeEntryService;
     @Override
     public List<WeeklyProjectVo> getWeeklyDocxList(int weekNumber, String id) {
         return baseMapper.getWeeklyDocxList(weekNumber, id);
@@ -44,6 +50,11 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     public List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list, Map<String, String> userMap, Map<String, String> groupMap, Map<String, Double> projectMap) {
         List<List<ProjectInfoVo>> resDate = new ArrayList<>();
         List<String> removeColumn = List.of("createTime", "isDelete");
+        // 工时合计
+        Map<String, Double> timeMap = new HashMap<>();
+        for (RdTimeEntry e : rdTimeEntryService.list()) {
+            timeMap.merge(String.valueOf(e.getProjectId()), (double) e.getHours(), Double::sum);
+        }
         list.forEach(info -> {
             List<ProjectInfoVo> res = new ArrayList<>();
             BeanUtil.beanToMap(info).forEach((k, v) -> {
@@ -55,6 +66,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
                 extracted(k, vo);
                 res.add(vo);
             });
+            String pid = info.getPid();
             ProjectInfoVo pm = new ProjectInfoVo();
             pm.setKey("pmName");
             pm.setValue(userMap.get(info.getPmOu()));
@@ -71,15 +83,55 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             // 成本
             ProjectInfoVo cost = new ProjectInfoVo();
             cost.setKey("costName");
-            Double costDouble = projectMap.get(info.getPid());
+            Double costDouble = projectMap.get(pid);
             if (costDouble == null) {
                 costDouble = 0.0;
             }
             cost.setValue(BigDecimal.valueOf(costDouble).setScale(2, RoundingMode.HALF_UP).doubleValue());
             cost.setColumnType("input");
             cost.setShowEdit(1);
-            cost.setLabel("目前成本(万元)");
+            cost.setLabel("目前成本（万元）");
             res.add(cost);
+
+            // 人力合计（小时）
+            ProjectInfoVo people = new ProjectInfoVo();
+            people.setKey("peopleTotal");
+            Double peopleDouble = timeMap.get(pid);
+            if (peopleDouble == null) {
+                peopleDouble = 0.0;
+            }
+            people.setValue(peopleDouble);
+            people.setColumnType("input");
+            people.setShowEdit(1);
+            people.setLabel("人力合计（小时）");
+            res.add(people);
+
+            // 人力合计（小时）
+            ProjectInfoVo overtime = new ProjectInfoVo();
+            overtime.setKey("peopleTotal");
+            Double overtimeDouble = timeMap.get(pid);
+            if (overtimeDouble == null) {
+                overtimeDouble = 0.0;
+            }
+            overtime.setValue(overtimeDouble);
+            overtime.setColumnType("input");
+            overtime.setShowEdit(1);
+            overtime.setLabel("'加班合计（小时）");
+            res.add(overtime);
+
+            // 人力合计（小时）
+            ProjectInfoVo work = new ProjectInfoVo();
+            work.setKey("peopleTotal");
+            Double workDouble = timeMap.get(pid);
+            if (workDouble == null) {
+                workDouble = 0.0;
+            }
+            work.setValue(workDouble);
+            work.setColumnType("input");
+            work.setShowEdit(1);
+            work.setLabel("正常合计（小时）");
+            res.add(work);
+
             resDate.add(res);
         });
         return resDate;
@@ -172,7 +224,10 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
 //        resMap.put("syncFeature", "同步需求管理表");
         resMap.put("projectShortName", "项目短名称");
         resMap.put("pmOu", "项目经理");
-        resMap.put("costName", "目前成本(万元)");
+        resMap.put("costName", "目前成本（万元）");
+        resMap.put("peopleTotal", "人力合计（小时）");
+        resMap.put("overtimeTotal", "加班合计（小时）");
+        resMap.put("workTotal", "正常合计（小时）");
         resMap.put("pmKey", "项目经理RedmineKey");
         resMap.put("redmineUrl", "RedmineURL");
         resMap.put("startDay", "项目开始时间");
