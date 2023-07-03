@@ -158,7 +158,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         if ("startDay".equals(k)) {
             vo.setColumnType("date");
         }
-        List<String> enable = List.of("id", "updateTime", "isDelete", "costName", "peopleTotal", "overtimeTotal", "workTotal");
+        List<String> enable = List.of("id", "updateTime", "isDelete");
         if (enable.contains(k)) {
             vo.setShowEdit(1);
         }
@@ -224,10 +224,6 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
 //        resMap.put("syncFeature", "同步需求管理表");
         resMap.put("projectShortName", "项目短名称");
         resMap.put("pmOu", "项目经理");
-        resMap.put("costName", "目前成本（万元）");
-        resMap.put("peopleTotal", "人力合计（小时）");
-        resMap.put("overtimeTotal", "加班合计（小时）");
-        resMap.put("workTotal", "正常合计（小时）");
         resMap.put("pmKey", "项目经理RedmineKey");
         resMap.put("redmineUrl", "RedmineURL");
         resMap.put("startDay", "项目开始时间");
