@@ -106,9 +106,9 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             people.setLabel("人力合计（小时）");
             res.add(people);
 
-            // 人力合计（小时）
+            // 加班合计（小时）
             ProjectInfoVo overtime = new ProjectInfoVo();
-            overtime.setKey("peopleTotal");
+            overtime.setKey("overtimeTotal");
             Double overtimeDouble = timeMap.get(pid);
             if (overtimeDouble == null) {
                 overtimeDouble = 0.0;
@@ -116,12 +116,12 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             overtime.setValue(overtimeDouble);
             overtime.setColumnType("input");
             overtime.setShowEdit(1);
-            overtime.setLabel("'加班合计（小时）");
+            overtime.setLabel("加班合计（小时）");
             res.add(overtime);
 
-            // 人力合计（小时）
+            // 正常合计（小时）
             ProjectInfoVo work = new ProjectInfoVo();
-            work.setKey("peopleTotal");
+            work.setKey("workTotal");
             Double workDouble = timeMap.get(pid);
             if (workDouble == null) {
                 workDouble = 0.0;
