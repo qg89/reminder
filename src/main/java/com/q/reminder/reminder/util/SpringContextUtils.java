@@ -1,4 +1,4 @@
-package com.q.reminder.reminder.config;
+package com.q.reminder.reminder.util;
 
 import org.springframework.context.ApplicationContext;
 

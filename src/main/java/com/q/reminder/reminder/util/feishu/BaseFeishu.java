@@ -1,7 +1,7 @@
 package com.q.reminder.reminder.util.feishu;
 
 import com.lark.oapi.Client;
-import com.q.reminder.reminder.config.SpringContextUtils;
+import com.q.reminder.reminder.util.SpringContextUtils;
 import com.q.reminder.reminder.service.impl.FeishuService;
 import com.q.reminder.reminder.util.feishu.cloud.Cloud;
 import com.q.reminder.reminder.util.feishu.group.GroupMessage;

@@ -1,6 +1,5 @@
 package com.q.reminder.reminder.util;
 
-import com.q.reminder.reminder.config.SpringContextUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.redis.core.RedisTemplate;
 

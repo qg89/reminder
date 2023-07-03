@@ -1,7 +1,7 @@
 package com.q.reminder.reminder;
 
 import com.github.jeffreyning.mybatisplus.conf.EnableMPP;
-import com.q.reminder.reminder.config.SpringContextUtils;
+import com.q.reminder.reminder.util.SpringContextUtils;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
