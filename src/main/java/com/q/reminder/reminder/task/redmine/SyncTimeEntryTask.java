@@ -60,6 +60,7 @@ public class SyncTimeEntryTask implements BasicProcessor {
         String startTime;
         String endTime;
         List<RequestParam> requestParams;
+        // index = -1 ，上个月1~30
         if (index < 0) {
             Date date = now.minusMonths(1).toDate();
             startTime = DateUtil.beginOfMonth(date).toString("yyyy-MM-dd");
