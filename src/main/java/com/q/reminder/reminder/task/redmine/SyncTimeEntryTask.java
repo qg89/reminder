@@ -1,7 +1,8 @@
 package com.q.reminder.reminder.task.redmine;
 
-import cn.hutool.core.lang.Validator;
-import cn.hutool.core.util.ReUtil;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.NumberUtil;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RdTimeEntry;
@@ -9,6 +10,7 @@ import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdTimeEntryService;
 import com.q.reminder.reminder.util.RedmineApi;
+import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -22,9 +24,7 @@ import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 import tech.powerjob.worker.log.OmsLogger;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author : saiko
@@ -49,30 +49,45 @@ public class SyncTimeEntryTask implements BasicProcessor {
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
         int index = 8;
-        if (StringUtils.isNotBlank(jobParams) && ReUtil.isMatch(Validator.NUMBERS, jobParams)) {
+        if (StringUtils.isNotBlank(jobParams) && NumberUtil.isNumber(jobParams)) {
             index = Integer.parseInt(jobParams);
         }
-        if (StringUtils.isNotBlank(instanceParams) && ReUtil.isMatch(Validator.NUMBERS, instanceParams)) {
-            index = Integer.parseInt(instanceParams);
+        String instanceParamsStr = JSONObject.parse(instanceParams).getString("instanceParams");
+        if (StringUtils.isNotBlank(instanceParamsStr) && NumberUtil.isNumber(instanceParamsStr)) {
+            index = Integer.parseInt(instanceParamsStr);
+        }
+        DateTime now = DateTime.now();
+        String startTime;
+        String endTime;
+        List<RequestParam> requestParams;
+        if (index < 0) {
+            Date date = now.minusMonths(1).toDate();
+            startTime = DateUtil.beginOfMonth(date).toString("yyyy-MM-dd");
+            endTime = DateUtil.endOfMonth(date).toString("yyyy-MM-dd");
+            requestParams = List.of(
+                    new RequestParam("f[]", "spent_on"),
+                    new RequestParam("op[spent_on]", "lm")
+            );
+        } else {
+            startTime = now.minusDays(index).toString("yyyy-MM-dd");
+            endTime = now.toString("yyyy-MM-dd");
+            requestParams = List.of(
+                    new RequestParam("f[]", "spent_on"),
+                    new RequestParam("op[spent_on]", ">t-"),
+                    new RequestParam("v[spent_on][]", String.valueOf(index))
+            );
         }
         log.info(taskName + "-start");
         List<RProjectInfo> projectList = projectInfoService.listAll();
         List<RdTimeEntry> data = new ArrayList<>();
-        log.info(taskName + "-时间{}天前", index);
-        String timeAgo = DateTime.now().minusDays(index).toString("yyyy-MM-dd");
-        String endTime = DateTime.now().toString("yyyy-MM-dd");
-        List<RequestParam> requestParams = List.of(
-                new RequestParam("f[]", "spent_on"),
-                new RequestParam("op[spent_on]", ">t-"),
-                new RequestParam("v[spent_on][]", String.valueOf(index))
-
-        );
+        log.info(taskName + "-开始时间 {}， 结束时间，{}", startTime, endTime);
         try {
-            rdTimeEntryService.remove(Wrappers.<RdTimeEntry>lambdaQuery().between(RdTimeEntry::getSpentOn, timeAgo, endTime));
-            log.info(taskName + "-数据删除完成， sDate：{}，eDate：{}", timeAgo, endTime);
+            rdTimeEntryService.remove(Wrappers.<RdTimeEntry>lambdaQuery().between(RdTimeEntry::getSpentOn, startTime, endTime));
+            log.info(taskName + "-数据删除完成， sDate：{}，eDate：{}", startTime, endTime);
             for (RProjectInfo projectInfo : projectList) {
                 String projectShortName = projectInfo.getProjectShortName();
-                RedmineApi.getTimeEntity(projectInfo, requestParams).forEach(timeEntry -> {
+                Collection<? extends TimeEntry> timeEntity = RedmineApi.getTimeEntity(projectInfo, requestParams);
+                timeEntity.forEach(timeEntry -> {
                     RdTimeEntry time = new RdTimeEntry();
                     time.setId(timeEntry.getId());
                     time.setActivityId(timeEntry.getActivityId());
