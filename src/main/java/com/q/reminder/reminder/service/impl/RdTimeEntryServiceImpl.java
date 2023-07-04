@@ -4,7 +4,10 @@ import com.github.jeffreyning.mybatisplus.service.MppServiceImpl;
 import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.mapper.RdTimeEntryMapping;
 import com.q.reminder.reminder.service.RdTimeEntryService;
+import com.q.reminder.reminder.vo.OvertimeVo;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 /**
@@ -15,5 +18,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class RdTimeEntryServiceImpl extends MppServiceImpl<RdTimeEntryMapping, RdTimeEntry> implements RdTimeEntryService {
-    
+
+    @Override
+    public List<OvertimeVo> listOvertime(String ym) {
+        return baseMapper.listOvertime(ym);
+    }
 }

@@ -2,6 +2,9 @@ package com.q.reminder.reminder.service;
 
 import com.github.jeffreyning.mybatisplus.service.IMppService;
 import com.q.reminder.reminder.entity.RdTimeEntry;
+import com.q.reminder.reminder.vo.OvertimeVo;
+
+import java.util.List;
 
 
 /**
@@ -12,4 +15,5 @@ import com.q.reminder.reminder.entity.RdTimeEntry;
  */
 public interface RdTimeEntryService extends IMppService<RdTimeEntry>{
 
+    List<OvertimeVo> listOvertime(String ym);
 }

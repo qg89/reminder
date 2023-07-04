@@ -1,8 +1,12 @@
 package com.q.reminder.reminder.mapper;
 
-import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.github.jeffreyning.mybatisplus.base.MppBaseMapper;
+import com.q.reminder.reminder.entity.RdTimeEntry;
+import com.q.reminder.reminder.vo.OvertimeVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 /**
  * (RdTimeEntry)表数据库访问层
@@ -12,5 +16,6 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface RdTimeEntryMapping extends MppBaseMapper<RdTimeEntry> {
+    List<OvertimeVo> listOvertime(@Param("ym") String ym);
 }
 

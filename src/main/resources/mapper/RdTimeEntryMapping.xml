@@ -2,5 +2,25 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.q.reminder.reminder.mapper.RdTimeEntryMapping">
 
+<select id="listOvertime" resultType="com.q.reminder.reminder.vo.OvertimeVo">
+    SELECT
+        CASE WHEN (SELECT COUNT(`date`) i FROM s_holiday_config WHERE `work`  = 1 AND te.spentOn = `date` )  >= 1
+                 THEN (SUM( hours ) - 8)
+             ELSE SUM(hours)
+            END
+                  AS addWork
+         ,spentOn AS `day`
+         ,projectId
+         ,userName
+         ,userId
+    FROM
+        rd_time_entry te
+    <where>
+        <if test="ym != null and ym != ''">
+            AND DATE_FORMAT( spentOn, '%Y%m' ) = #{ym}
+        </if>
+    </where>
+    GROUP BY `day`, userName, userId, projectId
+</select>
 </mapper>
 

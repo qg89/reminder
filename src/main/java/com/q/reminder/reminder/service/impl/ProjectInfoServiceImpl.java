@@ -10,10 +10,8 @@ import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.mapper.ProjectInfoMapping;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdTimeEntryService;
-import com.q.reminder.reminder.vo.ProjectInfoVo;
-import com.q.reminder.reminder.vo.RProjectReaVo;
-import com.q.reminder.reminder.vo.WeeklyByProjectVo;
-import com.q.reminder.reminder.vo.WeeklyProjectVo;
+import com.q.reminder.reminder.vo.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,6 +21,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author : saiko
@@ -50,6 +49,37 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     public List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list, Map<String, String> userMap, Map<String, String> groupMap, Map<String, Double> projectMap) {
         List<List<ProjectInfoVo>> resDate = new ArrayList<>();
         List<String> removeColumn = List.of("createTime", "isDelete");
+
+        // 加班
+        List<OvertimeVo> li = rdTimeEntryService.listOvertime("202306");
+        Map<String, List<OvertimeVo>> userOvertimeMap = li.stream().collect(Collectors.groupingBy(OvertimeVo::getUserId));
+        userOvertimeMap.forEach((userId, uList) -> {
+            // 取出小于0的数据，并且根据日期分组求和
+            Stream<OvertimeVo> overtimeVoStream = uList.stream().filter(e -> e.getAddWork() < 0);
+            Map<Date, Double> workMap = overtimeVoStream.collect(Collectors.groupingBy(OvertimeVo::getDay, Collectors.summingDouble(OvertimeVo::getAddWork)));
+            workMap.forEach((day, addWork) -> {
+                String projectId = uList.stream().filter(e -> e.getDay().equals(day)).findAny().get().getProjectId();
+                addWork = (addWork + 8);
+                if (addWork < 0 || StringUtils.isBlank(projectId)) {
+                    return;
+                }
+                OvertimeVo vo = new OvertimeVo();
+                vo.setDay(day);
+                vo.setProjectId(projectId);
+                vo.setUserId(userId);
+                vo.setAddWork(addWork);
+                uList.add(vo);
+            });
+            uList.removeIf(e -> e.getAddWork() < 0);
+        });
+
+        List<OvertimeVo> values = new ArrayList<>();
+        for (List<OvertimeVo> value : userOvertimeMap.values()) {
+            values.addAll(value);
+        }
+
+        Map<String, Double> overtimeMap = values.stream().collect(Collectors.groupingBy(OvertimeVo::getProjectId, Collectors.summingDouble(OvertimeVo::getAddWork)));
+
         // 工时合计
         Map<String, Double> timeMap = new HashMap<>();
         for (RdTimeEntry e : rdTimeEntryService.list()) {
@@ -100,7 +130,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             if (peopleDouble == null) {
                 peopleDouble = 0.0;
             }
-            people.setValue(peopleDouble);
+            people.setValue(BigDecimal.valueOf(peopleDouble).setScale(2, RoundingMode.HALF_UP).doubleValue());
             people.setColumnType("input");
             people.setShowEdit(1);
             people.setLabel("人力合计（小时）");
@@ -109,11 +139,11 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             // 加班合计（小时）
             ProjectInfoVo overtime = new ProjectInfoVo();
             overtime.setKey("overtimeTotal");
-            Double overtimeDouble = timeMap.get(pid);
+            Double overtimeDouble = overtimeMap.get(pid);
             if (overtimeDouble == null) {
                 overtimeDouble = 0.0;
             }
-            overtime.setValue(overtimeDouble);
+            overtime.setValue(BigDecimal.valueOf(overtimeDouble).setScale(2, RoundingMode.HALF_UP).doubleValue());
             overtime.setColumnType("input");
             overtime.setShowEdit(1);
             overtime.setLabel("加班合计（小时）");
@@ -122,11 +152,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             // 正常合计（小时）
             ProjectInfoVo work = new ProjectInfoVo();
             work.setKey("workTotal");
-            Double workDouble = timeMap.get(pid);
-            if (workDouble == null) {
-                workDouble = 0.0;
-            }
-            work.setValue(workDouble);
+            work.setValue(BigDecimal.valueOf(peopleDouble - overtimeDouble).setScale(2, RoundingMode.HALF_UP).doubleValue());
             work.setColumnType("input");
             work.setShowEdit(1);
             work.setLabel("正常合计（小时）");
