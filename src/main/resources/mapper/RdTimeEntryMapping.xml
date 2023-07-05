@@ -81,7 +81,7 @@
         <if test="vo.pid != null and vo.pid != ''">
             AND re.projectId = #{vo.pid}
         </if>
-        <if test="vo.pid != null and vo.pid != ''">
+        <if test="vo.userId != null and vo.userId != ''">
             AND re.userId = #{vo.userId}
         </if>
         <if test="vo.startTime != null and vo.startTime != ''">
