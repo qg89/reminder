@@ -13,7 +13,7 @@ spring:
   jackson:
     default-property-inclusion: non_null
     date-format: yyyy-MM-dd HH:mm:dd
-    time-zone: GMT-8
+    time-zone: GMT+8
     parser:
       allow-unquoted-control-chars: true
       allow-backslash-escaping-any-character: true
