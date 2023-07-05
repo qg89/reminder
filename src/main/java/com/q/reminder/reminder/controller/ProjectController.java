@@ -227,7 +227,7 @@ public class ProjectController {
     @GetMapping("/userOption")
     public ReturnT<List<Map<String, Object>>> userOption() {
         QueryWrapper<RdTimeEntry> query = Wrappers.query();
-        query.select("userId AS id, userName AS name");
+        query.select("DISTINCT userId AS id, userName AS name");
         query.groupBy("userId").groupBy("userName");
         List<Map<String, Object>> maps = rdTimeEntryService.listMaps(query);
         return new ReturnT<>(maps);
