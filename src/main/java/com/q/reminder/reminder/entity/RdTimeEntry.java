@@ -1,15 +1,15 @@
 package com.q.reminder.reminder.entity;
 
-import java.util.Date;
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
 import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 
 
 /**
@@ -57,6 +57,7 @@ public class RdTimeEntry extends Model<RdTimeEntry> implements Serializable {
     private String comment;
 
     @TableField("spentOn")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date spentOn;
 
     @TableField("createdOn")
