@@ -29,6 +29,8 @@ import java.util.*;
 public abstract class RedmineApi {
 
     private final static Date dueDate = DateTime.now().plusDays(7).toDate();
+    public final static String REDMINE_URL = "http://redmine-qa.mxnavi.com";
+    public final static String REDMINE_PA_URL = "http://redmine-pa.mxnavi.com";
 
 
     /**
