@@ -2,7 +2,9 @@ package com.q.reminder.reminder.controller;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.bitable.v1.model.AppTableField;
 import com.lark.oapi.service.bitable.v1.model.AppTableFieldProperty;
@@ -12,10 +14,10 @@ import com.q.reminder.reminder.entity.*;
 import com.q.reminder.reminder.service.*;
 import com.q.reminder.reminder.service.impl.FeishuService;
 import com.q.reminder.reminder.util.RedmineApi;
-import com.q.reminder.reminder.vo.OptionVo;
-import com.q.reminder.reminder.vo.ProjectInfoVo;
-import com.q.reminder.reminder.vo.RProjectReaVo;
+import com.q.reminder.reminder.vo.*;
 import com.q.reminder.reminder.vo.base.ReturnT;
+import com.q.reminder.reminder.vo.params.ProjectParamsVo;
+import com.q.reminder.reminder.vo.params.UserInfoParamsVo;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.bean.Project;
 import lombok.RequiredArgsConstructor;
@@ -45,16 +47,23 @@ public class ProjectController {
     private final UserMemberService userMemberService;
     private final FeishuService feishuService;
     private final TableFieldsFeatureService fieldsFeatureService;
+    private final RdTimeEntryService rdTimeEntryService;
+
+
+    @GetMapping("/list")
+    public ReturnT<Page<RProjectInfo>> listProject(Page<RProjectInfo> page) {
+        return new ReturnT<>(projectInfoService.page(page));
+    }
 
     @GetMapping("/i")
-    public ReturnT<List<List<ProjectInfoVo>>> list() {
+    public ReturnT<List<List<ProjectInfoVo>>> list(ProjectParamsVo vo) {
         LambdaQueryWrapper<RProjectInfo> lq = Wrappers.lambdaQuery();
         lq.orderByDesc(RProjectInfo::getUpdateTime);
         List<RProjectInfo> list = projectInfoService.list(lq);
         Map<String, String> userMap = userMemberService.list().stream().collect(Collectors.toMap(UserMemgerInfo::getMemberId, UserMemgerInfo::getName, (v1, v2) -> v1));
         Map<String, String> groupMap = groupInfoService.list().stream().collect(Collectors.toMap(FsGroupInfo::getChatId, FsGroupInfo::getName, (v1, v2) -> v1));
         Map<String, Double> projectMap = projectInfoService.getProjectCost();
-        List<List<ProjectInfoVo>> res = projectInfoService.listToArray(list, userMap, groupMap, projectMap);
+        List<List<ProjectInfoVo>> res = projectInfoService.listToArray(list, userMap, groupMap, projectMap, vo);
         return new ReturnT<>(res);
     }
 
@@ -201,5 +210,15 @@ public class ProjectController {
             res.add(vo);
         });
         return new ReturnT<>(res);
+    }
+
+    @GetMapping("/userInfoLit")
+    public ReturnT<IPage<UserInfoWrokVo>> userInfoLit(Page<UserInfoWrokVo> page, UserInfoParamsVo vo) {
+        IPage<UserInfoWrokVo> list = rdTimeEntryService.userinfoList(page, vo);
+        return new ReturnT<>(list);
+    }
+    @GetMapping("/userInfo")
+    public ReturnT<IPage<UserInfoTimeVo>> userInfo(Page<UserInfoTimeVo> page, UserInfoParamsVo vo){
+        return new ReturnT<>(rdTimeEntryService.userTimeList(page, vo));
     }
 }

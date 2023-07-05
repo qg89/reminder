@@ -11,6 +11,7 @@ import com.q.reminder.reminder.mapper.ProjectInfoMapping;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdTimeEntryService;
 import com.q.reminder.reminder.vo.*;
+import com.q.reminder.reminder.vo.params.ProjectParamsVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -46,12 +47,12 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     }
 
     @Override
-    public List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list, Map<String, String> userMap, Map<String, String> groupMap, Map<String, Double> projectMap) {
+    public List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list, Map<String, String> userMap, Map<String, String> groupMap, Map<String, Double> projectMap, ProjectParamsVo param) {
         List<List<ProjectInfoVo>> resDate = new ArrayList<>();
         List<String> removeColumn = List.of("createTime", "isDelete");
 
         // 加班
-        List<OvertimeVo> li = rdTimeEntryService.listOvertime("202306");
+        List<OvertimeVo> li = rdTimeEntryService.listOvertime(param);
         Map<String, List<OvertimeVo>> userOvertimeMap = li.stream().collect(Collectors.groupingBy(OvertimeVo::getUserId));
         userOvertimeMap.forEach((userId, uList) -> {
             // 取出小于0的数据，并且根据日期分组求和
@@ -82,7 +83,9 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
 
         // 工时合计
         Map<String, Double> timeMap = new HashMap<>();
-        for (RdTimeEntry e : rdTimeEntryService.list()) {
+        LambdaQueryWrapper<RdTimeEntry> queryWrapper = Wrappers.lambdaQuery();
+        queryWrapper.between(RdTimeEntry::getSpentOn, param.getStartTime(), param.getEndTime());
+        for (RdTimeEntry e : rdTimeEntryService.list(queryWrapper)) {
             timeMap.merge(String.valueOf(e.getProjectId()), (double) e.getHours(), Double::sum);
         }
         list.forEach(info -> {
@@ -180,6 +183,10 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         if ("sendGroupChatId".equals(k)) {
             vo.setColumnType("api");
             vo.setColumnDesc(Map.of("url", "/p/group", "method", "GET", "return", "array"));
+        }
+        if ("pname".equals(k)) {
+            vo.setColumnType("api");
+            vo.setColumnDesc(Map.of("url", "/p/userInfoLit", "method", "GET", "return", "array"));
         }
         if ("startDay".equals(k)) {
             vo.setColumnType("date");

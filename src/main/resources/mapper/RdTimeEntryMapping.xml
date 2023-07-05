@@ -16,11 +16,82 @@
     FROM
         rd_time_entry te
     <where>
-        <if test="ym != null and ym != ''">
-            AND DATE_FORMAT( spentOn, '%Y%m' ) = #{ym}
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND spentOn >= #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND spentOn <![CDATA[<=]]> #{vo.endTime}
         </if>
     </where>
     GROUP BY `day`, userName, userId, projectId
+</select>
+
+<select id="userinfoList" resultType="com.q.reminder.reminder.vo.UserInfoWrokVo">
+    SELECT
+        t.userId,
+        t.userName,
+        SUM( CASE WHEN t.addWork <![CDATA[<]]> 0 THEN 0 ELSE t.addWork END ) AS overtime,
+        SUM(t.allWork) AS totalTime
+    FROM (
+        SELECT
+            CASE WHEN
+            ( SELECT COUNT( `date` ) i FROM s_holiday_config WHERE `work` = 1 AND te.spentOn = `date` ) >= 1 THEN
+            ( SUM( hours ) - 8 ) ELSE SUM( hours )
+            END AS addWork,
+            SUM( hours ) allWork,
+            spentOn AS `day`,
+            userId,
+            te.userName
+        FROM
+            rd_time_entry te,
+            r_redmine_user_info ri
+        <where>
+            AND ri.assignee_id = te.userId
+            AND ri.redmine_type = 2
+            AND ri.is_delete = 0
+            <if test="vo.pid != null and vo.pid != ''">
+                AND projectId = #{vo.pid}
+            </if>
+            <if test="vo.startTime != null and vo.startTime != ''">
+                AND te.spentOn >= #{vo.startTime}
+            </if>
+            <if test="vo.endTime != null and vo.endTime != ''">
+                AND te.spentOn <![CDATA[<=]]> #{vo.endTime}
+            </if>
+        </where>
+        GROUP BY
+            `day`,userId,te.userName
+        ) t
+    GROUP BY t.userId,t.userName
+</select>
+
+<select id="userTimeList" resultType="com.q.reminder.reminder.vo.UserInfoTimeVo">
+    SELECT
+        re.hours,
+        re.userName,
+        rp.p_name AS pname,
+        re.spentOn
+    FROM
+        `rd_time_entry` re,
+        r_project_info rp
+    <where>
+        re.projectId = rp.p_id
+        AND rp.redmine_type = 2
+        AND rp.is_delete = 0
+        <if test="vo.pid != null and vo.pid != ''">
+            AND re.projectId = #{vo.pid}
+        </if>
+        <if test="vo.pid != null and vo.pid != ''">
+            AND re.userId = #{vo.userId}
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND re.spendOn >= #{vo.startTime}
+        </if>
+        <if test="vo.endTime != null and vo.endTime != ''">
+            AND re.spendOn <![CDATA[<=]]> #{vo.endTime}
+        </if>
+    </where>
+    ORDER BY re.spentOn DESC
 </select>
 </mapper>
 
