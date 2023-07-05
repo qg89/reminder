@@ -31,24 +31,31 @@ public class RProjectInfo extends Model<RProjectInfo> implements Serializable {
      private String pid;
     /**
      * redmine项目key
-     */     
-     @TableField(value = "p_key")
-     private String pkey;
+     */
+    @TableField(value = "p_key")
+    private String pkey;
     /**
      * redmine项目名称
-     */     
-     @TableField(value = "p_name")
-     private String pname;
+     */
+    @TableField(value = "p_name")
+    private String pname;
+
+    /**
+     * 项目预算（万元）
+     */
+    @TableField(value = "budget")
+    private Double budget;
+
     /**
      * 项目短名称
-     */     
-     @TableField(value = "project_short_name")
-     private String projectShortName;
+     */
+    @TableField(value = "project_short_name")
+    private String projectShortName;
     /**
      * 项目经理Open_Id
-     */     
-     @TableField(value = "pm_ou")
-     private String pmOu;
+     */
+    @TableField(value = "pm_ou")
+    private String pmOu;
     /**
      * 项目经理redminekey
      */     
