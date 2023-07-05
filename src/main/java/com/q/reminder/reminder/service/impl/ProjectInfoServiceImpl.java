@@ -246,6 +246,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
 //        resMap.put("pid", "redmine项目ID");
         resMap.put("pkey", "redmine项目Key");
         resMap.put("pname", "redmine项目名称");
+        resMap.put("budget", "项目预算（万元）");
 //        resMap.put("featureToken", "需求管理表Token");
 //        resMap.put("syncFeature", "同步需求管理表");
         resMap.put("projectShortName", "项目短名称");
