@@ -4,7 +4,7 @@
 
 <select id="listOvertime" resultType="com.q.reminder.reminder.vo.OvertimeVo">
     SELECT
-         SUM(CASE WHEN sc.`work` = 1 THEN (CASE WHEN (re.hours - 8) > 0 THEN (re.hours - 8) ELSE 0 END) ELSE 0 END) AS addWork
+         SUM(CASE WHEN sc.`work` = 1 THEN (CASE WHEN (te.hours - 8) > 0 THEN (te.hours - 8) ELSE 0 END) ELSE 0 END) AS addWork
          ,spentOn AS `day`
          ,projectId
          ,userName
@@ -17,7 +17,7 @@
         AND te.projectId = rp.p_id
         AND rp.is_delete = 0
         AND rp.redmine_type = 2
-        AND sc.`date` = re.spentOn
+        AND sc.`date` = te.spentOn
         <if test="vo.endTime != null and vo.endTime != ''">
             AND spentOn >= #{vo.startTime}
         </if>
