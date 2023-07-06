@@ -14,8 +14,11 @@
          ,userName
          ,userId
     FROM
-        rd_time_entry te
+        rd_time_entry te,
+        r_project_info rp
     <where>
+        AND te.projectId = rp.p_id
+        AND rp.is_delete = 0
         <if test="vo.endTime != null and vo.endTime != ''">
             AND spentOn >= #{vo.startTime}
         </if>
