@@ -94,7 +94,7 @@
     ORDER BY re.spentOn DESC
 </select>
 
-<delete id="userOption">
+<select id="userOption" resultType="com.q.reminder.reminder.vo.OptionVo">
     SELECT
         userId AS id,
         userName AS `name`
@@ -108,6 +108,6 @@
     GROUP BY
         re.userId,
         re.userName
-</delete>
+</select>
 </mapper>
 
