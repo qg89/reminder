@@ -37,7 +37,7 @@
         ROUND( SUM(t.allWork) / (SUM(t.allWork) - SUM( CASE WHEN t.addWork <![CDATA[<]]> 0 THEN 0 ELSE t.addWork END )), 2) employeeLoad
     FROM (
         SELECT
-            SUM(CASE WHEN sc.`work` = 1 THEN (CASE WHEN (re.hours - 8) > 0 THEN (re.hours - 8) ELSE 0 END) ELSE 0 END) AS addWork,
+            SUM(CASE WHEN sc.`work` = 1 THEN (CASE WHEN (te.hours - 8) > 0 THEN (te.hours - 8) ELSE 0 END) ELSE 0 END) AS addWork,
             SUM( hours ) allWork,
             spentOn AS `day`,
             userId,
@@ -53,7 +53,7 @@
             AND ri.is_delete = 0
             AND te.projectId = rp.p_id
             AND rp.is_delete = 0
-            AND sc.`date` = re.spentOn
+            AND sc.`date` = te.spentOn
             <if test="vo.pid != null and vo.pid != ''">
                 AND projectId = #{vo.pid}
             </if>
