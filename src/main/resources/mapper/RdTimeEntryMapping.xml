@@ -124,10 +124,17 @@
     FROM
         `rd_time_entry` re,
         r_redmine_user_info ri
-    WHERE
+    <where>
         ri.assignee_id = re.userId
-      AND ri.redmine_type = 2
-      AND ri.is_delete = 0
+        AND ri.redmine_type = 2
+        AND ri.is_delete = 0
+        <if test="vo.startTime != null and vo.startTime != ''">
+            re.spentOn >= #{vo.startTime}
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            re.spentOn <![CDATA[<=]]> #{vo.endTime}
+        </if>
+    </where>
     </select>
 </mapper>
 
