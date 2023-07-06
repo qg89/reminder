@@ -116,5 +116,18 @@
         re.userId,
         re.userName
 </select>
+
+<select id="listByProject" resultType="com.q.reminder.reminder.entity.RdTimeEntry">
+    SELECT
+        re.hours,
+        re.projectId
+    FROM
+        `rd_time_entry` re,
+        r_redmine_user_info ri
+    WHERE
+        ri.assignee_id = re.userId
+      AND ri.redmine_type = 2
+      AND ri.is_delete = 0
+    </select>
 </mapper>
 

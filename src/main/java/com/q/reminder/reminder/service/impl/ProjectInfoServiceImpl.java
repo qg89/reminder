@@ -83,9 +83,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
 
         // 工时合计
         Map<String, Double> timeMap = new HashMap<>();
-        LambdaQueryWrapper<RdTimeEntry> queryWrapper = Wrappers.lambdaQuery();
-        queryWrapper.between(RdTimeEntry::getSpentOn, param.getStartTime(), param.getEndTime());
-        for (RdTimeEntry e : rdTimeEntryService.list(queryWrapper)) {
+        for (RdTimeEntry e : rdTimeEntryService.listByProject(param)) {
             timeMap.merge(String.valueOf(e.getProjectId()), (double) e.getHours(), Double::sum);
         }
         list.forEach(info -> {

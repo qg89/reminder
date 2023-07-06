@@ -45,4 +45,9 @@ public class RdTimeEntryServiceImpl extends MppServiceImpl<RdTimeEntryMapping, R
     public List<OptionVo> userOption() {
         return baseMapper.userOption();
     }
+
+    @Override
+    public List<RdTimeEntry> listByProject(ProjectParamsVo vo) {
+        return baseMapper.listByProject(vo);
+    }
 }

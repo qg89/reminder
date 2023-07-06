@@ -30,5 +30,7 @@ public interface RdTimeEntryMapping extends MppBaseMapper<RdTimeEntry> {
     IPage<UserInfoTimeVo> userTimeList(@Param("page") Page<UserInfoTimeVo> page,@Param("vo") UserInfoParamsVo vo);
 
     List<OptionVo> userOption();
+
+    List<RdTimeEntry> listByProject(@Param("vo") ProjectParamsVo vo);
 }
 

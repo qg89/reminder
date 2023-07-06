@@ -29,4 +29,6 @@ public interface RdTimeEntryService extends IMppService<RdTimeEntry>{
     IPage<UserInfoTimeVo> userTimeList(Page<UserInfoTimeVo> page, UserInfoParamsVo vo);
 
     List<OptionVo> userOption();
+
+    List<RdTimeEntry> listByProject(ProjectParamsVo param);
 }
