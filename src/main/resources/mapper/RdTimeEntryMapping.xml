@@ -129,10 +129,10 @@
         AND ri.redmine_type = 2
         AND ri.is_delete = 0
         <if test="vo.startTime != null and vo.startTime != ''">
-            re.spentOn >= #{vo.startTime}
+            AND re.spentOn >= #{vo.startTime}
         </if>
         <if test="vo.startTime != null and vo.startTime != ''">
-            re.spentOn <![CDATA[<=]]> #{vo.endTime}
+            AND re.spentOn <![CDATA[<=]]> #{vo.endTime}
         </if>
     </where>
     </select>
