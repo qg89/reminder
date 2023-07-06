@@ -37,10 +37,7 @@
         ROUND( SUM(t.allWork) / (SUM(t.allWork) - SUM( CASE WHEN t.addWork <![CDATA[<]]> 0 THEN 0 ELSE t.addWork END )), 2) employeeLoad
     FROM (
         SELECT
-            CASE WHEN
-            ( SELECT COUNT( `date` ) i FROM s_holiday_config WHERE `work` = 1 AND te.spentOn = `date` ) >= 1 THEN
-            ( SUM( hours ) - 8 ) ELSE SUM( hours )
-            END AS addWork,
+            SUM(CASE WHEN sc.`work` = 1 THEN (CASE WHEN (re.hours - 8) > 0 THEN (re.hours - 8) ELSE 0 END) ELSE 0 END) AS addWork,
             SUM( hours ) allWork,
             spentOn AS `day`,
             userId,
@@ -48,13 +45,15 @@
         FROM
             rd_time_entry te,
             r_redmine_user_info ri,
-            r_project_info rp
+            r_project_info rp,
+            s_holiday_config sc
         <where>
             AND ri.assignee_id = te.userId
             AND ri.redmine_type = 2
             AND ri.is_delete = 0
             AND te.projectId = rp.p_id
             AND rp.is_delete = 0
+            AND sc.`date` = re.spentOn
             <if test="vo.pid != null and vo.pid != ''">
                 AND projectId = #{vo.pid}
             </if>
