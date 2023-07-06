@@ -6,6 +6,7 @@ import com.github.jeffreyning.mybatisplus.service.MppServiceImpl;
 import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.mapper.RdTimeEntryMapping;
 import com.q.reminder.reminder.service.RdTimeEntryService;
+import com.q.reminder.reminder.vo.OptionVo;
 import com.q.reminder.reminder.vo.OvertimeVo;
 import com.q.reminder.reminder.vo.UserInfoTimeVo;
 import com.q.reminder.reminder.vo.UserInfoWrokVo;
@@ -38,5 +39,10 @@ public class RdTimeEntryServiceImpl extends MppServiceImpl<RdTimeEntryMapping, R
     @Override
     public IPage<UserInfoTimeVo> userTimeList(Page<UserInfoTimeVo> page, UserInfoParamsVo vo) {
         return baseMapper.userTimeList(page, vo);
+    }
+
+    @Override
+    public List<OptionVo> userOption() {
+        return baseMapper.userOption();
     }
 }

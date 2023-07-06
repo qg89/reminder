@@ -93,5 +93,21 @@
     </where>
     ORDER BY re.spentOn DESC
 </select>
+
+<delete id="userOption">
+    SELECT
+        userId AS id,
+        userName AS `name`
+    FROM
+        `rd_time_entry` re,
+        r_redmine_user_info ri
+    WHERE
+        ri.assignee_id = re.userId
+      AND ri.redmine_type = 2
+      AND ri.is_delete = 0
+    GROUP BY
+        re.userId,
+        re.userName
+</delete>
 </mapper>
 

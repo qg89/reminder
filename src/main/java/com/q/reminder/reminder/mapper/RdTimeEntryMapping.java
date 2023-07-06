@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.jeffreyning.mybatisplus.base.MppBaseMapper;
 import com.q.reminder.reminder.entity.RdTimeEntry;
+import com.q.reminder.reminder.vo.OptionVo;
 import com.q.reminder.reminder.vo.OvertimeVo;
 import com.q.reminder.reminder.vo.UserInfoTimeVo;
 import com.q.reminder.reminder.vo.UserInfoWrokVo;
@@ -27,5 +28,7 @@ public interface RdTimeEntryMapping extends MppBaseMapper<RdTimeEntry> {
     IPage<UserInfoWrokVo> userinfoList(@Param("page") Page<UserInfoWrokVo> page, @Param("vo") UserInfoParamsVo vo);
 
     IPage<UserInfoTimeVo> userTimeList(@Param("page") Page<UserInfoTimeVo> page,@Param("vo") UserInfoParamsVo vo);
+
+    List<OptionVo> userOption();
 }
 

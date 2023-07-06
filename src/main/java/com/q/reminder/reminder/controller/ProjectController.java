@@ -2,7 +2,6 @@ package com.q.reminder.reminder.controller;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -225,11 +224,8 @@ public class ProjectController {
     }
 
     @GetMapping("/userOption")
-    public ReturnT<List<Map<String, Object>>> userOption() {
-        QueryWrapper<RdTimeEntry> query = Wrappers.query();
-        query.select("DISTINCT userId AS id, userName AS name");
-        query.groupBy("userId").groupBy("userName");
-        List<Map<String, Object>> maps = rdTimeEntryService.listMaps(query);
-        return new ReturnT<>(maps);
+    public ReturnT<List<OptionVo>> userOption() {
+        List<OptionVo> optionVos = rdTimeEntryService.userOption();
+        return new ReturnT<>(optionVos);
     }
 }
