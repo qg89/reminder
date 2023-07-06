@@ -2,6 +2,7 @@ package com.q.reminder.reminder.task.redmine;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.RProjectInfo;
@@ -52,9 +53,11 @@ public class SyncTimeEntryTask implements BasicProcessor {
         if (StringUtils.isNotBlank(jobParams) && NumberUtil.isNumber(jobParams)) {
             index = Integer.parseInt(jobParams);
         }
-        String instanceParamsStr = JSONObject.parse(instanceParams).getString("instanceParams");
-        if (StringUtils.isNotBlank(instanceParamsStr) && NumberUtil.isNumber(instanceParamsStr)) {
-            index = Integer.parseInt(instanceParamsStr);
+        Integer instanceJson;
+        if (JSONUtil.isTypeJSON(instanceParams) && (instanceJson = JSONObject.parse(instanceParams).getInteger("initParams")) != null) {
+            index = instanceJson;
+        } else if (NumberUtil.isNumber(instanceParams)) {
+            index = Integer.parseInt(instanceParams);
         }
         DateTime now = DateTime.now();
         String startTime;
