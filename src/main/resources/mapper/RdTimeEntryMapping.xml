@@ -4,21 +4,20 @@
 
 <select id="listOvertime" resultType="com.q.reminder.reminder.vo.OvertimeVo">
     SELECT
-        CASE WHEN (SELECT COUNT(`date`) i FROM s_holiday_config WHERE `work`  = 1 AND te.spentOn = `date` )  >= 1
-                 THEN (SUM( hours ) - 8)
-             ELSE SUM(hours)
-            END
-                  AS addWork
+         SUM(CASE WHEN sc.`work` = 1 THEN (CASE WHEN (re.hours - 8) > 0 THEN (re.hours - 8) ELSE 0 END) ELSE 0 END) AS addWork
          ,spentOn AS `day`
          ,projectId
          ,userName
          ,userId
     FROM
         rd_time_entry te,
-        r_project_info rp
+        r_project_info rp,
+        s_holiday_config sc
     <where>
         AND te.projectId = rp.p_id
         AND rp.is_delete = 0
+        AND rp.redmine_type = 2
+        AND sc.`date` = re.spentOn
         <if test="vo.endTime != null and vo.endTime != ''">
             AND spentOn >= #{vo.startTime}
         </if>
