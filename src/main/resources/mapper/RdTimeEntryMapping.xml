@@ -44,11 +44,14 @@
             te.userName
         FROM
             rd_time_entry te,
-            r_redmine_user_info ri
+            r_redmine_user_info ri,
+            r_project_info rp
         <where>
             AND ri.assignee_id = te.userId
             AND ri.redmine_type = 2
             AND ri.is_delete = 0
+            AND te.projectId = rp.p_id
+            AND rp.is_delete = 0
             <if test="vo.pid != null and vo.pid != ''">
                 AND projectId = #{vo.pid}
             </if>
