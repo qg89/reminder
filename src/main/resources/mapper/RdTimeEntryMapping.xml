@@ -33,39 +33,36 @@
         t.userId,
         t.userName,
         SUM( CASE WHEN t.addWork <![CDATA[<]]> 0 THEN 0 ELSE t.addWork END ) AS overtime,
-        SUM(t.allWork) AS totalTime,
-        ROUND( SUM(t.allWork) / (SUM(t.allWork) - SUM( CASE WHEN t.addWork <![CDATA[<]]> 0 THEN 0 ELSE t.addWork END )), 2) employeeLoad
+        SUM(t.hours) AS totalTime,
+        ROUND( SUM(t.hours) / (SUM(t.hours) - SUM( CASE WHEN t.addWork <![CDATA[<]]> 0 THEN 0 ELSE t.addWork END )), 2) employeeLoad
     FROM (
         SELECT
-            SUM(CASE WHEN sc.`work` = 1 THEN (CASE WHEN (te.hours - 8) > 0 THEN (te.hours - 8) ELSE 0 END) ELSE 0 END) AS addWork,
-            SUM( hours ) allWork,
-            spentOn AS `day`,
-            userId,
-            te.userName
+            SUM(re.hours) hours,
+            SUM(CASE WHEN sc.`work` = 1 THEN (CASE WHEN (re.hours - 8) > 0 THEN (re.hours - 8) ELSE 0 END) ELSE 0 END) AS addWork,
+            re.userId,
+            re.userName,
+            projectId
         FROM
-            rd_time_entry te,
-            r_redmine_user_info ri,
+            `rd_time_entry` re,
             r_project_info rp,
             s_holiday_config sc
         <where>
-            AND ri.assignee_id = te.userId
-            AND ri.redmine_type = 2
-            AND ri.is_delete = 0
-            AND te.projectId = rp.p_id
+            re.projectId = rp.p_id
+            AND rp.redmine_type = 2
             AND rp.is_delete = 0
-            AND sc.`date` = te.spentOn
+            AND sc.`date` = re.spentOn
             <if test="vo.pid != null and vo.pid != ''">
-                AND projectId = #{vo.pid}
+                AND re.projectId = #{vo.pid}
             </if>
             <if test="vo.startTime != null and vo.startTime != ''">
-                AND te.spentOn >= #{vo.startTime}
+                AND re.spentOn >= #{vo.startTime}
             </if>
             <if test="vo.endTime != null and vo.endTime != ''">
-                AND te.spentOn <![CDATA[<=]]> #{vo.endTime}
+                AND re.spentOn <![CDATA[<=]]> #{vo.endTime}
             </if>
         </where>
         GROUP BY
-            `day`,userId,te.userName
+            `day`, te.userId, te.userName, te.projectId
         ) t
     GROUP BY t.userId,t.userName
 </select>
