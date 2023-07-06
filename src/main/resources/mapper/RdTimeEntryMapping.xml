@@ -32,7 +32,7 @@
     SELECT
         t.userId,
         t.userName,
-        SUM( CASE WHEN t.addWork <![CDATA[<]]> 0 THEN 0 ELSE t.addWork END ) AS overtime,
+        SUM(t.addWork) AS overtime,
         SUM(t.hours) AS totalTime,
         ROUND( SUM(t.hours) / (SUM(t.hours) - SUM( CASE WHEN t.addWork <![CDATA[<]]> 0 THEN 0 ELSE t.addWork END )), 2) employeeLoad
     FROM (
