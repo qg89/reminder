@@ -21,4 +21,5 @@ public class UserInfoWrokVo implements Serializable {
     private String userName;
     private Double totalTime;
     private Double overtime;
+    private Double employeeLoad;
 }
