@@ -1,18 +1,11 @@
 package com.q.reminder.reminder.controller;
 
-import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.lark.oapi.core.request.RequestOptions;
-import com.lark.oapi.service.bitable.v1.model.AppTableField;
-import com.lark.oapi.service.bitable.v1.model.AppTableFieldProperty;
-import com.lark.oapi.service.bitable.v1.model.ListAppTableFieldReq;
-import com.lark.oapi.service.bitable.v1.model.ListAppTableFieldResp;
 import com.q.reminder.reminder.entity.*;
 import com.q.reminder.reminder.service.*;
-import com.q.reminder.reminder.service.impl.FeishuService;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.vo.*;
 import com.q.reminder.reminder.vo.base.ReturnT;
@@ -45,8 +38,6 @@ public class ProjectController {
     private final GroupInfoService groupInfoService;
     private final LoginService loginService;
     private final UserMemberService userMemberService;
-    private final FeishuService feishuService;
-    private final TableFieldsFeatureService fieldsFeatureService;
     private final RdTimeEntryService rdTimeEntryService;
 
 
@@ -56,7 +47,7 @@ public class ProjectController {
     }
 
     @GetMapping("/i")
-    public ReturnT<List<List<ProjectInfoVo>>> list(ProjectParamsVo vo) {
+    public ReturnT<List<List<ProjectInfoVo>>> i(ProjectParamsVo vo) {
         LambdaQueryWrapper<RProjectInfo> lq = Wrappers.lambdaQuery();
         lq.orderByDesc(RProjectInfo::getUpdateTime);
         List<RProjectInfo> list = projectInfoService.list(lq);
@@ -68,12 +59,12 @@ public class ProjectController {
     }
 
     @GetMapping("/d/{id}")
-    public ReturnT<Boolean> del(@PathVariable("id") String id) {
+    public ReturnT<Boolean> d(@PathVariable("id") String id) {
         return new ReturnT<>(projectInfoService.removeById(id));
     }
 
     @PostMapping("/s")
-    public ReturnT<String> save(@RequestBody RProjectReaVo info) {
+    public ReturnT<String> s(@RequestBody RProjectReaVo info) {
         try {
             Project project = RedmineApi.queryProjectByKey(info);
             if (project == null){
@@ -95,39 +86,9 @@ public class ProjectController {
         }
         return ReturnT.SUCCESS;
     }
-    @GetMapping("/t")
-    public Object t() throws Exception {
-        // 创建请求对象
-        ListAppTableFieldReq req = ListAppTableFieldReq.newBuilder()
-                .appToken("bascnrkdLGoUftLgM7fvME7ly5c")
-                .tableId("tbld61CFebNfZ6M6")
-                .viewId("vewk6iANmq")
-                .build();
-
-        // 发起请求
-        // 如开启了Sdk的token管理功能，就无需调用 RequestOptions.newBuilder().tenantAccessToken("t-xxx").build()来设置租户token了
-        ListAppTableFieldResp resp = feishuService.client().bitable().appTableField().list(req, RequestOptions.newBuilder()
-                .build());
-        List<TableFieldsFeature> data = new ArrayList<>() {
-        };
-        for (AppTableField item : resp.getData().getItems()) {
-            AppTableFieldProperty property = item.getProperty();
-            JSONObject from = JSONObject.from(property);
-            TableFieldsFeature feature = new TableFieldsFeature();
-            feature.setFieldId(item.getFieldId());
-            feature.setFieldName(item.getFieldName());
-            feature.setType(item.getType());
-            feature.setIsPrimary(String.valueOf(item.getIsPrimary()));
-            feature.setUiType(item.getUiType());
-            feature.setTableId("tbld61CFebNfZ6M6");
-//            feature.setProperty(from.toJSONString(JSONWriter.Feature.IgnoreNoneSerializable));
-            data.add(feature);
-        }
-       return fieldsFeatureService.saveOrUpdateBatch(data);
-    }
 
     @PostMapping("/e")
-    public ReturnT<String> edit(@RequestBody RProjectReaVo info) {
+    public ReturnT<String> e(@RequestBody RProjectReaVo info) {
         if ("1".equals(info.getIsDelete())) {
             projectInfoService.removeById(info);
             return ReturnT.SUCCESS;
@@ -140,7 +101,7 @@ public class ProjectController {
     }
 
     @PostMapping("/r")
-    public ReturnT<String> rea(@RequestBody RProjectReaVo vo) {
+    public ReturnT<String> r(@RequestBody RProjectReaVo vo) {
         if (!saveRea(vo)) {
             return ReturnT.FAIL;
         }
