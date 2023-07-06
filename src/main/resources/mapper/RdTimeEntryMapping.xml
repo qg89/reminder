@@ -62,7 +62,7 @@
             </if>
         </where>
         GROUP BY
-            `day`, te.userId, te.userName, te.projectId
+            re.spentOn, re.userId, re.userName, re.projectId
         ) t
     GROUP BY t.userId,t.userName
 </select>
