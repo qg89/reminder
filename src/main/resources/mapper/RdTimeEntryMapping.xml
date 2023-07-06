@@ -92,10 +92,10 @@
             AND re.userId = #{vo.userId}
         </if>
         <if test="vo.startTime != null and vo.startTime != ''">
-            AND re.spendOn >= #{vo.startTime}
+            AND re.spentOn >= #{vo.startTime}
         </if>
         <if test="vo.endTime != null and vo.endTime != ''">
-            AND re.spendOn <![CDATA[<=]]> #{vo.endTime}
+            AND re.spentOn <![CDATA[<=]]> #{vo.endTime}
         </if>
     </where>
     ORDER BY re.spentOn DESC
