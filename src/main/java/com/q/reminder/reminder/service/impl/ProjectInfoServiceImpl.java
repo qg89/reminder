@@ -10,8 +10,12 @@ import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.mapper.ProjectInfoMapping;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdTimeEntryService;
+import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.vo.*;
 import com.q.reminder.reminder.vo.params.ProjectParamsVo;
+import com.taskadapter.redmineapi.RedmineException;
+import com.taskadapter.redmineapi.bean.TimeEntry;
+import com.taskadapter.redmineapi.internal.RequestParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -47,9 +51,11 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     }
 
     @Override
-    public List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list, Map<String, String> userMap, Map<String, String> groupMap, Map<String, Double> projectMap, ProjectParamsVo param) {
+    public List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list, Map<String, String> userMap, Map<String, String> groupMap, Map<String, Double> projectMap, ProjectParamsVo param) throws RedmineException {
         List<List<ProjectInfoVo>> resDate = new ArrayList<>();
         List<String> removeColumn = List.of("createTime", "isDelete");
+
+        Map<String, String> copqMap = this.copq(list);
 
         // 加班
         List<OvertimeVo> li = rdTimeEntryService.listOvertime(param);
@@ -159,9 +165,34 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             work.setLabel("正常合计（小时）");
             res.add(work);
 
+            // 正常合计（小时）
+            ProjectInfoVo copq = new ProjectInfoVo();
+            copq.setKey("copq");
+            copq.setValue(copqMap.get(pid));
+            copq.setColumnType("input");
+            copq.setShowEdit(1);
+            copq.setLabel("COPQ（Cost Of Poor Quality）");
+            res.add(copq);
+
             resDate.add(res);
         });
         return resDate;
+    }
+
+    private Map<String, String> copq(List<RProjectInfo> list) throws RedmineException {
+        Map<String, String> map = new HashMap<>();
+        for (RProjectInfo projectInfo : list) {
+            // 查询所有工时
+            Collection<? extends TimeEntry> timeEntries = RedmineApi.getTimeEntity(projectInfo, List.of());
+            double sum = timeEntries.stream().mapToDouble(TimeEntry::getHours).sum();
+            // 查询BUG工时
+            Collection<? extends TimeEntry> bugTimeEntries = RedmineApi.getTimeEntity(projectInfo, List.of(
+                    new RequestParam("issue.tracker_id", "6")
+            ));
+            double bugSum = bugTimeEntries.stream().mapToDouble(TimeEntry::getHours).sum();
+            map.put(projectInfo.getPid(), BigDecimal.valueOf(bugSum/sum).setScale(2, RoundingMode.HALF_UP).toString());
+        }
+        return map;
     }
 
     private void extracted(String k, ProjectInfoVo vo) {

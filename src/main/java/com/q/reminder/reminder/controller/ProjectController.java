@@ -47,7 +47,7 @@ public class ProjectController {
     }
 
     @GetMapping("/i")
-    public ReturnT<List<List<ProjectInfoVo>>> i(ProjectParamsVo vo) {
+    public ReturnT<List<List<ProjectInfoVo>>> i(ProjectParamsVo vo) throws Exception {
         LambdaQueryWrapper<RProjectInfo> lq = Wrappers.lambdaQuery();
         lq.orderByDesc(RProjectInfo::getCreateTime);
         List<RProjectInfo> list = projectInfoService.list(lq);
