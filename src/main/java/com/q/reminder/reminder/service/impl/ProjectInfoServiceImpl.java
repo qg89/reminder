@@ -185,6 +185,9 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             // 查询所有工时
             Collection<? extends TimeEntry> timeEntries = RedmineApi.getTimeEntity(projectInfo, List.of());
             double sum = timeEntries.stream().mapToDouble(TimeEntry::getHours).sum();
+            if (sum == 0){
+                sum = 1;
+            }
             // 查询BUG工时
             Collection<? extends TimeEntry> bugTimeEntries = RedmineApi.getTimeEntity(projectInfo, List.of(
                     new RequestParam("issue.tracker_id", "6")
