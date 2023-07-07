@@ -16,6 +16,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -331,5 +333,24 @@ public abstract class RedmineApi {
     public static Project queryProjectByKey(RProjectReaVo info) throws RedmineException {
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey(info.getRedmineUrl(), info.getPmKey());
         return mgr.getProjectManager().getProjectByKey(info.getPkey());
+    }
+
+    public static Map<String, String> copq(List<RProjectInfo> list) throws RedmineException {
+        Map<String, String> map = new HashMap<>();
+        for (RProjectInfo projectInfo : list) {
+            // 查询所有工时
+            Collection<? extends TimeEntry> timeEntries = getTimeEntity(projectInfo, List.of());
+            double sum = timeEntries.stream().mapToDouble(TimeEntry::getHours).sum();
+            if (sum == 0) {
+                sum = 1;
+            }
+            // 查询BUG工时
+            Collection<? extends TimeEntry> bugTimeEntries = getTimeEntity(projectInfo, List.of(
+                    new RequestParam("issue.tracker_id", "6")
+            ));
+            double bugSum = bugTimeEntries.stream().mapToDouble(TimeEntry::getHours).sum();
+            map.put(projectInfo.getPid(), BigDecimal.valueOf(bugSum / sum * 100).setScale(2, RoundingMode.HALF_UP).toString());
+        }
+        return map;
     }
 }

@@ -7,7 +7,6 @@ import com.q.reminder.reminder.vo.RProjectReaVo;
 import com.q.reminder.reminder.vo.WeeklyByProjectVo;
 import com.q.reminder.reminder.vo.WeeklyProjectVo;
 import com.q.reminder.reminder.vo.params.ProjectParamsVo;
-import com.taskadapter.redmineapi.RedmineException;
 
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,7 @@ public interface ProjectInfoService extends IService<RProjectInfo> {
 
     List<WeeklyByProjectVo> weeklyByProjectList(String pKey, String name);
 
-    List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list, Map<String, String> userMap, Map<String, String> groupMap, Map<String, Double> projectMap, ProjectParamsVo vo) throws RedmineException;
+    List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list, Map<String, String> userMap, Map<String, String> groupMap, Map<String, Double> projectMap, ProjectParamsVo vo);
 
     List<ProjectInfoVo> listInfo();
 
