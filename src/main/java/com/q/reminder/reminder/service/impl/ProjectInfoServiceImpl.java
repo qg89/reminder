@@ -169,7 +169,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             // 正常合计（小时）
             ProjectInfoVo copq = new ProjectInfoVo();
             copq.setKey("copq");
-            copq.setValue(copqMap.get(pid) + "%");
+            copq.setValue(copqMap.get(pid));
             copq.setColumnType("input");
             copq.setShowEdit(1);
             copq.setLabel("COPQ（Cost Of Poor Quality）");
