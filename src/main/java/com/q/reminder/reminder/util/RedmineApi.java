@@ -349,7 +349,7 @@ public abstract class RedmineApi {
                     new RequestParam("issue.tracker_id", "6")
             ));
             double bugSum = bugTimeEntries.stream().mapToDouble(TimeEntry::getHours).sum();
-            map.put(projectInfo.getPid(), BigDecimal.valueOf(bugSum / sum * 100).setScale(2, RoundingMode.HALF_UP).toString());
+            map.put(projectInfo.getPid(), BigDecimal.valueOf(bugSum / sum * 100).setScale(2, RoundingMode.HALF_UP) + "%");
         }
         return map;
     }
