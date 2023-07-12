@@ -223,7 +223,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     }
 
     @Override
-    @Cacheable(cacheNames = RedisKeyContents.REDMINE_PROJECT_ALL, key = "'projectAll'")
+    @Cacheable(cacheNames = RedisKeyContents.REDMINE_PROJECT_ALL, key = "'projectAll'", unless = "#result == null")
     public List<RProjectInfo> listAll() {
         return list();
     }
