@@ -68,6 +68,7 @@ public class FeishuEventController {
         EventResp resp = EVENT_DISPATCHER.handle(req);
         log.info("FeishuEvent EventResp:{}", resp);
         write(response, resp);
+        CHAT_ID = null;
     }
 
     public void write(HttpServletResponse response, EventResp eventResp) throws IOException {
