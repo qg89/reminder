@@ -23,6 +23,7 @@ import com.q.reminder.reminder.service.TableFieldsFeatureService;
 import com.q.reminder.reminder.service.UserMemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
  * @Description :
  * @date :  2023.04.10 19:13
  */
+@Log4j2
 @RestController
 public class FeishuEventController {
 
@@ -54,13 +56,17 @@ public class FeishuEventController {
     @PostMapping("/event")
     public void event(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         String bodyStr = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        log.info("FeishuEvent request:{}", bodyStr);
         EventReq req = new EventReq();
         req.setHeaders(toHeaderMap(request));
         req.setBody(bodyStr.getBytes(StandardCharsets.UTF_8));
         req.setHttpPath(request.getRequestURI());
         FsGroupInfo groupInfo = groupInfoService.getOne(Wrappers.<FsGroupInfo>lambdaQuery().eq(FsGroupInfo::getSendType, GroupInfoType.DEP_GROUP));
+        log.info("FeishuEvent project:{}", groupInfo);
         CHAT_ID = groupInfo.getChatId();
+        log.info("FeishuEvent CHAT_ID:{}", CHAT_ID);
         EventResp resp = EVENT_DISPATCHER.handle(req);
+        log.info("FeishuEvent EventResp:{}", resp);
         write(response, resp);
     }
 
