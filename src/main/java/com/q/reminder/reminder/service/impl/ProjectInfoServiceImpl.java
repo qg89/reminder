@@ -235,7 +235,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     }
 
     @Override
-    @Cacheable(cacheNames = RedisKeyContents.REDMINE_PROJECT_KEY, key = "#prjctKey", unless = "#prjctKey == null")
+    @Cacheable(cacheNames = RedisKeyContents.REDMINE_PROJECT_KEY, key = "#prjctKey", unless = "#prjctKey == null and #result == null")
     public RProjectInfo projectInfoByPrjctKey(String prjctKey) {
         LambdaQueryWrapper<RProjectInfo> lambdaQueryWrapper = Wrappers.lambdaQuery();
         lambdaQueryWrapper.eq(RProjectInfo::getPkey, prjctKey);
