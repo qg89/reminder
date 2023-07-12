@@ -55,20 +55,23 @@ public class FeishuEventController {
 
     @PostMapping("/event")
     public void event(HttpServletRequest request, HttpServletResponse response) throws Throwable {
-        String bodyStr = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-        log.info("FeishuEvent request:{}", bodyStr);
-        EventReq req = new EventReq();
-        req.setHeaders(toHeaderMap(request));
-        req.setBody(bodyStr.getBytes(StandardCharsets.UTF_8));
-        req.setHttpPath(request.getRequestURI());
-        FsGroupInfo groupInfo = groupInfoService.getOne(Wrappers.<FsGroupInfo>lambdaQuery().eq(FsGroupInfo::getSendType, GroupInfoType.DEP_GROUP));
-        log.info("FeishuEvent project:{}", groupInfo);
-        CHAT_ID = groupInfo.getChatId();
-        log.info("FeishuEvent CHAT_ID:{}", CHAT_ID);
-        EventResp resp = EVENT_DISPATCHER.handle(req);
-        log.info("FeishuEvent EventResp:{}", resp);
-        write(response, resp);
-        CHAT_ID = null;
+        try {
+            String bodyStr = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+            log.info("FeishuEvent request:{}", bodyStr);
+            EventReq req = new EventReq();
+            req.setHeaders(toHeaderMap(request));
+            req.setBody(bodyStr.getBytes(StandardCharsets.UTF_8));
+            req.setHttpPath(request.getRequestURI());
+            FsGroupInfo groupInfo = groupInfoService.getOne(Wrappers.<FsGroupInfo>lambdaQuery().eq(FsGroupInfo::getSendType, GroupInfoType.DEP_GROUP));
+            log.info("FeishuEvent project:{}", groupInfo);
+            CHAT_ID = groupInfo.getChatId();
+            log.info("FeishuEvent CHAT_ID:{}", CHAT_ID);
+            EventResp resp = EVENT_DISPATCHER.handle(req);
+            log.info("FeishuEvent EventResp:{}", resp);
+            write(response, resp);
+        } finally {
+            CHAT_ID = null;
+        }
     }
 
     public void write(HttpServletResponse response, EventResp eventResp) throws IOException {
