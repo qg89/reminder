@@ -72,6 +72,7 @@ public class FeishuEventController {
         } finally {
             CHAT_ID = null;
         }
+        log.info("FeishuEvent done~");
     }
 
     public void write(HttpServletResponse response, EventResp eventResp) throws IOException {
