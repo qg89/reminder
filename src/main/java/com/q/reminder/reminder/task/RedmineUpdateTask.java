@@ -2,6 +2,7 @@ package com.q.reminder.reminder.task;
 
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -52,6 +53,8 @@ public class RedmineUpdateTask implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
+        String jobParams = context.getJobParams();
+        String instanceParams = context.getInstanceParams();
         ProcessResult processResult = new ProcessResult(true);
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
@@ -59,12 +62,20 @@ public class RedmineUpdateTask implements BasicProcessor {
             log.info(taskName + "-放假咯");
             return processResult;
         }
-        log.info(taskName + "-start");
+        int index = 10;
+        if (StringUtils.isNotBlank(jobParams) && NumberUtil.isNumber(jobParams)) {
+            index = Integer.parseInt(jobParams);
+        }
+        if (StringUtils.isNotBlank(instanceParams) && NumberUtil.isNumber(instanceParams)) {
+            index = Integer.parseInt(instanceParams);
+        }
+        log.info(taskName + "-start, minute：{}min", index);
         try {
             List<RProjectInfo> projectInfoList = projectInfoService.listAll().stream().filter(e -> StringUtils.isNotBlank(e.getPmKey())).toList();
             List<RedmineVo> issues = RedmineApi.queryUpdateIssue(projectInfoList);
+            int finalIndex = index;
             Map<String, List<RedmineVo>> issueMap = issues.stream().filter(issue ->
-                    DateUtil.between(issue.getUpdatedOn(), new Date(), DateUnit.MINUTE) <= 10 && StringUtils.isNotBlank(issue.getAssigneeName())
+                    DateUtil.between(issue.getUpdatedOn(), new Date(), DateUnit.MINUTE) <= finalIndex && StringUtils.isNotBlank(issue.getAssigneeName())
             ).collect(Collectors.groupingBy(RedmineVo::getAssigneeName));
 
             Map<String, List<RedmineVo>> noneIssueMapByAuthorName = issues.stream().filter(issue ->

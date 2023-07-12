@@ -8,7 +8,7 @@ import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.MessageVo;
 
 import java.util.Arrays;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 /**
  * @author : saiko
@@ -45,9 +45,13 @@ public class FeishuException extends RuntimeException {
         if (e != null) {
             JSONObject errorMsg = new JSONObject();
             JSONArray jsonArray = new JSONArray();
-            errorMsg.put("异常信息 概览", e.getMessage() + "\\r\\n");
+            errorMsg.put("异常信息 概览", e.getMessage() + "\r\n");
             Arrays.stream(e.getStackTrace()).forEach(s -> {
-                jsonArray.add(Map.of("className", s.getClassName(), "methodName", s.getMethodName(), "lineNumber", s.getLineNumber()));
+                LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+                map.put("className", s.getClassName());
+                map.put("methodName", s.getMethodName());
+                map.put("lineNumber", s.getLineNumber());
+                jsonArray.add(map);
             });
             errorMsg.put("异常堆栈", jsonArray);
             json.put("text", errorMsg.toJSONString());

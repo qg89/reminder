@@ -2,6 +2,7 @@ package com.q.reminder.reminder.util;
 
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
+import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.vo.*;
 import com.taskadapter.redmineapi.IssueManager;
 import com.taskadapter.redmineapi.RedmineException;
@@ -103,12 +104,12 @@ public abstract class RedmineApi {
     /**
      * 查询redmine当天修改的任务，所有状态
      *
-     * @param RProjectInfoList
+     * @param projectList
      * @return
      */
-    public static List<RedmineVo> queryUpdateIssue(List<RProjectInfo> RProjectInfoList) {
+    public static List<RedmineVo> queryUpdateIssue(List<RProjectInfo> projectList) {
         List<RedmineVo> issues = new ArrayList<>();
-        for (RProjectInfo project : RProjectInfoList) {
+        for (RProjectInfo project : projectList) {
             Transport transport = getTransportByProject(project);
             List<RequestParam> params = List.of(
                     new RequestParam("status_id", "*"),
@@ -132,7 +133,8 @@ public abstract class RedmineApi {
                     issues.add(queryRedmineVo);
                 });
             } catch (RedmineException e) {
-                log.error("Redmine-查询当天更新的任务异常");
+                String msg = RedmineApi.class.getName() + " projectName " + project.getPname();
+                throw new FeishuException(e, msg);
             }
         }
         return issues;
