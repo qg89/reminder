@@ -176,7 +176,7 @@ public class FeishuEventController {
                                     array.forEach(v -> {
                                         JSONObject from = JSONObject.from(v);
                                         if ("text".equals(from.get("type"))) {
-                                            fileArray.append(from.get("text"));
+                                            fileArray.append(from.get("text")).append("\r\n");
                                         }
                                     });
                                     if (fileArray.length() > 0) {
