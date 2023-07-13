@@ -172,7 +172,7 @@ public class FeishuEventController {
                             });
                         }
                     }
-                    tableRecordTmpService.saveOrUpdateBatch(tmpList);
+                    tableRecordTmpService.saveOrUpdateBatchByMultiId(tmpList);
                 }
             })
             // 审批事件
