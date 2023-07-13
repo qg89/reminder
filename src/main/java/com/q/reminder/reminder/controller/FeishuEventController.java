@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.controller;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.core.request.EventReq;
@@ -15,9 +16,12 @@ import com.lark.oapi.service.drive.v1.model.BitableTableFieldAction;
 import com.lark.oapi.service.drive.v1.model.BitableTableFieldActionValue;
 import com.lark.oapi.service.drive.v1.model.P2FileBitableFieldChangedV1;
 import com.lark.oapi.service.drive.v1.model.P2FileBitableFieldChangedV1Data;
+import com.lark.oapi.service.im.v1.ImService;
+import com.lark.oapi.service.im.v1.model.*;
 import com.q.reminder.reminder.constant.GroupInfoType;
 import com.q.reminder.reminder.entity.FsGroupInfo;
 import com.q.reminder.reminder.entity.TableFieldsFeature;
+import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.service.GroupInfoService;
 import com.q.reminder.reminder.service.TableFieldsFeatureService;
 import com.q.reminder.reminder.service.UserMemberService;
@@ -137,12 +141,18 @@ public class FeishuEventController {
                     String json = jsonObject.getString("encrypt");
                     String eventStr = EVENT_DISPATCHER.decryptEvent(json);
                     JSONObject object = JSONObject.parseObject(eventStr);
+                    JSONObject header = object.getJSONObject("header");
+                    log.info(header);
                     for (JSONObject j : object.getJSONObject("event").getList("action_list", JSONObject.class)) {
                         String action = j.getString("action");
-                        String afterValue = j.getString("after_value");
-                        String beforeValue = j.getString("before_value");
+                        JSONArray afterValue = j.getJSONArray("after_value");
+                        afterValue.forEach(e -> {
+                            JSONObject value = JSONObject.parseObject((String) e);
+                            String field_id = value.getString("field_id");
+                            String field_value = value.getString("field_value");
+                        });
                         String recordId = j.getString("record_id");
-                        System.out.println(j);
+                        log.info(afterValue);
                     }
                 }
             })
@@ -165,35 +175,35 @@ public class FeishuEventController {
                 }
             })
             // 会话成员变更事件
-//            .onP2ChatMemberUserAddedV1(new ImService.P2ChatMemberUserAddedV1Handler() {
-//                @Override
-//                public void handle(P2ChatMemberUserAddedV1 event) throws Exception {
-//                    P2ChatMemberUserAddedV1Data eventData = event.getEvent();
-//                    String chatId = eventData.getChatId();
-//                    if (Objects.equals(CHAT_ID, chatId)) {
-//                        ChatMemberUser[] users = eventData.getUsers();
-//                        for (ChatMemberUser user : users) {
-//                            UserMemgerInfo info = new UserMemgerInfo();
-//                            info.setName(user.getName());
-//                            info.setMemberId(user.getUserId().getOpenId());
-//                            info.setTenantKey(user.getTenantKey());
-//                            userMemberService.saveOrUpdate(info);
-//                        }
-//                    }
-//                }
-//            })
-//            // 会话成员删除事件
-//            .onP2ChatMemberUserDeletedV1(new ImService.P2ChatMemberUserDeletedV1Handler() {
-//                @Override
-//                public void handle(P2ChatMemberUserDeletedV1 event) throws Exception {
-//                    P2ChatMemberUserDeletedV1Data eventData = event.getEvent();
-//                    String chatId = eventData.getChatId();
-//                    if (Objects.equals(CHAT_ID, chatId)) {
-//                        for (ChatMemberUser user : eventData.getUsers()) {
-//                            userMemberService.remove(Wrappers.<UserMemgerInfo>lambdaUpdate().eq(UserMemgerInfo::getMemberId, user.getUserId().getOpenId()));
-//                        }
-//                    }
-//                }
-//            })
+            .onP2ChatMemberUserAddedV1(new ImService.P2ChatMemberUserAddedV1Handler() {
+                @Override
+                public void handle(P2ChatMemberUserAddedV1 event) throws Exception {
+                    P2ChatMemberUserAddedV1Data eventData = event.getEvent();
+                    String chatId = eventData.getChatId();
+                    if (Objects.equals(CHAT_ID, chatId)) {
+                        ChatMemberUser[] users = eventData.getUsers();
+                        for (ChatMemberUser user : users) {
+                            UserMemgerInfo info = new UserMemgerInfo();
+                            info.setName(user.getName());
+                            info.setMemberId(user.getUserId().getOpenId());
+                            info.setTenantKey(user.getTenantKey());
+                            userMemberService.saveOrUpdate(info);
+                        }
+                    }
+                }
+            })
+            // 会话成员删除事件
+            .onP2ChatMemberUserDeletedV1(new ImService.P2ChatMemberUserDeletedV1Handler() {
+                @Override
+                public void handle(P2ChatMemberUserDeletedV1 event) throws Exception {
+                    P2ChatMemberUserDeletedV1Data eventData = event.getEvent();
+                    String chatId = eventData.getChatId();
+                    if (Objects.equals(CHAT_ID, chatId)) {
+                        for (ChatMemberUser user : eventData.getUsers()) {
+                            userMemberService.remove(Wrappers.<UserMemgerInfo>lambdaUpdate().eq(UserMemgerInfo::getMemberId, user.getUserId().getOpenId()));
+                        }
+                    }
+                }
+            })
             .build();
 }
