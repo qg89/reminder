@@ -143,14 +143,17 @@ public class FeishuEventController {
                 public void handle(EventReq event) throws Exception {
                     JSONObject jsonObject = JSONObject.parse(new String(event.getBody()));
                     String json = jsonObject.getString("encrypt");
-                    String table_id = jsonObject.getString("table_id");
-                    String file_type = jsonObject.getString("file_type");
                     String eventStr = EVENT_DISPATCHER.decryptEvent(json);
                     JSONObject object = JSONObject.parseObject(eventStr);
+                    JSONObject eventJson = object.getJSONObject("event");
+                    log.info("drive.file.bitable_record_changed_v1 - event:{}", eventJson);
+
+                    String table_id = jsonObject.getString("table_id");
+                    String file_type = jsonObject.getString("file_type");
                     JSONObject header = object.getJSONObject("header");
-                    log.info(header);
+                    log.info("drive.file.bitable_record_changed_v1 - header:{}", header);
                     List<TableRecordTmp> tmpList = new ArrayList<>();
-                    for (JSONObject j : object.getJSONObject("event").getList("action_list", JSONObject.class)) {
+                    for (JSONObject j : eventJson.getList("action_list", JSONObject.class)) {
                         String action = j.getString("action");
                         String recordId = j.getString("record_id");
                         if ("record_deleted".equals(action)) {
@@ -167,7 +170,6 @@ public class FeishuEventController {
                                 tmp.setFileType(file_type);
                                 tmpList.add(tmp);
                             });
-                            log.info(afterValue);
                         }
                     }
                     tableRecordTmpService.saveOrUpdateBatch(tmpList);
