@@ -131,6 +131,8 @@ public class FeishuEventController {
                             feature.setFieldName(value.getName());
                             feature.setType(value.getType());
                             feature.setTableId(tableId);
+                            feature.setFileToken(eventEvent.getFileToken());
+                            feature.setTableId(eventEvent.getTableId());
                             data.add(feature);
                         }
                     }
