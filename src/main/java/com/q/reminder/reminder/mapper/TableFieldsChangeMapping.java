@@ -1,6 +1,6 @@
 package com.q.reminder.reminder.mapper;
 
-import com.q.reminder.reminder.entity.TableFieldsFeature;
+import com.q.reminder.reminder.entity.TableFieldsChange;
 import com.github.jeffreyning.mybatisplus.base.MppBaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -11,6 +11,6 @@ import org.apache.ibatis.annotations.Mapper;
  * @since 2023-07-13 14:33:52
  */
 @Mapper
-public interface TableFieldsFeatureMapping extends MppBaseMapper<TableFieldsFeature> {
+public interface TableFieldsChangeMapping extends MppBaseMapper<TableFieldsChange> {
 }
 

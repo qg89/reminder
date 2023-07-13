@@ -1,14 +1,16 @@
 package com.q.reminder.reminder.entity;
 
 import com.alibaba.fastjson2.JSONObject;
-import java.util.Date;
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
 import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 
 
 /**
@@ -19,7 +21,7 @@ import java.io.Serializable;
  */
 @Data
 @TableName("table_fields_feature")
-public class TableFieldsFeature extends Model<TableFieldsFeature> implements Serializable {
+public class TableFieldsChange extends Model<TableFieldsChange> implements Serializable {
     @Serial
     private static final long serialVersionUID = 327927939956406039L;
     

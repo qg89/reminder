@@ -20,11 +20,11 @@ import com.lark.oapi.service.im.v1.ImService;
 import com.lark.oapi.service.im.v1.model.*;
 import com.q.reminder.reminder.constant.GroupInfoType;
 import com.q.reminder.reminder.entity.FsGroupInfo;
-import com.q.reminder.reminder.entity.TableFieldsFeature;
+import com.q.reminder.reminder.entity.TableFieldsChange;
 import com.q.reminder.reminder.entity.TableRecordTmp;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.service.GroupInfoService;
-import com.q.reminder.reminder.service.TableFieldsFeatureService;
+import com.q.reminder.reminder.service.TableFieldsChangeService;
 import com.q.reminder.reminder.service.TableRecordTmpService;
 import com.q.reminder.reminder.service.UserMemberService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 public class FeishuEventController {
 
     @Autowired
-    private TableFieldsFeatureService tableFieldsFeatureService;
+    private TableFieldsChangeService tableFieldsFeatureService;
     @Autowired
     private GroupInfoService groupInfoService;
     @Autowired
@@ -118,7 +118,7 @@ public class FeishuEventController {
                         return;
                     }
                     BitableTableFieldAction[] actionList = eventEvent.getActionList();
-                    List<TableFieldsFeature> data = new ArrayList<>();
+                    List<TableFieldsChange> data = new ArrayList<>();
                     for (BitableTableFieldAction fieldAction : actionList) {
                         String fieldId = fieldAction.getFieldId();
                         String action = fieldAction.getAction();
@@ -126,7 +126,7 @@ public class FeishuEventController {
                             tableFieldsFeatureService.removeById(fieldId);
                         } else {
                             BitableTableFieldActionValue value = fieldAction.getAfterValue();
-                            TableFieldsFeature feature = new TableFieldsFeature();
+                            TableFieldsChange feature = new TableFieldsChange();
                             feature.setFieldId(fieldId);
                             feature.setFieldName(value.getName());
                             feature.setType(value.getType());

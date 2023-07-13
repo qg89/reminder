@@ -1,7 +1,7 @@
 package com.q.reminder.reminder.service;
 
 import com.github.jeffreyning.mybatisplus.service.IMppService;
-import com.q.reminder.reminder.entity.TableFieldsFeature;
+import com.q.reminder.reminder.entity.TableFieldsChange;
 
 
 /**
@@ -10,6 +10,6 @@ import com.q.reminder.reminder.entity.TableFieldsFeature;
  * @author makejava
  * @since 2023-07-13 14:33:50
  */
-public interface TableFieldsFeatureService extends IMppService<TableFieldsFeature>{
+public interface TableFieldsChangeService extends IMppService<TableFieldsChange>{
 
 }
