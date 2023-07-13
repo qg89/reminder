@@ -146,12 +146,12 @@ public class FeishuEventController {
                     String eventStr = EVENT_DISPATCHER.decryptEvent(json);
                     JSONObject object = JSONObject.parseObject(eventStr);
                     JSONObject eventJson = object.getJSONObject("event");
-                    log.info("drive.file.bitable_record_changed_v1 - event:{}", eventJson);
-
-                    String table_id = jsonObject.getString("table_id");
-                    String file_type = jsonObject.getString("file_type");
                     JSONObject header = object.getJSONObject("header");
+                    log.info("drive.file.bitable_record_changed_v1 - event:{}", eventJson);
                     log.info("drive.file.bitable_record_changed_v1 - header:{}", header);
+
+                    String table_id = eventJson.getString("table_id");
+                    String file_type = eventJson.getString("file_type");
                     List<TableRecordTmp> tmpList = new ArrayList<>();
                     for (JSONObject j : eventJson.getList("action_list", JSONObject.class)) {
                         String action = j.getString("action");
