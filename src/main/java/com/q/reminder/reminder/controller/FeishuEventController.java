@@ -133,6 +133,7 @@ public class FeishuEventController {
                             feature.setTableId(tableId);
                             feature.setFileToken(eventEvent.getFileToken());
                             feature.setTableId(eventEvent.getTableId());
+                            feature.setProperty(JSONObject.from(value.getProperty()));
                             data.add(feature);
                         }
                     }
