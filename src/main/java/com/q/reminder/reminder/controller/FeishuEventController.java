@@ -134,7 +134,7 @@ public class FeishuEventController {
                             data.add(feature);
                         }
                     }
-                    tableFieldsFeatureService.saveOrUpdateBatch(data);
+                    tableFieldsFeatureService.saveOrUpdateBatchByMultiId(data);
                 }
             })
             // 多维表格记录变更，回调事件
