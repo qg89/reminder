@@ -149,48 +149,7 @@ public class FeishuEventController {
                     String json = jsonObject.getString("encrypt");
                     String eventStr = EVENT_DISPATCHER.decryptEvent(json);
                     JSONObject object = JSONObject.parseObject(eventStr);
-                    JSONObject eventJson = object.getJSONObject("event");
-                    JSONObject header = object.getJSONObject("header");
-                    log.info("drive.file.bitable_record_changed_v1 - event:{}", eventJson);
-                    log.info("drive.file.bitable_record_changed_v1 - header:{}", header);
-
-                    String table_id = eventJson.getString("table_id");
-                    String file_type = eventJson.getString("file_type");
-                    List<TableRecordTmp> tmpList = new ArrayList<>();
-                    for (JSONObject j : eventJson.getList("action_list", JSONObject.class)) {
-                        String action = j.getString("action");
-                        String recordId = j.getString("record_id");
-                        if ("record_deleted".equals(action)) {
-                            tableRecordTmpService.remove(Wrappers.<TableRecordTmp>lambdaUpdate().eq(TableRecordTmp::getRecordId, recordId));
-                        } else {
-                            JSONArray afterValue = j.getJSONArray("after_value");
-                            afterValue.forEach(e -> {
-                                TableRecordTmp tmp = new TableRecordTmp();
-                                JSONObject value = JSONObject.from(e);
-                                String fieldValue = value.getString("field_value");
-                                tmp.setRecordId(recordId);
-                                tmp.setFieldId(value.getString("field_id"));
-                                if (JSONUtil.isTypeJSON(fieldValue)) {
-                                    StringBuilder fileArray = new StringBuilder();
-                                    JSONArray array = JSONArray.parse(fieldValue);
-                                    array.forEach(v -> {
-                                        JSONObject from = JSONObject.from(v);
-                                        if ("text".equals(from.get("type"))) {
-                                            fileArray.append(from.get("text")).append("\r\n");
-                                        }
-                                    });
-                                    if (fileArray.length() > 0) {
-                                        fieldValue = fileArray.toString();
-                                    }
-                                }
-                                tmp.setFieldValue(fieldValue);
-                                tmp.setTableId(table_id);
-                                tmp.setFileType(file_type);
-                                tmpList.add(tmp);
-                            });
-                        }
-                    }
-                    tableRecordTmpService.saveOrUpdateBatchByMultiId(tmpList);
+                    tableRecordChange(object);
                 }
             })
             // 审批事件
@@ -243,4 +202,49 @@ public class FeishuEventController {
                 }
             })
             .build();
+
+    private void tableRecordChange(JSONObject object) {
+        JSONObject eventJson = object.getJSONObject("event");
+        JSONObject header = object.getJSONObject("header");
+        log.info("drive.file.bitable_record_changed_v1 - event:{}", eventJson);
+        log.info("drive.file.bitable_record_changed_v1 - header:{}", header);
+
+        String table_id = eventJson.getString("table_id");
+        String file_type = eventJson.getString("file_type");
+        List<TableRecordTmp> tmpList = new ArrayList<>();
+        for (JSONObject j : eventJson.getList("action_list", JSONObject.class)) {
+            String action = j.getString("action");
+            String recordId = j.getString("record_id");
+            if ("record_deleted".equals(action)) {
+                tableRecordTmpService.remove(Wrappers.<TableRecordTmp>lambdaUpdate().eq(TableRecordTmp::getRecordId, recordId));
+            } else {
+                JSONArray afterValue = j.getJSONArray("after_value");
+                afterValue.forEach(e -> {
+                    TableRecordTmp tmp = new TableRecordTmp();
+                    JSONObject value = JSONObject.from(e);
+                    String fieldValue = value.getString("field_value");
+                    tmp.setRecordId(recordId);
+                    tmp.setFieldId(value.getString("field_id"));
+                    if (JSONUtil.isTypeJSON(fieldValue)) {
+                        StringBuilder fileArray = new StringBuilder();
+                        JSONArray array = JSONArray.from(fieldValue);
+                        array.forEach(v -> {
+                            JSONObject from = JSONObject.from(v);
+                            if ("text".equals(from.get("type"))) {
+                                fileArray.append(from.get("text")).append("\r\n");
+                            }
+                        });
+                        if (fileArray.length() > 0) {
+                            fieldValue = fileArray.toString();
+                        }
+                    }
+                    tmp.setFieldValue(fieldValue);
+                    tmp.setTableId(table_id);
+                    tmp.setFileType(file_type);
+                    tmpList.add(tmp);
+                });
+            }
+        }
+        tableRecordTmpService.saveOrUpdateBatchByMultiId(tmpList);
+    }
 }
