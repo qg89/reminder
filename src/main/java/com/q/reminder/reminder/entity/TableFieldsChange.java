@@ -47,19 +47,13 @@ public class TableFieldsChange extends Model<TableFieldsChange> implements Seria
     @TableField(value = "field_name")
     private String fieldName;
         
-    @TableField(value = "is_primary")
-    private String isPrimary;
-        
     @TableField(value = "property")
     private JSONObject property;
     /**
      * 字段类型
-     */    
+     */
     @TableField(value = "type")
     private Integer type;
-        
-    @TableField(value = "ui_type")
-    private String uiType;
         
     @TableLogic(value = "0", delval = "1")
     @TableField(value = "is_delete")
