@@ -68,7 +68,7 @@ public class TableFeatureController {
         LambdaQueryWrapper<RedmineUserInfo> lq = Wrappers.lambdaQuery();
         lq.eq(RedmineUserInfo::getRedmineType, RProjectInfo.getRedmineType());
         List<RedmineUserInfo> userInfoList = redmineUserInfoService.listUsers(RProjectInfo.getRedmineType());
-        Map<String, Integer> userMap = userInfoList.stream().collect(Collectors.toMap(RedmineUserInfo::getAssigneeName, RedmineUserInfo::getAssigneeId, (v1, v2) -> v1));
+        Map<String, Integer> userMap = userInfoList.stream().collect(Collectors.toMap(RedmineUserInfo::getUserName, RedmineUserInfo::getAssigneeId, (v1, v2) -> v1));
         TTableUserConfig entity = new TTableUserConfig();
         entity.setPrdctId(userMap.get(vo.getPrdct()));
         entity.setAlgrthmId(userMap.get(vo.getAlgrthm()));
