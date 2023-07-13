@@ -21,9 +21,11 @@ import com.lark.oapi.service.im.v1.model.*;
 import com.q.reminder.reminder.constant.GroupInfoType;
 import com.q.reminder.reminder.entity.FsGroupInfo;
 import com.q.reminder.reminder.entity.TableFieldsFeature;
+import com.q.reminder.reminder.entity.TableRecordTmp;
 import com.q.reminder.reminder.entity.UserMemgerInfo;
 import com.q.reminder.reminder.service.GroupInfoService;
 import com.q.reminder.reminder.service.TableFieldsFeatureService;
+import com.q.reminder.reminder.service.TableRecordTmpService;
 import com.q.reminder.reminder.service.UserMemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -55,6 +57,8 @@ public class FeishuEventController {
     private GroupInfoService groupInfoService;
     @Autowired
     private UserMemberService userMemberService;
+    @Autowired
+    private TableRecordTmpService tableRecordTmpService;
     private static String CHAT_ID = null;
 
     @PostMapping("/event")
@@ -139,21 +143,34 @@ public class FeishuEventController {
                 public void handle(EventReq event) throws Exception {
                     JSONObject jsonObject = JSONObject.parse(new String(event.getBody()));
                     String json = jsonObject.getString("encrypt");
+                    String table_id = jsonObject.getString("table_id");
+                    String file_type = jsonObject.getString("file_type");
                     String eventStr = EVENT_DISPATCHER.decryptEvent(json);
                     JSONObject object = JSONObject.parseObject(eventStr);
                     JSONObject header = object.getJSONObject("header");
                     log.info(header);
+                    List<TableRecordTmp> tmpList = new ArrayList<>();
                     for (JSONObject j : object.getJSONObject("event").getList("action_list", JSONObject.class)) {
                         String action = j.getString("action");
-                        JSONArray afterValue = j.getJSONArray("after_value");
-                        afterValue.forEach(e -> {
-                            JSONObject value = JSONObject.from(e);
-                            String field_id = value.getString("field_id");
-                            String field_value = value.getString("field_value");
-                        });
                         String recordId = j.getString("record_id");
-                        log.info(afterValue);
+                        if ("record_deleted".equals(action)) {
+                            tableRecordTmpService.remove(Wrappers.<TableRecordTmp>lambdaUpdate().eq(TableRecordTmp::getRecordId, recordId));
+                        } else {
+                            JSONArray afterValue = j.getJSONArray("after_value");
+                            afterValue.forEach(e -> {
+                                TableRecordTmp tmp = new TableRecordTmp();
+                                JSONObject value = JSONObject.from(e);
+                                tmp.setRecordId(recordId);
+                                tmp.setFieldId(value.getString("field_id"));
+                                tmp.setFieldValue(value.getString("field_value"));
+                                tmp.setTableId(table_id);
+                                tmp.setFileType(file_type);
+                                tmpList.add(tmp);
+                            });
+                            log.info(afterValue);
+                        }
                     }
+                    tableRecordTmpService.saveOrUpdateBatch(tmpList);
                 }
             })
             // 审批事件
