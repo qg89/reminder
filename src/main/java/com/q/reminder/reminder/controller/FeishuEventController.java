@@ -225,9 +225,9 @@ public class FeishuEventController {
                     String fieldValue = value.getString("field_value");
                     tmp.setRecordId(recordId);
                     tmp.setFieldId(value.getString("field_id"));
-                    if (JSONUtil.isTypeJSON(fieldValue)) {
+                    if (JSONUtil.isTypeJSON(fieldValue) && JSONUtil.isTypeJSONArray(fieldValue)) {
                         StringBuilder fileArray = new StringBuilder();
-                        JSONArray array = JSONArray.from(fieldValue);
+                        JSONArray array = JSONArray.parse(fieldValue);
                         array.forEach(v -> {
                             JSONObject from = JSONObject.from(v);
                             if ("text".equals(from.get("type"))) {
