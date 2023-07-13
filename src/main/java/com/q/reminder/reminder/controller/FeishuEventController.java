@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.controller;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -166,9 +167,13 @@ public class FeishuEventController {
                             afterValue.forEach(e -> {
                                 TableRecordTmp tmp = new TableRecordTmp();
                                 JSONObject value = JSONObject.from(e);
+                                String fieldValue = value.getString("field_value");
                                 tmp.setRecordId(recordId);
                                 tmp.setFieldId(value.getString("field_id"));
-                                tmp.setFieldValue(value.getString("field_value"));
+                                if (JSONUtil.isTypeJSON(fieldValue) && "text".equals(JSONObject.parseObject(fieldValue).get("type"))) {
+                                    fieldValue = JSONObject.parseObject(fieldValue).getString("text");
+                                }
+                                tmp.setFieldValue(fieldValue);
                                 tmp.setTableId(table_id);
                                 tmp.setFileType(file_type);
                                 tmpList.add(tmp);
