@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.controller;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -13,21 +14,12 @@ import com.lark.oapi.service.approval.v4.model.ApprovalEvent;
 import com.lark.oapi.service.approval.v4.model.P2ApprovalUpdatedV4;
 import com.lark.oapi.service.approval.v4.model.P2ApprovalUpdatedV4Data;
 import com.lark.oapi.service.drive.v1.DriveService;
-import com.lark.oapi.service.drive.v1.model.BitableTableFieldAction;
-import com.lark.oapi.service.drive.v1.model.BitableTableFieldActionValue;
-import com.lark.oapi.service.drive.v1.model.P2FileBitableFieldChangedV1;
-import com.lark.oapi.service.drive.v1.model.P2FileBitableFieldChangedV1Data;
+import com.lark.oapi.service.drive.v1.model.*;
 import com.lark.oapi.service.im.v1.ImService;
 import com.lark.oapi.service.im.v1.model.*;
 import com.q.reminder.reminder.constant.GroupInfoType;
-import com.q.reminder.reminder.entity.FsGroupInfo;
-import com.q.reminder.reminder.entity.TableFieldsChange;
-import com.q.reminder.reminder.entity.TableRecordTmp;
-import com.q.reminder.reminder.entity.UserMemgerInfo;
-import com.q.reminder.reminder.service.GroupInfoService;
-import com.q.reminder.reminder.service.TableFieldsChangeService;
-import com.q.reminder.reminder.service.TableRecordTmpService;
-import com.q.reminder.reminder.service.UserMemberService;
+import com.q.reminder.reminder.entity.*;
+import com.q.reminder.reminder.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
@@ -60,6 +52,8 @@ public class FeishuEventController {
     private UserMemberService userMemberService;
     @Autowired
     private TableRecordTmpService tableRecordTmpService;
+    @Autowired
+    private TableFieldsOptionService tableFieldsOptionService;
     private static String CHAT_ID = null;
 
     @PostMapping("/event")
@@ -127,6 +121,20 @@ public class FeishuEventController {
                             tableFieldsFeatureService.removeById(fieldId);
                         } else {
                             BitableTableFieldActionValue value = fieldAction.getAfterValue();
+                            BitableTableFieldActionValueProperty property = value.getProperty();
+                            BitableTableFieldActionValuePropertyOption[] options = property.getOptions();
+                            if (options != null && CollectionUtil.isNotEmpty(Arrays.asList(options))) {
+                                List<TableFieldsOption> opList = new ArrayList<>();
+                                for (BitableTableFieldActionValuePropertyOption option : options) {
+                                    TableFieldsOption op = new TableFieldsOption();
+                                    op.setId(option.getId());
+                                    op.setName(option.getName());
+                                    op.setColor(option.getColor());
+                                    opList.add(op);
+                                }
+                                tableFieldsOptionService.saveOrUpdateBatch(opList);
+                            }
+
                             TableFieldsChange feature = new TableFieldsChange();
                             feature.setFieldId(fieldId);
                             feature.setFieldName(value.getName());
@@ -134,11 +142,13 @@ public class FeishuEventController {
                             feature.setTableId(tableId);
                             feature.setFileToken(eventEvent.getFileToken());
                             feature.setTableId(eventEvent.getTableId());
-                            feature.setProperty(JSONObject.from(value.getProperty()));
+                            feature.setProperty(JSONObject.from(property));
                             data.add(feature);
                         }
                     }
-                    tableFieldsFeatureService.saveOrUpdateBatchByMultiId(data);
+                    if (CollectionUtil.isNotEmpty(data)) {
+                        tableFieldsFeatureService.saveOrUpdateBatchByMultiId(data);
+                    }
                 }
             })
             // 多维表格记录变更，回调事件
