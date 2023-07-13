@@ -15,6 +15,7 @@ import com.q.reminder.reminder.service.TTableFeatureTmpService;
 import com.q.reminder.reminder.service.TTableUserConfigService;
 import com.q.reminder.reminder.vo.table.FeatureUserConfigVo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
  * @Description :
  * @date :  2023.02.01 15:26
  */
+@Log4j2
 @RestController
 @RequestMapping("/table")
 @RequiredArgsConstructor
@@ -57,6 +59,7 @@ public class TableFeatureController {
 
     @PostMapping("/user_config")
     public void userConfig(@RequestBody FeatureUserConfigVo vo) {
+        log.info("/table/user_config  FeatureUserConfigVo : {}", vo);
         String prjctKey = vo.getPrjctKey();
         if (StringUtils.isBlank(prjctKey)) {
             return;
