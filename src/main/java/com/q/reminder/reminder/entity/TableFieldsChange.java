@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.baomidou.mybatisplus.extension.handlers.FastjsonTypeHandler;
 import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
 import lombok.Data;
 
@@ -20,7 +21,7 @@ import java.util.Date;
  * @since 2023-07-13 15:19:10
  */
 @Data
-@TableName("table_fields_change")
+@TableName(value = "table_fields_change", autoResultMap = true)
 public class TableFieldsChange extends Model<TableFieldsChange> implements Serializable {
     @Serial
     private static final long serialVersionUID = 253624788083114180L;
@@ -47,7 +48,7 @@ public class TableFieldsChange extends Model<TableFieldsChange> implements Seria
     @TableField(value = "field_name")
     private String fieldName;
         
-    @TableField(value = "property")
+    @TableField(value = "property", typeHandler = FastjsonTypeHandler.class)
     private JSONObject property;
     /**
      * 字段类型
