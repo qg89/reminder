@@ -8,10 +8,10 @@ import org.springframework.stereotype.Service;
 
 
 /**
- * 多维表格，表字段(TableFieldsFeature)表服务实现类
+ * 多维表格，表字段(TableFieldsChange)表服务实现类
  *
  * @author makejava
- * @since 2023-07-13 14:33:51
+ * @since 2023-07-13 15:19:13
  */
 @Service
 public class TableFieldsChangeServiceImpl extends MppServiceImpl<TableFieldsChangeMapping, TableFieldsChange> implements TableFieldsChangeService {
