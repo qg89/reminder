@@ -46,6 +46,7 @@ public class TableFeatureController {
 
     @PostMapping("/records")
     public void records(@RequestBody String entity) {
+        log.info("/records/user_config : {}", entity);
         JSONObject json = json(entity);
         TTableFeatureTmp featureTmp = json.to(TTableFeatureTmp.class);
         if (!"是".equals(featureTmp.getWriteType())) {
@@ -54,6 +55,7 @@ public class TableFeatureController {
         Map<String, String> userConfigMap = tTableUserConfigService.listAll().stream().collect(Collectors.toMap(TTableUserConfig::getPrjctName, TTableUserConfig::getPrjctKey, (v1, v2) -> v1));
         String prjct = featureTmp.getPrjct();
         featureTmp.setPrjctKey(userConfigMap.get(prjct));
+        log.info("/records/user_config save : {}", featureTmp);
         tTableFeatureTmpService.saveOrUpdate(featureTmp);
     }
 
