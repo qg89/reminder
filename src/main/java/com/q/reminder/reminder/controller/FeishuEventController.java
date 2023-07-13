@@ -147,7 +147,7 @@ public class FeishuEventController {
                         String action = j.getString("action");
                         JSONArray afterValue = j.getJSONArray("after_value");
                         afterValue.forEach(e -> {
-                            JSONObject value = JSONObject.parseObject((String) e);
+                            JSONObject value = JSONObject.from(e);
                             String field_id = value.getString("field_id");
                             String field_value = value.getString("field_value");
                         });
