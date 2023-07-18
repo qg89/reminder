@@ -37,20 +37,21 @@
         ROUND( SUM(t.hours) / (SUM(t.hours) - SUM( CASE WHEN t.addWork <![CDATA[<]]> 0 THEN 0 ELSE t.addWork END )), 2) employeeLoad
     FROM (
         SELECT
-            SUM(re.hours) hours,
-            SUM(CASE WHEN sc.`work` = 1 THEN (CASE WHEN (re.hours - 8) > 0 THEN (re.hours - 8) ELSE 0 END) ELSE 0 END) AS addWork,
+            res.spentOn,
+            res.userId,
+            res.userName,
+            SUM(res.hours) AS hours,
+            SUM(CASE WHEN sc.`work` = 1 THEN (CASE WHEN (res.hours - 8) > 0 THEN (res.hours - 8) ELSE 0 END) WHEN DAYOFWEEK(res.spentOn) IN (1,7) AND sc.`work` = 0 THEN res.hours  ELSE 0 END) AS addWork
+        FROM
+        (
+        SELECT
+            SUM( CASE WHEN (SELECT COUNT(*) FROM r_project_info WHERE p_id = re.projectId AND redmine_type = 2) > 0 THEN re.hours ELSE 0 END ) hours,
             re.userId,
             re.userName,
-            projectId
+            re.spentOn
         FROM
-            `rd_time_entry` re,
-            r_project_info rp,
-            s_holiday_config sc
+            `rd_time_entry` re
         <where>
-            re.projectId = rp.p_id
-            AND rp.redmine_type = 2
-            AND rp.is_delete = 0
-            AND sc.`date` = re.spentOn
             <if test="vo.pid != null and vo.pid != ''">
                 AND re.projectId = #{vo.pid}
             </if>
@@ -62,8 +63,12 @@
             </if>
         </where>
         GROUP BY
-            re.spentOn, re.userId, re.userName, re.projectId
-        ) t
+            re.spentOn, re.userId, re.userName
+        ) res,
+        s_holiday_config sc
+        WHERE sc.date = res.spentOn
+        GROUP BY res.spentOn,res.userId,res.userName
+    ) t
     GROUP BY t.userId,t.userName
 </select>
 
