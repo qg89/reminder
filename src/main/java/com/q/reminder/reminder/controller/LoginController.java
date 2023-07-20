@@ -1,10 +1,12 @@
 package com.q.reminder.reminder.controller;
 
+import cn.hutool.core.net.Ipv4Util;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.User;
 import com.q.reminder.reminder.mapper.UserInfoMapping;
 import com.q.reminder.reminder.service.LoginService;
+import com.q.reminder.reminder.util.IpUtils;
 import com.q.reminder.reminder.vo.LoginParam;
 import com.q.reminder.reminder.vo.UpdatePasswordVo;
 import com.q.reminder.reminder.vo.base.ResultUtil;
@@ -15,7 +17,10 @@ import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author : saiko
@@ -34,12 +39,7 @@ public class LoginController {
     private final UserInfoMapping userMapper;
     private final UserDetailsService userDetailsService;
 
-    @PostMapping("/login")
-    public ResultUtil login(HttpServletRequest request, @RequestBody LoginParam loginParam) {
-        String remoteAddr = request.getRemoteAddr();
-        log.info("remoteAddr: {}", remoteAddr);
-        return loginService.login(loginParam, remoteAddr);
-    }
+
 
     @PostMapping("/update_p")
     public ResultUtil update(@RequestBody UpdatePasswordVo vo) {
@@ -61,5 +61,12 @@ public class LoginController {
         user.setPassword(newPd);
         userMapper.updateById(user);
         return ResultUtil.success("修改成功");
+    }
+
+    @PostMapping("/login")
+    public ResultUtil login(HttpServletRequest request, @RequestBody LoginParam loginParam) {
+        String remoteAddr = IpUtils.getIp(request);
+        log.info("remoteAddr: {}", remoteAddr);
+        return loginService.login(loginParam, remoteAddr);
     }
 }
