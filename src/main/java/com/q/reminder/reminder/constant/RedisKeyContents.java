@@ -16,6 +16,7 @@ public interface RedisKeyContents {
     String TABLE_USER_CONFIG = "table:user:config";
     String FEISHU_MESSAGE_INVOKEEXCEEDEDTIMES = "feishu:message:invokeExceededTimes";
     String FEISHU_TENANT_ACCESS_TOKEN_KEY = "feishu:TENANT_ACCESS_TOKEN::expire";
+    String USER_NAME_IP = "user:username";
 
     String COPQ_DAY = "copq:" + DateTime.now().toString("yyyyMMdd");
 }

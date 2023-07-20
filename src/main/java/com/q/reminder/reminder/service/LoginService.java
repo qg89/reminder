@@ -14,4 +14,6 @@ import com.q.reminder.reminder.vo.base.ResultUtil;
  */
 public interface LoginService extends IService<User> {
     ResultUtil login(LoginParam loginParam, String remoteAddr);
+
+    String getByUserNameToIp(String username);
 }

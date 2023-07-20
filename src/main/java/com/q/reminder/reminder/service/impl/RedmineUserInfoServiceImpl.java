@@ -5,12 +5,14 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.jeffreyning.mybatisplus.service.MppServiceImpl;
 import com.q.reminder.reminder.constant.RedisKeyContents;
 import com.q.reminder.reminder.entity.RedmineUserInfo;
+import com.q.reminder.reminder.entity.User;
 import com.q.reminder.reminder.mapper.RedmineUserInfoMapping;
 import com.q.reminder.reminder.service.RedmineUserInfoService;
 import com.q.reminder.reminder.util.RoleInvolvementUtils;
 import com.q.reminder.reminder.vo.RoleInvolvementVo;
 import com.q.reminder.reminder.vo.WorkloadParamsVo;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

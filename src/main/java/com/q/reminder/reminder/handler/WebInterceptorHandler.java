@@ -2,9 +2,8 @@ package com.q.reminder.reminder.handler;
 
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSONObject;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.q.reminder.reminder.entity.User;
 import com.q.reminder.reminder.mapper.UserInfoMapping;
+import com.q.reminder.reminder.service.LoginService;
 import com.q.reminder.reminder.util.IpUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,6 +30,9 @@ public class WebInterceptorHandler implements HandlerInterceptor {
 
     @Autowired
     private UserInfoMapping userInfoMapping;
+    @Autowired
+    private LoginService loginService;
+
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -42,8 +44,8 @@ public class WebInterceptorHandler implements HandlerInterceptor {
         String username = JSONObject.parse(verifySignParam).getString("username");
         String remoteAddr = IpUtils.getIp(request);
         log.info("remoteAddr:{}", remoteAddr);
-        User user = userInfoMapping.selectOne(Wrappers.<User>lambdaQuery().eq(User::getUsername, username));
-        if (user == null || !remoteAddr.contains(user.getRemoteAddr())) {
+        String ip = loginService.getByUserNameToIp(username);
+        if (!remoteAddr.contains(ip)) {
             return false;
         }
         return true;

@@ -1,6 +1,8 @@
 package com.q.reminder.reminder.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.q.reminder.reminder.constant.RedisKeyContents;
 import com.q.reminder.reminder.entity.User;
 import com.q.reminder.reminder.mapper.UserInfoMapping;
 import com.q.reminder.reminder.service.LoginService;
@@ -12,6 +14,7 @@ import com.q.reminder.reminder.vo.base.ResultUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -60,5 +63,15 @@ public class LoginServiceImpl extends ServiceImpl<UserInfoMapping, User> impleme
         }
         info.setToken(token);
         return ResultUtil.success("登录成功", info);
+    }
+
+    @Override
+    @Cacheable(cacheNames = RedisKeyContents.USER_NAME_IP, key = "#username", unless = "#username == null and #result == null")
+    public String getByUserNameToIp(String username) {
+        User user = baseMapper.selectOne(Wrappers.<User>lambdaQuery().eq(User::getUsername, username));
+        if (user == null) {
+            return null;
+        }
+        return user.getRemoteAddr();
     }
 }
