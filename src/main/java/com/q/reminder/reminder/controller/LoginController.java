@@ -10,6 +10,7 @@ import com.q.reminder.reminder.vo.UpdatePasswordVo;
 import com.q.reminder.reminder.vo.base.ResultUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/user")
 @RequiredArgsConstructor
+@Log4j2
 public class LoginController {
 
     private final LoginService loginService;
@@ -35,6 +37,7 @@ public class LoginController {
     @PostMapping("/login")
     public ResultUtil login(HttpServletRequest request, @RequestBody LoginParam loginParam) {
         String remoteAddr = request.getRemoteAddr();
+        log.info("remoteAddr: {}", remoteAddr);
         return loginService.login(loginParam, remoteAddr);
     }
 
