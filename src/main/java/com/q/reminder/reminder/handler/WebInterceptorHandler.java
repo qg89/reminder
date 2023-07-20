@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.handler;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.User;
@@ -8,6 +9,7 @@ import com.q.reminder.reminder.util.IpUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
@@ -34,6 +36,9 @@ public class WebInterceptorHandler implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         String verifySignParam = getVerifySignParam(request);
         MethodParameter[] methodParameters = ((HandlerMethod) handler).getMethodParameters();
+        if (!JSONUtil.isTypeJSON(verifySignParam) || StringUtils.isBlank(verifySignParam)) {
+            return false;
+        }
         String username = JSONObject.parse(verifySignParam).getString("username");
         String remoteAddr = IpUtils.getIp(request);
         log.info("remoteAddr:{}", remoteAddr);
