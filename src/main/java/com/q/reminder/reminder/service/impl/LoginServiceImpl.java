@@ -34,7 +34,7 @@ public class LoginServiceImpl extends ServiceImpl<UserInfoMapping, User> impleme
     private final UserInfoMapping userInfoMapping;
 
     @Override
-    public ResultUtil login(LoginParam loginParam) {
+    public ResultUtil login(LoginParam loginParam, String remoteAddr) {
         //进行用户认证。获取AuthenticationManager authenticate
         //获取认证对象
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginParam.getUsername(), loginParam.getPassword());
@@ -54,6 +54,10 @@ public class LoginServiceImpl extends ServiceImpl<UserInfoMapping, User> impleme
         String token = jjwtUtil.createToken(claims);
         //返回
         UserInfoVo info = userInfoMapping.userInfo(user.getUsername());
+        String remoteAddrS = info.getRemoteAddr();
+        if (!remoteAddrS.contains(remoteAddr)) {
+            return ResultUtil.fail("IP鉴权失败");
+        }
         info.setToken(token);
         return ResultUtil.success("登录成功", info);
     }

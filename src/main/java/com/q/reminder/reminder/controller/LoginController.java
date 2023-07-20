@@ -8,15 +8,13 @@ import com.q.reminder.reminder.service.LoginService;
 import com.q.reminder.reminder.vo.LoginParam;
 import com.q.reminder.reminder.vo.UpdatePasswordVo;
 import com.q.reminder.reminder.vo.base.ResultUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AccountExpiredException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author : saiko
@@ -35,8 +33,9 @@ public class LoginController {
     private final UserDetailsService userDetailsService;
 
     @PostMapping("/login")
-    public ResultUtil login(@RequestBody LoginParam loginParam) {
-        return loginService.login(loginParam);
+    public ResultUtil login(HttpServletRequest request, @RequestBody LoginParam loginParam) {
+        String remoteAddr = request.getRemoteAddr();
+        return loginService.login(loginParam, remoteAddr);
     }
 
     @PostMapping("/update_p")

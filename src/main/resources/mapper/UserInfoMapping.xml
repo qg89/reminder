@@ -5,7 +5,8 @@
     <select id="userInfo" resultType="com.q.reminder.reminder.vo.UserInfoVo">
         SELECT
             u.username,
-            p.p_key AS pKey
+            p.p_key AS pKey,
+            u.remote_addr remoteAddr
         FROM
             s_user u
             LEFT JOIN s_user_p sp ON u.id = sp.user_id
