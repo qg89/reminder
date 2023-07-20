@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.vo;
 
+import com.alibaba.fastjson2.annotation.JSONField;
 import lombok.Data;
 
 import java.io.Serial;
@@ -20,4 +21,6 @@ public class UserInfoVo implements Serializable {
     private String token;
     private String username;
     private String pKey;
+    @JSONField(serialize = false)
+    private String remoteAddr;
 }
