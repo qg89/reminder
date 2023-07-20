@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 
 import java.io.Serial;
@@ -18,7 +19,7 @@ import java.io.Serializable;
  */
 @Data
 @TableName("s_user")
-public class User implements Serializable {
+public class User extends Model<User> implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -6402690812700891582L;
@@ -31,4 +32,9 @@ public class User implements Serializable {
     private String password;
     @TableField("name")
     private String name;
+    /**
+     * 本地IP，逗号分隔
+     */
+    @TableField(value = "remote_addr")
+    private String remoteAddr;
 }
