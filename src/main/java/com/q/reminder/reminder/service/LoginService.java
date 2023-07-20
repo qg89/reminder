@@ -13,5 +13,5 @@ import com.q.reminder.reminder.vo.base.ResultUtil;
  * @date :  2022.11.17 14:19
  */
 public interface LoginService extends IService<User> {
-    ResultUtil login(LoginParam loginParam);
+    ResultUtil login(LoginParam loginParam, String remoteAddr);
 }
