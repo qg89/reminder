@@ -2,9 +2,6 @@ package com.q.reminder.reminder.util.jjwtutil;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -179,7 +176,7 @@ public class JJWTUtil {
     /**
      * 具体解析出PayLoad
      */
-    public Claims getTokenPayLoad(String token) {
+    public Claims getTokenPayLoad(String token) throws Exception{
         Jws jws = getJws(token);
         return (Claims) jws.getBody();
     }
@@ -195,7 +192,7 @@ public class JJWTUtil {
     /**
      * 具体解析出剩余时间（过期）
      */
-    public Long getTokenExpirationTime(String token) {
+    public Long getTokenExpirationTime(String token) throws Exception {
         Claims tokenPayLoad = getTokenPayLoad(token);
         Long tokenExpirationTime = Long.valueOf((Integer) tokenPayLoad.get("exp"));
         Long createDate = (Long) tokenPayLoad.get("create");
@@ -206,7 +203,7 @@ public class JJWTUtil {
     /**
      * 判断token是否过期，返回布尔值，过期则true，否则false
      */
-    public Boolean judgeExpirationTime(String token) {
+    public Boolean judgeExpirationTime(String token) throws Exception {
         Long rest = getTokenExpirationTime(token);
         return rest <= 0;
     }
