@@ -66,7 +66,7 @@ public class LoginServiceImpl extends ServiceImpl<UserInfoMapping, User> impleme
     }
 
     @Override
-    @Cacheable(cacheNames = RedisKeyContents.USER_NAME_IP, key = "#username", unless = "#username == null and #result == null")
+    @Cacheable(cacheNames = RedisKeyContents.USER_NAME_IP, key = "#username", unless = "#username == null or #result == null")
     public String getByUserNameToIp(String username) {
         User user = baseMapper.selectOne(Wrappers.<User>lambdaQuery().eq(User::getUsername, username));
         if (user == null) {
