@@ -50,13 +50,13 @@ public class LoginServiceImpl extends ServiceImpl<UserInfoMapping, User> impleme
         //认证成功，生成token
         //获取用户信息（getPrincipal()）
         UserLogin user = (UserLogin) authenticate.getPrincipal();
+        UserInfoVo info = userInfoMapping.userInfo(user.getUsername());
         Long id = user.getUser().getId();
         Claims claims = Jwts.claims();
-        claims.put("userId", id);
+        claims.put("user", info);
         jjwtUtil.defaultBuilder(jjwtUtil);
         String token = jjwtUtil.createToken(claims);
         //返回
-        UserInfoVo info = userInfoMapping.userInfo(user.getUsername());
         String remoteAddrS = info.getRemoteAddr();
         if (!remoteAddrS.contains(remoteAddr)) {
             return ResultUtil.fail("IP鉴权失败");
@@ -73,5 +73,15 @@ public class LoginServiceImpl extends ServiceImpl<UserInfoMapping, User> impleme
             return null;
         }
         return user.getRemoteAddr();
+    }
+
+    @Override
+    @Cacheable(cacheNames = RedisKeyContents.USER_NAME_IP, key = "#userID", unless = "#userID == null or #result == null")
+    public String getUsernameById(Integer userID) {
+        User user = baseMapper.selectById(userID);
+        if (user == null) {
+            return null;
+        }
+        return user.getUsername();
     }
 }
