@@ -50,19 +50,21 @@ public class LoginServiceImpl extends ServiceImpl<UserInfoMapping, User> impleme
         //认证成功，生成token
         //获取用户信息（getPrincipal()）
         UserLogin user = (UserLogin) authenticate.getPrincipal();
-        UserInfoVo info = userInfoMapping.userInfo(user.getUsername());
-        Long id = user.getUser().getId();
+        User userInfo = user.getUser();
+        UserInfoVo vo = new UserInfoVo();
+        Long id = userInfo.getId();
         Claims claims = Jwts.claims();
-        claims.put("user", info);
+        claims.put("user", userInfo);
         jjwtUtil.defaultBuilder(jjwtUtil);
         String token = jjwtUtil.createToken(claims);
         //返回
-        String remoteAddrS = info.getRemoteAddr();
-        if (!remoteAddrS.contains(remoteAddr)) {
+        String ips = userInfo.getRemoteAddr();
+        if (!ips.contains(remoteAddr)) {
             return ResultUtil.fail("IP鉴权失败");
         }
-        info.setToken(token);
-        return ResultUtil.success("登录成功", info);
+        vo.setUsername(userInfo.getName());
+        vo.setToken(token);
+        return ResultUtil.success("登录成功", vo);
     }
 
     @Override
