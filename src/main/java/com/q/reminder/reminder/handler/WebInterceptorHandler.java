@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.handler;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.q.reminder.reminder.entity.User;
 import com.q.reminder.reminder.mapper.UserInfoMapping;
 import com.q.reminder.reminder.service.LoginService;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 
 /**
  * @author : saiko
@@ -44,15 +46,14 @@ public class WebInterceptorHandler implements HandlerInterceptor {
         if (StringUtils.isNotBlank(strToken)) {
             Claims claims = jjwtUtil.getTokenPayLoad(strToken);
             String userToken = claims.toString();
-            user = claims.get("user", User.class);
-            if (user != null) {
-                username = user.getUsername();
-            }
+            LinkedHashMap<String, Object> map = claims.get("user", LinkedHashMap.class);
+            user = BeanUtil.fillBeanWithMap(map, new User(), false);
+            username = user.getUsername();
         } else {
             return false;
         }
         boolean flag = true;
-        if (user == null) {
+        if (StringUtils.isBlank(username)) {
             response.setStatus(401);
            return false;
         }
