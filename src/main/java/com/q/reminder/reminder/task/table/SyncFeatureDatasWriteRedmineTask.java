@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.task.table;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.service.bitable.v1.model.AppTableRecord;
@@ -96,6 +97,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                     List<FeautreTimeVo> feautreTimeVos = featureTimeMap.get(recordsId);
                     if (CollectionUtils.isEmpty(feautreTimeVos)) {
                         log.error(taskName + " 获取记录为空");
+
                         sendAdmin.append(taskName).append(" 获取记录为空!\r\n recordId: ").append(recordsId).append(", type : ").append(type).append("  \r\n");
                         continue;
                     }
@@ -167,8 +169,10 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                 }
             });
             if (!sendAdmin.isEmpty()) {
+                JSONObject content = new JSONObject();
+                content.put("text", sendAdmin.toString());
                 MessageVo vo = new MessageVo();
-                vo.setContent(sendAdmin.toString());
+                vo.setContent(content.toJSONString());
                 vo.setMsgType("text");
                 vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
                 vo.setReceiveId(FeiShuContents.ADMIN_MEMBERS);
