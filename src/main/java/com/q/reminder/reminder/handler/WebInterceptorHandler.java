@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.handler;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson2.JSONObject;
 import com.q.reminder.reminder.entity.SUserLog;
 import com.q.reminder.reminder.entity.User;
 import com.q.reminder.reminder.mapper.UserInfoMapping;
@@ -70,6 +71,7 @@ public class WebInterceptorHandler implements HandlerInterceptor {
             SUserLog userLog = new SUserLog();
             userLog.setUserId(user.getId());
             userLog.setParams(getVerifySignParam(request));
+            userLog.setRequestUrl(request.getRequestURL().toString());
             logService.save(userLog);
         } catch (Exception e) {
             log.error("[拦截器]保存用户日志失败", e);
@@ -79,6 +81,10 @@ public class WebInterceptorHandler implements HandlerInterceptor {
 
     public String getVerifySignParam(HttpServletRequest request) throws IOException {
         BodyHttpServletRequestWrapper bodyHttpServletRequestWrapper = (BodyHttpServletRequestWrapper) request;
-        return bodyHttpServletRequestWrapper.getBody();
+        String body = bodyHttpServletRequestWrapper.getBody();
+        if (StringUtils.isBlank(body)) {
+            body = JSONObject.from(bodyHttpServletRequestWrapper.getParameterMap()).toJSONString();
+        }
+        return body;
     }
 }

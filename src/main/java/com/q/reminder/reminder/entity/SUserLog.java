@@ -12,29 +12,46 @@ import java.io.Serializable;
 import java.util.Date;
 
 
+
 /**
  * (SUserLog)实体类
  *
  * @author makejava
- * @since 2023-07-24 10:16:24
+ * @since 2023-07-24 10:47:23
  */
 @Data
 @TableName("s_user_log")
 public class SUserLog extends Model<SUserLog> implements Serializable {
     @Serial
-    private static final long serialVersionUID = 809120455907338549L;
-
+    private static final long serialVersionUID = -85453066790379790L;
+    
+        
     @TableId(type = IdType.AUTO)
     @TableField(value = "id")
     private Integer id;
+    
 
+    /**
+     * 用户ID
+     */     
     @TableField(value = "user_id")
     private Long userId;
-
+     
+    /**
+     * 请求参数
+     */     
     @TableField(value = "params")
     private String params;
-
+     
+    /**
+     * 请求URL
+     */     
+    @TableField(value = "request_url")
+    private String requestUrl;
+     
+         
     @TableField(value = "create_time")
     private Date createTime;
+     
 }
 
