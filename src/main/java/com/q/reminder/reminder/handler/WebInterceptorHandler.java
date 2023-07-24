@@ -1,9 +1,11 @@
 package com.q.reminder.reminder.handler;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.q.reminder.reminder.entity.SUserLog;
 import com.q.reminder.reminder.entity.User;
 import com.q.reminder.reminder.mapper.UserInfoMapping;
 import com.q.reminder.reminder.service.LoginService;
+import com.q.reminder.reminder.service.SUserLogService;
 import com.q.reminder.reminder.util.IpUtils;
 import com.q.reminder.reminder.util.JWTUtil;
 import io.jsonwebtoken.Claims;
@@ -36,6 +38,8 @@ public class WebInterceptorHandler implements HandlerInterceptor {
     private LoginService loginService;
     @Autowired
     private JWTUtil jjwtUtil;
+    @Autowired
+    private SUserLogService logService;
 
 
     @Override
@@ -61,6 +65,14 @@ public class WebInterceptorHandler implements HandlerInterceptor {
         String ip = IpUtils.getIp(request);
         if (StringUtils.isBlank(ips) || !ips.contains(ip)) {
             flag = false;
+        }
+        try {
+            SUserLog userLog = new SUserLog();
+            userLog.setUserId(user.getId());
+            userLog.setParams(getVerifySignParam(request));
+            logService.save(userLog);
+        } catch (Exception e) {
+            log.error("[拦截器]保存用户日志失败", e);
         }
         return flag;
     }
