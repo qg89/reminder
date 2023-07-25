@@ -34,4 +34,4 @@ out/
 /.nb-gradle/
 
 #
-/src/main/java/com/q/reminder/reminder/test/
+/src/main/java/com/q/reminder/reminder/test/*.java
