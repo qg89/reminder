@@ -48,6 +48,10 @@ public class WebInterceptorHandler implements HandlerInterceptor {
         String username;
         User user;
         String strToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+        /**
+         从请求头中取出token，
+         @see com.q.reminder.reminder.config.WebConfiguration
+         */
         if (StringUtils.isNotBlank(strToken)) {
             Claims claims = jjwtUtil.getTokenPayLoad(strToken);
             String userToken = claims.toString();
