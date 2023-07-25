@@ -32,6 +32,3 @@ out/
 /dist/
 /nbdist/
 /.nb-gradle/
-
-#
-/src/main/java/com/q/reminder/reminder/test/*.java
