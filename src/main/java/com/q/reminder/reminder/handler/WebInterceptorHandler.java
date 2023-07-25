@@ -55,16 +55,19 @@ public class WebInterceptorHandler implements HandlerInterceptor {
             user = BeanUtil.fillBeanWithMap(map, new User(), false);
             username = user.getUsername();
         } else {
+            log.info("[handler]获取token为空！");
             return false;
         }
         boolean flag = true;
         if (StringUtils.isBlank(username)) {
             response.setStatus(401);
+            log.info("[handler] 用户名称为空");
            return false;
         }
         String ips = user.getRemoteAddr();
         String ip = IpUtils.getIp(request);
         if (StringUtils.isBlank(ips) || !ips.contains(ip)) {
+            log.info("[handler]IP鉴权失败,{}", ip);
             flag = false;
         }
         try {
