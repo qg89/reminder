@@ -9,11 +9,13 @@ import com.q.reminder.reminder.service.TTableInfoService;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.FeatureAllVo;
 import lombok.AllArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author : saiko
@@ -26,13 +28,16 @@ import java.util.List;
 @AllArgsConstructor
 public class TableFeatureService {
     public final TTableInfoService tTableInfoService;
+    public final RedisTemplate<String, Object> redisTemplate;
 
-    @Cacheable(value = RedisKeyContents.TABLE_RECORDS, key = "#projectName", unless = "#projectName == null and #result == null")
     public List<FeatureAllVo> records(String projectName) {
+        Object recordsObj = redisTemplate.opsForValue().get(RedisKeyContents.TABLE_RECORDS);
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(RedisKeyContents.TABLE_RECORDS)) && recordsObj != null) {
+            return (List<FeatureAllVo>) recordsObj;
+        }
         List<FeatureAllVo> featureAllVos = new ArrayList<>();
         TTableInfo vo = tTableInfoService.getOne(Wrappers.<TTableInfo>lambdaQuery().eq(TTableInfo::getTableType, TableTypeContants.FEATURE));
         List<AppTableRecord> appTableRecords = BaseFeishu.cloud().table().listTableRecords(vo);
-        FeatureAllVo featureAllVo = new FeatureAllVo();
         List<AppTableRecord> tableRecords = appTableRecords.stream().filter(e ->
                 e.getFields().containsValue(projectName)
         ).toList();
@@ -49,6 +54,9 @@ public class TableFeatureService {
             });
             op.setValue(value.deleteCharAt(value.length() - 1).toString());
             featureAllVos.add(op);
+        }
+        if (!CollectionUtils.isEmpty(featureAllVos)) {
+            redisTemplate.opsForValue().set(RedisKeyContents.TABLE_RECORDS, featureAllVos, 10, TimeUnit.MINUTES);
         }
         return featureAllVos;
     }
