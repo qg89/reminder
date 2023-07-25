@@ -1,4 +1,4 @@
-package com.q.reminder.reminder.service.taskService;
+package com.q.reminder.reminder.service.otherService;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;

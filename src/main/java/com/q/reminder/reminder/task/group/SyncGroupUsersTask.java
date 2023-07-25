@@ -1,7 +1,7 @@
 package com.q.reminder.reminder.task.group;
 
 import com.q.reminder.reminder.exception.FeishuException;
-import com.q.reminder.reminder.service.taskService.SyncGroupUsersService;
+import com.q.reminder.reminder.service.otherService.SyncGroupUsersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tech.powerjob.client.PowerJobClient;

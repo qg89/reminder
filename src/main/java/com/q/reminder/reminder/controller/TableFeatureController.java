@@ -9,18 +9,15 @@ import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RedmineUserInfo;
 import com.q.reminder.reminder.entity.TTableFeatureTmp;
 import com.q.reminder.reminder.entity.TTableUserConfig;
-import com.q.reminder.reminder.service.ProjectInfoService;
-import com.q.reminder.reminder.service.RedmineUserInfoService;
-import com.q.reminder.reminder.service.TTableFeatureTmpService;
-import com.q.reminder.reminder.service.TTableUserConfigService;
+import com.q.reminder.reminder.service.*;
+import com.q.reminder.reminder.service.otherService.TableFeatureService;
+import com.q.reminder.reminder.vo.FeatureAllVo;
+import com.q.reminder.reminder.vo.base.ReturnT;
 import com.q.reminder.reminder.vo.table.FeatureUserConfigVo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -42,6 +39,8 @@ public class TableFeatureController {
     private final RedmineUserInfoService redmineUserInfoService;
     private final ProjectInfoService projectInfoService;
     private final TTableUserConfigService tTableUserConfigService;
+    private final TTableInfoService tTableInfoService;
+    private final TableFeatureService tableFeatureService;
 
 
     @PostMapping("/records")
@@ -85,6 +84,11 @@ public class TableFeatureController {
         entity.setArchtctId(userMap.get(vo.getArchtct()));
         entity.setPrjctKey(prjctKey);
         tTableUserConfigService.saveInfo(entity);
+    }
+
+    @GetMapping("/feature/{name}")
+    public ReturnT<List<FeatureAllVo>> feature(@PathVariable("name") String projectName) {
+        return new ReturnT<>(tableFeatureService.records(projectName));
     }
 
     private JSONObject json(String str) {
