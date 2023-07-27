@@ -87,6 +87,7 @@ public class TableFeatureController {
     }
 
     @GetMapping("/feature/{name}")
+    @CrossOrigin(maxAge = 3600)
     public ReturnT<List<FeatureAllVo>> feature(@PathVariable("name") String projectName) {
         return new ReturnT<>(tableFeatureService.records(projectName));
     }
