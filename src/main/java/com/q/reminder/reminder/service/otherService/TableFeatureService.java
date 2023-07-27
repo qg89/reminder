@@ -43,7 +43,7 @@ public class TableFeatureService {
         ).toList();
         for (AppTableRecord record : tableRecords) {
             FeatureAllVo op = new FeatureAllVo();
-            op.setLabel(record.getRecordId());
+            op.setValue(record.getRecordId());
             StringBuilder value = new StringBuilder();
             record.getFields().forEach((k, v) -> {
                 switch (k) {
@@ -52,7 +52,7 @@ public class TableFeatureService {
                     }
                 }
             });
-            op.setValue(value.deleteCharAt(value.length() - 1).toString());
+            op.setLabel(value.deleteCharAt(value.length() - 1).toString());
             featureAllVos.add(op);
         }
         if (!CollectionUtils.isEmpty(featureAllVos)) {
