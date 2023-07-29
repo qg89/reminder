@@ -138,15 +138,14 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             if (peopleDouble == null) {
                 peopleDouble = 0.0;
             }
-            double peopleValue = BigDecimal.valueOf(peopleDouble).setScale(2, RoundingMode.HALF_UP).doubleValue();
-            people.setValue(peopleValue);
+            people.setValue(BigDecimal.valueOf(peopleDouble).setScale(2, RoundingMode.HALF_UP).doubleValue());
             people.setColumnType("input");
             people.setShowEdit(1);
             people.setLabel("人力合计（小时）");
             res.add(people);
 
             ProjectInfoVo<Double> peopleMonth = new ProjectInfoVo<>();
-            peopleMonth.setValue(BigDecimal.valueOf(peopleValue / 8 / 21.75).setScale(2, RoundingMode.HALF_UP).doubleValue());
+            peopleMonth.setValue(BigDecimal.valueOf(peopleDouble / 8 / 21.75).setScale(2, RoundingMode.HALF_UP).doubleValue());
             peopleMonth.setLabel("人力合计（人月）");
             peopleMonth.setKey("peopleMonth");
             peopleMonth.setShowEdit(1);
