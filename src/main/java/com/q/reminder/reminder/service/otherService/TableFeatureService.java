@@ -56,7 +56,7 @@ public class TableFeatureService {
             featureAllVos.add(op);
         }
         if (!CollectionUtils.isEmpty(featureAllVos)) {
-            redisTemplate.opsForValue().set(RedisKeyContents.TABLE_RECORDS, featureAllVos, 10, TimeUnit.MINUTES);
+            redisTemplate.opsForValue().set(RedisKeyContents.TABLE_RECORDS, featureAllVos, 1, TimeUnit.HOURS);
         }
         return featureAllVos;
     }

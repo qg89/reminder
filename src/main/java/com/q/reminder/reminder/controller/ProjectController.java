@@ -47,14 +47,14 @@ public class ProjectController {
     }
 
     @GetMapping("/i")
-    public ReturnT<List<List<ProjectInfoVo>>> i(ProjectParamsVo vo) throws Exception {
+    public ReturnT<List<List<ProjectInfoVo<?>>>> i(ProjectParamsVo vo) throws Exception {
         LambdaQueryWrapper<RProjectInfo> lq = Wrappers.lambdaQuery();
         lq.orderByDesc(RProjectInfo::getCreateTime);
         List<RProjectInfo> list = projectInfoService.list(lq);
         Map<String, String> userMap = userMemberService.list().stream().collect(Collectors.toMap(UserMemgerInfo::getMemberId, UserMemgerInfo::getName, (v1, v2) -> v1));
         Map<String, String> groupMap = groupInfoService.list().stream().collect(Collectors.toMap(FsGroupInfo::getChatId, FsGroupInfo::getName, (v1, v2) -> v1));
         Map<String, Double> projectMap = projectInfoService.getProjectCost();
-        List<List<ProjectInfoVo>> res = projectInfoService.listToArray(list, userMap, groupMap, projectMap, vo);
+        List<List<ProjectInfoVo<?>>> res = projectInfoService.listToArray(list, userMap, groupMap, projectMap, vo);
         return new ReturnT<>(res);
     }
 

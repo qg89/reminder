@@ -23,7 +23,7 @@ public interface ProjectInfoService extends IService<RProjectInfo> {
 
     List<WeeklyByProjectVo> weeklyByProjectList(String pKey, String name);
 
-    List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list, Map<String, String> userMap, Map<String, String> groupMap, Map<String, Double> projectMap, ProjectParamsVo vo);
+    List<List<ProjectInfoVo<?>>> listToArray(List<RProjectInfo> list, Map<String, String> userMap, Map<String, String> groupMap, Map<String, Double> projectMap, ProjectParamsVo vo);
 
     List<ProjectInfoVo> listInfo();
 

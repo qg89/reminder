@@ -12,11 +12,11 @@ import java.io.Serializable;
  * @date :  2023.03.06 10:59
  */
 @Data
-public class ProjectInfoVo implements Serializable {
+public class ProjectInfoVo<T> implements Serializable {
 
     private String key;
     private String label;
-    private Object value;
+    private T value;
     private String columnType;
     private Object columnDesc;
     private Integer showEdit;

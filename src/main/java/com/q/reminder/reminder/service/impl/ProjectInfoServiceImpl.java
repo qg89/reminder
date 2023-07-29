@@ -52,8 +52,8 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     }
 
     @Override
-    public List<List<ProjectInfoVo>> listToArray(List<RProjectInfo> list, Map<String, String> userMap, Map<String, String> groupMap, Map<String, Double> projectMap, ProjectParamsVo param) {
-        List<List<ProjectInfoVo>> resDate = new ArrayList<>();
+    public List<List<ProjectInfoVo<?>>> listToArray(List<RProjectInfo> list, Map<String, String> userMap, Map<String, String> groupMap, Map<String, Double> projectMap, ProjectParamsVo param) {
+        List<List<ProjectInfoVo<?>>> resDate = new ArrayList<>();
         List<String> removeColumn = List.of("createTime", "isDelete");
 
         Map<Object, Object> copqMap = redisTemplate.opsForHash().entries(RedisKeyContents.COPQ_DAY);
@@ -94,24 +94,24 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             timeMap.merge(String.valueOf(e.getProjectId()), (double) e.getHours(), Double::sum);
         }
         list.forEach(info -> {
-            List<ProjectInfoVo> res = new ArrayList<>();
+            List<ProjectInfoVo<?>> res = new ArrayList<>();
             BeanUtil.beanToMap(info).forEach((k, v) -> {
                 if (removeColumn.contains(k)) {
                     return;
                 }
-                ProjectInfoVo vo = new ProjectInfoVo();
+                ProjectInfoVo<Object> vo = new ProjectInfoVo<>();
                 vo.setValue(v);
                 extracted(k, vo);
                 res.add(vo);
             });
             String pid = info.getPid();
-            ProjectInfoVo pm = new ProjectInfoVo();
+            ProjectInfoVo<String> pm = new ProjectInfoVo<>();
             pm.setKey("pmName");
             pm.setValue(userMap.get(info.getPmOu()));
             pm.setColumnType("input");
             pm.setShowEdit(1);
             res.add(pm);
-            ProjectInfoVo gm = new ProjectInfoVo();
+            ProjectInfoVo<String> gm = new ProjectInfoVo<>();
             gm.setKey("groupName");
             gm.setValue(groupMap.get(info.getSendGroupChatId()));
             gm.setColumnType("input");
@@ -119,7 +119,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             res.add(gm);
 
             // 成本
-            ProjectInfoVo cost = new ProjectInfoVo();
+            ProjectInfoVo<Double> cost = new ProjectInfoVo<>();
             cost.setKey("costName");
             Double costDouble = projectMap.get(pid);
             if (costDouble == null) {
@@ -132,24 +132,25 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             res.add(cost);
 
             // 人力合计（小时）
-            ProjectInfoVo people = new ProjectInfoVo();
+            ProjectInfoVo<Double> people = new ProjectInfoVo<>();
             people.setKey("peopleTotal");
             Double peopleDouble = timeMap.get(pid);
             if (peopleDouble == null) {
                 peopleDouble = 0.0;
             }
-            people.setValue(BigDecimal.valueOf(peopleDouble).setScale(2, RoundingMode.HALF_UP).doubleValue());
+            double peopleValue = BigDecimal.valueOf(peopleDouble).setScale(2, RoundingMode.HALF_UP).doubleValue();
+            people.setValue(peopleValue);
             people.setColumnType("input");
             people.setShowEdit(1);
             people.setLabel("人力合计（小时）");
             res.add(people);
-            people.setValue(BigDecimal.valueOf((Double) people.getValue() / 8 / 21.75).setScale(2, RoundingMode.HALF_UP).doubleValue());
+            people.setValue(BigDecimal.valueOf(peopleValue / 8 / 21.75).setScale(2, RoundingMode.HALF_UP).doubleValue());
             people.setLabel("人力合计（人月）");
             people.setKey("peopleMonth");
             res.add(people);
 
             // 加班合计（小时）
-            ProjectInfoVo overtime = new ProjectInfoVo();
+            ProjectInfoVo<Double> overtime = new ProjectInfoVo<>();
             overtime.setKey("overtimeTotal");
             Double overtimeDouble = overtimeMap.get(pid);
             if (overtimeDouble == null) {
@@ -162,7 +163,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             res.add(overtime);
 
             // 正常合计（小时）
-            ProjectInfoVo work = new ProjectInfoVo();
+            ProjectInfoVo<Double> work = new ProjectInfoVo<>();
             work.setKey("workTotal");
             work.setValue(BigDecimal.valueOf(peopleDouble - overtimeDouble).setScale(2, RoundingMode.HALF_UP).doubleValue());
             work.setColumnType("input");
@@ -171,7 +172,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             res.add(work);
 
             // 正常合计（小时）
-            ProjectInfoVo copq = new ProjectInfoVo();
+            ProjectInfoVo<Object> copq = new ProjectInfoVo<>();
             copq.setKey("copq");
             copq.setValue(copqMap.get(pid));
             copq.setColumnType("input");
