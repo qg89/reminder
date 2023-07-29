@@ -144,10 +144,13 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             people.setShowEdit(1);
             people.setLabel("人力合计（小时）");
             res.add(people);
-            people.setValue(BigDecimal.valueOf(peopleValue / 8 / 21.75).setScale(2, RoundingMode.HALF_UP).doubleValue());
-            people.setLabel("人力合计（人月）");
-            people.setKey("peopleMonth");
-            res.add(people);
+
+            ProjectInfoVo<Double> peopleMonth = new ProjectInfoVo<>();
+            peopleMonth.setValue(BigDecimal.valueOf(peopleValue / 8 / 21.75).setScale(2, RoundingMode.HALF_UP).doubleValue());
+            peopleMonth.setLabel("人力合计（人月）");
+            peopleMonth.setKey("peopleMonth");
+            peopleMonth.setShowEdit(1);
+            res.add(peopleMonth);
 
             // 加班合计（小时）
             ProjectInfoVo<Double> overtime = new ProjectInfoVo<>();
