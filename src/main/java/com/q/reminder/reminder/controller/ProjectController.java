@@ -66,7 +66,7 @@ public class ProjectController {
     @PostMapping("/s")
     public ReturnT<String> s(@RequestBody RProjectReaVo info) {
         try {
-            Project project = RedmineApi.queryProjectByKey(info);
+            Project project = RedmineApi.getRedmineManager(info).getProjectManager().getProjectByKey(info.getPkey());
             if (project == null){
                 return ReturnT.FAIL;
             }

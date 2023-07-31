@@ -14,6 +14,7 @@ import com.taskadapter.redmineapi.internal.Transport;
 import lombok.NonNull;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.springframework.util.CollectionUtils;
 
@@ -62,7 +63,7 @@ public abstract class RedmineApi {
         projectInfos.forEach(projectInfo -> {
             String redmineType = projectInfo.getRedmineType();
             String redmineUrl = getRedmineUrl(redmineType);
-            RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, projectInfo.getPmKey());
+            RedmineManager mgr = getRedmineManager(projectInfo);
             IssueManager issueManager = mgr.getIssueManager();
             try {
                 issueManager.getIssues(projectInfo.getPkey(), null).stream().filter(e -> {
@@ -145,7 +146,6 @@ public abstract class RedmineApi {
      * @throws RedmineException
      */
     public static List<TimeEntry> queryTimes(RProjectInfo info) throws RedmineException {
-        String redmineUrl = getRedmineUrl(info.getRedmineType());
         Transport transport = getTransportByProject(info);
         Collection<RequestParam> params = new ArrayList<>();
         Date startDay = info.getStartDay();
@@ -155,7 +155,7 @@ public abstract class RedmineApi {
             params.add(new RequestParam("v[spent_on][]", new DateTime(startDay).toString("yyyy-MM-dd")));
         }
         List<TimeEntry> timeEntries = transport.getObjectsList(TimeEntry.class, params);
-        IssueManager issueManager = RedmineManagerFactory.createWithApiKey(redmineUrl, info.getPmKey()).getIssueManager();
+        IssueManager issueManager = getRedmineManager(info).getIssueManager();
         for (TimeEntry timeEntry : timeEntries) {
             Integer issueId = timeEntry.getIssueId();
             Issue issue = issueManager.getIssueById(issueId);
@@ -208,11 +208,6 @@ public abstract class RedmineApi {
         issue.setStatusId(1).setCreatedOn(new Date());
         issue.setTransport(transport);
         return issue.create();
-    }
-
-    public static Transport getTransportByProject(RProjectInfo projectInfo) {
-        String url = getRedmineUrl(projectInfo.getRedmineType()) + "/projects/" + projectInfo.getPkey();
-        return RedmineManagerFactory.createWithApiKey(url, projectInfo.getPmKey()).getTransport();
     }
 
     public static String createSubject(RedmineDataVo featureTmp) {
@@ -329,9 +324,19 @@ public abstract class RedmineApi {
         return transport.getObjectsList(TimeEntry.class, requestParams);
     }
 
-    public static Project queryProjectByKey(RProjectReaVo info) throws RedmineException {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(getRedmineUrl(info.getRedmineType()), info.getPmKey());
-        return mgr.getProjectManager().getProjectByKey(info.getPkey());
+    public static Transport getTransportByProject(RProjectInfo projectInfo) {
+        String url = getProjectRedmineUrl(projectInfo.getRedmineType()) + projectInfo.getPkey();
+        return getRedmineManager(projectInfo).getTransport();
+    }
+
+    /**
+     * 获取RedmineManager
+     * @param info
+     * @return
+     */
+    @NotNull
+    public static RedmineManager getRedmineManager(RProjectInfo info) {
+        return RedmineManagerFactory.createWithApiKey(getRedmineUrl(info.getRedmineType()), info.getPmKey());
     }
 
     public static Map<String, String> copq(List<RProjectInfo> list) throws RedmineException {
@@ -355,5 +360,8 @@ public abstract class RedmineApi {
 
     public static String getRedmineUrl(@NonNull String redmineType) {
         return "2".equals(redmineType) ? "http://redmine-pa.mxnavi.com" : "http://redmine-qa.mxnavi.com";
+    }
+    public static String getProjectRedmineUrl(@NonNull String redmineType) {
+        return "2".equals(redmineType) ? "http://redmine-pa.mxnavi.com/projects/" : "http://redmine-qa.mxnavi.com/projects/";
     }
 }

@@ -71,7 +71,7 @@ public abstract class WeeklyProjectRedmineUtils {
 //    }
 
     public static List<TimeEntry> wProjectTimes(WeeklyProjectVo projectInfo) {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(RedmineApi.getRedmineUrl(projectInfo.getRedmineType()) + "/projects/" + projectInfo.getPKey(), projectInfo.getPmKey());
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(RedmineApi.getProjectRedmineUrl(projectInfo.getRedmineType()) + projectInfo.getPKey(), projectInfo.getPmKey());
         Transport transport = mgr.getTransport();
         try {
             return transport.getObjectsList(TimeEntry.class, List.of(
@@ -86,7 +86,7 @@ public abstract class WeeklyProjectRedmineUtils {
     }
 
     public static List<TimeEntry> wprojectTimesBugs(WeeklyProjectVo projectInfo) {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(RedmineApi.getRedmineUrl(projectInfo.getRedmineType()) + "/projects/" + projectInfo.getPKey(), projectInfo.getPmKey());
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(RedmineApi.getProjectRedmineUrl(projectInfo.getRedmineType()) + projectInfo.getPKey(), projectInfo.getPmKey());
         Transport transport = mgr.getTransport();
         List<RequestParam> params = List.of(
                 new RequestParam("f[]", "issue.cf_72"),
@@ -109,7 +109,7 @@ public abstract class WeeklyProjectRedmineUtils {
      */
     private static List<Issue> queryRedmine(WeeklyProjectVo projectInfo, List<RequestParam> params) {
         List<Issue> objectsList = null;
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(RedmineApi.getRedmineUrl(projectInfo.getRedmineType()) + "/projects/" + projectInfo.getPKey(), projectInfo.getPmKey());
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(RedmineApi.getProjectRedmineUrl(projectInfo.getRedmineType()) + projectInfo.getPKey(), projectInfo.getPmKey());
         Transport transport = mgr.getTransport();
         try {
             objectsList = transport.getObjectsList(Issue.class, params);
