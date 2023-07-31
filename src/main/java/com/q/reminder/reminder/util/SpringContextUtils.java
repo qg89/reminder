@@ -1,6 +1,10 @@
 package com.q.reminder.reminder.util;
 
+import lombok.NonNull;
 import org.springframework.context.ApplicationContext;
+import org.springframework.lang.Nullable;
+
+import java.util.Map;
 
 /**
  * @author : saiko
@@ -16,7 +20,7 @@ public final class SpringContextUtils {
         return SpringContextUtils.applicationContext;
     }
 
-    public static void setApplicationContext(ApplicationContext applicationContext) {
+    public static void setApplicationContext(@NonNull ApplicationContext applicationContext) {
         SpringContextUtils.applicationContext = applicationContext;
     }
 
@@ -30,5 +34,9 @@ public final class SpringContextUtils {
 
     public static <T> T getBean(String name, Class<T> clazz) {
         return applicationContext.getBean(name, clazz);
+    }
+
+    public static <T> Map<String, T> getBeanOfType(@Nullable Class<T> type) {
+        return applicationContext.getBeansOfType(type);
     }
 }

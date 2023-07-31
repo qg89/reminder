@@ -5,11 +5,8 @@ import com.q.reminder.reminder.enums.ReminderTypeEnum;
 import com.q.reminder.reminder.exception.BizException;
 import com.q.reminder.reminder.strategys.anno.RedmineTypeAnnotation;
 import com.q.reminder.reminder.strategys.service.RedmineTypeStrategy;
+import com.q.reminder.reminder.util.SpringContextUtils;
 import lombok.extern.log4j.Log4j2;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
@@ -27,7 +24,7 @@ import java.util.Map;
  */
 @Log4j2
 @Component
-public class HandlerTypeContext implements ApplicationContextAware {
+public abstract class HandlerTypeContext implements ApplicationContextAware {
     /**
      * 锁, 防止重复创建同一对象
      */
@@ -38,20 +35,7 @@ public class HandlerTypeContext implements ApplicationContextAware {
      * <p>
      * 注：此集合只存放RedmineTypeStrategy的子类class，对应的实例交由spring容器来管理
      */
-    private static final Map<ReminderTypeEnum, Class<? extends RedmineTypeStrategy>> orderStrategyBeanMap = new HashMap<>();
-
-    @Autowired
-    private static ApplicationContext applicationContext;
-
-    @Override
-    public void setApplicationContext(@NotNull ApplicationContext applicationContext) throws BeansException {
-        HandlerTypeContext.applicationContext = applicationContext;
-    }
-
-    public static ApplicationContext getApplicationContext() {
-        return applicationContext;
-    }
-
+    private static final Map<ReminderTypeEnum, Class<? extends RedmineTypeStrategy>> TYPE_ENUM_CLASS_HASH_MAP = new HashMap<>();
 
     /**
      * 获取创建redmine策略实例
@@ -71,16 +55,16 @@ public class HandlerTypeContext implements ApplicationContextAware {
         }
 
         // 当集合为空时，则初始化
-        if (orderStrategyBeanMap.size() == 0) {
+        if (TYPE_ENUM_CLASS_HASH_MAP.isEmpty()) {
             initStrategy();
         }
 
-        Class<? extends RedmineTypeStrategy> clazz = orderStrategyBeanMap.get(orderTypeEnum);
+        Class<? extends RedmineTypeStrategy> clazz = TYPE_ENUM_CLASS_HASH_MAP.get(orderTypeEnum);
         if (null == clazz) {
             throw new BizException(BizResultCode.ERR_PARAM.getCode(), "未找到redmine类型(" + orderTypeEnum + ")的创建redmine策略实现类");
         }
         // 从spring容器中获取bean
-        return applicationContext.getBean(clazz);
+        return SpringContextUtils.getBean(clazz);
     }
 
     /**
@@ -89,7 +73,7 @@ public class HandlerTypeContext implements ApplicationContextAware {
     private static void initStrategy() {
         synchronized (LOCK) {
             // 获取接口下所有实例bean
-            Map<String, RedmineTypeStrategy> strategyMap = applicationContext.getBeansOfType(RedmineTypeStrategy.class);
+            Map<String, RedmineTypeStrategy> strategyMap = SpringContextUtils.getBeanOfType(RedmineTypeStrategy.class);
             if (CollectionUtils.isEmpty(strategyMap)) {
                 throw new BizException(BizResultCode.ERR_SYSTEM.getCode(), "代码配置错误：未获取到RedmineTypeStrategy的实现类，请检查代码中是否有将实现类bean注册到spring容器");
             }
@@ -112,14 +96,14 @@ public class HandlerTypeContext implements ApplicationContextAware {
                 // 支持多个事件类型
                 ReminderTypeEnum typeEnum = annotation.type();
                 //String key = getKey(typeEnum.getOrderType());
-                if (orderStrategyBeanMap.containsKey(typeEnum)) {
+                if (TYPE_ENUM_CLASS_HASH_MAP.containsKey(typeEnum)) {
                     log.error("代码配置错误：一个redmine类型({})只能对应一个创建redmine策略实现{}", typeEnum, strategyClazz.getName());
                     throw new BizException(BizResultCode.ERR_SYSTEM.getCode(), "代码配置错误：一个redmine类型(" + typeEnum + ")只能对应一个创建redmine策略实现bean");
                 }
-                orderStrategyBeanMap.put(typeEnum, strategyClazz);
+                TYPE_ENUM_CLASS_HASH_MAP.put(typeEnum, strategyClazz);
             }
 
-            if (orderStrategyBeanMap.size() == 0) {
+            if (TYPE_ENUM_CLASS_HASH_MAP.isEmpty()) {
                 log.warn("初始化创建redmine策略集合失败");
             }
         }
