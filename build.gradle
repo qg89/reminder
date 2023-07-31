@@ -48,6 +48,16 @@ dependencies {
 	implementation 'mysql:mysql-connector-java:8.0.32'
 //	implementation 'com.alibaba:druid-spring-boot-starter:1.2.16'
 	implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3.1'
+
+//	mybatis-flex
+	annotationProcessor 'com.mybatis-flex:mybatis-flex-spring-boot-starter:1.5.3'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.3.1.Final'
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-bindin:1.18.26'
+//	mybatis-flex-codegen
+	implementation 'com.mybatis-flex:mybatis-flex-codegen:1.5.3'
+
+
+
 	implementation 'com.github.jeffreyning:mybatisplus-plus:1.7.3-RELEASE'
 
 
