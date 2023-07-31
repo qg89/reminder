@@ -1,7 +1,7 @@
 buildscript {
 	repositories {
-		maven { url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/' }
 		maven { url "https://maven.aliyun.com/repository/central"}
+		maven { url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/' }
 		mavenCentral()
 	}
 	dependencies {
@@ -120,8 +120,8 @@ configure(allprojects) {
 	apply plugin: "io.spring.dependency-management"
 
 	repositories {
-		maven { url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/' }
 		maven { url "https://maven.aliyun.com/repository/central"}
+		maven { url 'https://devops-maven.mxnavi.com/nexus/repository/gradle-mxnavi3-group/' }
 		mavenLocal()
 	}
 
