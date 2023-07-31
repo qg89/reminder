@@ -65,7 +65,8 @@ public abstract class RedmineApi {
         Integer expiredDay = vo.getExpiredDay();
         List<RedmineVo> allIssueList = new ArrayList<>();
         projectInfos.forEach(projectInfo -> {
-            String redmineUrl = projectInfo.getRedmineUrl();
+            String redmineType = projectInfo.getRedmineType();
+            String redmineUrl = getRedmineUrl(redmineType);
             RedmineManager mgr = RedmineManagerFactory.createWithApiKey(redmineUrl, projectInfo.getPmKey());
             IssueManager issueManager = mgr.getIssueManager();
             try {
@@ -110,6 +111,7 @@ public abstract class RedmineApi {
     public static List<RedmineVo> queryUpdateIssue(List<RProjectInfo> projectList) {
         List<RedmineVo> issues = new ArrayList<>();
         for (RProjectInfo project : projectList) {
+            String redmineType = project.getRedmineType();
             Transport transport = getTransportByProject(project);
             List<RequestParam> params = List.of(
                     new RequestParam("status_id", "*"),
@@ -129,7 +131,7 @@ public abstract class RedmineApi {
                     if (StringUtils.isNotBlank(assigneeName)) {
                         queryRedmineVo.setAssigneeName(assigneeName.replace(" ", ""));
                     }
-                    queryRedmineVo.setRedmineUrl(project.getRedmineUrl());
+                    queryRedmineVo.setRedmineUrl(getRedmineUrl(redmineType));
                     issues.add(queryRedmineVo);
                 });
             } catch (RedmineException e) {
@@ -148,7 +150,7 @@ public abstract class RedmineApi {
      * @throws RedmineException
      */
     public static List<TimeEntry> queryTimes(RProjectInfo info) throws RedmineException {
-        String redmineUrl = info.getRedmineUrl();
+        String redmineUrl = getRedmineUrl(info.getRedmineType());
         Transport transport = getTransportByProject(info);
         Collection<RequestParam> params = new ArrayList<>();
         Date startDay = info.getStartDay();
@@ -214,7 +216,7 @@ public abstract class RedmineApi {
     }
 
     public static Transport getTransportByProject(RProjectInfo projectInfo) {
-        String url = projectInfo.getRedmineUrl() + "/projects/" + projectInfo.getPkey();
+        String url = getRedmineUrl(projectInfo.getRedmineType()) + "/projects/" + projectInfo.getPkey();
         return RedmineManagerFactory.createWithApiKey(url, projectInfo.getPmKey()).getTransport();
     }
 
@@ -333,7 +335,7 @@ public abstract class RedmineApi {
     }
 
     public static Project queryProjectByKey(RProjectReaVo info) throws RedmineException {
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(info.getRedmineUrl(), info.getPmKey());
+        RedmineManager mgr = RedmineManagerFactory.createWithApiKey(getRedmineUrl(info.getRedmineType()), info.getPmKey());
         return mgr.getProjectManager().getProjectByKey(info.getPkey());
     }
 
@@ -354,5 +356,9 @@ public abstract class RedmineApi {
             map.put(projectInfo.getPid(), BigDecimal.valueOf(bugSum / sum * 100).setScale(2, RoundingMode.HALF_UP) + "%");
         }
         return map;
+    }
+
+    public static String getRedmineUrl(@NonNull String redmineType) {
+        return "2".equals(redmineType) ? REDMINE_PA_URL : REDMINE_URL;
     }
 }

@@ -88,6 +88,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                 Tracker testTracker = redmineTypeStrategy.getTestTracker();
                 for (RedmineDataVo redmineDataVo : list) {
                     String recordsId = redmineDataVo.getRecordsId();
+                    String redmineType = redmineDataVo.getRedmineType();
                     List<CustomField> customFieldList = redmineTypeStrategy.getCustomField(recordsId);
                     List<RequestParam> requestParams = redmineTypeStrategy.getFeatureIdParams(recordsId);
                     String dscrptn = redmineDataVo.getDscrptn();
@@ -105,9 +106,9 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                     boolean ftrType = "非功能".equals(featureType);
                     log.info(taskName + "-开始执行，需求类型：{}", featureType);
                     RProjectInfo project = new RProjectInfo();
-                    project.setRedmineUrl(redmineDataVo.getRedmineUrl());
                     project.setPkey(redmineDataVo.getPrjctKey());
                     project.setPmKey(redmineDataVo.getPmKey());
+                    project.setRedmineType(redmineType);
                     Transport transport = RedmineApi.getTransportByProject(project);
                     if (RedmineApi.checkIssue(transport, requestParams)) {
                         log.info(taskName + " 已存在，recordsId {}", recordsId);

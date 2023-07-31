@@ -6,7 +6,7 @@
             p.pm_key AS pmKey,
             p.folder_token AS folder_token,
             p.project_short_name AS projectShortName,
-            p.redmine_url AS redmineUrl,
+            p.redmine_type AS redmineType,
             p.start_day AS startDay,
             p.pm_ou AS pmOu,
             p.p_key AS pKey,

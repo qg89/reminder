@@ -25,7 +25,7 @@ public class WeeklyProjectVo extends BaseFeishuVo implements Serializable {
     private String pmKey;
     private String folderToken;
     private String projectShortName;
-    private String redmineUrl;
+    private String redmineType;
     private Date startDay;
     private String fileName;
     private String fileToken;

@@ -85,7 +85,6 @@
         tmp.*,
         p.redmine_type AS redmineType,
         p.pm_key as pmKey,
-        p.redmine_url as redmineUrl,
         p.p_id AS pId,
         (SELECT prdct_id FROM t_table_user_config WHERE prjct_key = tmp.prjct_key ) prdctId
     FROM

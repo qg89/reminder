@@ -73,10 +73,6 @@ public class ProjectController {
             info.setPid(String.valueOf(project.getId()));
             String name = project.getName();
             info.setPname(name);
-            info.setRedmineUrl(RedmineApi.REDMINE_PA_URL);
-            if (Objects.equals("1", info.getRedmineType())) {
-                info.setRedmineUrl(RedmineApi.REDMINE_URL);
-            }
             projectInfoService.save(info);
             if (!saveRea(info)) {
                 return ReturnT.FAIL;

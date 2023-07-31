@@ -62,11 +62,6 @@ public class RProjectInfo extends Model<RProjectInfo> implements Serializable {
      @TableField(value = "pm_key")
      private String pmKey;
     /**
-     * redmineURL
-     */     
-     @TableField(value = "redmine_url")
-     private String redmineUrl;
-    /**
      * 项目开始时间
      */     
      @TableField(value = "start_day")
