@@ -31,8 +31,6 @@ import java.util.*;
 @Log4j2
 public abstract class RedmineApi {
 
-    private final static String REDMINE_URL = "http://redmine-qa.mxnavi.com";
-    private final static String REDMINE_PA_URL = "http://redmine-pa.mxnavi.com";
     private final static Date dueDate = DateTime.now().plusDays(7).toDate();
 
 
@@ -359,6 +357,6 @@ public abstract class RedmineApi {
     }
 
     public static String getRedmineUrl(@NonNull String redmineType) {
-        return "2".equals(redmineType) ? REDMINE_PA_URL : REDMINE_URL;
+        return "2".equals(redmineType) ? "http://redmine-pa.mxnavi.com" : "http://redmine-qa.mxnavi.com";
     }
 }
