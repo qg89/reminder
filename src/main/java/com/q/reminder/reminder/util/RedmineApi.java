@@ -31,9 +31,6 @@ import java.util.*;
 @Log4j2
 public abstract class RedmineApi {
 
-    private final static Date dueDate = DateTime.now().plusDays(7).toDate();
-
-
     /**
      * 检查任务是否创建
      *
@@ -265,7 +262,7 @@ public abstract class RedmineApi {
         issue.setProjectId(parentIssue.getProjectId());
         String subject = parentIssue.getSubject();
         issue.setTransport(transport);
-        issue.setDueDate(dueDate);
+        issue.setDueDate(DateTime.now().plusDays(7).toDate());
         issue.setStatusId(1);
         issue.setPriorityId(4);
 
