@@ -1,5 +1,8 @@
 package com.q.reminder.reminder.util;
 
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 import com.q.reminder.reminder.util.entity.GitCount;
 import lombok.extern.log4j.Log4j2;
 import org.eclipse.jgit.api.CheckoutCommand;
@@ -8,6 +11,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PushCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.*;
+import org.eclipse.jgit.errors.TransportException;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
 import org.eclipse.jgit.lib.*;
 import org.eclipse.jgit.patch.FileHeader;
@@ -15,18 +19,21 @@ import org.eclipse.jgit.patch.HunkHeader;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.transport.CredentialsProvider;
-import org.eclipse.jgit.transport.PushResult;
-import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.transport.*;
+import org.eclipse.jgit.transport.ssh.jsch.JschConfigSessionFactory;
+import org.eclipse.jgit.transport.ssh.jsch.OpenSshConfig;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.TreeWalk;
+import org.eclipse.jgit.util.FS;
 import org.gitective.core.BlobUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -40,13 +47,48 @@ import java.util.*;
 @Log4j2
 public class JGitUtils {
 
+    static String localPath = "/";
+    static String remoteRepoPath = "ssh://git@192.168.3.40:1022/mx-4s/telematics/telematics_adp.git";
+    static String keyPath = "/id_rsa_46";
     public static void main(String[] args) throws Exception {
-        String localPath = "d:\\Users\\saiko\\Desktop\\rem";
-//        Git git = gitClone("qig", "qigang0925", "https://codeup.aliyun.com/617a04646746bc7c6cc8ce00/redmine/reminder.git", "master", localPath);
-        gitPull("qig", "qigang0925", localPath, "master");
+        gitClone(remoteRepoPath, localPath);
         List<GitCount> master = commitResolver(localPath, "master");
         System.out.println(master);
+    }
 
+    public static void gitClone(String remoteRepoPath, String localRepoPath) throws URISyntaxException, TransportException {
+        //ssh session的工厂,用来创建密匙连接
+        SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
+            @Override
+            protected void configure(OpenSshConfig.Host host, Session session) {
+                session.setConfig("StrictHostKeyChecking", "no");
+            }
+
+            @Override
+            protected JSch createDefaultJSch(FS fs) throws JSchException {
+                JSch sch = super.createDefaultJSch(fs);
+                //添加私钥文件
+                sch.addIdentity(keyPath);
+                return sch;
+            }
+        };
+        //设置远程URI
+        try (Git git = Git.cloneRepository()
+                .setURI(remoteRepoPath)
+                .setTransportConfigCallback(transport -> {
+                    SshTransport sshTransport = (SshTransport) transport;
+                    sshTransport.setSshSessionFactory(sshSessionFactory);
+                })
+                //设置下载存放路径
+                .setDirectory(new File(String.valueOf(Paths.get(localPath))))
+                .setNoCheckout(true)
+                .call()) {
+            //设置远程URI
+            //设置下载存放路径
+            System.out.println("success");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -265,7 +307,7 @@ public class JGitUtils {
      * @author duandi
      * 进行两版本之间文件对比
      */
-    public static Map<String, Object> gitdiff(List<RevCommit> commitList, String localPath) throws IOException, GitAPIException {
+    public static Map<String, Object> gitDiff(List<RevCommit> commitList, String localPath) throws IOException, GitAPIException {
         Map<String, Object> map = new HashMap<>();
         Git git = new Git(new FileRepository(localPath + "/.git"));
         Repository repository = git.getRepository();
@@ -314,9 +356,7 @@ public class JGitUtils {
             try (ObjectReader oldReader = repository.newObjectReader()) {
                 oldTreeParser.reset(oldReader, tree.getId());
             }
-
             walk.dispose();
-
             return oldTreeParser;
         } catch (Exception e) {
             // TODO: handle exception
@@ -427,7 +467,6 @@ public class JGitUtils {
                 listGitCount.add(gitCount);
             }
         }
-
         return listGitCount;
     }
 
@@ -550,7 +589,7 @@ public class JGitUtils {
                 commitList.add(revCommit);
                 commitList.add(revCommitParent);
                 // 控制版本，两个相邻版本进行文件对比
-                Map<String, Object> map = gitdiff(commitList, localPath);
+                Map<String, Object> map = gitDiff(commitList, localPath);
                 addLine = addLine + (int) map.get("addSize");
                 removeLine = removeLine + (int) map.get("subSize");
             }
