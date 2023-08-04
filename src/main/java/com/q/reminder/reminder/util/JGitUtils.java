@@ -51,12 +51,12 @@ public class JGitUtils {
         String localPath = "/test";
         String remoteRepoPath = "ssh://git@192.168.3.40:1022/mx-4s/telematics/telematics_adp.git";
         String keyPath = "/id_rsa_46";
-        gitClone(remoteRepoPath, localPath);
+        gitClone(remoteRepoPath, localPath, keyPath);
         List<GitCount> master = commitResolver(localPath, "master");
         System.out.println(master);
     }
 
-    public static void gitClone(String remoteRepoPath, String localRepoPath) throws URISyntaxException, TransportException {
+    public static void gitClone(String remoteRepoPath, String localPath, String keyPath) throws URISyntaxException, TransportException {
         //ssh session的工厂,用来创建密匙连接
         SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
             @Override

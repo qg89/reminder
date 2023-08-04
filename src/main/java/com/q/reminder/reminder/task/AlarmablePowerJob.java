@@ -101,7 +101,7 @@ public class AlarmablePowerJob implements BasicProcessor {
         String remoteRepoPath = "ssh://git@192.168.3.40:1022/mx-4s/telematics/telematics_adp.git";
         String keyPath = "/id_rsa_46";
         String localPath = "/test123";
-        JGitUtils.gitClone(remoteRepoPath, keyPath);
+        JGitUtils.gitClone(remoteRepoPath, localPath, keyPath);
         List<GitCount> master = JGitUtils.commitResolver(localPath, "master");
         OmsLogger omsLogger = context.getOmsLogger();
         omsLogger.info("master,{}", master);
