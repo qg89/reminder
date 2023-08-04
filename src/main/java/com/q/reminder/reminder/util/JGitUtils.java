@@ -47,10 +47,10 @@ import java.util.*;
 @Log4j2
 public class JGitUtils {
 
-    static String localPath = "/";
-    static String remoteRepoPath = "ssh://git@192.168.3.40:1022/mx-4s/telematics/telematics_adp.git";
-    static String keyPath = "/id_rsa_46";
     public static void main(String[] args) throws Exception {
+        String localPath = "/test";
+        String remoteRepoPath = "ssh://git@192.168.3.40:1022/mx-4s/telematics/telematics_adp.git";
+        String keyPath = "/id_rsa_46";
         gitClone(remoteRepoPath, localPath);
         List<GitCount> master = commitResolver(localPath, "master");
         System.out.println(master);
