@@ -367,8 +367,8 @@ public abstract class RedmineApi {
         return "2".equals(redmineType) ? "http://redmine-pa.mxnavi.com/" : "http://redmine-qa.mxnavi.com/";
     }
 
-    public static RedmineManager getProjectRedmineManager(RProjectInfo info) {
-        return RedmineManagerFactory.createWithApiKey(getProjectRedmineUrl(info.getRedmineType()), info.getPmKey());
+    private static RedmineManager getProjectRedmineManager(RProjectInfo info) {
+        return RedmineManagerFactory.createWithApiKey(getProjectRedmineUrl(info.getRedmineType()) + info.getPkey() + "/", info.getPmKey());
     }
 
     public static String getProjectRedmineUrl(@NonNull String redmineType) {
