@@ -330,10 +330,6 @@ public abstract class RedmineApi {
         return transport.getObjectsList(TimeEntry.class, requestParams);
     }
 
-    public static Transport getTransportByProject(RProjectInfo projectInfo) {
-        return getRedmineManager(projectInfo).getTransport();
-    }
-
     /**
      * 获取RedmineManager
      * @param info
@@ -341,6 +337,10 @@ public abstract class RedmineApi {
      */
     @NotNull
     public static RedmineManager getRedmineManager(RProjectInfo info) {
+        return RedmineManagerFactory.createWithApiKey(getRedmineUrl(info.getRedmineType()), info.getPmKey());
+    }
+
+    public static RedmineManager getProjectRedmineManager(RProjectInfo info) {
         return RedmineManagerFactory.createWithApiKey(getProjectRedmineUrl(info.getRedmineType()), info.getPmKey());
     }
 
@@ -366,7 +366,11 @@ public abstract class RedmineApi {
     public static String getRedmineUrl(@NonNull String redmineType) {
         return "2".equals(redmineType) ? "http://redmine-pa.mxnavi.com/" : "http://redmine-qa.mxnavi.com/";
     }
+
     public static String getProjectRedmineUrl(@NonNull String redmineType) {
         return "2".equals(redmineType) ? "http://redmine-pa.mxnavi.com/projects/" : "http://redmine-qa.mxnavi.com/projects/";
+    }
+    public static Transport getTransportByProject(RProjectInfo projectInfo) {
+        return getProjectRedmineManager(projectInfo).getTransport();
     }
 }
