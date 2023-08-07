@@ -330,20 +330,6 @@ public abstract class RedmineApi {
         return transport.getObjectsList(TimeEntry.class, requestParams);
     }
 
-    /**
-     * 获取RedmineManager
-     * @param info
-     * @return
-     */
-    @NotNull
-    public static RedmineManager getRedmineManager(RProjectInfo info) {
-        return RedmineManagerFactory.createWithApiKey(getRedmineUrl(info.getRedmineType()), info.getPmKey());
-    }
-
-    public static RedmineManager getProjectRedmineManager(RProjectInfo info) {
-        return RedmineManagerFactory.createWithApiKey(getProjectRedmineUrl(info.getRedmineType()), info.getPmKey());
-    }
-
     public static Map<String, String> copq(List<RProjectInfo> list) throws RedmineException {
         Map<String, String> map = new HashMap<>();
         for (RProjectInfo projectInfo : list) {
@@ -363,8 +349,26 @@ public abstract class RedmineApi {
         return map;
     }
 
+    /**
+     * 获取RedmineManager
+     * @param info
+     * @return
+     */
+    @NotNull
+    public static RedmineManager getRedmineManager(RProjectInfo info) {
+        return RedmineManagerFactory.createWithApiKey(getRedmineUrl(info.getRedmineType()), info.getPmKey());
+    }
+
+    public static Transport getTransport(RProjectInfo projectInfo) {
+        return getRedmineManager(projectInfo).getTransport();
+    }
+
     public static String getRedmineUrl(@NonNull String redmineType) {
         return "2".equals(redmineType) ? "http://redmine-pa.mxnavi.com/" : "http://redmine-qa.mxnavi.com/";
+    }
+
+    public static RedmineManager getProjectRedmineManager(RProjectInfo info) {
+        return RedmineManagerFactory.createWithApiKey(getProjectRedmineUrl(info.getRedmineType()), info.getPmKey());
     }
 
     public static String getProjectRedmineUrl(@NonNull String redmineType) {
