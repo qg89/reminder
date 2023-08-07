@@ -3,12 +3,18 @@ package com.q.reminder.reminder.util;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.enums.CustomFieldsEnum;
 import com.q.reminder.reminder.exception.FeishuException;
-import com.q.reminder.reminder.vo.*;
+import com.q.reminder.reminder.vo.FeautreTimeVo;
+import com.q.reminder.reminder.vo.QueryVo;
+import com.q.reminder.reminder.vo.RedmineDataVo;
+import com.q.reminder.reminder.vo.RedmineVo;
 import com.taskadapter.redmineapi.IssueManager;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.RedmineManagerFactory;
-import com.taskadapter.redmineapi.bean.*;
+import com.taskadapter.redmineapi.bean.CustomField;
+import com.taskadapter.redmineapi.bean.Issue;
+import com.taskadapter.redmineapi.bean.TimeEntry;
+import com.taskadapter.redmineapi.bean.Tracker;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import com.taskadapter.redmineapi.internal.Transport;
 import lombok.NonNull;
@@ -320,7 +326,7 @@ public abstract class RedmineApi {
     }
 
     public static Collection<? extends TimeEntry> getTimeEntity(RProjectInfo projectInfo, List<RequestParam> requestParams) throws RedmineException {
-        Transport transport = getTransportByProject(projectInfo);
+        Transport transport = RedmineManagerFactory.createWithApiKey(getRedmineUrl(projectInfo.getRedmineType()) + projectInfo.getPkey(), projectInfo.getPmKey()).getTransport();
         return transport.getObjectsList(TimeEntry.class, requestParams);
     }
 
