@@ -326,7 +326,7 @@ public abstract class RedmineApi {
     }
 
     public static Collection<? extends TimeEntry> getTimeEntity(RProjectInfo projectInfo, List<RequestParam> requestParams) throws RedmineException {
-        Transport transport = RedmineManagerFactory.createWithApiKey(getRedmineUrl(projectInfo.getRedmineType()), projectInfo.getPmKey()).getTransport();
+        Transport transport = getRedmineManager(projectInfo).getTransport();
         return transport.getObjectsList(TimeEntry.class, requestParams);
     }
 
