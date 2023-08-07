@@ -325,7 +325,6 @@ public abstract class RedmineApi {
     }
 
     public static Transport getTransportByProject(RProjectInfo projectInfo) {
-        String url = getProjectRedmineUrl(projectInfo.getRedmineType()) + projectInfo.getPkey();
         return getRedmineManager(projectInfo).getTransport();
     }
 
@@ -336,7 +335,7 @@ public abstract class RedmineApi {
      */
     @NotNull
     public static RedmineManager getRedmineManager(RProjectInfo info) {
-        return RedmineManagerFactory.createWithApiKey(getRedmineUrl(info.getRedmineType()), info.getPmKey());
+        return RedmineManagerFactory.createWithApiKey(getProjectRedmineUrl(info.getRedmineType()), info.getPmKey());
     }
 
     public static Map<String, String> copq(List<RProjectInfo> list) throws RedmineException {
