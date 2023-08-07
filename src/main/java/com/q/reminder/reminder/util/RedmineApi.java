@@ -358,7 +358,7 @@ public abstract class RedmineApi {
     }
 
     public static String getRedmineUrl(@NonNull String redmineType) {
-        return "2".equals(redmineType) ? "http://redmine-pa.mxnavi.com" : "http://redmine-qa.mxnavi.com";
+        return "2".equals(redmineType) ? "http://redmine-pa.mxnavi.com/" : "http://redmine-qa.mxnavi.com/";
     }
     public static String getProjectRedmineUrl(@NonNull String redmineType) {
         return "2".equals(redmineType) ? "http://redmine-pa.mxnavi.com/projects/" : "http://redmine-qa.mxnavi.com/projects/";
