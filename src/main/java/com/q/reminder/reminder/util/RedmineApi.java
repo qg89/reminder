@@ -377,4 +377,16 @@ public abstract class RedmineApi {
     public static Transport getTransportByProject(RProjectInfo projectInfo) {
         return getProjectRedmineManager(projectInfo).getTransport();
     }
+
+    /**
+     * 获取所有的工时
+     * @param info
+     * @param requestParams
+     * @return
+     * @throws RedmineException
+     */
+    public static List<TimeEntry> listAllTimes(RProjectInfo info, List<RequestParam> requestParams) throws RedmineException {
+        Transport transport = getRedmineManager(info).getTransport();
+        return transport.getObjectsList(TimeEntry.class, requestParams);
+    }
 }

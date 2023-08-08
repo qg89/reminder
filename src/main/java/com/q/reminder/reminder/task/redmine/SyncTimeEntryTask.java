@@ -8,9 +8,9 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.exception.FeishuException;
-import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdTimeEntryService;
 import com.q.reminder.reminder.util.RedmineApi;
+import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,6 @@ import java.util.*;
 @Component
 @RequiredArgsConstructor
 public class SyncTimeEntryTask implements BasicProcessor {
-    private final ProjectInfoService projectInfoService;
     private final RdTimeEntryService rdTimeEntryService;
     private final PowerJobClient client;
 
@@ -82,34 +81,35 @@ public class SyncTimeEntryTask implements BasicProcessor {
             );
         }
         log.info(taskName + "-start");
-        List<RProjectInfo> projectList = projectInfoService.listAll();
-        List<RdTimeEntry> data = new ArrayList<>();
-        log.info(taskName + "-开始时间 {}， 结束时间，{}", startTime, endTime);
         try {
             rdTimeEntryService.remove(Wrappers.<RdTimeEntry>lambdaQuery().between(RdTimeEntry::getSpentOn, startTime, endTime));
             log.info(taskName + "-数据删除完成， sDate：{}，eDate：{}", startTime, endTime);
-            for (RProjectInfo projectInfo : projectList) {
-                String projectShortName = projectInfo.getProjectShortName();
-                Collection<? extends TimeEntry> timeEntity = RedmineApi.getTimeEntity(projectInfo, requestParams);
-                timeEntity.forEach(timeEntry -> {
-                    RdTimeEntry time = new RdTimeEntry();
-                    time.setId(timeEntry.getId());
-                    time.setActivityId(timeEntry.getActivityId());
-                    time.setComment(timeEntry.getComment());
-                    time.setActivityName(timeEntry.getActivityName());
-                    time.setHours(timeEntry.getHours());
-                    time.setCreatedOn(timeEntry.getCreatedOn());
-                    time.setIssueId(timeEntry.getIssueId());
-                    time.setProjectId(timeEntry.getProjectId());
-                    time.setProjectName(timeEntry.getProjectName());
-                    time.setSpentOn(timeEntry.getSpentOn());
-                    time.setUserid(timeEntry.getUserId());
-                    time.setUpdatedOn(timeEntry.getUpdatedOn());
-                    time.setUserName(timeEntry.getUserName());
-                    data.add(time);
-                });
-                log.info(taskName + "-项目： {}.  Redmine 查询完成，dataSize：{}", projectShortName, data.size());
-            }
+            RProjectInfo info = new RProjectInfo();
+            info.setPmKey("e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
+            info.setRedmineType("2");
+            List<RdTimeEntry> data = queryRedmineTimes(info, requestParams);
+//            for (RProjectInfo projectInfo : projectList) {
+//                String projectShortName = projectInfo.getProjectShortName();
+//                Collection<? extends TimeEntry> timeEntity = RedmineApi.getTimeEntity(projectInfo, requestParams);
+//                timeEntity.forEach(timeEntry -> {
+//                    RdTimeEntry time = new RdTimeEntry();
+//                    time.setId(timeEntry.getId());
+//                    time.setActivityId(timeEntry.getActivityId());
+//                    time.setComment(timeEntry.getComment());
+//                    time.setActivityName(timeEntry.getActivityName());
+//                    time.setHours(timeEntry.getHours());
+//                    time.setCreatedOn(timeEntry.getCreatedOn());
+//                    time.setIssueId(timeEntry.getIssueId());
+//                    time.setProjectId(timeEntry.getProjectId());
+//                    time.setProjectName(timeEntry.getProjectName());
+//                    time.setSpentOn(timeEntry.getSpentOn());
+//                    time.setUserid(timeEntry.getUserId());
+//                    time.setUpdatedOn(timeEntry.getUpdatedOn());
+//                    time.setUserName(timeEntry.getUserName());
+//                    data.add(time);
+//                });
+//                log.info(taskName + "-项目： {}.  Redmine 查询完成，dataSize：{}", projectShortName, data.size());
+//            }
             rdTimeEntryService.saveOrUpdateBatchByMultiId(data);
             log.info(taskName + "-查询完成，size:{}", data.size());
         } catch (Exception e) {
@@ -117,5 +117,28 @@ public class SyncTimeEntryTask implements BasicProcessor {
         }
         log.info(taskName + "-done");
         return processResult;
+    }
+
+    private List<RdTimeEntry> queryRedmineTimes(RProjectInfo info, List<RequestParam> requestParams) throws RedmineException {
+        Collection<? extends TimeEntry> timeEntity = RedmineApi.listAllTimes(info, requestParams);
+        List<RdTimeEntry> data = new ArrayList<>();
+        timeEntity.forEach(timeEntry -> {
+            RdTimeEntry time = new RdTimeEntry();
+            time.setId(timeEntry.getId());
+            time.setActivityId(timeEntry.getActivityId());
+            time.setComment(timeEntry.getComment());
+            time.setActivityName(timeEntry.getActivityName());
+            time.setHours(timeEntry.getHours());
+            time.setCreatedOn(timeEntry.getCreatedOn());
+            time.setIssueId(timeEntry.getIssueId());
+            time.setProjectId(timeEntry.getProjectId());
+            time.setProjectName(timeEntry.getProjectName());
+            time.setSpentOn(timeEntry.getSpentOn());
+            time.setUserid(timeEntry.getUserId());
+            time.setUpdatedOn(timeEntry.getUpdatedOn());
+            time.setUserName(timeEntry.getUserName());
+            data.add(time);
+        });
+        return data;
     }
 }
