@@ -88,28 +88,6 @@ public class SyncTimeEntryTask implements BasicProcessor {
             info.setPmKey("e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
             info.setRedmineType("2");
             List<RdTimeEntry> data = queryRedmineTimes(info, requestParams);
-//            for (RProjectInfo projectInfo : projectList) {
-//                String projectShortName = projectInfo.getProjectShortName();
-//                Collection<? extends TimeEntry> timeEntity = RedmineApi.getTimeEntity(projectInfo, requestParams);
-//                timeEntity.forEach(timeEntry -> {
-//                    RdTimeEntry time = new RdTimeEntry();
-//                    time.setId(timeEntry.getId());
-//                    time.setActivityId(timeEntry.getActivityId());
-//                    time.setComment(timeEntry.getComment());
-//                    time.setActivityName(timeEntry.getActivityName());
-//                    time.setHours(timeEntry.getHours());
-//                    time.setCreatedOn(timeEntry.getCreatedOn());
-//                    time.setIssueId(timeEntry.getIssueId());
-//                    time.setProjectId(timeEntry.getProjectId());
-//                    time.setProjectName(timeEntry.getProjectName());
-//                    time.setSpentOn(timeEntry.getSpentOn());
-//                    time.setUserid(timeEntry.getUserId());
-//                    time.setUpdatedOn(timeEntry.getUpdatedOn());
-//                    time.setUserName(timeEntry.getUserName());
-//                    data.add(time);
-//                });
-//                log.info(taskName + "-项目： {}.  Redmine 查询完成，dataSize：{}", projectShortName, data.size());
-//            }
             rdTimeEntryService.saveOrUpdateBatchByMultiId(data);
             log.info(taskName + "-查询完成，size:{}", data.size());
         } catch (Exception e) {
