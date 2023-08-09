@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -330,7 +331,7 @@ public abstract class RedmineApi {
         return transport.getObjectsList(TimeEntry.class, requestParams);
     }
 
-    public static Map<String, String> copq(List<RProjectInfo> list) throws RedmineException {
+    public static Map<String, String> copq(List<RProjectInfo> list, OmsLogger omsLogger) throws RedmineException {
         Map<String, String> map = new HashMap<>();
         for (RProjectInfo projectInfo : list) {
             // 查询所有工时
@@ -345,6 +346,7 @@ public abstract class RedmineApi {
             ));
             double bugSum = bugTimeEntries.stream().mapToDouble(TimeEntry::getHours).sum();
             map.put(projectInfo.getPid(), BigDecimal.valueOf(bugSum / sum * 100).setScale(2, RoundingMode.HALF_UP) + "%");
+            omsLogger.info("项目名称：{}， 所有工时：{}，BUG工时：{}", projectInfo.getProjectShortName(), sum, bugSum);
         }
         return map;
     }
