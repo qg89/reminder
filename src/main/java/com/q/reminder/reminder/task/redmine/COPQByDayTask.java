@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.task.redmine;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.q.reminder.reminder.constant.RedisKeyContents;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.util.RedmineApi;
@@ -11,6 +12,7 @@ import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author : saiko
@@ -28,7 +30,8 @@ public class COPQByDayTask implements BasicProcessor {
     public ProcessResult process(TaskContext context) throws Exception {
         ProcessResult processResult = new ProcessResult(true);
         Map<String, String> copq = RedmineApi.copq(projectInfoService.listAll(), context.getOmsLogger());
-        redisTemplate.opsForHash().putAll(RedisKeyContents.COPQ_DAY, copq);
+//        redisTemplate.opsForHash().putAll(RedisKeyContents.COPQ_DAY, copq);
+        redisTemplate.opsForValue().set(RedisKeyContents.COPQ_DAY, JSONObject.from(copq).toJSONString(),1, TimeUnit.DAYS);
         return processResult;
     }
 }

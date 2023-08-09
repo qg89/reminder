@@ -1,6 +1,8 @@
 package com.q.reminder.reminder.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -56,7 +58,11 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         List<List<ProjectInfoVo<?>>> resDate = new ArrayList<>();
         List<String> removeColumn = List.of("createTime", "isDelete");
 
-        Map<Object, Object> copqMap = redisTemplate.opsForHash().entries(RedisKeyContents.COPQ_DAY);
+        Map<String, String> copqMap = new HashMap<>();
+        Object object = redisTemplate.opsForValue().get(RedisKeyContents.COPQ_DAY);
+        if (object instanceof String json) {
+           copqMap = JSONObject.parseObject(json, new TypeReference<HashMap<String, String>>() {});
+        }
 
         // 加班
         List<OvertimeVo> li = rdTimeEntryService.listOvertime(param);
@@ -93,6 +99,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         for (RdTimeEntry e : rdTimeEntryService.listByProject(param)) {
             timeMap.merge(String.valueOf(e.getProjectId()), (double) e.getHours(), Double::sum);
         }
+        Map<String, String> finalCopqMap = copqMap;
         list.forEach(info -> {
             List<ProjectInfoVo<?>> res = new ArrayList<>();
             BeanUtil.beanToMap(info).forEach((k, v) -> {
@@ -174,9 +181,9 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             res.add(work);
 
             // 正常合计（小时）
-            ProjectInfoVo<Object> copq = new ProjectInfoVo<>();
+            ProjectInfoVo<String> copq = new ProjectInfoVo<>();
             copq.setKey("copq");
-            copq.setValue(copqMap.get(pid));
+            copq.setValue(finalCopqMap.get(pid));
             copq.setColumnType("input");
             copq.setShowEdit(1);
             copq.setLabel("COPQ（Cost Of Poor Quality）");
