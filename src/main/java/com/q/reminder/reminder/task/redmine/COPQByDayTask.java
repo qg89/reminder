@@ -27,7 +27,7 @@ public class COPQByDayTask implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
         ProcessResult processResult = new ProcessResult(true);
-        Map<String, String> copq = RedmineApi.copq(projectInfoService.listAll());
+        Map<String, String> copq = RedmineApi.copq(projectInfoService.listAll(), context.getOmsLogger());
         redisTemplate.opsForHash().putAll(RedisKeyContents.COPQ_DAY, copq);
         return processResult;
     }
