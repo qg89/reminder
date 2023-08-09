@@ -1,9 +1,8 @@
 package com.q.reminder.reminder.task.redmine;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.json.JSONUtil;
-import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RdTimeEntry;
@@ -14,8 +13,6 @@ import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.internal.RequestParam;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 import tech.powerjob.client.PowerJobClient;
 import tech.powerjob.common.response.JobInfoDTO;
@@ -25,7 +22,10 @@ import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 import tech.powerjob.worker.log.OmsLogger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author : saiko
@@ -42,44 +42,21 @@ public class SyncTimeEntryTask implements BasicProcessor {
 
     @Override
     public ProcessResult process(TaskContext context) {
-        String jobParams = Optional.ofNullable(context.getJobParams()).orElse("0");
-        String instanceParams = context.getInstanceParams();
         ProcessResult processResult = new ProcessResult(true);
         OmsLogger log = context.getOmsLogger();
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
-        int index = 8;
-        if (StringUtils.isNotBlank(jobParams) && NumberUtil.isNumber(jobParams)) {
-            index = Integer.parseInt(jobParams);
-        }
-        Integer instanceJson;
-        if (JSONUtil.isTypeJSON(instanceParams) && (instanceJson = JSONObject.parse(instanceParams).getInteger("initParams")) != null) {
-            index = instanceJson;
-        } else if (NumberUtil.isNumber(instanceParams)) {
-            index = Integer.parseInt(instanceParams);
-        }
-        DateTime now = DateTime.now();
-        String startTime;
-        String endTime;
-        List<RequestParam> requestParams;
-        // index = -1 ，上个月1~30
-        if (index < 0) {
-            Date date = now.plusMonths(index).toDate();
-            startTime = DateUtil.beginOfMonth(date).toString("yyyy-MM-dd");
-            endTime = DateUtil.endOfMonth(date).toString("yyyy-MM-dd");
-            requestParams = List.of(
-                    new RequestParam("f[]", "spent_on"),
-                    new RequestParam("op[spent_on]", "lm")
-            );
-        } else {
-            startTime = now.minusDays(index).toString("yyyy-MM-dd");
-            endTime = now.toString("yyyy-MM-dd");
-            requestParams = List.of(
-                    new RequestParam("f[]", "spent_on"),
-                    new RequestParam("op[spent_on]", ">t-"),
-                    new RequestParam("v[spent_on][]", String.valueOf(index))
-            );
-        }
+        DateTime sDate = DateUtil.beginOfMonth(new Date());
+        DateTime eDate = DateUtil.date();
+        String startTime = sDate.toString("yyy-MM-dd");
+        String endTime = eDate.toString("yyy-MM-dd");
+        long i = DateUtil.between(sDate, eDate, DateUnit.DAY);
+
+        List<RequestParam> requestParams = List.of(
+                new RequestParam("f[]", "spent_on"),
+                new RequestParam("op[spent_on]", ">t-"),
+                new RequestParam("v[spent_on][]", String.valueOf(i))
+        );
         log.info(taskName + "-start");
         try {
             rdTimeEntryService.remove(Wrappers.<RdTimeEntry>lambdaQuery().between(RdTimeEntry::getSpentOn, startTime, endTime));
