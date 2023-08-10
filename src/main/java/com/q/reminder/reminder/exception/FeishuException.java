@@ -27,10 +27,7 @@ public class FeishuException extends RuntimeException {
         super(message, e);
         sendContent(message, e);
     }
-
-    public FeishuException(String message) {
-        super(message);
-    }
+    
 
     private void sendContent(String message, Throwable e) {
         JSONObject content = new JSONObject();
