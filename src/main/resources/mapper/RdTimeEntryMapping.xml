@@ -136,5 +136,31 @@
         </if>
     </where>
     </select>
+
+<select id="listByProjectByDate" resultType="com.q.reminder.reminder.vo.ProjectCostVo">
+        SELECT
+            SUM(CASE WHEN sc.`work` = 1 THEN ( CASE WHEN ( te.hours - 8 ) > 0 THEN ( te.hours - 8 ) ELSE 0 END ) ELSE 0 END ) AS overtime,
+            SUM(te.hours) AS peopleHours,
+            projectId AS pid,
+            IFNULL(rp.budget,0) budget,
+            DATE_FORMAT(te.spentOn,'%Y%m') AS months,
+            rp.project_short_name AS shortName
+        FROM
+            rd_time_entry te,
+            r_project_info rp,
+            s_holiday_config sc
+        WHERE
+            te.projectId = rp.p_id
+          AND rp.is_delete = 0
+          AND rp.redmine_type = 2
+          AND sc.`date` = te.spentOn
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND te.spentOn >= #{vo.startTime}
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND te.spentOn <![CDATA[<=]]> #{vo.endTime}
+        </if>
+        GROUP BY te.projectId,rp.budget,months,shortName
+    </select>
 </mapper>
 

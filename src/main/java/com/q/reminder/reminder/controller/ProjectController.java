@@ -58,6 +58,12 @@ public class ProjectController {
         return new ReturnT<>(res);
     }
 
+    @GetMapping("/cost")
+    public ReturnT<List<ProjectCostVo>> projectCost(ProjectParamsVo vo) {
+        List<ProjectCostVo> list = projectInfoService.projectCost(vo);
+        return new ReturnT<>(list);
+    }
+
     @GetMapping("/d/{id}")
     public ReturnT<Boolean> d(@PathVariable("id") String id) {
         return new ReturnT<>(projectInfoService.removeById(id));

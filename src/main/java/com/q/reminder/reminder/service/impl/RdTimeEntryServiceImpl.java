@@ -6,10 +6,7 @@ import com.github.jeffreyning.mybatisplus.service.MppServiceImpl;
 import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.mapper.RdTimeEntryMapping;
 import com.q.reminder.reminder.service.RdTimeEntryService;
-import com.q.reminder.reminder.vo.OptionVo;
-import com.q.reminder.reminder.vo.OvertimeVo;
-import com.q.reminder.reminder.vo.UserInfoTimeVo;
-import com.q.reminder.reminder.vo.UserInfoWrokVo;
+import com.q.reminder.reminder.vo.*;
 import com.q.reminder.reminder.vo.params.ProjectParamsVo;
 import com.q.reminder.reminder.vo.params.UserInfoParamsVo;
 import org.springframework.stereotype.Service;
@@ -49,5 +46,10 @@ public class RdTimeEntryServiceImpl extends MppServiceImpl<RdTimeEntryMapping, R
     @Override
     public List<RdTimeEntry> listByProject(ProjectParamsVo vo) {
         return baseMapper.listByProject(vo);
+    }
+
+    @Override
+    public List<ProjectCostVo> listProjectByDate(ProjectParamsVo param) {
+        return baseMapper.listByProjectByDate(param);
     }
 }

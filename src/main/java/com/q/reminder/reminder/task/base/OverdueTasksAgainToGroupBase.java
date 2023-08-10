@@ -90,7 +90,8 @@ public class OverdueTasksAgainToGroupBase {
         // 查询要群对应的人员信息
         List<SendUserByGroupVo> sendUserByGroupVoList = userMemberService.queryUserGroupList();
         if (CollectionUtils.isEmpty(sendUserByGroupVoList)) {
-            throw new FeishuException(taskName + "-未找到群内成员");
+            log.info(taskName + "-未找到群内成员");
+            return;
         }
         // 群内人员
         Set<String> sendUsers = sendUserByGroupVoList.stream().map(SendUserByGroupVo::getAssigneeId).collect(Collectors.toSet());

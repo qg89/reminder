@@ -253,7 +253,7 @@ public abstract class RedmineApi {
      * @param devTracker
      */
     public static boolean createSubIssue(Issue parentIssue, Transport transport, List<CustomField> customFields, boolean ftrType, List<FeautreTimeVo> records, Tracker testTracker, Tracker devTracker) {
-        boolean createSubIssue = true;
+        boolean ceateFlug = true;
         Integer issueId = parentIssue.getId();
         Issue issue = new Issue();
         if (!ftrType) {
@@ -279,26 +279,26 @@ public abstract class RedmineApi {
                 newIssue.setSubject(subject + "-测试用例");
                 newIssue.setTracker(testTracker);
                 try {
-                    createSubIssue = createSubIssue && newIssue.create().getId() != null;
+                    ceateFlug = ceateFlug && newIssue.create().getId() != null;
                     newIssue.setSubject(subject + "-测试执行");
-                    createSubIssue = createSubIssue && newIssue.create().getId() != null;
-                } catch (RedmineException ex) {
-                    createSubIssue = false;
+                    ceateFlug = ceateFlug && newIssue.create().getId() != null;
+                } catch (Exception ex) {
                     log.error(ex);
+                    throw new FeishuException(ex, "创建测试子任务异常");
                 }
             } else {
                 newIssue.setSubject(subject + "-" + ROLE_MAP.get(name));
                 newIssue.setTracker(devTracker);
                 try {
                     Issue issu = newIssue.create();
-                    createSubIssue = createSubIssue && issu.getId() != null;
+                    ceateFlug = ceateFlug && issu.getId() != null;
                 } catch (Exception ex) {
                     log.error(ex);
-                    createSubIssue = false;
+                    throw new FeishuException(ex, "创建子任务异常");
                 }
             }
         }
-        return createSubIssue;
+        return ceateFlug;
     }
 
     private static final Map<String, String> ROLE_MAP = Map.of(

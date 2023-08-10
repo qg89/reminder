@@ -1,12 +1,14 @@
 package com.q.reminder.reminder.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.q.reminder.reminder.constant.RedisKeyContents;
+import com.q.reminder.reminder.constant.WorkContents;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.mapper.ProjectInfoMapping;
@@ -20,10 +22,12 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,6 +46,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+
 
     @Override
     public List<WeeklyProjectVo> getWeeklyDocxList(int weekNumber, String id) {
@@ -260,6 +265,52 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     public Map<String, Double> getProjectCost() {
         List<Map<String, Double>> map = baseMapper.getProjectCost();
         return map.stream().collect(Collectors.toMap(e -> String.valueOf(e.get("projectId")), f -> Double.valueOf(String.valueOf(f.get("cost"))), (v1, v2) -> v1));
+    }
+
+    @Override
+    public List<ProjectCostVo> projectCost(ProjectParamsVo param) {
+        List<RProjectInfo> projectInfoList = this.listAll();
+        List<ProjectCostVo> list = new ArrayList<>();
+
+        Map<String, Double> projectMap = getProjectCost();
+        Map<String, Integer> workMap = WorkContents.work();
+        List<ProjectCostVo> overtime = rdTimeEntryService.listProjectByDate(param);
+        Map<String, List<ProjectCostVo>> projectCostVoMap = overtime.stream().collect(Collectors.groupingBy(ProjectCostVo::getPid));
+
+        Map<String, String> copqMap = new HashMap<>();
+        Object object = redisTemplate.opsForValue().get(RedisKeyContents.COPQ_DAY);
+        if (object instanceof String json) {
+            copqMap = JSONObject.parseObject(json, new TypeReference<HashMap<String, String>>() {
+            });
+        }
+
+        for (RProjectInfo projectInfo : projectInfoList) {
+            String pid = projectInfo.getPid();
+            List<ProjectCostVo> dataList = projectCostVoMap.get(pid);
+            if (CollectionUtils.isEmpty(dataList)) {
+                continue;
+            }
+            double peopleHours = dataList.stream().mapToDouble(ProjectCostVo::getPeopleHours).sum();
+            double overHours = dataList.stream().mapToDouble(ProjectCostVo::getOvertime).sum();
+            ProjectCostVo vo = new ProjectCostVo();
+            Double budget = projectInfo.getBudget();
+            vo.setBudget(budget);
+            vo.setCopq(copqMap.get(pid));
+            Map<String, Double> monthMap = dataList.stream().collect(Collectors.groupingBy(ProjectCostVo::getMonths, Collectors.summingDouble(ProjectCostVo::getPeopleHours)));
+            AtomicReference<Double> peopleMonth = new AtomicReference<>(0.00D);
+            monthMap.forEach((month, peopleHour) -> {
+                Integer normalTime = workMap.get(month);
+                peopleMonth.updateAndGet(v -> v + NumberUtil.div(peopleHour, normalTime).doubleValue());
+            });
+            vo.setPeopleHours(peopleHours);
+            vo.setOvertime(overHours);
+            vo.setNormal(NumberUtil.round(NumberUtil.sub(peopleHours, overHours), 2).doubleValue());
+            vo.setPeopleMonth(NumberUtil.round(peopleMonth.get(), 2).doubleValue());
+            vo.setShortName(projectInfo.getProjectShortName());
+            vo.setCost(projectMap.get(pid));
+            list.add(vo);
+        }
+        return list;
     }
 
 
