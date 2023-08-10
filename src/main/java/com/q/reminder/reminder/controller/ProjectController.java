@@ -175,8 +175,8 @@ public class ProjectController {
         return new ReturnT<>(res);
     }
 
-    @GetMapping("/userInfoLit")
-    public ReturnT<IPage<UserInfoWrokVo>> userInfoLit(Page<UserInfoWrokVo> page, UserInfoParamsVo vo) {
+    @GetMapping("/userInfoList")
+    public ReturnT<IPage<UserInfoWrokVo>> userInfoList(Page<UserInfoWrokVo> page, UserInfoParamsVo vo) {
         IPage<UserInfoWrokVo> list = rdTimeEntryService.userinfoList(page, vo);
         return new ReturnT<>(list);
     }
