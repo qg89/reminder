@@ -302,7 +302,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
                 Integer normalTime = workMap.get(month);
                 peopleMonth.updateAndGet(v -> v + NumberUtil.div(peopleHour, normalTime).doubleValue());
             });
-            vo.setPeopleHours(peopleHours);
+            vo.setPeopleHours(NumberUtil.round(peopleHours,2).doubleValue());
             vo.setOvertime(overHours);
             vo.setNormal(NumberUtil.round(NumberUtil.sub(peopleHours, overHours), 2).doubleValue());
             vo.setPeopleMonth(NumberUtil.round(peopleMonth.get(), 2).doubleValue());
