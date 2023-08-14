@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.vo;
 
+import com.q.reminder.reminder.ano.Format;
 import lombok.Data;
 
 import java.io.Serial;
@@ -26,29 +27,35 @@ public class ProjectCostVo implements Serializable {
     /**
      * 项目预算
      */
+    @Format(2)
    private Double budget;
 
     /**
      * 目前成本
      */
+    @Format(2)
    private Double cost;
 
     /**
      * 人力合计（小时）
      */
+    @Format(2)
    private Double peopleHours;
 
     /**
      * 人力合计（月）
      */
+    @Format(2)
    private Double peopleMonth;
     /**
      * 加班合计（小时）
      */
+    @Format(2)
    private Double overtime;
     /**
      * 正常合计（小时）
      */
+    @Format(2)
     private Double normal;
 
     private String months;

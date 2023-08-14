@@ -12,7 +12,7 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 @SpringBootApplication
 @MapperScan("com.q.reminder.reminder.mapper")
-@EnableMPP 
+@EnableMPP
 public class ReminderApplication {
 
     public static void main(String[] args) {
