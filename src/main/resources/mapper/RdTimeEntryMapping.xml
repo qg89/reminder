@@ -54,7 +54,7 @@
             `r_project_info` rp,
             `fs_user_member_info` fu
         <where>
-            AND rp.redmine_type = 2 AND re.projectId = rp.p_id AND rp.is_delete = 0	AND fu.`name` = REPLACE(re.userName,' ','') AND fu.resign = 0
+            AND rp.redmine_type = 2 AND re.projectId = rp.p_id	AND fu.`name` = REPLACE(re.userName,' ','') AND fu.resign = 0
             <if test="vo.pid != null and vo.pid != ''">
                 AND re.projectId = #{vo.pid}
             </if>
