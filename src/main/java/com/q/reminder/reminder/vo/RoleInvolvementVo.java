@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.vo;
 
 import com.alibaba.fastjson2.annotation.JSONField;
+import com.q.reminder.reminder.ano.Format;
 import lombok.Data;
 
 import java.io.Serial;
@@ -29,16 +30,28 @@ public class RoleInvolvementVo implements Serializable {
     private String months;
     @JSONField(serialize = false)
     private Integer sort;
+    @Format(2)
     private String jan;
+    @Format(2)
     private String feb;
+    @Format(2)
     private String mar;
+    @Format(2)
     private String arp;
+    @Format(2)
     private String may;
+    @Format(2)
     private String jun;
+    @Format(2)
     private String jul;
+    @Format(2)
     private String aug;
+    @Format(2)
     private String sep;
+    @Format(2)
     private String oct;
+    @Format(2)
     private String nov;
+    @Format(2)
     private String dec;
 }

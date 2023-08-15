@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.vo;
 
+import com.q.reminder.reminder.ano.Format;
 import lombok.Data;
 
 import java.io.Serial;
@@ -19,7 +20,10 @@ public class UserInfoWrokVo implements Serializable {
     private static final long serialVersionUID = -5626373534712444979L;
     private String userId;
     private String userName;
+    @Format(2)
     private Double totalTime;
+    @Format(2)
     private Double overtime;
+    @Format(2)
     private Double employeeLoad;
 }

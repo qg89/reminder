@@ -19,4 +19,15 @@ public abstract class HolidayUtils {
         Holiday holiday = HolidayUtil.getHoliday(now.toString("yyyy-MM-dd"));
         return (holiday == null && DateUtil.isWeekend(now.toDate())) || (holiday != null && !holiday.isWork());
     }
+
+    /**
+     * 校验是否工作日
+     * @param time yyyy-MM-dd
+     * @return
+     */
+    public static boolean isHoliday(String time) {
+        DateTime now = new DateTime(time);
+        Holiday holiday = HolidayUtil.getHoliday(now.toString("yyyy-MM-dd"));
+        return (holiday == null && DateUtil.isWeekend(now.toDate())) || (holiday != null && !holiday.isWork());
+    }
 }
