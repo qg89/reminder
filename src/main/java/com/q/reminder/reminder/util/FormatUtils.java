@@ -17,7 +17,7 @@ import java.io.IOException;
  * @Description :
  * @date :  2023/8/14 10:50
  */
-public class FormatUtils extends JsonSerializer<Number> implements ContextualSerializer {
+public class FormatUtils extends JsonSerializer<Object> implements ContextualSerializer {
 
     private Format format;
 
@@ -28,12 +28,16 @@ public class FormatUtils extends JsonSerializer<Number> implements ContextualSer
     public FormatUtils(){}
 
     @Override
-    public void serialize(Number value, JsonGenerator jsonGenerator, SerializerProvider serializers) throws IOException {
+    public void serialize(Object value, JsonGenerator jsonGenerator, SerializerProvider serializers) throws IOException {
         if (value == null) {
             return;
         }
         int scale = format.value();
-        jsonGenerator.writeObject(NumberUtil.round(value.doubleValue(), scale).doubleValue());
+        String v = value.toString();
+        if (!NumberUtil.isNumber(v)) {
+            return;
+        }
+        jsonGenerator.writeObject(NumberUtil.round(v, scale).doubleValue());
     }
     @Override
     public JsonSerializer<?> createContextual(SerializerProvider prov, BeanProperty property) {
