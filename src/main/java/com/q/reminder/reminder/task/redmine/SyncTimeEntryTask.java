@@ -3,6 +3,7 @@ package com.q.reminder.reminder.task.redmine;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RdTimeEntry;
@@ -45,9 +46,15 @@ public class SyncTimeEntryTask implements BasicProcessor {
         ProcessResult processResult = new ProcessResult(true);
         OmsLogger log = context.getOmsLogger();
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
+        String instanceParams = context.getInstanceParams();
         String taskName = resultDTO.getData().getJobName();
         DateTime sDate = DateUtil.beginOfMonth(new Date());
         DateTime eDate = DateUtil.date();
+        if (NumberUtil.isInteger(instanceParams)) {
+            instanceParams = String.format("%02d", Integer.parseInt(instanceParams));
+            sDate = new DateTime(DateUtil.thisYear() + "-" + instanceParams + "-01");
+            eDate = new DateTime(DateUtil.thisYear() + "-" + instanceParams + "-" +sDate.getLastDayOfMonth());
+        }
         String startTime = sDate.toString("yyy-MM-dd");
         String endTime = eDate.toString("yyy-MM-dd");
         long i = DateUtil.between(sDate, eDate, DateUnit.DAY);
