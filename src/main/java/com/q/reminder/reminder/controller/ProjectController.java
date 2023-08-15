@@ -49,6 +49,7 @@ public class ProjectController {
         return new ReturnT<>(projectInfoService.page(page));
     }
 
+    @Deprecated
     @GetMapping("/i")
     public ReturnT<List<List<ProjectInfoVo<?>>>> i(ProjectParamsVo vo) throws Exception {
         LambdaQueryWrapper<RProjectInfo> lq = Wrappers.lambdaQuery();

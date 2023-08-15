@@ -39,9 +39,8 @@ public class WorkloadAnalysisController {
 
     @GetMapping("/option")
     public ReturnT<List<OptionVo>> option(WorkloadParamsVo paramsVo) {
-        String pKey = paramsVo.getPKey();
         String year = paramsVo.getYear();
-        if (StringUtils.isBlank(pKey) || StringUtils.isBlank(year)) {
+        if (StringUtils.isBlank(year)) {
             return new ReturnT<>(new ArrayList<>());
         }
         return new ReturnT<>(wRoleGroupUserService.option(paramsVo));

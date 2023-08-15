@@ -5,14 +5,14 @@
         SELECT
             r.role AS `name`,
             r.sort,
-            IFNULL( DATE_FORMAT( ut.`day`, '%c' ), 0 ) AS `months`,
+            IFNULL( DATE_FORMAT( ut.`spentOn`, '%c' ), 0 ) AS `months`,
             ROUND(
-                IFNULL( SUM( ut.houses )/ 8 /(
+                IFNULL( SUM( ut.hours )/ 8 /(
                 SELECT
                     c.days
                 FROM
                     `w_config` c
-                        LEFT JOIN s_date_config d ON d.id = c.date_id
+                    LEFT JOIN s_date_config d ON d.id = c.date_id
                 WHERE
                    d.`month` = `months`
                     AND d.`year` = #{vo.year}
@@ -21,10 +21,17 @@
         FROM
             w_role r
             LEFT JOIN w_role_group_user re ON r.id = re.role_id
-            LEFT JOIN w_user_times ut ON re.user_id = ut.user_id
-            LEFT JOIN r_project_info p ON p.id = ut.p_id AND p.p_key = #{vo.pKey}
+            LEFT JOIN rd_time_entry ut ON re.user_id = ut.userId
+            LEFT JOIN r_project_info p ON p.p_id = ut.projectId
         WHERE
-            DATE_FORMAT( ut.`day`, '%Y' ) = #{vo.year}
+            DATE_FORMAT( ut.`spentOn`, '%Y' ) = #{vo.year}
+            <if test="vo.ids != null and vo.ids.size > 0 ">
+                AND p.id in(
+                <foreach collection="vo.ids" item="item" separator=",">
+                    #{item}
+                </foreach>
+                )
+            </if>
         GROUP BY
             r.role, r.sort,`months`
     </select>

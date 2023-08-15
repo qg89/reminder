@@ -7,21 +7,28 @@
             g.`group`,
             r.role,
             dc.`month` AS `months`,
-            ROUND( SUM( ut.houses )/ 8 / um.times / wc.days, 2 ) AS `hours`
+            ROUND( SUM( ut.hours )/ 8 / um.times / wc.days, 2 ) AS `hours`
         FROM
             r_redmine_user_info u
             LEFT JOIN w_role_group_user re ON u.assignee_id = re.user_id
-            LEFT JOIN w_user_times ut ON re.user_id = ut.user_id
-            LEFT JOIN r_project_info p ON p.id = ut.p_id AND u.redmine_type = p.redmine_type
+            LEFT JOIN rd_time_entry ut ON re.user_id = ut.userId
+            LEFT JOIN r_project_info p ON p.id = ut.projectId
             LEFT JOIN w_user_time_month um ON um.user_id = u.assignee_id
             LEFT JOIN s_date_config dc ON um.date_id = dc.id
             LEFT JOIN w_config wc ON dc.id = wc.date_id
             LEFT JOIN w_group g ON g.id = re.group_id
             LEFT JOIN w_role r ON r.id = re.role_id
         WHERE
-            p.p_key = #{vo.pKey}
-          AND dc.`year` = #{vo.year}
-          AND CONCAT( dc.`year`, dc.`month` ) = DATE_FORMAT( ut.`day`, '%Y%c' )
+          dc.`year` = #{vo.year}
+        AND p.redmine_type = 2
+          AND CONCAT( dc.`year`, dc.`month` ) = DATE_FORMAT( ut.`spentOn`, '%Y%c' )
+        <if test="vo.ids != null and vo.ids.size > 0 ">
+            AND p.id in(
+            <foreach collection="vo.ids" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
         <if test="vo.groupId != null and vo.groupId.size() > 0">
             AND g.id IN(
             <foreach collection="vo.groupId" item="item" separator=",">
@@ -56,19 +63,26 @@
         SELECT
             u.assignee_name AS `name`,
             dc.`month` AS `months`,
-            ROUND( (SUM( ut.houses) - (wc.days * um.times * 8)), 2) AS `hours`
+            ROUND( (SUM( ut.hours) - (wc.days * um.times * 8)), 2) AS `hours`
         FROM
             r_redmine_user_info u
             LEFT JOIN w_role_group_user re ON u.assignee_id = re.user_id
-            LEFT JOIN w_user_times ut ON re.user_id = ut.user_id
-            LEFT JOIN r_project_info p ON p.id = ut.p_id AND u.redmine_type = p.redmine_type
+            LEFT JOIN rd_time_entry ut ON re.user_id = ut.userId
+            LEFT JOIN r_project_info p ON p.id = ut.projectId
             LEFT JOIN w_user_time_month um ON um.user_id = u.assignee_id
             LEFT JOIN s_date_config dc ON um.date_id = dc.id
             LEFT JOIN w_config wc ON dc.id = wc.date_id
         WHERE
-            p.p_key = #{vo.pKey}
-          AND dc.`year` = #{vo.year}
-          AND CONCAT( dc.`year`, dc.`month` ) = DATE_FORMAT( ut.`day`, '%Y%c' )
+          dc.`year` = #{vo.year}
+        AND p.redmine_type = 2
+          AND CONCAT( dc.`year`, dc.`month` ) = DATE_FORMAT( ut.`spentOn`, '%Y%c' )
+        <if test="vo.ids != null and vo.ids.size > 0 ">
+            AND p.id in(
+            <foreach collection="vo.ids" item="item" separator=",">
+                #{item}
+            </foreach>
+            )
+        </if>
         <if test="vo.groupId != null and vo.groupId.size() > 0">
             AND re.group_id IN(
             <foreach collection="vo.groupId" item="item" separator=",">
