@@ -1,9 +1,6 @@
 package com.q.reminder.reminder.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.Data;
 
@@ -37,4 +34,8 @@ public class User extends Model<User> implements Serializable {
      */
     @TableField(value = "remote_addr")
     private String remoteAddr;
+
+    @TableField(value = "enable")
+    @TableLogic(value = "0", delval = "1")
+    private Integer enable;
 }
