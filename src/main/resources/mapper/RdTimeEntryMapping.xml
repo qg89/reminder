@@ -67,7 +67,7 @@
             <if test="vo.endTime != null and vo.endTime != ''">
                 AND re.spentOn <![CDATA[<=]]> #{vo.endTime}
             </if>
-            <if test="re.userId != null and re.userId != ''">
+            <if test="vo.userId != null and vo.userId != ''">
                 AND re.userId = #{vo.userId}
             </if>
         </where>
