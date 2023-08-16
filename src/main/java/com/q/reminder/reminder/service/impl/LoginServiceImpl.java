@@ -61,7 +61,7 @@ public class LoginServiceImpl extends ServiceImpl<UserInfoMapping, User> impleme
         if (!ips.contains(remoteAddr)) {
             return ResultUtil.fail("IP鉴权失败");
         }
-        vo.setUsername(userInfo.getName());
+        vo.setUsername(userInfo.getUsername());
         vo.setToken(token);
         vo.setRealName(userInfo.getName());
         return ResultUtil.success("登录成功", vo);
