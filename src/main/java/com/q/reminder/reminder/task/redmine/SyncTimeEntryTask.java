@@ -25,7 +25,6 @@ import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -44,20 +43,19 @@ public class SyncTimeEntryTask implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) {
         ProcessResult processResult = new ProcessResult(true);
-        Date today = new Date();
         String format = "yyy-MM-dd";
         OmsLogger log = context.getOmsLogger();
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
-        DateTime sDate = DateUtil.beginOfMonth(today);
         DateTime eDate = DateUtil.date();
+        DateTime sDate = DateUtil.beginOfMonth(eDate);
         String startTime = sDate.toString(format);
-        String endTime = eDate.toString(format);
+        String endTime = eDate.toString(format + " 23:59:59");
         String instanceParams = context.getInstanceParams();
         long i = 0L;
         if (NumberUtil.isInteger(instanceParams)) {
             int algo = Integer.parseInt(instanceParams);
-            startTime = DateUtil.offsetDay(today, -algo).toString(format);
+            startTime = DateUtil.offsetDay(eDate, -algo).toString(format);
             i = algo;
         } else {
             i = DateUtil.between(sDate, eDate, DateUnit.DAY);
