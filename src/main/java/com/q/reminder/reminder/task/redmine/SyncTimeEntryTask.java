@@ -3,6 +3,7 @@ package com.q.reminder.reminder.task.redmine;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.NumberUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RdTimeEntry;
@@ -43,14 +44,24 @@ public class SyncTimeEntryTask implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) {
         ProcessResult processResult = new ProcessResult(true);
+        Date today = new Date();
+        String format = "yyy-MM-dd";
         OmsLogger log = context.getOmsLogger();
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
-        DateTime sDate = DateUtil.beginOfMonth(new Date());
+        DateTime sDate = DateUtil.beginOfMonth(today);
         DateTime eDate = DateUtil.date();
-        String startTime = sDate.toString("yyy-MM-dd");
-        String endTime = eDate.toString("yyy-MM-dd");
-        long i = DateUtil.between(sDate, eDate, DateUnit.DAY);
+        String startTime = sDate.toString(format);
+        String endTime = eDate.toString(format);
+        String instanceParams = context.getInstanceParams();
+        long i = 0L;
+        if (NumberUtil.isInteger(instanceParams)) {
+            int algo = Integer.parseInt(instanceParams);
+            startTime = DateUtil.offsetDay(today, -algo).toString(format);
+            i = algo;
+        } else {
+            i = DateUtil.between(sDate, eDate, DateUnit.DAY);
+        }
 
         List<RequestParam> requestParams = List.of(
                 new RequestParam("f[]", "spent_on"),
