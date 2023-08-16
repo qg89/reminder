@@ -4,8 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.q.reminder.reminder.entity.SUserLog;
 import com.q.reminder.reminder.entity.User;
-import com.q.reminder.reminder.mapper.UserInfoMapping;
-import com.q.reminder.reminder.service.LoginService;
 import com.q.reminder.reminder.service.SUserLogService;
 import com.q.reminder.reminder.util.IpUtils;
 import com.q.reminder.reminder.util.JWTUtil;
@@ -34,10 +32,6 @@ import java.util.LinkedHashMap;
 public class WebInterceptorHandler implements HandlerInterceptor {
 
     @Autowired
-    private UserInfoMapping userInfoMapping;
-    @Autowired
-    private LoginService loginService;
-    @Autowired
     private JWTUtil jjwtUtil;
     @Autowired
     private SUserLogService logService;
@@ -54,7 +48,6 @@ public class WebInterceptorHandler implements HandlerInterceptor {
          */
         if (StringUtils.isNotBlank(strToken)) {
             Claims claims = jjwtUtil.getTokenPayLoad(strToken);
-            String userToken = claims.toString();
             LinkedHashMap<String, Object> map = claims.get("user", LinkedHashMap.class);
             user = BeanUtil.fillBeanWithMap(map, new User(), false);
             username = user.getUsername();

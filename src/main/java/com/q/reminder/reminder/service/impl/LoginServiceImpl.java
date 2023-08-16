@@ -34,7 +34,6 @@ import java.util.Objects;
 public class LoginServiceImpl extends ServiceImpl<UserInfoMapping, User> implements LoginService {
     private final JWTUtil jjwtUtil;
     private final AuthenticationManager authenticationManager;
-    private final UserInfoMapping userInfoMapping;
 
     @Override
     public ResultUtil login(LoginParam loginParam, String remoteAddr) {
@@ -64,6 +63,7 @@ public class LoginServiceImpl extends ServiceImpl<UserInfoMapping, User> impleme
         }
         vo.setUsername(userInfo.getName());
         vo.setToken(token);
+        vo.setRealName(userInfo.getName());
         return ResultUtil.success("登录成功", vo);
     }
 

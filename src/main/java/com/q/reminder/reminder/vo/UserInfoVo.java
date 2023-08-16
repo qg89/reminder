@@ -20,6 +20,7 @@ public class UserInfoVo implements Serializable {
     private static final long serialVersionUID = -828643677505571791L;
     private String token;
     private String username;
+    private String realName;
     private String pKey;
     @JSONField(serialize = false)
     private String remoteAddr;
