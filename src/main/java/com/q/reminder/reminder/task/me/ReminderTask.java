@@ -50,7 +50,7 @@ public class ReminderTask implements BasicProcessor {
         if (value < 8) {
             MessageVo sendVo = new MessageVo();
             sendVo.setReceiveId(FeiShuContents.ADMIN_MEMBERS);
-            sendVo.setContent(date + ", 应该写日报了，同学！,已填日报：" + value + " 小时");
+            sendVo.setContent("Hi 同学，该写日报了，" + date + "！已填日报：" + value + " 小时");
             BaseFeishu.message().sendText(sendVo, omsLogger);
         }
         return result;
