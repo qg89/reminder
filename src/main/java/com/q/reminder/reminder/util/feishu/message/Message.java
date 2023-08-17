@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.util.feishu.message;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.*;
 import com.q.reminder.reminder.constant.RedisKeyContents;
 import com.q.reminder.reminder.exception.FeishuException;
@@ -56,7 +57,7 @@ public class Message extends BaseFeishu {
                         .receiveId(vo.getReceiveId())
                         .content(content)
                         .uuid(UUID.randomUUID().toString())
-                        .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
+                        .build()).receiveIdType(CreateMessageReceiveIdTypeEnum.OPEN_ID).build();
         CreateMessageResp resp = new CreateMessageResp();
         try {
             resp = CLIENT.im().message().create(req);
@@ -90,7 +91,7 @@ public class Message extends BaseFeishu {
                         .receiveId(vo.getReceiveId())
                         .content(content)
                         .uuid(UUID.randomUUID().toString())
-                        .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
+                        .build()).receiveIdType(CreateMessageReceiveIdTypeEnum.OPEN_ID).build();
         return getCreateMessageResp(vo, log, content, req);
     }
 
@@ -133,7 +134,7 @@ public class Message extends BaseFeishu {
                         .receiveId(vo.getReceiveId())
                         .content(json.toJSONString())
                         .uuid(UUID.randomUUID().toString())
-                        .build()).receiveIdType(vo.getReceiveIdTypeEnum()).build();
+                        .build()).receiveIdType(CreateMessageReceiveIdTypeEnum.OPEN_ID).build();
         return getCreateMessageResp(vo, log, content, req);
     }
 
