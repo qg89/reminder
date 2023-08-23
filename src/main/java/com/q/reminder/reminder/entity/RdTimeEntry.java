@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
@@ -50,7 +51,7 @@ public class RdTimeEntry extends Model<RdTimeEntry> implements Serializable {
     @TableField("activityId")
     private Integer activityId;
 
-    @TableField("hours")
+    @TableField(value = "hours", fill = FieldFill.INSERT_UPDATE)
     private Float hours;
 
     @TableField("comment")
