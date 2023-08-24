@@ -84,9 +84,6 @@ public class ProjectController {
             String name = project.getName();
             info.setPname(name);
             projectInfoService.save(info);
-            if (!saveRea(info)) {
-                return ReturnT.FAIL;
-            }
         } catch (RedmineException e) {
             throw new RuntimeException(e);
         }
@@ -128,9 +125,6 @@ public class ProjectController {
         }
         if (StringUtils.isNotBlank(chatId)) {
             groupProjectService.saveOrUpdateByMultiId(new GroupProject(chatId, pId));
-        }
-        if (StringUtils.isNotBlank(userId)) {
-            userPService.saveOrUpdateByMultiId(new UserP(userId, pId));
         }
         return Boolean.TRUE;
     }

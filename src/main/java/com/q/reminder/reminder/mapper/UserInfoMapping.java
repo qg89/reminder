@@ -2,9 +2,7 @@ package com.q.reminder.reminder.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.q.reminder.reminder.entity.User;
-import com.q.reminder.reminder.vo.UserInfoVo;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 /**
  * @author : saiko
@@ -15,5 +13,4 @@ import org.apache.ibatis.annotations.Param;
  */
 @Mapper
 public interface UserInfoMapping extends BaseMapper<User> {
-    UserInfoVo userInfo(@Param("username") String username);
 }
