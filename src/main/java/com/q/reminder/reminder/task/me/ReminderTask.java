@@ -53,7 +53,7 @@ public class ReminderTask implements BasicProcessor {
             sendVo.setContent("Hi 同学，该写日报了，" + date + "！已填日报：" + value + " 小时");
             BaseFeishu.message().sendText(sendVo, omsLogger);
         } else {
-            omsLogger.info("日报已填写~！", holidayConfig);
+            omsLogger.info("日报已填写~！ holidayConfig:{}，value:{}", holidayConfig, value);
         }
         return result;
     }
