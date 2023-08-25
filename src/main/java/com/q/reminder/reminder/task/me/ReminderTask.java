@@ -54,7 +54,6 @@ public class ReminderTask implements BasicProcessor {
             BaseFeishu.message().sendText(sendVo, omsLogger);
         } else {
             omsLogger.info("日报已填写~！", holidayConfig);
-            return result;
         }
         return result;
     }
