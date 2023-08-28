@@ -119,28 +119,29 @@ public abstract class RedmineApi {
             List<RequestParam> params = List.of(
                     new RequestParam("status_id", "*"),
                     new RequestParam("updated_on", "t"));
+            List<Issue> issueList;
             try {
-                List<Issue> issueList = transport.getObjectsList(Issue.class, params);
+               issueList = transport.getObjectsList(Issue.class, params);
                 if (CollectionUtils.isEmpty(issueList)) {
                     continue;
                 }
-                issueList.forEach(e -> {
-                    String assigneeName = e.getAssigneeName();
-                    RedmineVo queryRedmineVo = new RedmineVo();
-                    queryRedmineVo.setUpdatedOn(e.getUpdatedOn());
-                    queryRedmineVo.setSubject(e.getSubject());
-                    queryRedmineVo.setRedmineId(String.valueOf(e.getId()));
-                    queryRedmineVo.setAuthorName(e.getAuthorName());
-                    if (StringUtils.isNotBlank(assigneeName)) {
-                        queryRedmineVo.setAssigneeName(assigneeName.replace(" ", ""));
-                    }
-                    queryRedmineVo.setRedmineUrl(getRedmineUrl(redmineType));
-                    issues.add(queryRedmineVo);
-                });
             } catch (RedmineException e) {
                 String msg = RedmineApi.class.getName() + " projectName " + project.getPname();
                 throw new FeishuException(e, msg);
             }
+            issueList.forEach(e -> {
+                String assigneeName = e.getAssigneeName();
+                RedmineVo queryRedmineVo = new RedmineVo();
+                queryRedmineVo.setUpdatedOn(e.getUpdatedOn());
+                queryRedmineVo.setSubject(e.getSubject());
+                queryRedmineVo.setRedmineId(String.valueOf(e.getId()));
+                queryRedmineVo.setAuthorName(e.getAuthorName());
+                if (StringUtils.isNotBlank(assigneeName)) {
+                    queryRedmineVo.setAssigneeName(assigneeName.replace(" ", ""));
+                }
+                queryRedmineVo.setRedmineUrl(getRedmineUrl(redmineType));
+                issues.add(queryRedmineVo);
+            });
         }
         return issues;
     }
