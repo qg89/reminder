@@ -60,17 +60,28 @@
 
     <select id="getProjectCost" resultType="java.util.Map">
         SELECT
-            SUM( rt.hours )* p.per_capita_cost AS `cost`,
-            p.p_id AS projectId
+            SUM( t.cost ) AS cost,
+            t.projectId
         FROM
-            rd_time_entry rt,
-            r_project_info p
-        WHERE
-            p.p_id = rt.projectId
-          AND p.is_delete = 0
+            (
+                SELECT
+                    SUM( rt.hours )* p.per_capita_cost / w.hours AS `cost`,
+                    p.p_id AS projectId
+                FROM
+                    rd_time_entry rt,
+                    r_project_info p,
+                    s_working_hours w
+                WHERE
+                    p.p_id = rt.projectId
+                  AND p.is_delete = 0
+                  AND DATE_FORMAT( rt.spentOn, '%Y%m' ) = w.yyyymm
+                GROUP BY
+                    p.p_id,
+                    p.per_capita_cost,
+                    yyyymm
+            ) t
         GROUP BY
-            p.p_id,
-            p.per_capita_cost
+            t.projectId
     </select>
 
     <!--    <select id="getProjectCost" resultType="java.util.Map">-->
