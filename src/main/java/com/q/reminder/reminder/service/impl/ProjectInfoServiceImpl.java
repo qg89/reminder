@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.q.reminder.reminder.constant.RedisKeyContents;
-import com.q.reminder.reminder.constant.WorkContents;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.mapper.ProjectInfoMapping;
@@ -295,8 +294,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             double peopleMonth = dataList.stream().mapToDouble(ProjectCostVo::getPeopleMonth).sum();
             double overHours = dataList.stream().mapToDouble(ProjectCostVo::getOvertime).sum();
             ProjectCostVo vo = new ProjectCostVo();
-            Double budget = projectInfo.getBudget();
-            vo.setBudget(budget);
+            vo.setBudget(projectInfo.getBudget());
             vo.setCopq(copqMap.get(pid));
             vo.setPeopleHours(peopleHours);
             vo.setOvertime(overHours);
