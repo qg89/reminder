@@ -39,11 +39,11 @@ public class ReminderTask implements BasicProcessor {
         OmsLogger omsLogger = context.getOmsLogger();
         ProcessResult result = new ProcessResult(true);
         DateTime dateTime = DateUtil.offsetDay(new Date(), -1);
-        String date = dateTime.toString("yyyy-MM-dd");
         // 判断周末
         while (DateUtil.isWeekend(dateTime)) {
             dateTime.offset(DateField.DAY_OF_MONTH, -1);
         }
+        String date = dateTime.toString("yyyy-MM-dd");
         Holiday holiday = HolidayUtil.getHoliday(date);
         if (holiday != null && holiday.isWork()) {
             List<RdTimeEntry> list = rdTimeEntryService.list(Wrappers.<RdTimeEntry>lambdaQuery().eq(RdTimeEntry::getSpentOn, date).eq(RdTimeEntry::getUserid, 1215));
