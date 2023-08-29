@@ -45,7 +45,7 @@ public class ReminderTask implements BasicProcessor {
         }
         String date = dateTime.toString("yyyy-MM-dd");
         Holiday holiday = HolidayUtil.getHoliday(date);
-        if (holiday != null && holiday.isWork()) {
+        if (holiday == null || holiday.isWork()) {
             List<RdTimeEntry> list = rdTimeEntryService.list(Wrappers.<RdTimeEntry>lambdaQuery().eq(RdTimeEntry::getSpentOn, date).eq(RdTimeEntry::getUserid, 1215));
             double value = list.stream().mapToDouble(RdTimeEntry::getHours).sum();
             if (value < 8) {
