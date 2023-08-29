@@ -152,6 +152,7 @@
         SELECT
             SUM(CASE WHEN sc.`work` = 1 THEN ( CASE WHEN ( te.hours - 8 ) > 0 THEN ( te.hours - 8 ) ELSE 0 END ) ELSE 0 END ) AS overtime,
             SUM(te.hours) AS peopleHours,
+            SUM(te.hours)/w.hours AS peopleMonth,
             projectId AS pid,
             IFNULL(rp.budget,0) budget,
             DATE_FORMAT(te.spentOn,'%Y%m') AS months,
@@ -159,19 +160,21 @@
         FROM
             rd_time_entry te,
             r_project_info rp,
-            s_holiday_config sc
+            s_holiday_config sc,
+            s_working_hours w
         WHERE
             te.projectId = rp.p_id
-          AND rp.is_delete = 0
-          AND rp.redmine_type = 2
-          AND sc.`date` = te.spentOn
+            AND rp.is_delete = 0
+            AND rp.redmine_type = 2
+            AND sc.`date` = te.spentOn
+            AND DATE_FORMAT(te.spentOn,'%Y%m') = w.yyyymm
         <if test="vo.startTime != null and vo.startTime != ''">
             AND te.spentOn >= #{vo.startTime}
         </if>
         <if test="vo.startTime != null and vo.startTime != ''">
             AND te.spentOn <![CDATA[<=]]> #{vo.endTime}
         </if>
-        GROUP BY te.projectId,rp.budget,months,shortName
+        GROUP BY te.projectId,rp.budget,months,shortName,w.yyyymm
     </select>
 </mapper>
 

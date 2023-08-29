@@ -28,7 +28,6 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -274,7 +273,6 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         List<ProjectCostVo> list = new ArrayList<>();
 
         Map<String, Double> projectMap = getProjectCost();
-        Map<String, Integer> workMap = WorkContents.work();
         List<ProjectCostVo> overtime = rdTimeEntryService.listProjectByDate(param);
         Map<String, List<ProjectCostVo>> projectCostVoMap = overtime.stream().collect(Collectors.groupingBy(ProjectCostVo::getPid));
 
@@ -294,21 +292,16 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
                 continue;
             }
             double peopleHours = dataList.stream().mapToDouble(ProjectCostVo::getPeopleHours).sum();
+            double peopleMonth = dataList.stream().mapToDouble(ProjectCostVo::getPeopleMonth).sum();
             double overHours = dataList.stream().mapToDouble(ProjectCostVo::getOvertime).sum();
             ProjectCostVo vo = new ProjectCostVo();
             Double budget = projectInfo.getBudget();
             vo.setBudget(budget);
             vo.setCopq(copqMap.get(pid));
-            Map<String, Double> monthMap = dataList.stream().collect(Collectors.groupingBy(ProjectCostVo::getMonths, Collectors.summingDouble(ProjectCostVo::getPeopleHours)));
-            AtomicReference<Double> peopleMonth = new AtomicReference<>(0.00D);
-            monthMap.forEach((month, peopleHour) -> {
-                Integer normalTime = workMap.get(month);
-                peopleMonth.updateAndGet(v -> v + NumberUtil.div(peopleHour, normalTime).doubleValue());
-            });
             vo.setPeopleHours(peopleHours);
             vo.setOvertime(overHours);
             vo.setNormal(NumberUtil.sub(peopleHours, overHours));
-            vo.setPeopleMonth(peopleMonth.get());
+            vo.setPeopleMonth(peopleMonth);
             vo.setShortName(projectInfo.getProjectShortName());
             vo.setCost(projectMap.get(pid));
             vo.setPid(pid);
