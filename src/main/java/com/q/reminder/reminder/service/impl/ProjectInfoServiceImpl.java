@@ -17,6 +17,7 @@ import com.q.reminder.reminder.service.RdTimeEntryService;
 import com.q.reminder.reminder.vo.*;
 import com.q.reminder.reminder.vo.params.ProjectParamsVo;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -284,6 +285,8 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             });
         }
 
+        String ym = DateTime.now().toString("yyyyMM");
+
         for (RProjectInfo projectInfo : projectInfoList) {
             String pid = projectInfo.getPid();
             List<ProjectCostVo> dataList = projectCostVoMap.get(pid);
@@ -307,7 +310,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             vo.setNormal(NumberUtil.sub(peopleHours, overHours));
             vo.setPeopleMonth(peopleMonth.get());
             vo.setShortName(projectInfo.getProjectShortName());
-            vo.setCost(projectMap.get(pid));
+            vo.setCost(projectMap.get(pid) / WorkContents.work().get(ym));
             vo.setPid(pid);
             list.add(vo);
         }

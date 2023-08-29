@@ -6,22 +6,21 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.q.reminder.reminder.entity.*;
 import com.q.reminder.reminder.service.*;
-import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.vo.*;
 import com.q.reminder.reminder.vo.base.ReturnT;
 import com.q.reminder.reminder.vo.params.ProjectParamsVo;
 import com.q.reminder.reminder.vo.params.UserInfoParamsVo;
-import com.taskadapter.redmineapi.RedmineException;
-import com.taskadapter.redmineapi.bean.Project;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author : saiko
@@ -48,19 +47,6 @@ public class ProjectController {
         return new ReturnT<>(projectInfoService.page(page));
     }
 
-    @Deprecated
-    @GetMapping("/i")
-    public ReturnT<List<List<ProjectInfoVo<?>>>> i(ProjectParamsVo vo) throws Exception {
-        LambdaQueryWrapper<RProjectInfo> lq = Wrappers.lambdaQuery();
-        lq.orderByDesc(RProjectInfo::getCreateTime);
-        List<RProjectInfo> list = projectInfoService.list(lq);
-        Map<String, String> userMap = userMemberService.list().stream().collect(Collectors.toMap(UserMemgerInfo::getMemberId, UserMemgerInfo::getName, (v1, v2) -> v1));
-        Map<String, String> groupMap = groupInfoService.list().stream().collect(Collectors.toMap(FsGroupInfo::getChatId, FsGroupInfo::getName, (v1, v2) -> v1));
-        Map<String, Double> projectMap = projectInfoService.getProjectCost();
-        List<List<ProjectInfoVo<?>>> res = projectInfoService.listToArray(list, userMap, groupMap, projectMap, vo);
-        return new ReturnT<>(res);
-    }
-
     @GetMapping("/cost")
     public ReturnT<List<ProjectCostVo>> projectCost(ProjectParamsVo vo) {
         List<ProjectCostVo> list = projectInfoService.projectCost(vo);
@@ -72,43 +58,6 @@ public class ProjectController {
         return new ReturnT<>(projectInfoService.removeById(id));
     }
 
-    @PostMapping("/s")
-    public ReturnT<String> s(@RequestBody RProjectReaVo info) {
-        try {
-            Project project = RedmineApi.getRedmineManager(info).getProjectManager().getProjectByKey(info.getPkey());
-            if (project == null){
-                return ReturnT.FAIL;
-            }
-            info.setPid(String.valueOf(project.getId()));
-            String name = project.getName();
-            info.setPname(name);
-            projectInfoService.save(info);
-        } catch (RedmineException e) {
-            throw new RuntimeException(e);
-        }
-        return ReturnT.SUCCESS;
-    }
-
-    @PostMapping("/e")
-    public ReturnT<String> e(@RequestBody RProjectReaVo info) {
-        if ("1".equals(info.getIsDelete())) {
-            projectInfoService.removeById(info);
-            return ReturnT.SUCCESS;
-        }
-        projectInfoService.updateInfo(info);
-        if (!saveRea(info)) {
-            return ReturnT.FAIL;
-        }
-        return ReturnT.SUCCESS;
-    }
-
-    @PostMapping("/r")
-    public ReturnT<String> r(@RequestBody RProjectReaVo vo) {
-        if (!saveRea(vo)) {
-            return ReturnT.FAIL;
-        }
-        return ReturnT.SUCCESS;
-    }
 
     @GetMapping("/info")
     public ReturnT<List<ProjectInfoVo>> info() {
