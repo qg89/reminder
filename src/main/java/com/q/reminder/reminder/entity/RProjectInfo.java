@@ -47,6 +47,12 @@ public class RProjectInfo extends Model<RProjectInfo> implements Serializable {
     private Double budget;
 
     /**
+     * 人均成本（万元）
+     */
+    @TableField(value = "per_capita_cost")
+    private Double perCapitaCost;
+
+    /**
      * 项目短名称
      */
     @TableField(value = "project_short_name")
