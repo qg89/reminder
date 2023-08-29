@@ -155,7 +155,6 @@
             SUM(te.hours)/w.hours AS peopleMonth,
             projectId AS pid,
             IFNULL(rp.budget,0) budget,
-            DATE_FORMAT(te.spentOn,'%Y%m') AS months,
             rp.project_short_name AS shortName
         FROM
             rd_time_entry te,
@@ -174,7 +173,7 @@
         <if test="vo.startTime != null and vo.startTime != ''">
             AND te.spentOn <![CDATA[<=]]> #{vo.endTime}
         </if>
-        GROUP BY te.projectId,rp.budget,months,shortName,w.yyyymm
+        GROUP BY te.projectId,rp.budget,shortName,w.yyyymm
     </select>
 </mapper>
 
