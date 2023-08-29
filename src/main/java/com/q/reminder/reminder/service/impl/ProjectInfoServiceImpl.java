@@ -310,7 +310,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             vo.setNormal(NumberUtil.sub(peopleHours, overHours));
             vo.setPeopleMonth(peopleMonth.get());
             vo.setShortName(projectInfo.getProjectShortName());
-            vo.setCost(projectMap.get(pid) / WorkContents.work().get(ym));
+            vo.setCost(projectMap.get(pid));
             vo.setPid(pid);
             list.add(vo);
         }
