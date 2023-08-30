@@ -37,6 +37,12 @@ public class ProjectCostVo implements Serializable {
    private Double cost;
 
     /**
+     * 目前成本（利润）
+     */
+    @Format(2)
+   private Double costProfit;
+
+    /**
      * 人力合计（小时）
      */
     @Format(2)

@@ -1,7 +1,6 @@
 package com.q.reminder.reminder.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -290,18 +289,19 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             if (CollectionUtils.isEmpty(dataList)) {
                 continue;
             }
-            double peopleHours = dataList.stream().mapToDouble(ProjectCostVo::getPeopleHours).sum();
+//            double peopleHours = dataList.stream().mapToDouble(ProjectCostVo::getPeopleHours).sum();
             double peopleMonth = dataList.stream().mapToDouble(ProjectCostVo::getPeopleMonth).sum();
             double overHours = dataList.stream().mapToDouble(ProjectCostVo::getOvertime).sum();
             ProjectCostVo vo = new ProjectCostVo();
             vo.setBudget(projectInfo.getBudget());
             vo.setCopq(copqMap.get(pid));
-            vo.setPeopleHours(peopleHours);
+//            vo.setPeopleHours(peopleHours);
             vo.setOvertime(overHours);
-            vo.setNormal(NumberUtil.sub(peopleHours, overHours));
+//            vo.setNormal(NumberUtil.sub(peopleHours, overHours));
             vo.setPeopleMonth(peopleMonth);
             vo.setShortName(projectInfo.getProjectShortName());
             vo.setCost(projectMap.get(pid));
+            vo.setCostProfit(vo.getCost() * 1.25);
             vo.setPid(pid);
             list.add(vo);
         }
