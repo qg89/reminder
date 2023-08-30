@@ -53,6 +53,12 @@ public class RProjectInfo extends Model<RProjectInfo> implements Serializable {
     private Double perCapitaCost;
 
     /**
+     * 利润率
+     */
+    @TableField(value = "profit_margin")
+    private Double profitMargin;
+
+    /**
      * 项目短名称
      */
     @TableField(value = "project_short_name")

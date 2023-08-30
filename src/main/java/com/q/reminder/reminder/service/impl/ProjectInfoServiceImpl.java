@@ -301,7 +301,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             vo.setPeopleMonth(peopleMonth);
             vo.setShortName(projectInfo.getProjectShortName());
             vo.setCost(projectMap.get(pid));
-            vo.setCostProfit(vo.getCost() * 1.25);
+            vo.setCostProfit(vo.getCost() * projectInfo.getProfitMargin());
             vo.setPid(pid);
             list.add(vo);
         }
