@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.vo;
 
+import com.alibaba.fastjson2.annotation.JSONField;
 import com.q.reminder.reminder.ano.Format;
 import lombok.Data;
 
@@ -64,7 +65,10 @@ public class ProjectCostVo implements Serializable {
     @Format(2)
     private Double normal;
 
-    private String months;
+    @JSONField(serialize = false)
+    private String userDate;
+    @JSONField(serialize = false)
+    private Double proportion;
 
     private String shortName;
 }

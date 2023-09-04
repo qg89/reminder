@@ -29,5 +29,5 @@ public interface RdTimeEntryService extends IMppService<RdTimeEntry>{
 
     List<RdTimeEntry> listByProject(ProjectParamsVo param);
 
-    List<ProjectCostVo> listProjectByDate(ProjectParamsVo param);
+    List<ProjectCostVo> listBySpentOnToCost(ProjectParamsVo param);
 }

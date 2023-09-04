@@ -175,5 +175,38 @@
         </if>
         GROUP BY te.projectId,rp.budget,shortName,w.yyyymm
     </select>
+
+    <select id="listBySpentOnToCost" resultType="com.q.reminder.reminder.vo.ProjectCostVo">
+        SELECT
+            CONCAT( rt.spentOn, '~', rt.userId ) userDate,
+            projectId AS pid,
+            IFNULL( p.budget, 0 ) budget,
+            p.project_short_name AS shortName,
+            SUM( rt.hours )/ 8 / w.hours AS peopleMonth,
+            SUM( rt.hours ) AS peopleHours,
+            0 AS overtime
+        FROM
+            rd_time_entry rt,
+            r_project_info p,
+            s_working_hours w
+        WHERE
+            rt.projectId = p.p_id
+          AND DATE_FORMAT( rt.spentOn, '%Y%m' ) = w.yyyymm
+          AND p.is_delete = 0
+          AND p.redmine_type = 2
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND rt.spentOn >= #{vo.startTime}
+        </if>
+        <if test="vo.startTime != null and vo.startTime != ''">
+            AND rt.spentOn <![CDATA[<=]]> #{vo.endTime}
+        </if>
+        GROUP BY
+            userDate,
+            rt.projectId,
+            w.yyyymm,
+            p.p_id,
+            p.budget,
+            shortName
+    </select>
 </mapper>
 

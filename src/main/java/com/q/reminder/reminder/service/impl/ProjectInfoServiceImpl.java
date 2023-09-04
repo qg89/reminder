@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.NumberUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -12,9 +13,12 @@ import com.q.reminder.reminder.entity.RdTimeEntry;
 import com.q.reminder.reminder.mapper.ProjectInfoMapping;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdTimeEntryService;
+import com.q.reminder.reminder.service.otherService.COPQByDayService;
 import com.q.reminder.reminder.vo.*;
 import com.q.reminder.reminder.vo.params.ProjectParamsVo;
+import com.taskadapter.redmineapi.RedmineException;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -22,6 +26,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import tech.powerjob.worker.log.impl.OmsNullLogger;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -44,6 +49,8 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+    @Autowired
+    private COPQByDayService copqByDayService;
 
 
     @Override
@@ -62,10 +69,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         List<String> removeColumn = List.of("createTime", "isDelete");
 
         Map<String, String> copqMap = new HashMap<>();
-        Object object = redisTemplate.opsForValue().get(RedisKeyContents.COPQ_DAY);
-        if (object instanceof String json) {
-           copqMap = JSONObject.parseObject(json, new TypeReference<HashMap<String, String>>() {});
-        }
+        copqMap = getProjectCopqMap();
 
         // 加班
         List<OvertimeVo> li = rdTimeEntryService.listOvertime(param);
@@ -266,46 +270,84 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     }
 
     @Override
-    public List<ProjectCostVo> projectCost(ProjectParamsVo param) {
+    public List<ProjectCostVo> projectCost(ProjectParamsVo param) throws RedmineException {
         List<RProjectInfo> projectInfoList = this.listAll();
         List<ProjectCostVo> list = new ArrayList<>();
-
+        // 处理成本
         Map<String, Double> projectMap = getProjectCost();
-        List<ProjectCostVo> overtime = rdTimeEntryService.listProjectByDate(param);
-        Map<String, List<ProjectCostVo>> projectCostVoMap = overtime.stream().collect(Collectors.groupingBy(ProjectCostVo::getPid));
-
-        Map<String, String> copqMap = new HashMap<>();
-        Object object = redisTemplate.opsForValue().get(RedisKeyContents.COPQ_DAY);
-        if (object instanceof String json) {
-            copqMap = JSONObject.parseObject(json, new TypeReference<HashMap<String, String>>() {
-            });
+        List<ProjectCostVo> costList = rdTimeEntryService.listBySpentOnToCost(param);
+        // 处理合计人月
+        Map<String, Double> peopleMonthsMap = costList.stream().collect(Collectors.groupingBy(ProjectCostVo::getPid, Collectors.summingDouble(ProjectCostVo::getPeopleMonth)));
+        // 处理加班合计
+        Map<String, Double> overtimeMap = getProjectOvertimeList(costList);
+        // COPQ
+        Map<String, String> copqMap = getProjectCopqMap();
+        if (CollectionUtils.isEmpty(copqMap)) {
+            copqMap = copqByDayService.copqDay(new OmsNullLogger());
         }
 
         String ym = DateTime.now().toString("yyyyMM");
 
         for (RProjectInfo projectInfo : projectInfoList) {
             String pid = projectInfo.getPid();
-            List<ProjectCostVo> dataList = projectCostVoMap.get(pid);
-            if (CollectionUtils.isEmpty(dataList)) {
-                continue;
-            }
-//            double peopleHours = dataList.stream().mapToDouble(ProjectCostVo::getPeopleHours).sum();
-            double peopleMonth = dataList.stream().mapToDouble(ProjectCostVo::getPeopleMonth).sum();
-            double overHours = dataList.stream().mapToDouble(ProjectCostVo::getOvertime).sum();
+            Double peopleMonth = peopleMonthsMap.get(pid);
+            Double overtime = overtimeMap.get(pid);
+
             ProjectCostVo vo = new ProjectCostVo();
             vo.setBudget(projectInfo.getBudget());
             vo.setCopq(copqMap.get(pid));
-//            vo.setPeopleHours(peopleHours);
-            vo.setOvertime(overHours);
-//            vo.setNormal(NumberUtil.sub(peopleHours, overHours));
             vo.setPeopleMonth(peopleMonth);
             vo.setShortName(projectInfo.getProjectShortName());
             vo.setCost(projectMap.get(pid));
             vo.setCostProfit(vo.getCost() * projectInfo.getProfitMargin());
+            vo.setOvertime(overtime);
             vo.setPid(pid);
             list.add(vo);
         }
         return list;
+    }
+
+    private Map<String, String> getProjectCopqMap() {
+        Object object = redisTemplate.opsForValue().get(RedisKeyContents.COPQ_DAY);
+        if (object instanceof String json) {
+            return JSONObject.parseObject(json, new TypeReference<HashMap<String, String>>() {
+            });
+        }
+        return null;
+    }
+
+    @NotNull
+    private static Map<String, Double> getProjectOvertimeList(List<ProjectCostVo> costList) {
+        List<ProjectCostVo> overtimelist = new ArrayList<>();
+        costList.stream().collect(Collectors.groupingBy(ProjectCostVo::getUserDate)).values().forEach(uList -> {
+            int normal = 8;
+            int size = uList.size();
+            if (size == 1) {
+                ProjectCostVo vo = uList.get(0);
+                double peopleHours = vo.getPeopleHours();
+                if (peopleHours > normal) {
+                    vo.setOvertime(NumberUtil.sub(peopleHours, normal));
+                    overtimelist.add(vo);
+                }
+            }
+            // 写在两个项目中
+            else {
+                ProjectCostVo vo = new ProjectCostVo();
+                double peoSum = uList.stream().mapToDouble(ProjectCostVo::getPeopleHours).sum();
+                // 大于8小时算加班
+                if (peoSum <= 8) {
+                    return;
+                }
+                for (ProjectCostVo v : uList) {
+                    double proportion = NumberUtil.div(v.getPeopleHours().doubleValue(), peoSum);
+                    // 加班工时 = （已填工时 * 比例）-（正常工时 * 比例）
+                    v.setOvertime(NumberUtil.sub(NumberUtil.mul(peoSum, proportion), NumberUtil.mul(normal, proportion)));
+                    overtimelist.add(v);
+                }
+            }
+        });
+        Stream<ProjectCostVo> projectCostVoStream = overtimelist.stream().filter(e -> e.getOvertime() != null);
+        return projectCostVoStream.collect(Collectors.groupingBy(ProjectCostVo::getPid, Collectors.summingDouble(ProjectCostVo::getOvertime)));
     }
 
 

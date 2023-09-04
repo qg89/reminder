@@ -10,6 +10,7 @@ import com.q.reminder.reminder.vo.*;
 import com.q.reminder.reminder.vo.base.ReturnT;
 import com.q.reminder.reminder.vo.params.ProjectParamsVo;
 import com.q.reminder.reminder.vo.params.UserInfoParamsVo;
+import com.taskadapter.redmineapi.RedmineException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,7 +49,7 @@ public class ProjectController {
     }
 
     @GetMapping("/cost")
-    public ReturnT<List<ProjectCostVo>> projectCost(ProjectParamsVo vo) {
+    public ReturnT<List<ProjectCostVo>> projectCost(ProjectParamsVo vo) throws RedmineException {
         List<ProjectCostVo> list = projectInfoService.projectCost(vo);
         return new ReturnT<>(list);
     }

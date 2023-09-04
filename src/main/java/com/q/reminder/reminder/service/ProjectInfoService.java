@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.vo.*;
 import com.q.reminder.reminder.vo.params.ProjectParamsVo;
+import com.taskadapter.redmineapi.RedmineException;
 
 import java.util.List;
 import java.util.Map;
@@ -33,5 +34,5 @@ public interface ProjectInfoService extends IService<RProjectInfo> {
 
     Map<String, Double> getProjectCost();
 
-    List<ProjectCostVo> projectCost(ProjectParamsVo vo);
+    List<ProjectCostVo> projectCost(ProjectParamsVo vo) throws RedmineException;
 }
