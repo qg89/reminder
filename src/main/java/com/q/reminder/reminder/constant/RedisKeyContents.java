@@ -16,4 +16,5 @@ public interface RedisKeyContents {
     String FEISHU_MESSAGE_INVOKEEXCEEDEDTIMES = "feishu:message:invokeExceededTimes";
     String USER_NAME_IP = "user:username";
 
+    String COPQ_DAY = "copq:";
 }

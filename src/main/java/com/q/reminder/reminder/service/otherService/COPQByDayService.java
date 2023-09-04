@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.service.otherService;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.q.reminder.reminder.constant.RedisKeyContents;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.taskadapter.redmineapi.RedmineException;
@@ -28,7 +29,7 @@ public class COPQByDayService {
 
     public Map<String, String> copqDay(OmsLogger omsLogger) throws RedmineException {
         Map<String, String> copq = RedmineApi.copq(projectInfoService.listAll(), omsLogger);
-        redisTemplate.opsForValue().set("copq:" + DateTime.now().toString("yyyyMMdd"), JSONObject.from(copq).toJSONString(),1, TimeUnit.DAYS);
+        redisTemplate.opsForValue().set(RedisKeyContents.COPQ_DAY + DateTime.now().toString("yyyyMMdd"), JSONObject.from(copq).toJSONString(),1, TimeUnit.DAYS);
         return copq;
     }
 }

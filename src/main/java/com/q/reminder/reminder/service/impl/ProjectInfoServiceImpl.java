@@ -311,7 +311,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     }
 
     private Map<String, String> getProjectCopqMap() {
-        Object object = redisTemplate.opsForValue().get("copq:" + DateTime.now().toString("yyyyMMdd"));
+        Object object = redisTemplate.opsForValue().get(RedisKeyContents.COPQ_DAY + DateTime.now().toString("yyyyMMdd"));
         if (object instanceof String json) {
             return JSONObject.parseObject(json, new TypeReference<HashMap<String, String>>() {
             });
