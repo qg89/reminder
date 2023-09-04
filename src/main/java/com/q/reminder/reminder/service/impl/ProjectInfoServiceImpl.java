@@ -280,6 +280,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         Map<String, Double> peopleMonthsMap = costList.stream().collect(Collectors.groupingBy(ProjectCostVo::getPid, Collectors.summingDouble(ProjectCostVo::getPeopleMonth)));
         // 处理加班合计
         Map<String, Double> overtimeMap = getProjectOvertimeList(costList);
+        Map<String, Double> peopleHoursMap = costList.stream().collect(Collectors.groupingBy(ProjectCostVo::getPid, Collectors.summingDouble(ProjectCostVo::getPeopleHours)));
         // COPQ
         Map<String, String> copqMap = getProjectCopqMap();
         if (CollectionUtils.isEmpty(copqMap)) {
@@ -292,6 +293,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             String pid = projectInfo.getPid();
             Double peopleMonth = peopleMonthsMap.get(pid);
             Double overtime = overtimeMap.get(pid);
+            Double peopleHours = peopleHoursMap.get(pid);
 
             ProjectCostVo vo = new ProjectCostVo();
             vo.setBudget(projectInfo.getBudget());
@@ -302,6 +304,7 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
             vo.setCostProfit(vo.getCost() * projectInfo.getProfitMargin());
             vo.setOvertime(overtime);
             vo.setPid(pid);
+            vo.setNormal(NumberUtil.sub(peopleHours, overtime));
             list.add(vo);
         }
         return list;
