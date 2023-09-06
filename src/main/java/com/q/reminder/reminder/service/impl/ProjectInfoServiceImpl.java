@@ -274,15 +274,17 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         List<RProjectInfo> projectInfoList = this.listAll();
         List<ProjectCostVo> list = new ArrayList<>();
         // 处理成本
-        Map<String, Double> projectMap = getProjectCost();
+        Map<String, Double> projectMap = this.getProjectCost();
         List<ProjectCostVo> costList = rdTimeEntryService.listBySpentOnToCost(param);
         // 处理合计人月
         Map<String, Double> peopleMonthsMap = costList.stream().collect(Collectors.groupingBy(ProjectCostVo::getPid, Collectors.summingDouble(ProjectCostVo::getPeopleMonth)));
         // 处理加班合计
-        Map<String, Double> overtimeMap = getProjectOvertimeList(costList);
+        List<? extends ProjectCostBaseVo> projectOvertimeList = this.getProjectOvertimeList(costList);
+        List<ProjectCostVo> costLists = (List<ProjectCostVo>) projectOvertimeList;
+        Map<String, Double> overtimeMap = costLists.stream().filter(e -> e.getOvertime() != null).collect(Collectors.groupingBy(ProjectCostVo::getPid, Collectors.summingDouble(ProjectCostVo::getOvertime)));
         Map<String, Double> peopleHoursMap = costList.stream().collect(Collectors.groupingBy(ProjectCostVo::getPid, Collectors.summingDouble(ProjectCostVo::getPeopleHours)));
         // COPQ
-        Map<String, String> copqMap = getProjectCopqMap();
+        Map<String, String> copqMap = this.getProjectCopqMap();
         if (CollectionUtils.isEmpty(copqMap)) {
             copqMap = copqByDayService.copqDay(new OmsNullLogger());
         }
@@ -310,6 +312,13 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         return list;
     }
 
+    @Override
+    public List<ProjectUserCostVo> exportCostByPid(ProjectParamsVo vo) throws RedmineException {
+        // 计算加班工时
+        List<ProjectUserCostVo> costList = rdTimeEntryService.listByPidSpentOnToCost(vo);
+        return (List<ProjectUserCostVo>) this.getProjectOvertimeList(costList);
+    }
+
     private Map<String, String> getProjectCopqMap() {
         Object object = redisTemplate.opsForValue().get(RedisKeyContents.COPQ_DAY + DateTime.now().toString("yyyyMMdd"));
         if (object instanceof String json) {
@@ -319,38 +328,51 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
         return null;
     }
 
+    /**
+     * 计算加班
+     * @param costList
+     * @return
+     */
     @NotNull
-    private static Map<String, Double> getProjectOvertimeList(List<ProjectCostVo> costList) {
-        List<ProjectCostVo> overtimelist = new ArrayList<>();
-        costList.stream().collect(Collectors.groupingBy(ProjectCostVo::getUserDate)).values().forEach(uList -> {
-            int normal = 8;
+    private List<? extends ProjectCostBaseVo> getProjectOvertimeList(List<? extends ProjectCostBaseVo> costList) {
+        List<ProjectCostBaseVo> overtimelist = new ArrayList<>();
+        costList.stream().collect(Collectors.groupingBy(ProjectCostBaseVo::getUserDate)).values().forEach(uList -> {
+            double normal = 8.0D;
             int size = uList.size();
+            // 只填写本项目内的日报
             if (size == 1) {
-                ProjectCostVo vo = uList.get(0);
+                ProjectCostBaseVo vo = uList.get(0);
                 double peopleHours = vo.getPeopleHours();
+                vo.setNormal(normal);
+                // 大于8小时算加班
                 if (peopleHours > normal) {
                     vo.setOvertime(NumberUtil.sub(peopleHours, normal));
-                    overtimelist.add(vo);
                 }
+                overtimelist.add(vo);
             }
             // 写在两个项目中
             else {
                 ProjectCostVo vo = new ProjectCostVo();
-                double peoSum = uList.stream().mapToDouble(ProjectCostVo::getPeopleHours).sum();
-                // 大于8小时算加班
-                if (peoSum <= 8) {
+                double peoSum = uList.stream().mapToDouble(ProjectCostBaseVo::getPeopleHours).sum();
+                if (peoSum <= 0) {
                     return;
                 }
-                for (ProjectCostVo v : uList) {
+                for (ProjectCostBaseVo v : uList) {
+                    if (peoSum <= normal) {
+                        double proportion = NumberUtil.div(v.getPeopleHours().doubleValue(), peoSum);
+                        v.setNormal(NumberUtil.mul(proportion, normal));
+                        continue;
+                    }
+                    // 大于8小时算加班
                     double proportion = NumberUtil.div(v.getPeopleHours().doubleValue(), peoSum);
                     // 加班工时 = （已填工时 * 比例）-（正常工时 * 比例）
                     v.setOvertime(NumberUtil.sub(NumberUtil.mul(peoSum, proportion), NumberUtil.mul(normal, proportion)));
-                    overtimelist.add(v);
+                    v.setNormal(NumberUtil.mul(proportion, normal));
                 }
+                overtimelist.addAll(uList);
             }
         });
-        Stream<ProjectCostVo> projectCostVoStream = overtimelist.stream().filter(e -> e.getOvertime() != null);
-        return projectCostVoStream.collect(Collectors.groupingBy(ProjectCostVo::getPid, Collectors.summingDouble(ProjectCostVo::getOvertime)));
+        return overtimelist;
     }
 
 

@@ -77,4 +77,9 @@ public class RdTimeEntryServiceImpl extends MppServiceImpl<RdTimeEntryMapping, R
     public List<ProjectCostVo> listBySpentOnToCost(ProjectParamsVo param) {
         return baseMapper.listBySpentOnToCost(param);
     }
+
+    @Override
+    public List<ProjectUserCostVo> listByPidSpentOnToCost(ProjectParamsVo vo) {
+        return baseMapper.listByPidSpentOnToCost(vo);
+    }
 }

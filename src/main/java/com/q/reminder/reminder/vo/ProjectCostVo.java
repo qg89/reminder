@@ -15,7 +15,7 @@ import java.io.Serializable;
  * @date :  2023/8/10 10:09
  */
 @Data
-public class ProjectCostVo implements Serializable {
+public class ProjectCostVo extends ProjectCostBaseVo implements Serializable {
 
 
     @Serial
@@ -44,31 +44,11 @@ public class ProjectCostVo implements Serializable {
    private Double costProfit;
 
     /**
-     * 人力合计（小时）
-     */
-    @Format(2)
-   private Double peopleHours;
-
-    /**
      * 人力合计（月）
      */
     @Format(2)
    private Double peopleMonth;
-    /**
-     * 加班合计（小时）
-     */
-    @Format(2)
-   private Double overtime;
-    /**
-     * 正常合计（小时）
-     */
-    @Format(2)
-    private Double normal;
 
-    @JSONField(serialize = false)
-    private String userDate;
     @JSONField(serialize = false)
     private Double proportion;
-
-    private String shortName;
 }

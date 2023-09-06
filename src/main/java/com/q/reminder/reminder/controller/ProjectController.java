@@ -1,5 +1,8 @@
 package com.q.reminder.reminder.controller;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.io.IoUtil;
+import cn.hutool.poi.excel.BigExcelWriter;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -11,17 +14,19 @@ import com.q.reminder.reminder.vo.base.ReturnT;
 import com.q.reminder.reminder.vo.params.ProjectParamsVo;
 import com.q.reminder.reminder.vo.params.UserInfoParamsVo;
 import com.taskadapter.redmineapi.RedmineException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * @author : saiko
@@ -34,7 +39,7 @@ import java.util.Map;
 @RequestMapping("/p")
 @RequiredArgsConstructor
 public class ProjectController {
-    
+
     private final ProjectInfoService projectInfoService;
     private final GroupProjectService groupProjectService;
     private final GroupInfoService groupInfoService;
@@ -52,6 +57,39 @@ public class ProjectController {
     public ReturnT<List<ProjectCostVo>> projectCost(ProjectParamsVo vo) throws RedmineException {
         List<ProjectCostVo> list = projectInfoService.projectCost(vo);
         return new ReturnT<>(list);
+    }
+
+    @SneakyThrows
+    @GetMapping("/exportCost")
+    public void exportCostByPid(ProjectParamsVo vo, HttpServletResponse response) {
+        List<ProjectUserCostVo> list = projectInfoService.exportCostByPid(vo);
+        BigExcelWriter writer = new BigExcelWriter();
+        writer.setSheet(0);
+        Map<String, String> header = new LinkedHashMap<>();
+        header.put("userName", "员工姓名");
+        header.put("spentOn", "填写日期");
+        header.put("peopleHours", "实际工时（小时）");
+        header.put("overtime", "加班工时（小时）");
+        header.put("normal", "项目内正常工时（小时）");
+        writer.setHeaderAlias(header);
+        writer.setOnlyAlias(true);
+        writer.setFreezePane(1);
+        writer.autoSizeColumnAll();
+        writer.renameSheet("日报明细");
+        writer.write(list, true);
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        String fileName = list.get(0).getShortName() + "-" + DateUtil.today() + ".xlsx";
+        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+        ServletOutputStream outputStream = null;
+        try {
+            outputStream = response.getOutputStream();
+            writer.flush(outputStream, true);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            writer.close();
+            IoUtil.close(outputStream);
+        }
     }
 
     @GetMapping("/d/{id}")

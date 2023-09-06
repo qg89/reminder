@@ -14,4 +14,5 @@ public class ProjectParamsVo {
 
     private String startTime;
     private String endTime;
+    private String pid;
 }

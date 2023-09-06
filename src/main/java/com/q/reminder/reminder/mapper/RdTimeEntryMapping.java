@@ -32,5 +32,7 @@ public interface RdTimeEntryMapping extends MppBaseMapper<RdTimeEntry> {
 
     List<ProjectCostVo> listByProjectByDate(@Param("vo") ProjectParamsVo param);
     List<ProjectCostVo> listBySpentOnToCost(@Param("vo") ProjectParamsVo param);
+
+    List<ProjectUserCostVo> listByPidSpentOnToCost(@Param("vo") ProjectParamsVo vo);
 }
 

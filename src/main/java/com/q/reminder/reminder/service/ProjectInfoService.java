@@ -35,4 +35,6 @@ public interface ProjectInfoService extends IService<RProjectInfo> {
     Map<String, Double> getProjectCost();
 
     List<ProjectCostVo> projectCost(ProjectParamsVo vo) throws RedmineException;
+
+    List<ProjectUserCostVo> exportCostByPid(ProjectParamsVo vo) throws RedmineException;
 }
