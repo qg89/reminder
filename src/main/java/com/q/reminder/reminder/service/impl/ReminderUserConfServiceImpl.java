@@ -31,7 +31,7 @@ public class ReminderUserConfServiceImpl extends ServiceImpl<ReminderUserConfMap
     public void reminder(OmsLogger omsLogger) {
         final int normal = 8;
         // 当前周一日期
-        DateTime dateTime = DateUtil.beginOfWeek(new Date());
+        DateTime dateTime = DateUtil.endOfWeek(new Date());
         List<UserReminderVo> userReminderVos = baseMapper.listByUser(dateTime.toString("yyyy-MM-dd")).stream().filter(e -> !Objects.equals("1", e.getEnable())).toList();
         Map<String, StringBuffer> contentMap = new HashMap<>();
         // 按人分组
@@ -63,7 +63,7 @@ public class ReminderUserConfServiceImpl extends ServiceImpl<ReminderUserConfMap
                 if (sumDay < normal) {
                     content.append(date).append("！已填日报：").append(sumDay).append(" 小时").append("\r\t\n");
                 }
-                omsLogger.info("用户：{}， 日期：{}", userReminderVo.getUserId(), toDay);
+                omsLogger.info("用户：{}， 日期：{}", userReminderVo.getUserName(), DateTime.of(toDay).toString("yyyy/MM/dd"));
             });
             contentMap.put(memberId, content);
         });
