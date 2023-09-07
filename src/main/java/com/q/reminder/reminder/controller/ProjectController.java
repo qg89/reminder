@@ -71,7 +71,7 @@ public class ProjectController {
         writer.autoSizeColumnAll();
         writer.renameSheet("日报明细");
         writer.write(list, true);
-        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        response.setContentType("application/vnd.ms-excel;charset=UTF-8");
         String fileName = list.get(0).getShortName() + "-" + DateUtil.today();
         response.setHeader("Content-Disposition","attachment;filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8) + ".xlsx");
         ServletOutputStream outputStream = null;
