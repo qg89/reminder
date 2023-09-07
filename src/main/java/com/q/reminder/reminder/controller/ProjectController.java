@@ -3,11 +3,9 @@ package com.q.reminder.reminder.controller;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.poi.excel.BigExcelWriter;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.q.reminder.reminder.entity.*;
+import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.service.*;
 import com.q.reminder.reminder.vo.*;
 import com.q.reminder.reminder.vo.base.ReturnT;
@@ -18,15 +16,15 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author : saiko
@@ -78,8 +76,8 @@ public class ProjectController {
         writer.renameSheet("日报明细");
         writer.write(list, true);
         response.setContentType("application/vnd.ms-excel;charset=utf-8");
-        String fileName = list.get(0).getShortName() + "-" + DateUtil.today() + ".xlsx";
-        response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+        String fileName = list.get(0).getShortName() + "-" + DateUtil.today();
+        response.setHeader("Content-Disposition","attachment;filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8) + ".xlsx");
         ServletOutputStream outputStream = null;
         try {
             outputStream = response.getOutputStream();
@@ -92,85 +90,35 @@ public class ProjectController {
         }
     }
 
-    @GetMapping("/d/{id}")
-    public ReturnT<Boolean> d(@PathVariable("id") String id) {
-        return new ReturnT<>(projectInfoService.removeById(id));
-    }
 
 
-    @GetMapping("/info")
-    public ReturnT<List<ProjectInfoVo>> info() {
-        return new ReturnT<>(projectInfoService.listInfo());
-    }
-
-    private Boolean saveRea(RProjectReaVo vo) {
-        String pId = vo.getPid();
-        String chatId = vo.getChatId();
-        String userId = vo.getUserId();
-        if (StringUtils.isBlank(pId) || projectInfoService.getOne(Wrappers.<RProjectInfo>lambdaQuery().eq(RProjectInfo::getPid, pId)) == null) {
-            return Boolean.FALSE;
-        }
-        if (StringUtils.isNotBlank(chatId)) {
-            groupProjectService.saveOrUpdateByMultiId(new GroupProject(chatId, pId));
-        }
-        return Boolean.TRUE;
-    }
-
-    @GetMapping("/o")
-    public ReturnT<Map<String, Object>> option() {
-        Map<String, Object> map = new HashMap<>(4);
-        LambdaQueryWrapper<FsGroupInfo> gp = Wrappers.lambdaQuery();
-        gp.select(FsGroupInfo::getChatId, FsGroupInfo::getName);
-        List<FsGroupInfo> fsGroupInfoList = groupInfoService.list(gp);
-        LambdaQueryWrapper<User> u = Wrappers.lambdaQuery();
-        u.select(User::getId, User::getName);
-        List<User> userList = loginService.list(u);
-        map.put("group", fsGroupInfoList);
-        map.put("user", userList);
-        return new ReturnT<>(map);
-    }
-
-    @GetMapping("/group")
-    public ReturnT<List<OptionVo>> group() {
-        LambdaQueryWrapper<FsGroupInfo> lq = Wrappers.lambdaQuery();
-        lq.select(FsGroupInfo::getChatId, FsGroupInfo::getName);
-        List<FsGroupInfo> list = groupInfoService.list(lq);
-        List<OptionVo> res = new ArrayList<>();
-        list.forEach(i -> {
-            OptionVo vo = new OptionVo();
-            vo.setId(i.getChatId());
-            vo.setName(i.getName());
-            res.add(vo);
-        });
-        return new ReturnT<>(res);
-    }
-
-    @GetMapping("/member")
-    public ReturnT<List<OptionVo>> member() {
-        LambdaQueryWrapper<UserMemgerInfo> lq = Wrappers.lambdaQuery();
-        lq.select(UserMemgerInfo::getMemberId, UserMemgerInfo::getName);
-        lq.eq(UserMemgerInfo::getResign, "0");
-        List<OptionVo> res = new ArrayList<>();
-        userMemberService.list(lq).forEach(i -> {
-            OptionVo vo = new OptionVo();
-            vo.setId(i.getMemberId());
-            vo.setName(i.getName());
-            res.add(vo);
-        });
-        return new ReturnT<>(res);
-    }
-
+    /**
+     * 用户管理
+     * @param page
+     * @param vo
+     * @return
+     */
     @GetMapping("/userInfoList")
     public ReturnT<IPage<UserInfoWrokVo>> userInfoList(Page<UserInfoWrokVo> page, UserInfoParamsVo vo) {
         IPage<UserInfoWrokVo> list = rdTimeEntryService.userinfoList(page, vo);
         return new ReturnT<>(list);
     }
 
+    /**
+     * 用户详情
+     * @param page
+     * @param vo
+     * @return
+     */
     @GetMapping("/userInfo")
     public ReturnT<IPage<UserInfoTimeVo>> userInfo(Page<UserInfoTimeVo> page, UserInfoParamsVo vo) {
         return new ReturnT<>(rdTimeEntryService.userTimeList(page, vo));
     }
 
+    /**
+     * 在职人员下拉列表
+     * @return
+     */
     @GetMapping("/userOption")
     public ReturnT<List<OptionVo>> userOption() {
         List<OptionVo> optionVos = rdTimeEntryService.userOption();
