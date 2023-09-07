@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.service.impl;
 
+import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -11,6 +12,7 @@ import com.q.reminder.reminder.vo.MessageVo;
 import com.q.reminder.reminder.vo.UserReminderVo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.*;
@@ -30,12 +32,40 @@ public class ReminderUserConfServiceImpl extends ServiceImpl<ReminderUserConfMap
     @Override
     public void reminder(OmsLogger omsLogger) {
         final int normal = 8;
+        DateTime now = DateTime.now();
         // 当前周一日期
-        DateTime dateTime = DateUtil.endOfWeek(new Date());
-        List<UserReminderVo> userReminderVos = baseMapper.listByUser(dateTime.toString("yyyy-MM-dd")).stream().filter(e -> !Objects.equals("1", e.getEnable())).toList();
+        DateTime dateTime = now.offsetNew(DateField.DAY_OF_MONTH, -7);
+        List<UserReminderVo> userReminderList = baseMapper.listByUser(dateTime.toString("yyyy-MM-dd"));
+        userReminderList.removeIf(e -> {
+            String memberId = null;
+            boolean flag = Objects.equals("1", e.getEnable());
+            if (flag) {
+                return true;
+            }
+            Date toDay = new DateTime(now.toString("yyyy-MM-dd"));
+            Date startDate = e.getStartDate();
+            Date endDate = e.getEndDate();
+            // 当天在开始结束范围内，过滤掉
+            if (startDate != null && endDate != null && DateUtil.isIn(toDay, startDate, endDate)) {
+                omsLogger.info("不提醒，[{}]当前为休假期，startDate：{} ~ endDate：{}", e.getUserName(), startDate, endDate);
+                return true;
+            }
+            return false;
+        });
+        if (CollectionUtils.isEmpty(userReminderList)) {
+            omsLogger.info("当前日期全部填写日报！");
+            return;
+        }
+
         Map<String, StringBuffer> contentMap = new HashMap<>();
         // 按人分组
-        userReminderVos.stream().collect(Collectors.groupingBy(UserReminderVo::getMemberId)).forEach((memberId, list) -> {
+        userReminderList.stream().collect(Collectors.groupingBy(UserReminderVo::getMemberId)).forEach((memberId, list) -> {
+            UserReminderVo userReminderVo = list.get(0);
+            if (userReminderVo == null) {
+                omsLogger.info("获取用户信息为空！");
+                return;
+            }
+
             StringBuffer content = new StringBuffer("Hi 同学，该写日报了！").append("\r\t\n");
             // 按日期
             Map<String, List<UserReminderVo>> spentMap = list.stream().collect(Collectors.groupingBy(UserReminderVo::getSpentOn));
@@ -43,27 +73,13 @@ public class ReminderUserConfServiceImpl extends ServiceImpl<ReminderUserConfMap
             Map<String, List<UserReminderVo>> resultMap = new LinkedHashMap<>();
             spentMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEachOrdered(e -> resultMap.put(e.getKey(), e.getValue()));
             resultMap.forEach((date, userList) -> {
-                UserReminderVo userReminderVo = userList.get(0);
-                if (userReminderVo == null) {
-                    omsLogger.info("获取用户信息为空！");
-                    return;
-                }
-                // 当天日期
-                Date toDay = DateUtil.parse(date).toJdkDate();
-                Date startDate = userReminderVo.getStartDate();
-                Date endDate = userReminderVo.getEndDate();
-                // 当天在开始结束范围内，过滤掉
-                if (startDate != null && endDate != null && DateUtil.isIn(toDay, startDate, endDate)) {
-                    omsLogger.info("已请假，{}", toDay);
-                    return;
-                }
                 // 当日日报合计
                 double sumDay = userList.stream().filter(e -> e.getHours() != null).mapToDouble(UserReminderVo::getHours).sum();
                 // 判断是否 < 8
                 if (sumDay < normal) {
                     content.append(date).append("！已填日报：").append(sumDay).append(" 小时").append("\r\t\n");
                 }
-                omsLogger.info("用户：{}， 日期：{}", userReminderVo.getUserName(), DateTime.of(toDay).toString("yyyy/MM/dd"));
+                omsLogger.info("用户：{}， 日期：{}", userReminderVo.getUserName(), date);
             });
             contentMap.put(memberId, content);
         });
