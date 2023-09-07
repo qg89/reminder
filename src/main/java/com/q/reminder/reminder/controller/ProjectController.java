@@ -39,10 +39,6 @@ import java.util.Map;
 public class ProjectController {
 
     private final ProjectInfoService projectInfoService;
-    private final GroupProjectService groupProjectService;
-    private final GroupInfoService groupInfoService;
-    private final LoginService loginService;
-    private final UserMemberService userMemberService;
     private final RdTimeEntryService rdTimeEntryService;
 
 
