@@ -316,7 +316,8 @@ public class ProjectInfoServiceImpl extends ServiceImpl<ProjectInfoMapping, RPro
     public List<ProjectUserCostVo> exportCostByPid(ProjectParamsVo vo) throws RedmineException {
         // 计算加班工时
         List<ProjectUserCostVo> costList = rdTimeEntryService.listByPidSpentOnToCost(vo);
-        return (List<ProjectUserCostVo>) this.getProjectOvertimeList(costList);
+        List<ProjectUserCostVo> overtimeList = (List<ProjectUserCostVo>) this.getProjectOvertimeList(costList);
+        return overtimeList.stream().sorted(Comparator.comparing(ProjectUserCostVo::getUserName)).sorted(Comparator.comparing(ProjectUserCostVo::getSpentOn)).toList();
     }
 
     private Map<String, String> getProjectCopqMap() {
