@@ -16,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 
@@ -72,16 +73,20 @@ public class ReminderUserConfServiceImpl extends ServiceImpl<ReminderUserConfMap
             // sort
             Map<String, List<UserReminderVo>> resultMap = new LinkedHashMap<>();
             spentMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEachOrdered(e -> resultMap.put(e.getKey(), e.getValue()));
+            AtomicInteger i = new AtomicInteger();
             resultMap.forEach((date, userList) -> {
                 // 当日日报合计
                 double sumDay = userList.stream().filter(e -> e.getHours() != null).mapToDouble(UserReminderVo::getHours).sum();
                 // 判断是否 < 8
                 if (sumDay < normal) {
+                    i.getAndIncrement();
                     content.append(date).append("！已填日报：").append(sumDay).append(" 小时").append("\r\t\n");
                 }
                 omsLogger.info("用户：{}， 日期：{}", userReminderVo.getUserName(), date);
             });
-            contentMap.put(memberId, content);
+            if (i.get() > 0) {
+                contentMap.put(memberId, content);
+            }
         });
         contentMap.forEach((memberId, content) -> {
             MessageVo sendVo = new MessageVo();
