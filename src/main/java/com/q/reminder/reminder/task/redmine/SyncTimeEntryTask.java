@@ -47,18 +47,18 @@ public class SyncTimeEntryTask implements BasicProcessor {
         OmsLogger log = context.getOmsLogger();
         ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
         String taskName = resultDTO.getData().getJobName();
-        DateTime eDate = DateUtil.date();
-        DateTime sDate = DateUtil.beginOfMonth(eDate);
+        DateTime toDay = DateUtil.date();
+        DateTime sDate = DateUtil.beginOfMonth(toDay);
         String startTime = sDate.toString(format);
-        String endTime = eDate.toString(format + " 23:59:59");
+        String endTime = toDay.toString(format) + " 23:59:59";
         String instanceParams = context.getInstanceParams();
         long i = 0L;
         if (NumberUtil.isInteger(instanceParams)) {
             int algo = Integer.parseInt(instanceParams);
-            startTime = DateUtil.offsetDay(eDate, -algo).toString(format);
+            startTime = DateUtil.offsetDay(toDay, -algo).toString(format);
             i = algo;
         } else {
-            i = DateUtil.between(sDate, eDate, DateUnit.DAY);
+            i = DateUtil.between(sDate, toDay, DateUnit.DAY);
         }
 
         List<RequestParam> requestParams = List.of(
