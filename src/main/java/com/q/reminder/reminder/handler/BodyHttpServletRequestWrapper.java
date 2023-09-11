@@ -4,11 +4,12 @@ import jakarta.servlet.ReadListener;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
-import org.springframework.util.StreamUtils;
+import org.apache.commons.io.IOUtils;
 import org.springframework.web.multipart.support.StandardServletMultipartResolver;
 
-import java.io.ByteArrayInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Map;
 
 /**
@@ -20,8 +21,6 @@ import java.util.Map;
  */
 public class BodyHttpServletRequestWrapper extends HttpServletRequestWrapper {
     private byte[] body;
-    private ServletInputStream inputStream;
-
     /**
      * Constructs a request object wrapping the given request.
      *
@@ -35,21 +34,22 @@ public class BodyHttpServletRequestWrapper extends HttpServletRequestWrapper {
         if (standardServletMultipartResolver.isMultipart(request)) {
 
         } else {
-            body = StreamUtils.copyToByteArray(request.getInputStream());
-            inputStream = new RequestCachingInputStream(body);
+            body = IOUtils.toByteArray(super.getInputStream());
         }
-    }
-
-    public String getBody() {
-        return new String(body);
     }
 
     @Override
     public ServletInputStream getInputStream() throws IOException {
-        if (inputStream != null) {
-            return inputStream;
-        }
-        return super.getInputStream();
+        return new RequestCachingInputStream(body);
+    }
+
+    @Override
+    public BufferedReader getReader() throws IOException {
+        return new BufferedReader(new InputStreamReader(getInputStream()));
+    }
+
+    public String getBody() {
+        return new String(body);
     }
 
     @Override
@@ -59,30 +59,74 @@ public class BodyHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
     private static class RequestCachingInputStream extends ServletInputStream {
 
-        private final ByteArrayInputStream inputStream;
+        private byte[] body;
+        private int lastIndexRetrieved = -1;
+        private ReadListener listener;
 
-        public RequestCachingInputStream(byte[] bytes) {
-            inputStream = new ByteArrayInputStream(bytes);
+        public RequestCachingInputStream(byte[] body) {
+            this.body = body;
         }
 
         @Override
         public int read() throws IOException {
-            return inputStream.read();
+            if (isFinished()) {
+                return -1;
+            }
+            int i = body[lastIndexRetrieved + 1];
+            lastIndexRetrieved++;
+            if (isFinished() && listener != null) {
+                try {
+                    listener.onAllDataRead();
+                } catch (IOException e) {
+                    listener.onError(e);
+                    throw e;
+                }
+            }
+            return i;
         }
 
         @Override
         public boolean isFinished() {
-            return inputStream.available() == 0;
+            return lastIndexRetrieved == body.length - 1;
         }
 
         @Override
         public boolean isReady() {
-            return true;
+            return isFinished();
         }
 
         @Override
         public void setReadListener(ReadListener readlistener) {
+            if (listener == null) {
+                throw new IllegalArgumentException("listener cann not be null");
+            }
+            if (this.listener != null) {
+                throw new IllegalArgumentException("listener has been set");
+            }
+            this.listener = listener;
+            if (!isFinished()) {
+                try {
+                    listener.onAllDataRead();
+                } catch (IOException e) {
+                    listener.onError(e);
+                }
+            } else {
+                try {
+                    listener.onAllDataRead();
+                } catch (IOException e) {
+                    listener.onError(e);
+                }
+            }
+        }
+        @Override
+        public int available() throws IOException {
+            return body.length - lastIndexRetrieved - 1;
         }
 
+        @Override
+        public void close() throws IOException {
+            lastIndexRetrieved = body.length - 1;
+            body = null;
+        }
     }
 }
