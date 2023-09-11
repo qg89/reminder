@@ -29,6 +29,7 @@
                 AND ui.resign = 0
                 AND ui.is_delete = 0
                 AND `work` = 1
+                AND rui.redmine_type = 2
             GROUP BY
                 dc.`date`,
                 ui.member_id,

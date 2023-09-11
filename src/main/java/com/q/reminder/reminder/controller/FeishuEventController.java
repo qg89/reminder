@@ -229,26 +229,35 @@ public class FeishuEventController {
                 tableRecordTmpService.remove(Wrappers.<TableRecordTmp>lambdaUpdate().eq(TableRecordTmp::getRecordId, recordId));
             } else {
                 JSONArray afterValue = j.getJSONArray("after_value");
+                JSONArray beforeValue = j.getJSONArray("before_value");
+//                JsonComparedOption jsonComparedOption = new JsonComparedOption().setIgnoreOrder(true);
+//                JsonCompareResult jsonCompareResult = new DefaultJsonDifference()
+//                        .option(jsonComparedOption)
+//                        .detectDiff(afterValue, beforeValue);
+//                List<Defects> defectsList = jsonCompareResult.getDefectsList();
+
                 afterValue.forEach(e -> {
                     TableRecordTmp tmp = new TableRecordTmp();
-                    JSONObject value = JSONObject.from(e);
-                    String fieldValue = value.getString("field_value");
-                    tmp.setRecordId(recordId);
-                    tmp.setFieldId(value.getString("field_id"));
-                    if (JSONUtil.isTypeJSON(fieldValue) && JSONUtil.isTypeJSONArray(fieldValue)) {
-                        StringBuilder fileArray = new StringBuilder();
-                        JSONArray array = JSONArray.parse(fieldValue);
-                        array.forEach(v -> {
-                            JSONObject from = JSONObject.from(v);
-                            if ("text".equals(from.get("type"))) {
-                                fileArray.append(from.get("text")).append("\r\n");
-                            }
-                        });
-                        if (fileArray.length() > 0) {
-                            fieldValue = fileArray.toString();
+                    JSONObject afterJson = JSONObject.from(e);
+                    JSONObject beforeJson = new JSONObject();
+                    String afterFieldValue = afterJson.getString("field_value");
+                    String fieldId = afterJson.getString("field_id");
+                    String beforeFieldValue = "";
+
+                    for (Object o : beforeValue) {
+                        beforeJson = JSONObject.from(o);
+                        if (fieldId.equals(beforeJson.getString("field_id"))) {
+                            beforeFieldValue = beforeJson.getString("field_value");
+                            break;
                         }
                     }
-                    tmp.setFieldValue(fieldValue);
+
+                    tmp.setRecordId(recordId);
+                    tmp.setFieldId(fieldId);
+                    afterFieldValue = getValue(afterFieldValue);
+                    beforeFieldValue = getValue(beforeFieldValue);
+                    tmp.setBeforeFieldValue(beforeFieldValue);
+                    tmp.setAfterFieldValue(afterFieldValue);
                     tmp.setTableId(table_id);
                     tmp.setFileType(file_type);
                     tmpList.add(tmp);
@@ -256,5 +265,22 @@ public class FeishuEventController {
             }
         }
         tableRecordTmpService.saveOrUpdateBatchByMultiId(tmpList);
+    }
+
+    private static String getValue(String beforeFieldValue) {
+        if (JSONUtil.isTypeJSON(beforeFieldValue) && JSONUtil.isTypeJSONArray(beforeFieldValue)) {
+            StringBuilder fileArray = new StringBuilder();
+            JSONArray array = JSONArray.parse(beforeFieldValue);
+            array.forEach(v -> {
+                JSONObject from = JSONObject.from(v);
+                if ("text".equals(from.get("type"))) {
+                    fileArray.append(from.get("text")).append("\r\n");
+                }
+            });
+            if (!fileArray.isEmpty()) {
+                beforeFieldValue = fileArray.toString();
+            }
+        }
+        return beforeFieldValue;
     }
 }
