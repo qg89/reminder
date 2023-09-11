@@ -39,7 +39,6 @@ public class TableFeatureController {
     private final RedmineUserInfoService redmineUserInfoService;
     private final ProjectInfoService projectInfoService;
     private final TTableUserConfigService tTableUserConfigService;
-    private final TTableInfoService tTableInfoService;
     private final TableFeatureService tableFeatureService;
 
 
