@@ -25,6 +25,7 @@ public enum TableFieldEnum {
     FIELD_FEATURE_TYPE("fldYrJP7Hd", "featureType"),
     FIELD_MDL("fldzBqWKKF", "mdl"),
     FIELD_PROJECT_KEY("prjctKey", "prjctKey"),
+    FIELD_FEATURE_ID("fldbO4FXw5", "featureId"),
 
     ;
     private String fieldId;
