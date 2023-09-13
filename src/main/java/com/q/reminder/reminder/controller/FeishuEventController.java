@@ -25,6 +25,7 @@ import com.q.reminder.reminder.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -253,7 +254,7 @@ public class FeishuEventController {
             tableRecordTmpService.remove(Wrappers.<TableRecordTmp>lambdaUpdate().eq(TableRecordTmp::getRecordId, recordId));
         } else {
             JSONArray afterValue = actionJson.getJSONArray("after_value");
-            List<String> fieldIds = List.of("fldzBqWKKF", "fldyxlzDlx", "fldVitCKLL", "fldwfsE7FK", "fldSgKd6Rp", "fldnlI18sF", "fldYrJP7Hd", "fldLuzGYK8", "fldRwSQfOm", "fldy8bIsUP", "fldeDXrMOV");
+            List<String> fieldIds = List.of("fldzBqWKKF", "fldyxlzDlx", "fldVitCKLL", "fldwfsE7FK", "fldSgKd6Rp", "fldnlI18sF", "fldYrJP7Hd", "fldLuzGYK8", "fldRwSQfOm", "fldy8bIsUP", "fldeDXrMOV", "fldbO4FXw5");
             List<Object> fieldId1 = afterValue.stream().filter(e -> fieldIds.contains(JSONObject.from(e).get("field_id"))).toList();
             List<TableFieldsOption> list = tableFieldsOptionService.list();
             Map<String, String> optionMap = list.stream().collect(Collectors.toMap(TableFieldsOption::getId, TableFieldsOption::getName));
@@ -272,7 +273,7 @@ public class FeishuEventController {
                 fieldJson.put(TableFieldEnum.getValue(fieldId), fieldValue);
             }
             TTableFeatureTmp featureTmp = JSONObject.parseObject(fieldJson.toJSONString(), TTableFeatureTmp.class);
-            if ("是".equals(featureTmp.getWriteType())) {
+            if ("是".equals(featureTmp.getWriteType()) && StringUtils.isBlank(featureTmp.getFeatureId())) {
                 featureTmp.setRecordsId(recordId);
                 tTableFeatureTmpService.saveOrUpdate(featureTmp);
             }
