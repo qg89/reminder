@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
@@ -19,6 +20,7 @@ import com.lark.oapi.service.im.v1.ImService;
 import com.lark.oapi.service.im.v1.model.*;
 import com.q.reminder.reminder.constant.GroupInfoType;
 import com.q.reminder.reminder.entity.*;
+import com.q.reminder.reminder.enums.TableFieldEnum;
 import com.q.reminder.reminder.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -54,6 +56,10 @@ public class FeishuEventController {
     private TableRecordTmpService tableRecordTmpService;
     @Autowired
     private TableFieldsOptionService tableFieldsOptionService;
+    @Autowired
+    private TTableUserConfigService tTableUserConfigService;
+    @Autowired
+    private TTableFeatureTmpService tTableFeatureTmpService;
     private static String CHAT_ID = null;
 
     @PostMapping("/event")
@@ -213,64 +219,10 @@ public class FeishuEventController {
             })
             .build();
 
-    private void tableRecordChange(JSONObject object) {
-        JSONObject eventJson = object.getJSONObject("event");
-        JSONObject header = object.getJSONObject("header");
-        log.info("drive.file.bitable_record_changed_v1 - event:{}", eventJson);
-        log.info("drive.file.bitable_record_changed_v1 - header:{}", header);
-
-        String table_id = eventJson.getString("table_id");
-        String file_type = eventJson.getString("file_type");
-        List<TableRecordTmp> tmpList = new ArrayList<>();
-        for (JSONObject j : eventJson.getList("action_list", JSONObject.class)) {
-            String action = j.getString("action");
-            String recordId = j.getString("record_id");
-            if ("record_deleted".equals(action)) {
-                tableRecordTmpService.remove(Wrappers.<TableRecordTmp>lambdaUpdate().eq(TableRecordTmp::getRecordId, recordId));
-            } else {
-                JSONArray afterValue = j.getJSONArray("after_value");
-                JSONArray beforeValue = j.getJSONArray("before_value");
-//                JsonComparedOption jsonComparedOption = new JsonComparedOption().setIgnoreOrder(true);
-//                JsonCompareResult jsonCompareResult = new DefaultJsonDifference()
-//                        .option(jsonComparedOption)
-//                        .detectDiff(afterValue, beforeValue);
-//                List<Defects> defectsList = jsonCompareResult.getDefectsList();
-
-                afterValue.forEach(e -> {
-                    TableRecordTmp tmp = new TableRecordTmp();
-                    JSONObject afterJson = JSONObject.from(e);
-                    JSONObject beforeJson = new JSONObject();
-                    String afterFieldValue = afterJson.getString("field_value");
-                    String fieldId = afterJson.getString("field_id");
-                    String beforeFieldValue = "";
-
-                    for (Object o : beforeValue) {
-                        beforeJson = JSONObject.from(o);
-                        if (fieldId.equals(beforeJson.getString("field_id"))) {
-                            beforeFieldValue = beforeJson.getString("field_value");
-                            break;
-                        }
-                    }
-
-                    tmp.setRecordId(recordId);
-                    tmp.setFieldId(fieldId);
-                    afterFieldValue = getValue(afterFieldValue);
-                    beforeFieldValue = getValue(beforeFieldValue);
-                    tmp.setBeforeFieldValue(beforeFieldValue);
-                    tmp.setAfterFieldValue(afterFieldValue);
-                    tmp.setTableId(table_id);
-                    tmp.setFileType(file_type);
-                    tmpList.add(tmp);
-                });
-            }
-        }
-        tableRecordTmpService.saveOrUpdateBatchByMultiId(tmpList);
-    }
-
-    private static String getValue(String beforeFieldValue) {
-        if (JSONUtil.isTypeJSON(beforeFieldValue) && JSONUtil.isTypeJSONArray(beforeFieldValue)) {
+    private static String getFieldValue(String fieldValue) {
+        if (JSONUtil.isTypeJSON(fieldValue) && JSONUtil.isTypeJSONArray(fieldValue)) {
             StringBuilder fileArray = new StringBuilder();
-            JSONArray array = JSONArray.parse(beforeFieldValue);
+            JSONArray array = JSONArray.parse(fieldValue);
             array.forEach(v -> {
                 JSONObject from = JSONObject.from(v);
                 if ("text".equals(from.get("type"))) {
@@ -278,9 +230,52 @@ public class FeishuEventController {
                 }
             });
             if (!fileArray.isEmpty()) {
-                beforeFieldValue = fileArray.toString();
+                fieldValue = fileArray.toString();
             }
         }
-        return beforeFieldValue;
+        return StrUtil.trimEnd(fieldValue);
+    }
+
+    private void tableRecordChange(JSONObject object) {
+        JSONObject eventJson = object.getJSONObject("event");
+        JSONObject header = object.getJSONObject("header");
+        log.info("drive.file.bitable_record_changed_v1 - event:{}", eventJson);
+        log.info("drive.file.bitable_record_changed_v1 - header:{}", header);
+//        String table_id = eventJson.getString("table_id");
+//        String file_type = eventJson.getString("file_type");
+        JSONObject actionJson = eventJson.getList("action_list", JSONObject.class).get(0);
+        String action = actionJson.getString("action");
+        String recordId = actionJson.getString("record_id");
+
+        // 需求表
+        JSONObject fieldJson = new JSONObject();
+        if ("record_deleted".equals(action)) {
+            tableRecordTmpService.remove(Wrappers.<TableRecordTmp>lambdaUpdate().eq(TableRecordTmp::getRecordId, recordId));
+        } else {
+            JSONArray afterValue = actionJson.getJSONArray("after_value");
+            List<String> fieldIds = List.of("fldzBqWKKF", "fldyxlzDlx", "fldVitCKLL", "fldwfsE7FK", "fldSgKd6Rp", "fldnlI18sF", "fldYrJP7Hd", "fldLuzGYK8", "fldRwSQfOm", "fldy8bIsUP", "fldeDXrMOV");
+            List<Object> fieldId1 = afterValue.stream().filter(e -> fieldIds.contains(JSONObject.from(e).get("field_id"))).toList();
+            List<TableFieldsOption> list = tableFieldsOptionService.list();
+            Map<String, String> optionMap = list.stream().collect(Collectors.toMap(TableFieldsOption::getId, TableFieldsOption::getName));
+            List<TTableUserConfig> tTableUserConfigs = tTableUserConfigService.listAll();
+            Map<String, String> projectMap = tTableUserConfigs.stream().collect(Collectors.toMap(TTableUserConfig::getPrjctName, TTableUserConfig::getPrjctKey));
+            for (Object o : fieldId1) {
+                JSONObject afterJson = JSONObject.from(o);
+                String fieldId = afterJson.getString("field_id");
+                String fieldValue = getFieldValue(afterJson.getString("field_value"));
+                if (optionMap.containsKey(fieldValue)) {
+                    fieldValue = optionMap.get(fieldValue);
+                }
+                if (projectMap.containsKey(fieldValue)) {
+                    fieldJson.put("prjctKey", projectMap.get(fieldValue));
+                }
+                fieldJson.put(TableFieldEnum.getValue(fieldId), fieldValue);
+            }
+            TTableFeatureTmp featureTmp = JSONObject.parseObject(fieldJson.toJSONString(), TTableFeatureTmp.class);
+            if ("是".equals(featureTmp.getWriteType())) {
+                featureTmp.setRecordsId(recordId);
+                tTableFeatureTmpService.saveOrUpdate(featureTmp);
+            }
+        }
     }
 }
