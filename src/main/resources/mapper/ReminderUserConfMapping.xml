@@ -8,7 +8,7 @@
             t.`date` AS spentOn,
             t.`name` AS userName,
             t.userId,
-            te.hours,
+            IFNULL(te.hours, 0) AS hours,
             t.start_date AS startDate,
             t.end_date AS endDate,
             t.`enable`
