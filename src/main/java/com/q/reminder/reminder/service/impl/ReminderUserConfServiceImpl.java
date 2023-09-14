@@ -37,22 +37,6 @@ public class ReminderUserConfServiceImpl extends ServiceImpl<ReminderUserConfMap
         // 开始日期
         DateTime dateTime = now.offsetNew(DateField.DAY_OF_MONTH, -7);
         List<UserReminderVo> userReminderList = baseMapper.listByUser(dateTime.toString("yyyy-MM-dd"));
-//        userReminderList.removeIf(e -> {
-//            String memberId = null;
-//            boolean flag = Objects.equals("1", e.getEnable());
-//            if (flag) {
-//                return true;
-//            }
-//            Date toDay = new DateTime(now.toString("yyyy-MM-dd"));
-//            Date startDate = e.getStartDate();
-//            Date endDate = e.getEndDate();
-//            // 当天在开始结束范围内，过滤掉
-//            if (startDate != null && endDate != null && DateUtil.isIn(toDay, startDate, endDate)) {
-//                omsLogger.info("不提醒，[{}]当前为休假期，startDate：{} ~ endDate：{}", e.getUserName(), startDate, endDate);
-//                return true;
-//            }
-//            return false;
-//        });
         if (CollectionUtils.isEmpty(userReminderList)) {
             omsLogger.info("当前日期全部填写日报！");
             return;
