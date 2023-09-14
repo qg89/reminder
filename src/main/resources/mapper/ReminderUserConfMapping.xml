@@ -37,6 +37,7 @@
         ) t
         LEFT JOIN rd_time_entry te ON t.`date` = te.spentOn AND REPLACE ( te.userName, ' ', '' ) = t.`name`
         LEFT JOIN s_reminder_user_conf uc ON t.member_id = uc.member_id
+        HAVING `enable` = 0
     </select>
 </mapper>
 
