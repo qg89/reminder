@@ -28,7 +28,7 @@
             LEFT JOIN r_redmine_user_info rui ON ui.`name` = REPLACE(rui.assignee_name,' ','')
             WHERE
                 dc.`date` >= #{beginOfWeek}
-                AND dc.`date` <![CDATA[<=]]> DATE_SUB(NOW(),INTERVAL 1 DAY)
+                AND dc.`date` <![CDATA[<]]> CURDATE()
                 AND `work` = 1
                 AND rui.redmine_type = 2
             GROUP BY
