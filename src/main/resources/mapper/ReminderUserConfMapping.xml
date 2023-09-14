@@ -9,25 +9,26 @@
             t.`name` AS userName,
             t.userId,
             te.hours,
-            uc.start_date AS startDate,
-            uc.end_date AS endDate,
-            uc.`enable`
+            t.start_date AS startDate,
+            t.end_date AS endDate,
+            t.`enable`
         FROM
         (
             SELECT
                 dc.`date`,
                 ui.`name`,
                 ui.member_id,
-                rui.assignee_id as userId
+                rui.assignee_id as userId,
+                ui.start_date,
+                ui.end_date,
+                ui.`enable`
             FROM
                 s_holiday_config dc,
-                fs_user_member_info ui
+                s_reminder_user_conf ui
             LEFT JOIN r_redmine_user_info rui ON ui.`name` = REPLACE(rui.assignee_name,' ','')
             WHERE
                 dc.`date` >= #{beginOfWeek}
                 AND dc.`date` <![CDATA[<=]]> DATE_SUB(NOW(),INTERVAL 1 DAY)
-                AND ui.resign = 0
-                AND ui.is_delete = 0
                 AND `work` = 1
                 AND rui.redmine_type = 2
             GROUP BY
@@ -36,7 +37,6 @@
                 rui.assignee_id
         ) t
         LEFT JOIN rd_time_entry te ON t.`date` = te.spentOn AND REPLACE ( te.userName, ' ', '' ) = t.`name`
-        LEFT JOIN s_reminder_user_conf uc ON t.member_id = uc.member_id
         HAVING `enable` = 0
     </select>
 </mapper>
