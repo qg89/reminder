@@ -124,6 +124,7 @@
       AND ri.redmine_type = 2
       AND fi.resign = 0
       AND fi.is_delete = 0
+    ORDER BY CONVERT(fi.`name` USING GBK)
 </select>
 
 <select id="listByProject" resultType="com.q.reminder.reminder.entity.RdTimeEntry">
