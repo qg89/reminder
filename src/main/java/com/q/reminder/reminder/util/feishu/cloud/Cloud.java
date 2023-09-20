@@ -2,6 +2,7 @@ package com.q.reminder.reminder.util.feishu.cloud;
 
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.util.feishu.cloud.documents.Documents;
+import com.q.reminder.reminder.util.feishu.cloud.documents.ExportFile;
 import com.q.reminder.reminder.util.feishu.cloud.documents.Upload;
 import com.q.reminder.reminder.util.feishu.cloud.space.Space;
 import com.q.reminder.reminder.util.feishu.cloud.table.Table;
@@ -39,5 +40,8 @@ public class Cloud extends BaseFeishu {
 
     public Upload upload() {
         return Upload.getInstance();
+    }
+    public ExportFile export() {
+        return ExportFile.getInstance();
     }
 }

@@ -1,6 +1,8 @@
 package com.q.reminder.reminder.util.feishu;
 
 import com.lark.oapi.Client;
+import com.lark.oapi.core.cache.LocalCache;
+import com.lark.oapi.core.enums.BaseUrlEnum;
 import com.q.reminder.reminder.service.impl.FeishuService;
 import com.q.reminder.reminder.util.SpringContextUtils;
 import com.q.reminder.reminder.util.feishu.cloud.Cloud;
@@ -8,6 +10,8 @@ import com.q.reminder.reminder.util.feishu.group.GroupMessage;
 import com.q.reminder.reminder.util.feishu.message.Message;
 import com.q.reminder.reminder.util.feishu.wiki.Wiki;
 import lombok.extern.log4j.Log4j2;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author : saiko
@@ -22,6 +26,15 @@ public abstract class BaseFeishu {
     protected Client CLIENT = feishuService.client();
 
     protected BaseFeishu() {
+    }
+
+    public void client(String appId, String appSecret) {
+        this.CLIENT = Client.newBuilder(appId, appSecret)
+                .requestTimeout(5, TimeUnit.MINUTES)
+                .openBaseUrl(BaseUrlEnum.FeiShu)
+                .tokenCache(LocalCache.getInstance())
+                .build();
+
     }
 
     /**
