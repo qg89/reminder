@@ -20,6 +20,7 @@ import tech.powerjob.client.PowerJobClient;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
+import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.concurrent.TimeUnit;
 
@@ -45,10 +46,12 @@ public class AlarmablePowerJob implements BasicProcessor {
 //        String taskName = resultDTO.getData().getJobName();
 //
         ProcessResult processResult = new ProcessResult(true);
+        OmsLogger omsLogger = context.getOmsLogger();
+        omsLogger.info("init - system loadLibary");
         System.loadLibrary("Demo123");
         Demo123 demo123 = new Demo123();
         String i = demo123.sayHello("111");
-        context.getOmsLogger().info("报文信息:" , i);
+        omsLogger.info("报文信息:" , i);
 
 //        Boolean test = RedisUtils.getInstance().invokeExceededTimes("test", 10, 10);
 //
