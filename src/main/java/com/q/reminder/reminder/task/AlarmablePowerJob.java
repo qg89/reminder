@@ -50,7 +50,7 @@ public class AlarmablePowerJob implements BasicProcessor {
         ProcessResult processResult = new ProcessResult(true);
         OmsLogger omsLogger = context.getOmsLogger();
         omsLogger.info("init - system loadLibary");
-        String property = System.getProperty(" com.q.reminder.reminder.cpp");
+        String property = System.getProperty("com.q.reminder.reminder.cpp");
         omsLogger.info("property {} ", property);
         Demo123 demo1231 = Native.loadLibrary(property + "Demo123.so", Demo123.class);
         omsLogger.info("demo1231 {} ", demo1231);
