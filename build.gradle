@@ -34,7 +34,6 @@ configurations {
 }
 
 dependencies {
-//	implementation 'org.springframework.boot:spring-boot-starter-quartz'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
@@ -112,6 +111,8 @@ dependencies {
 	implementation 'cn.6tail:lunar:1.6.3'
 
 	implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+
+	implementation 'net.java.dev.jna:jna:5.13.0'
 
 }
 

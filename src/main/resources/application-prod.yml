@@ -42,3 +42,9 @@ powerjob:
     max-result-length: 4096
     max-appended-wf-context-length: 4096
     password: Qigang0211
+
+feishu-config:
+  app-id: mpw:XmOtdJZ/rrM7t+S1c9SV2nyu+ihCGM3sSfkWWWcW/TY=
+  app-secret: mpw:1HSZ98TVPJZoFZr0aHkbIv+jIxmu1niV5I8bhkDtSe/ENC5S07lLG1LKoKhOAkyr
+  weekly-report-token: wikcnXpXCgmL3E7vdbM1TiwXiGc
+  weekly-report-spaceId: 7046680616087126018

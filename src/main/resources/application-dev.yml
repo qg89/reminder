@@ -15,9 +15,9 @@ spring:
     # 数据源
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    username: root
-    password: root
-    url: jdbc:mysql://127.0.0.1/reminder?characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=GMT%2B8&allowMultiQueries=true&allowPublicKeyRetrieval=true
+    url: mpw:HycUW8Lgi8NaSPXgn5QBiJhZHEjXL5ZbJ10H5SyUaCIHtucW2AizgBepO1CQBrDDMBsalyG4vaswU1ByUOnnk8nrA1T6n1tQ3kW1IjJ4mvvpw16o5XFdvpBI35I5zFzACip7Qn2hZkVJ6og64XMvWfLpbZW+ORMb0BDrrdGHf5OIvu2SNCO5BFM17L+cdnh0xV9Z1iDiZqjc6F0rFqmZbGkR1VEWbIxuvUyvNk8FU3myRCaBXtJkzjvHbHe8c1nppSD5LJN4Wq2yhXrenLgtD+rV1kht/m5YghLFyHoirYMOEJqw1AS99nUiSEEAR7jo4aQMzZODkqxhEfF8QRw1xQ==
+    username: mpw:Yk3qY5/w217jU2OBvZWxFA==
+    password: mpw:pCg3OoNI1k+vb5u77cNkRw==
     hikari:
       connection-timeout: 30000     # 等待连接池分配链接的最大时长（毫秒），超过这个时长还没有可用的连接则发生 SQLException，默认：30 秒
       minimum-idle: 2               # 最小空闲连接数
@@ -26,7 +26,7 @@ spring:
       idle-timeout: 600000          # 连接超时的最大时长（毫秒），超时则被释放（retired），默认：10 分钟
       max-lifetime: 1800000         # 连接的生命时长（毫秒），超时而且没被使用则被释放（retired），默认： 30 分钟
       connection-test-query: SELECT 1
-      pool-name: MakuHikariCP_Reminder
+      pool-name: MakuHikariCP_Reminder_DEV
 logging:
   level:
     root: info
@@ -42,3 +42,9 @@ powerjob:
     max-result-length: 4096
     max-appended-wf-context-length: 4096
     password: Qigang0211
+
+feishu-config:
+  app-id: mpw:McdDaRsXUJanlcUCtBE64+snZK74DlHTAREQSveEzrc=
+  app-secret: mpw:McdDaRsXUJanlcUCtBE64+snZK74DlHTAREQSveEzrc=
+  weekly-report-token: wikcnXpXCgmL3E7vdbM1TiwXiGc
+  weekly-report-spaceId: 7046680616087126018

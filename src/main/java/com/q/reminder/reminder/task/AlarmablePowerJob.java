@@ -1,30 +1,27 @@
 package com.q.reminder.reminder.task;
 
-import cn.hutool.core.date.DateUtil;
+import com.lark.oapi.Client;
+import com.lark.oapi.core.Config;
+import com.lark.oapi.core.enums.AppType;
+import com.lark.oapi.core.enums.BaseUrlEnum;
+import com.lark.oapi.core.httpclient.OkHttpTransport;
+import com.lark.oapi.core.request.RequestOptions;
+import com.lark.oapi.core.utils.OKHttps;
 import com.lark.oapi.service.bitable.v1.model.ListAppTableFieldReq;
 import com.lark.oapi.service.bitable.v1.model.ListAppTableFieldResp;
-import com.nlf.calendar.Holiday;
-import com.nlf.calendar.util.HolidayUtil;
-import com.q.reminder.reminder.entity.FsGroupInfo;
-import com.q.reminder.reminder.entity.SHolidayConfig;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.SHolidayConfigService;
 import com.q.reminder.reminder.service.TableFieldsChangeService;
 import com.q.reminder.reminder.service.impl.FeishuService;
-import com.q.reminder.reminder.util.RedisUtils;
-import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 import tech.powerjob.client.PowerJobClient;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author : saiko
@@ -48,39 +45,42 @@ public class AlarmablePowerJob implements BasicProcessor {
 //        String taskName = resultDTO.getData().getJobName();
 //
         ProcessResult processResult = new ProcessResult(true);
-        String instanceParams = context.getInstanceParams();
+        System.loadLibrary("Demo123");
+        Demo123 demo123 = new Demo123();
+        String i = demo123.sayHello("111");
+        context.getOmsLogger().info("报文信息:" , i);
 
-        Boolean test = RedisUtils.getInstance().invokeExceededTimes("test", 10, 10);
-
-        List<FsGroupInfo> groupToChats = BaseFeishu.groupMessage().getGroupToChats();
-        System.out.println();
-        DateTime now = new DateTime(context.getInstanceParams()).minusDays(1);
-        boolean flag = true;
-        List<SHolidayConfig> data = new ArrayList<>();
-        while (flag) {
-            now = now.plusDays(1);
-            Date nowDate = now.toDate();
-            Holiday holiday = HolidayUtil.getHoliday(now.toString("yyyy-MM-dd"));
-            SHolidayConfig sHolidayConfig = new SHolidayConfig();
-            if ((holiday == null && !DateUtil.isWeekend(nowDate)) || holiday != null && holiday.isWork()) {
-                sHolidayConfig.setDate(nowDate);
-                sHolidayConfig.setWork(1);
-                if (holiday != null) {
-                    sHolidayConfig.setName(holiday.toString());
-                }
-            } else {
-                sHolidayConfig.setWork(0);
-                sHolidayConfig.setDate(nowDate);
-                if (holiday != null) {
-                    sHolidayConfig.setName(holiday.getName());
-                }
-            }
-            data.add(sHolidayConfig);
-            if (DateUtil.isLastDayOfMonth(nowDate)) {
-                flag = false;
-            }
-        }
-        service.saveOrUpdateBatch(data);
+//        Boolean test = RedisUtils.getInstance().invokeExceededTimes("test", 10, 10);
+//
+//        List<FsGroupInfo> groupToChats = BaseFeishu.groupMessage().getGroupToChats();
+//        System.out.println();
+//        DateTime now = new DateTime(context.getInstanceParams()).minusDays(1);
+//        boolean flag = true;
+//        List<SHolidayConfig> data = new ArrayList<>();
+//        while (flag) {
+//            now = now.plusDays(1);
+//            Date nowDate = now.toDate();
+//            Holiday holiday = HolidayUtil.getHoliday(now.toString("yyyy-MM-dd"));
+//            SHolidayConfig sHolidayConfig = new SHolidayConfig();
+//            if ((holiday == null && !DateUtil.isWeekend(nowDate)) || holiday != null && holiday.isWork()) {
+//                sHolidayConfig.setDate(nowDate);
+//                sHolidayConfig.setWork(1);
+//                if (holiday != null) {
+//                    sHolidayConfig.setName(holiday.toString());
+//                }
+//            } else {
+//                sHolidayConfig.setWork(0);
+//                sHolidayConfig.setDate(nowDate);
+//                if (holiday != null) {
+//                    sHolidayConfig.setName(holiday.getName());
+//                }
+//            }
+//            data.add(sHolidayConfig);
+//            if (DateUtil.isLastDayOfMonth(nowDate)) {
+//                flag = false;
+//            }
+//        }
+//        service.saveOrUpdateBatch(data);
 //        List<TableFieldsChange> list = new ArrayList<>();
 //        String token = "";
 //        ListAppTableFieldRespBody data = chan(token).getData();
@@ -124,7 +124,17 @@ public class AlarmablePowerJob implements BasicProcessor {
         if (StringUtils.isNotBlank(token)) {
             req.setPageToken(token);
         }
+        RequestOptions options = RequestOptions.newBuilder().appAccessToken("u-d6Op03N25a5GCZg.7ht65Dhk4yLA00rxO0w0g0k20bw9").build();
+        Config config = new Config();
+        config.setBaseUrl(BaseUrlEnum.FeiShu.getUrl());
+        config.setAppType(AppType.SELF_BUILT);
+        config.setDisableTokenCache(false);
+//        config.setAppId("cli_a1144b112738d013");
+//        config.setAppSecret("AQHvpoTxE4pxjkIlcOwC1bEMoJMkJiTx");
+        config.setHttpTransport(new OkHttpTransport(OKHttps.create(1, TimeUnit.DAYS)));
         // 发起请求
-        return feishuService.client().bitable().appTableField().list(req);
+        Client cliented = feishuService.client();
+        cliented.setConfig(config);
+        return cliented.bitable().appTableField().list(req, options);
     }
 }
