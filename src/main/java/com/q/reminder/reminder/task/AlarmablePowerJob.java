@@ -14,7 +14,6 @@ import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.SHolidayConfigService;
 import com.q.reminder.reminder.service.TableFieldsChangeService;
 import com.q.reminder.reminder.service.impl.FeishuService;
-import com.sun.jna.Native;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -50,11 +49,10 @@ public class AlarmablePowerJob implements BasicProcessor {
         ProcessResult processResult = new ProcessResult(true);
         OmsLogger omsLogger = context.getOmsLogger();
         omsLogger.info("init - system loadLibary");
-        String property = System.getProperty("com.q.reminder.reminder.cpp");
-        omsLogger.info("property {} ", property);
-        Demo123 demo1231 = Native.loadLibrary(property + "Demo123.so", Demo123.class);
-        omsLogger.info("demo1231 {} ", demo1231);
-        String i = demo1231.sayHello("111");
+        System.loadLibrary("Demo123");
+        omsLogger.info("init - so success");
+        Demo123 demo123 = new Demo123();
+        String i = demo123.sayHello("111");
         omsLogger.info("报文信息:" , i);
 
 //        Boolean test = RedisUtils.getInstance().invokeExceededTimes("test", 10, 10);
