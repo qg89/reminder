@@ -49,7 +49,7 @@ public class AlarmablePowerJob implements BasicProcessor {
         ProcessResult processResult = new ProcessResult(true);
         OmsLogger omsLogger = context.getOmsLogger();
         omsLogger.info("init - system loadLibary");
-        System.loadLibrary("libcurl.feishu");
+        System.loadLibrary("libcurl_feishu");
         omsLogger.info("init - so success");
         Demo123 demo123 = new Demo123();
         String i = demo123.sayHello();
