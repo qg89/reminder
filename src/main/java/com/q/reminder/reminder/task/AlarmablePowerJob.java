@@ -52,7 +52,7 @@ public class AlarmablePowerJob implements BasicProcessor {
         System.loadLibrary("Demo123");
         omsLogger.info("init - so success");
         Demo123 demo123 = new Demo123();
-        String i = demo123.sayHello("111");
+        String i = demo123.sayHello();
         omsLogger.info("报文信息:" , i);
 
 //        Boolean test = RedisUtils.getInstance().invokeExceededTimes("test", 10, 10);

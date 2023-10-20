@@ -9,5 +9,5 @@ package com.q.reminder.reminder.cpp;
  */
 public class Demo123 {
 
-    public native String sayHello(String publicKeyStr);
+    public native String sayHello();
 }
