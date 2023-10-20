@@ -17,6 +17,7 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +35,7 @@ import java.util.Map;
  * @Description :
  * @date :  2022.12.21 19:13
  */
+@Log4j2
 @RestController
 @RequestMapping("/p")
 @RequiredArgsConstructor
@@ -124,7 +126,9 @@ public class ProjectController {
 
     @GetMapping("/so")
     public ReturnT<String> so() {
+        log.info("init - system loadLibary");
         System.loadLibrary("libcurl_feish");
+        log.info("init - so success");
         Demo123 demo123 = new Demo123();
         String i = demo123.sayHello();
         return new ReturnT<>(i);
