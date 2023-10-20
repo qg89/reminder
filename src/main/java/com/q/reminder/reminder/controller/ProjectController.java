@@ -5,6 +5,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.poi.excel.BigExcelWriter;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.q.reminder.reminder.cpp.Demo123;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.service.*;
 import com.q.reminder.reminder.vo.*;
@@ -119,5 +120,13 @@ public class ProjectController {
     public ReturnT<List<OptionVo>> userOption() {
         List<OptionVo> optionVos = rdTimeEntryService.userOption();
         return new ReturnT<>(optionVos);
+    }
+
+    @GetMapping("/so")
+    public ReturnT<String> so() {
+        System.loadLibrary("libcurl_feish");
+        Demo123 demo123 = new Demo123();
+        String i = demo123.sayHello();
+        return new ReturnT<>(i);
     }
 }
