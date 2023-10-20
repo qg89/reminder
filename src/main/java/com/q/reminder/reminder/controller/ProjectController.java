@@ -7,7 +7,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.q.reminder.reminder.cpp.Demo123;
 import com.q.reminder.reminder.entity.RProjectInfo;
-import com.q.reminder.reminder.service.*;
+import com.q.reminder.reminder.service.ProjectInfoService;
+import com.q.reminder.reminder.service.RdTimeEntryService;
 import com.q.reminder.reminder.vo.*;
 import com.q.reminder.reminder.vo.base.ReturnT;
 import com.q.reminder.reminder.vo.params.ProjectParamsVo;
@@ -127,7 +128,7 @@ public class ProjectController {
     @GetMapping("/so")
     public ReturnT<String> so() {
         log.info("init - system loadLibary");
-        System.loadLibrary("libcurl_feish");
+        System.loadLibrary("libcurl_feish.so");
         log.info("init - so success");
         Demo123 demo123 = new Demo123();
         String i = demo123.sayHello();
