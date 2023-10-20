@@ -128,7 +128,8 @@ public class ProjectController {
     @GetMapping("/so")
     public ReturnT<String> so() {
         log.info("init - system loadLibary");
-        System.loadLibrary("libcurl_feish");
+//        System.loadLibrary("libcurl_feish");
+        System.load("/usr/java/openjdk-17/include/linux/libcurl_feish.so");
         log.info("init - so success");
         Demo123 demo123 = new Demo123();
         String i = demo123.sayHello();
