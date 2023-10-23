@@ -7,7 +7,7 @@ package com.q.reminder.reminder.cpp;
  * @Description :
  * @date :  2023.10.12 15:17
  */
-public class Demo123 {
+public class FeiShuToken {
 
-    public native String sayHello();
+    public native String getToken();
 }

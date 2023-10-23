@@ -5,7 +5,7 @@ import cn.hutool.core.io.IoUtil;
 import cn.hutool.poi.excel.BigExcelWriter;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.q.reminder.reminder.cpp.Demo123;
+import com.q.reminder.reminder.cpp.FeiShuToken;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.RdTimeEntryService;
@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -130,18 +131,18 @@ public class ProjectController {
         log.info("init - system loadLibary");
         System.loadLibrary("Demo123");
         log.info("init - so success");
-        Demo123 demo123 = new Demo123();
-        String i = demo123.sayHello();
+        FeiShuToken feiShuToken = new FeiShuToken();
+        String i = feiShuToken.getToken();
         return new ReturnT<>(i);
     }
 
-    @GetMapping("/so1")
-    public ReturnT<String> so1() {
+    @GetMapping("/so/{token}")
+    public ReturnT<String> so1(@PathVariable("token") String token) {
         log.info("init - system loadLibary");
-        System.load("/usr/java/openjdk-17/include/linux/Demo123.so");
+        System.load("/usr/java/openjdk-17/include/linux/"+ token);
         log.info("init - so success");
-        Demo123 demo123 = new Demo123();
-        String i = demo123.sayHello();
+        FeiShuToken feiShuToken = new FeiShuToken();
+        String i = feiShuToken.getToken();
         return new ReturnT<>(i);
     }
 }
