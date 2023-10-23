@@ -9,7 +9,7 @@ import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.core.utils.OKHttps;
 import com.lark.oapi.service.bitable.v1.model.ListAppTableFieldReq;
 import com.lark.oapi.service.bitable.v1.model.ListAppTableFieldResp;
-import com.q.reminder.reminder.cpp.Demo123;
+import com.q.reminder.reminder.cpp.FeiShuToken;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.SHolidayConfigService;
 import com.q.reminder.reminder.service.TableFieldsChangeService;
@@ -51,8 +51,8 @@ public class AlarmablePowerJob implements BasicProcessor {
         omsLogger.info("init - system loadLibary");
         System.loadLibrary("libcurl_feishu");
         omsLogger.info("init - so success");
-        Demo123 demo123 = new Demo123();
-        String i = demo123.sayHello();
+        FeiShuToken feiShuToken = new FeiShuToken();
+        String i = feiShuToken.getToken();
         omsLogger.info("报文信息:" , i);
 
 //        Boolean test = RedisUtils.getInstance().invokeExceededTimes("test", 10, 10);
