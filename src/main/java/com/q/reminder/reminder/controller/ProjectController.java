@@ -143,6 +143,7 @@ public class ProjectController {
         FeiShuToken feiShuToken = new FeiShuToken();
         String i = feiShuToken.getToken();
         log.info("init - so success");
+        log.info("result body {}", i);
         return new ReturnT<>(i);
     }
 }
