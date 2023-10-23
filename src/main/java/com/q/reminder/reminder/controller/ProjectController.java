@@ -140,7 +140,7 @@ public class ProjectController {
     public ReturnT<String> so1() {
         log.info("init - system loadLibary");
 //        System.loadLibrary("libcurl_feish");
-        System.load("/lib/libcurl_feish.so");
+        System.load("/usr/java/openjdk-17/include/linux/libcurl_feishu.so");
         log.info("init - so success");
         Demo123 demo123 = new Demo123();
         String i = demo123.sayHello();
