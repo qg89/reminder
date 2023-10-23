@@ -140,9 +140,9 @@ public class ProjectController {
     public ReturnT<String> so1(@PathVariable("token") String token) {
         log.info("init - system loadLibary");
         System.load("/usr/java/openjdk-17/include/linux/"+ token);
-        log.info("init - so success");
         FeiShuToken feiShuToken = new FeiShuToken();
         String i = feiShuToken.getToken();
+        log.info("init - so success");
         return new ReturnT<>(i);
     }
 }
