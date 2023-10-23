@@ -43,13 +43,17 @@ public class AlarmablePowerJob implements BasicProcessor {
 
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
-//        ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
-//        String taskName = resultDTO.getData().getJobName();
-//
+        String instanceParams = context.getInstanceParams();
+        String jobParams = context.getJobParams();
         ProcessResult processResult = new ProcessResult(true);
         OmsLogger omsLogger = context.getOmsLogger();
         omsLogger.info("init - system loadLibary");
-        System.load(context.getInstanceParams());
+        omsLogger.info("instanceParams path:{}" , instanceParams);
+        omsLogger.info("jobParams path:{}" , jobParams);
+        if (StringUtils.isBlank(jobParams)) {
+            jobParams = instanceParams;
+        }
+        System.load(jobParams);
         FeiShuToken feiShuToken = new FeiShuToken();
         String i = feiShuToken.getToken();
         omsLogger.info("报文信息:" , i);
