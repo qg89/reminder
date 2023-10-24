@@ -263,7 +263,6 @@ public class FeishuEventController {
             }
             TableFeatureRole role = new TableFeatureRole();
             role.setRecordId(recordId);
-            role.setRoleTime(fieldValue);
             switch (fieldId) {
                 case "fldzBqWKKF" -> table.setModule(fieldValue);
                 case "fldyxlzDlx" -> table.setMenuOne(fieldValue);
@@ -277,6 +276,9 @@ public class FeishuEventController {
                 case "fldRwSQfOm" -> role.setRoleType("3");
                 case "fldLuzGYK8" -> role.setRoleType("4");
                 case "fldgPB2P3W" -> role.setRoleType("5");
+            }
+            if (StringUtils.isNotBlank(role.getRoleType())) {
+                role.setRoleTime(fieldValue);
             }
             roleList.add(role);
         }
