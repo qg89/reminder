@@ -277,7 +277,7 @@ public class FeishuEventController {
                 case "fldLuzGYK8" -> role.setRoleType("4");
                 case "fldgPB2P3W" -> role.setRoleType("5");
             }
-            if (StringUtils.isNotBlank(role.getRoleType())) {
+            if (StringUtils.isNotBlank(role.getRoleType()) && StringUtils.isNotBlank(fieldValue)) {
                 role.setRoleTime(fieldValue);
                 roleList.add(role);
             }
