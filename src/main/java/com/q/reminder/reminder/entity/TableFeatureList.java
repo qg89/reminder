@@ -1,13 +1,12 @@
 package com.q.reminder.reminder.entity;
 
-import java.util.Date;
 import com.baomidou.mybatisplus.annotation.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
+import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 
 
 
@@ -26,7 +25,7 @@ public class TableFeatureList extends Model<TableFeatureList> implements Seriali
 /**
      * 飞书多维表格记录ID
      */    
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.INPUT)
     @TableField(value = "record_id")
     private String recordId;
     
