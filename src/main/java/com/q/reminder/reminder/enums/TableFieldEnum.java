@@ -27,6 +27,7 @@ public enum TableFieldEnum {
     FIELD_PROJECT_KEY("prjctKey", "prjctKey"),
     FIELD_FEATURE_ID("fldbO4FXw5", "featureId"),
     FIELD_BGDT("fldM0tclLc", "bgdt"),
+    FIELD_ALGRTHM("fldM0tclLc", "algrthm"),
 
     ;
     private String fieldId;
