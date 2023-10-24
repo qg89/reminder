@@ -102,30 +102,4 @@ public class TableFeatureController {
         });
         return jsonKey;
     }
-
-    public JSONObject jsonKey() {
-        JSONObject jsonKey = new JSONObject();
-        jsonKey.put("recordsId", "");
-        jsonKey.put("menuOne", "");
-        jsonKey.put("prdct", "");
-        jsonKey.put("front", "");
-        jsonKey.put("back", "");
-        jsonKey.put("bgdt", "");
-        jsonKey.put("implmntton", "");
-        jsonKey.put("archtct", "");
-        jsonKey.put("mdl", "");
-        jsonKey.put("test", "");
-        jsonKey.put("prodTime", "");
-        jsonKey.put("andrd", "");
-        jsonKey.put("prjct", "");
-        jsonKey.put("menuTwo", "");
-        jsonKey.put("menuThree", "");
-        jsonKey.put("algrthm", "");
-        jsonKey.put("oprton", "");
-        jsonKey.put("featureId", "");
-        jsonKey.put("dscrptn", "");
-        jsonKey.put("writeType", "");
-        jsonKey.put("featureType", "");
-        return jsonKey;
-    }
 }

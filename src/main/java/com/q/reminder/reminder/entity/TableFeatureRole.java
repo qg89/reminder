@@ -1,28 +1,26 @@
 package com.q.reminder.reminder.entity;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableLogic;
-import com.baomidou.mybatisplus.annotation.TableName;
+import java.util.Date;
+import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
 import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
 
 
 /**
  * 需求管理表各角色列表(TableFeatureRole)实体类
  *
  * @author makejava
- * @since 2023-10-24 12:37:31
+ * @since 2023-10-24 17:12:51
  */
 @Data
 @TableName("t_table_feature_role")
 public class TableFeatureRole extends Model<TableFeatureRole> implements Serializable {
     @Serial
-    private static final long serialVersionUID = 784218337634665309L;
+    private static final long serialVersionUID = -10262314184938050L;
     
 /**
      * 飞书多维表格记录ID
@@ -35,7 +33,7 @@ public class TableFeatureRole extends Model<TableFeatureRole> implements Seriali
      */    
     @MppMultiId
     @TableField(value = "role_type")
-    private String roleType;
+    private Integer roleType;
 /**
      * redmineID
      */    
@@ -45,12 +43,12 @@ public class TableFeatureRole extends Model<TableFeatureRole> implements Seriali
      * 角色工时
      */    
     @TableField(value = "role_time")
-    private String roleTime;
+    private Integer roleTime;
 /**
-     * 状态
+     * 状态：1设计，2开发
      */    
     @TableField(value = "state")
-    private String state;
+    private Integer state;
     
     @TableLogic(value = "0", delval = "1")
     @TableField(value = "is_delete")
