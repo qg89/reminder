@@ -279,8 +279,8 @@ public class FeishuEventController {
             }
             if (StringUtils.isNotBlank(role.getRoleType())) {
                 role.setRoleTime(fieldValue);
+                roleList.add(role);
             }
-            roleList.add(role);
         }
         tableFeatureRoleService.saveOrUpdateBatchByMultiId(roleList);
         tableFeatureListService.saveOrUpdate(table);
