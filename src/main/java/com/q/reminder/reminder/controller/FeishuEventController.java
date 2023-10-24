@@ -61,6 +61,10 @@ public class FeishuEventController {
     private TTableUserConfigService tTableUserConfigService;
     @Autowired
     private TTableFeatureTmpService tTableFeatureTmpService;
+    @Autowired
+    private TableFeatureListService tableFeatureListService;
+    @Autowired
+    private TableFeatureRoleService tableFeatureRoleService;
     private static String CHAT_ID = null;
 
     @PostMapping("/event")
@@ -167,6 +171,7 @@ public class FeishuEventController {
                     String eventStr = EVENT_DISPATCHER.decryptEvent(json);
                     JSONObject object = JSONObject.parseObject(eventStr);
                     tableRecordChange(object);
+                    tableRecordList(object);
                 }
             })
             // 审批事件
@@ -219,6 +224,69 @@ public class FeishuEventController {
                 }
             })
             .build();
+
+    /**
+     * 报错表 t_table_feature_list
+     * @param object
+     */
+    private void tableRecordList(JSONObject object) {
+        TableFeatureList table = new TableFeatureList();
+        JSONObject eventJson = object.getJSONObject("event");
+        JSONObject header = object.getJSONObject("header");
+        log.info("drive.file.bitable_record_changed_v1 - event:{}", eventJson);
+        log.info("drive.file.bitable_record_changed_v1 - header:{}", header);
+        JSONObject actionJson = eventJson.getList("action_list", JSONObject.class).get(0);
+        String action = actionJson.getString("action");
+        String recordId = actionJson.getString("record_id");
+        table.setRecordId(recordId);
+        if ("record_deleted".equals(action)) {
+            return;
+        }
+        List<String> fieldIds = List.of("fldzBqWKKF", "fldyxlzDlx", "fldVitCKLL", "fldwfsE7FK", "fldSgKd6Rp", "fldnlI18sF", "fldYrJP7Hd", "fldLuzGYK8", "fldRwSQfOm", "fldy8bIsUP", "fldeDXrMOV", "fldbO4FXw5");
+        JSONArray afterValue = actionJson.getJSONArray("after_value");
+        List<Object> record = afterValue.stream().filter(e -> fieldIds.contains(JSONObject.from(e).get("field_id"))).toList();
+        List<TableFieldsOption> list = tableFieldsOptionService.list();
+        Map<String, String> optionMap = list.stream().collect(Collectors.toMap(TableFieldsOption::getId, TableFieldsOption::getName));
+        List<TTableUserConfig> tTableUserConfigs = tTableUserConfigService.listAll();
+        Map<String, String> projectMap = tTableUserConfigs.stream().collect(Collectors.toMap(TTableUserConfig::getPrjctName, TTableUserConfig::getPrjctKey));
+
+        List<TableFeatureRole> roleList = new ArrayList<>();
+        for (Object field : record) {
+            JSONObject afterJson = JSONObject.from(field);
+            String fieldId = afterJson.getString("field_id");
+            String fieldValue = getFieldValue(afterJson.getString("field_value"));
+            if (optionMap.containsKey(fieldValue)) {
+                fieldValue = optionMap.get(fieldValue);
+            }
+            if (projectMap.containsKey(fieldValue)) {
+                table.setProjectKey(projectMap.get(fieldValue));
+            }
+            TableFeatureRole role = new TableFeatureRole();
+            role.setRecordId(recordId);
+            role.setRoleTime(fieldValue);
+            switch (fieldId) {
+                case "fldzBqWKKF" -> table.setModule(fieldValue);
+                case "fldyxlzDlx" -> table.setMenuOne(fieldValue);
+                case "fldVitCKLL" -> table.setMenuTwo(fieldValue);
+                case "fldwfsE7FK" -> table.setMenuThree(fieldValue);
+                case "fldSgKd6Rp" -> table.setDscrptn(fieldValue);
+                case "fldYrJP7Hd" -> table.setFeatureType(fieldValue);
+
+                case "fldM0tclLc" -> role.setRoleType("1");
+                case "fldy8bIsUP" -> role.setRoleType("2");
+                case "fldRwSQfOm" -> role.setRoleType("3");
+                case "fldLuzGYK8" -> role.setRoleType("4");
+                case "fldgPB2P3W" -> role.setRoleType("5");
+            }
+            roleList.add(role);
+        }
+        tableFeatureRoleService.saveOrUpdateBatch(roleList);
+        tableFeatureListService.saveOrUpdate(table);
+    }
+
+    private void tableRecordRole(JSONObject object) {
+
+    }
 
     private static String getFieldValue(String fieldValue) {
         if (JSONUtil.isTypeJSON(fieldValue) && JSONUtil.isTypeJSONArray(fieldValue)) {
