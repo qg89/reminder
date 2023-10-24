@@ -1,13 +1,15 @@
 package com.q.reminder.reminder.entity;
 
-import java.util.Date;
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import com.github.jeffreyning.mybatisplus.anno.MppMultiId;
 import lombok.Data;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Date;
 
 
 /**
@@ -43,7 +45,7 @@ public class TableFeatureRole extends Model<TableFeatureRole> implements Seriali
      * 角色工时
      */    
     @TableField(value = "role_time")
-    private Integer roleTime;
+    private String roleTime;
 /**
      * 状态：1设计，2开发
      */    
