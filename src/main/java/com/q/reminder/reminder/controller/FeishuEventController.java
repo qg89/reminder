@@ -270,6 +270,7 @@ public class FeishuEventController {
                 case "fldwfsE7FK" -> table.setMenuThree(fieldValue);
                 case "fldSgKd6Rp" -> table.setDscrptn(fieldValue);
                 case "fldYrJP7Hd" -> table.setFeatureType(fieldValue);
+                case "flds5vtn7k" -> table.setFeatureState(fieldValue);
 
                 case "fldM0tclLc" -> role.setRoleType("1");
                 case "fldy8bIsUP" -> role.setRoleType("2");
