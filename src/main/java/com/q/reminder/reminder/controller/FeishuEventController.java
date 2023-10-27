@@ -71,7 +71,6 @@ public class FeishuEventController {
     public void event(HttpServletRequest request, HttpServletResponse response) throws Throwable {
         try {
             String bodyStr = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-            log.info("FeishuEvent request:{}", bodyStr);
             EventReq req = new EventReq();
             req.setHeaders(toHeaderMap(request));
             req.setBody(bodyStr.getBytes(StandardCharsets.UTF_8));
