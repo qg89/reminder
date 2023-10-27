@@ -172,6 +172,7 @@ public class FeishuEventController {
                     JSONObject object = JSONObject.parseObject(eventStr);
                     tableRecordChange(object);
                     tableRecordList(object);
+                    log.info("drive.file.bitable_record_changed_v1 successful!!");
                 }
             })
             // 审批事件
@@ -233,8 +234,6 @@ public class FeishuEventController {
         TableFeatureList table = new TableFeatureList();
         JSONObject eventJson = object.getJSONObject("event");
         JSONObject header = object.getJSONObject("header");
-        log.info("drive.file.bitable_record_changed_v1 - event:{}", eventJson);
-        log.info("drive.file.bitable_record_changed_v1 - header:{}", header);
         JSONObject actionJson = eventJson.getList("action_list", JSONObject.class).get(0);
         String action = actionJson.getString("action");
         String recordId = actionJson.getString("record_id");
@@ -242,7 +241,21 @@ public class FeishuEventController {
         if ("record_deleted".equals(action)) {
             return;
         }
-        List<String> fieldIds = List.of("fldzBqWKKF", "fldyxlzDlx", "fldVitCKLL", "fldwfsE7FK", "fldSgKd6Rp", "fldnlI18sF", "fldYrJP7Hd", "fldLuzGYK8", "fldRwSQfOm", "fldy8bIsUP", "fldeDXrMOV", "fldbO4FXw5", "flds5vtn7k", "fldM0tclLc");
+        List<String> fieldIds = List.of(
+                "fldzBqWKKF",
+                "fldyxlzDlx",
+                "fldVitCKLL",
+                "fldwfsE7FK",
+                "fldSgKd6Rp",
+                "fldnlI18sF",
+                "fldYrJP7Hd",
+                "fldLuzGYK8",
+                "fldRwSQfOm",
+                "fldy8bIsUP",
+                "fldeDXrMOV",
+                "fldbO4FXw5",
+                "flds5vtn7k",
+                "fldM0tclLc");
         JSONArray afterValue = actionJson.getJSONArray("after_value");
         List<Object> record = afterValue.stream().filter(e -> fieldIds.contains(JSONObject.from(e).get("field_id"))).toList();
         List<TableFieldsOption> list = tableFieldsOptionService.list();
