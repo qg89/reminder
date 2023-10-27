@@ -325,8 +325,6 @@ public class FeishuEventController {
     private void tableRecordChange(JSONObject object) {
         JSONObject eventJson = object.getJSONObject("event");
         JSONObject header = object.getJSONObject("header");
-        log.info("drive.file.bitable_record_changed_v1 - event:{}", eventJson);
-        log.info("drive.file.bitable_record_changed_v1 - header:{}", header);
 //        String table_id = eventJson.getString("table_id");
 //        String file_type = eventJson.getString("file_type");
         JSONObject actionJson = eventJson.getList("action_list", JSONObject.class).get(0);
