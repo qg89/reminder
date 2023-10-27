@@ -242,7 +242,7 @@ public class FeishuEventController {
         if ("record_deleted".equals(action)) {
             return;
         }
-        List<String> fieldIds = List.of("fldzBqWKKF", "fldyxlzDlx", "fldVitCKLL", "fldwfsE7FK", "fldSgKd6Rp", "fldnlI18sF", "fldYrJP7Hd", "fldLuzGYK8", "fldRwSQfOm", "fldy8bIsUP", "fldeDXrMOV", "fldbO4FXw5", "flds5vtn7k");
+        List<String> fieldIds = List.of("fldzBqWKKF", "fldyxlzDlx", "fldVitCKLL", "fldwfsE7FK", "fldSgKd6Rp", "fldnlI18sF", "fldYrJP7Hd", "fldLuzGYK8", "fldRwSQfOm", "fldy8bIsUP", "fldeDXrMOV", "fldbO4FXw5", "flds5vtn7k", "fldM0tclLc");
         JSONArray afterValue = actionJson.getJSONArray("after_value");
         List<Object> record = afterValue.stream().filter(e -> fieldIds.contains(JSONObject.from(e).get("field_id"))).toList();
         List<TableFieldsOption> list = tableFieldsOptionService.list();
@@ -271,6 +271,7 @@ public class FeishuEventController {
                 case "fldSgKd6Rp" -> table.setDscrptn(fieldValue);
                 case "fldYrJP7Hd" -> table.setFeatureType(fieldValue);
                 case "flds5vtn7k" -> table.setFeatureState(fieldValue);
+                case "fldbO4FXw5" -> table.setFeatureId(fieldValue);
 
                 case "fldM0tclLc" -> role.setRoleType(1);
                 case "fldy8bIsUP" -> role.setRoleType(2);
