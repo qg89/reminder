@@ -14,13 +14,13 @@ import java.util.Date;
  * 需求管理表列表(TableFeatureList)实体类
  *
  * @author makejava
- * @since 2023-10-24 17:12:44
+ * @since 2023-10-24 17:31:59
  */
 @Data
 @TableName("t_table_feature_list")
 public class TableFeatureList extends Model<TableFeatureList> implements Serializable {
     @Serial
-    private static final long serialVersionUID = 517353110640948756L;
+    private static final long serialVersionUID = 934574330347878338L;
     
 /**
      * 飞书多维表格记录ID
@@ -35,6 +35,12 @@ public class TableFeatureList extends Model<TableFeatureList> implements Seriali
      */     
     @TableField(value = "redmine_id")
     private String redmineId;
+     
+/**
+     * 需求ID
+     */     
+    @TableField(value = "feature_id")
+    private String featureId;
      
 /**
      * 项目Key
