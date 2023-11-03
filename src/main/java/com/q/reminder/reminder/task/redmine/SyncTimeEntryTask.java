@@ -52,9 +52,14 @@ public class SyncTimeEntryTask implements BasicProcessor {
         String startTime = sDate.toString(format);
         String endTime = toDay.toString(format) + " 23:59:59";
         String instanceParams = context.getInstanceParams();
+        String jobParams = context.getJobParams();
         long i = 0L;
         if (NumberUtil.isInteger(instanceParams)) {
             int algo = Integer.parseInt(instanceParams);
+            startTime = DateUtil.offsetDay(toDay, -algo).toString(format);
+            i = algo;
+        } else if (NumberUtil.isInteger(jobParams)) {
+            int algo = Integer.parseInt(jobParams);
             startTime = DateUtil.offsetDay(toDay, -algo).toString(format);
             i = algo;
         } else {
