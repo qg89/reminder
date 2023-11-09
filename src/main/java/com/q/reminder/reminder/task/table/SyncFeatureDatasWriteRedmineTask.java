@@ -41,10 +41,7 @@ import tech.powerjob.worker.log.OmsLogger;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -96,6 +93,7 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                     LocalDate prodTime = redmineDataVo.getProdTime();
                     String featureType = redmineDataVo.getFeatureType();
                     List<FeautreTimeVo> feautreTimeVos = featureTimeMap.get(recordsId);
+                    Map<String, Object> recordField = new HashMap<>();
                     if (CollectionUtils.isEmpty(feautreTimeVos)) {
                         log.error(taskName + " 获取记录为空");
 
@@ -159,12 +157,14 @@ public class SyncFeatureDatasWriteRedmineTask implements BasicProcessor {
                                 redmineDataVo.setWriteRedmine("3");
                                 log.info(taskName + "-创建子任务失败, 需求类型：{}", featureType);
                             }
+                            recordField.put("RedmineId", parentIssue.getId());
                         }
                         log.info(taskName + "-创建子任务结束, 需求类型：{}", featureType);
                     }
 
                     if ("1".equals(redmineDataVo.getWriteRedmine())) {
-                        records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(Map.of("需求ID", recordsId)).build());
+                        recordField.put("需求ID", recordsId);
+                        records.add(AppTableRecord.newBuilder().recordId(recordsId).fields(recordField).build());
                     }
                     featureTmps.add(redmineDataVo);
                 }
