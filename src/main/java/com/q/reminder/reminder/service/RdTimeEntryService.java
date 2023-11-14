@@ -32,4 +32,6 @@ public interface RdTimeEntryService extends IMppService<RdTimeEntry>{
     List<ProjectCostVo> listBySpentOnToCost(ProjectParamsVo param);
 
     List<ProjectUserCostVo> listByPidSpentOnToCost(ProjectParamsVo vo);
+
+    List<RedmineNoneTimeVo> listNoneTimeUsers(String dateTime, String yesterday);
 }

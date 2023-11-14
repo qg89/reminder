@@ -82,4 +82,9 @@ public class RdTimeEntryServiceImpl extends MppServiceImpl<RdTimeEntryMapping, R
     public List<ProjectUserCostVo> listByPidSpentOnToCost(ProjectParamsVo vo) {
         return baseMapper.listByPidSpentOnToCost(vo);
     }
+
+    @Override
+    public List<RedmineNoneTimeVo> listNoneTimeUsers(String dateTime, String yesterday) {
+        return baseMapper.listNoneTimeUsers(dateTime, yesterday);
+    }
 }

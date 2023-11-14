@@ -239,5 +239,48 @@
             shortName,
             rt.spentOn
     </select>
+
+    <select id="listNoneTimeUsers" resultType="com.q.reminder.reminder.vo.RedmineNoneTimeVo">
+        SELECT
+            u.assignee_id AS userId,
+            u.date AS spentOn,
+            t.hours AS hours
+        FROM
+        (
+            SELECT
+                ru.assignee_id,
+                ru.user_name,
+                sh.date
+            FROM
+                fs_user_member_info fu,
+                r_redmine_user_info ru,
+                s_holiday_config sh
+            WHERE
+                resign = 0
+                AND fu.`name` = ru.user_name
+                AND fu.is_delete = 0
+                AND ru.is_delete = 0
+                AND sh.`work` = 1
+                AND ru.redmine_type = 2
+                AND sh.date >= #{beginOfMonth}
+        ) u
+        LEFT JOIN (
+            SELECT
+                userId,
+                userName,
+                SUM( hours ) hours,
+                spentOn
+            FROM
+                `rd_time_entry`
+            WHERE
+                spentOn BETWEEN #{beginOfMonth} AND #{yesterday}
+            GROUP BY
+                userId,
+                userName,
+                spentOn
+        ) t ON t.userId = u.assignee_id AND t.spentOn = u.date
+        WHERE
+            u.date <![CDATA[<=]]>  #{yesterday} AND (t.hours <![CDATA[<]]> 8 OR t.hours IS NULL)
+    </select>
 </mapper>
 
