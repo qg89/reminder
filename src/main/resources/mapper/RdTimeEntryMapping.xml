@@ -243,6 +243,7 @@
     <select id="listNoneTimeUsers" resultType="com.q.reminder.reminder.vo.RedmineNoneTimeVo">
         SELECT
             u.assignee_id AS userId,
+            u.user_name AS userName,
             u.date AS spentOn,
             t.hours AS hours
         FROM

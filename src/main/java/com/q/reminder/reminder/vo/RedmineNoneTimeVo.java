@@ -18,6 +18,7 @@ public class RedmineNoneTimeVo implements Serializable {
     @Serial
     private static final long serialVersionUID = 5066102270415906886L;
     private Integer userId;
+    private String userName;
     private Date spentOn;
     private Double hours;
 }

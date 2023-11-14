@@ -43,7 +43,7 @@ public class RedmineTimeTask implements BasicProcessor {
         String yesterday = DateUtil.yesterday().toString("yyyy-MM-dd");
         try {
             List<RedmineNoneTimeVo> list = rdTimeEntryService.listNoneTimeUsers(dateTime, yesterday);
-            Map<Integer, List<RedmineNoneTimeVo>> userMap = list.stream().collect(Collectors.groupingBy(RedmineNoneTimeVo::getUserId));
+            Map<String, List<RedmineNoneTimeVo>> userMap = list.stream().collect(Collectors.groupingBy(RedmineNoneTimeVo::getUserName));
             sendFeishu(userMap, log);
         }catch (Exception e){
             result.setSuccess(false);
@@ -54,7 +54,7 @@ public class RedmineTimeTask implements BasicProcessor {
         return result;
     }
 
-    private void sendFeishu(Map<Integer, List<RedmineNoneTimeVo>> map, OmsLogger log) {
+    private void sendFeishu(Map<String, List<RedmineNoneTimeVo>> map, OmsLogger log) {
         JSONObject con = new JSONObject();
         JSONObject all = new JSONObject();
         con.put("zh_cn", all);
@@ -75,6 +75,6 @@ public class RedmineTimeTask implements BasicProcessor {
 //        vo.setMsgType("post");
 //        CreateMessageResp resp = BaseFeishu.message().sendContent(vo);
 //        log.info("返回飞书报文，{}", resp);
-        log.info("未填日报集合。{}", map);
+        log.info("未填日报集合。{}", JSONObject.from(map));
     }
 }
