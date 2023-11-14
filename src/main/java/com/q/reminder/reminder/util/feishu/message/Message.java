@@ -66,7 +66,7 @@ public class Message extends BaseFeishu {
                 log.error("发送消息异常：error: {}, content:{}", resp.getMsg(), content);
                 sendContent(vo);
             }
-            throw new FeishuException(e, this.getClass().getName() + " 发送消息异常");
+//            throw new FeishuException(e, this.getClass().getName() + " 发送消息异常");
         }
         if (!resp.success() && redisUtils.invokeExceededTimes(key, 10, 5)) {
             log.error("发送消息异常：fault: {}, content:{}", resp.getMsg(), content);
@@ -107,7 +107,7 @@ public class Message extends BaseFeishu {
                 log.error("Task发送消息异常：error: {}, content:{}",  resp.getMsg(), content);
                 sendContent(vo, log);
             }
-            throw new FeishuException(e, this.getClass().getName() + " Task发送消息异常");
+//            throw new FeishuException(e, this.getClass().getName() + " Task发送消息异常");
         }
         if (!resp.success() && redisUtils.invokeExceededTimes(key, 10, 5)) {
             log.error("Task发送消息异常：error: {}, content:{}",  resp.getMsg(), content);
