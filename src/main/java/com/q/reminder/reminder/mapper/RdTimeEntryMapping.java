@@ -24,15 +24,18 @@ public interface RdTimeEntryMapping extends MppBaseMapper<RdTimeEntry> {
 
     IPage<UserInfoWrokVo> userinfoList(@Param("page") Page<UserInfoWrokVo> page, @Param("vo") UserInfoParamsVo vo);
 
-    IPage<UserInfoTimeVo> userTimeList(@Param("page") Page<UserInfoTimeVo> page,@Param("vo") UserInfoParamsVo vo);
+    IPage<UserInfoTimeVo> userTimeList(@Param("page") Page<UserInfoTimeVo> page, @Param("vo") UserInfoParamsVo vo);
 
     List<OptionVo> userOption();
 
     List<RdTimeEntry> listByProject(@Param("vo") ProjectParamsVo vo);
 
     List<ProjectCostVo> listByProjectByDate(@Param("vo") ProjectParamsVo param);
+
     List<ProjectCostVo> listBySpentOnToCost(@Param("vo") ProjectParamsVo param);
 
     List<ProjectUserCostVo> listByPidSpentOnToCost(@Param("vo") ProjectParamsVo vo);
+
+    List<RedmineNoneTimeVo> listNoneTimeUsers(@Param("beginOfMonth") String dateTime, @Param("yesterday") String yesterday);
 }
 
