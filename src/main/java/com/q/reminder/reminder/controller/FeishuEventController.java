@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.lark.oapi.core.request.EventReq;
 import com.lark.oapi.core.response.EventResp;
@@ -26,6 +27,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -128,20 +130,15 @@ public class FeishuEventController {
                         String fieldId = fieldAction.getFieldId();
                         String action = fieldAction.getAction();
                         if ("field_deleted".equals(action)) {
-                            tableFieldsFeatureService.removeById(fieldId);
+                            LambdaUpdateWrapper<TableFieldsChange> updateWrapper = Wrappers.lambdaUpdate();
+                            updateWrapper.eq(TableFieldsChange::getFieldId, fieldId);
+                            tableFieldsFeatureService.remove(updateWrapper);
                         } else {
                             BitableTableFieldActionValue value = fieldAction.getAfterValue();
                             BitableTableFieldActionValueProperty property = value.getProperty();
                             BitableTableFieldActionValuePropertyOption[] options = property.getOptions();
                             if (options != null && CollectionUtil.isNotEmpty(Arrays.asList(options))) {
-                                List<TableFieldsOption> opList = new ArrayList<>();
-                                for (BitableTableFieldActionValuePropertyOption option : options) {
-                                    TableFieldsOption op = new TableFieldsOption();
-                                    op.setId(option.getId());
-                                    op.setName(option.getName());
-                                    op.setColor(option.getColor());
-                                    opList.add(op);
-                                }
+                                List<TableFieldsOption> opList = getTableFieldsOptions(options);
                                 tableFieldsOptionService.saveOrUpdateBatch(opList);
                             }
 
@@ -224,6 +221,19 @@ public class FeishuEventController {
                 }
             })
             .build();
+
+    @NotNull
+    private static List<TableFieldsOption> getTableFieldsOptions(BitableTableFieldActionValuePropertyOption[] options) {
+        List<TableFieldsOption> opList = new ArrayList<>();
+        for (BitableTableFieldActionValuePropertyOption option : options) {
+            TableFieldsOption op = new TableFieldsOption();
+            op.setId(option.getId());
+            op.setName(option.getName());
+            op.setColor(option.getColor());
+            opList.add(op);
+        }
+        return opList;
+    }
 
     /**
      * 报错表 t_table_feature_list
