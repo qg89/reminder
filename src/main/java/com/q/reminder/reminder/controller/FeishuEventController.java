@@ -136,10 +136,12 @@ public class FeishuEventController {
                         } else {
                             BitableTableFieldActionValue value = fieldAction.getAfterValue();
                             BitableTableFieldActionValueProperty property = value.getProperty();
-                            BitableTableFieldActionValuePropertyOption[] options = property.getOptions();
-                            if (options != null && CollectionUtil.isNotEmpty(Arrays.asList(options))) {
-                                List<TableFieldsOption> opList = getTableFieldsOptions(options);
-                                tableFieldsOptionService.saveOrUpdateBatch(opList);
+                            if (property != null) {
+                                BitableTableFieldActionValuePropertyOption[] options = property.getOptions();
+                                if (options != null && CollectionUtil.isNotEmpty(Arrays.asList(options))) {
+                                    List<TableFieldsOption> opList = getTableFieldsOptions(options);
+                                    tableFieldsOptionService.saveOrUpdateBatch(opList);
+                                }
                             }
 
                             TableFieldsChange feature = new TableFieldsChange();
