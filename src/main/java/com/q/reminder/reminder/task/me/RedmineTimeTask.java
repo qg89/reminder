@@ -3,13 +3,8 @@ package com.q.reminder.reminder.task.me;
 import cn.hutool.core.date.DateUtil;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
-import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
-import com.lark.oapi.service.im.v1.model.CreateMessageResp;
-import com.q.reminder.reminder.constant.FeiShuContents;
 import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.RdTimeEntryService;
-import com.q.reminder.reminder.util.feishu.BaseFeishu;
-import com.q.reminder.reminder.vo.MessageVo;
 import com.q.reminder.reminder.vo.RedmineNoneTimeVo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -23,6 +18,8 @@ import tech.powerjob.worker.log.OmsLogger;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author : Administrator
@@ -46,7 +43,8 @@ public class RedmineTimeTask implements BasicProcessor {
         String yesterday = DateUtil.yesterday().toString("yyyy-MM-dd");
         try {
             List<RedmineNoneTimeVo> list = rdTimeEntryService.listNoneTimeUsers(dateTime, yesterday);
-            sendFeishu(list, log);
+            Map<Integer, List<RedmineNoneTimeVo>> userMap = list.stream().collect(Collectors.groupingBy(RedmineNoneTimeVo::getUserId));
+            sendFeishu(userMap, log);
         }catch (Exception e){
             result.setSuccess(false);
             ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
@@ -56,7 +54,7 @@ public class RedmineTimeTask implements BasicProcessor {
         return result;
     }
 
-    private void sendFeishu(List<RedmineNoneTimeVo> list, OmsLogger log) {
+    private void sendFeishu(Map<Integer, List<RedmineNoneTimeVo>> map, OmsLogger log) {
         JSONObject con = new JSONObject();
         JSONObject all = new JSONObject();
         con.put("zh_cn", all);
@@ -70,12 +68,13 @@ public class RedmineTimeTask implements BasicProcessor {
         subContentJsonArray.add(subject);
         contentJsonArray.add(subContentJsonArray);
 
-        MessageVo vo = new MessageVo();
-        vo.setReceiveId(FeiShuContents.ADMIN_MEMBERS);
-        vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-        vo.setContent(con.toJSONString());
-        vo.setMsgType("post");
-        CreateMessageResp resp = BaseFeishu.message().sendContent(vo);
-        log.info("返回飞书报文，{}", resp);
+//        MessageVo vo = new MessageVo();
+//        vo.setReceiveId(FeiShuContents.ADMIN_MEMBERS);
+//        vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+//        vo.setContent(con.toJSONString());
+//        vo.setMsgType("post");
+//        CreateMessageResp resp = BaseFeishu.message().sendContent(vo);
+//        log.info("返回飞书报文，{}", resp);
+        log.info("未填日报集合。{}", map);
     }
 }
