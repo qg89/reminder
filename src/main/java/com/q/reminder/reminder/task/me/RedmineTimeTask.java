@@ -1,7 +1,6 @@
 package com.q.reminder.reminder.task.me;
 
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.CreateMessageResp;
 import com.q.reminder.reminder.constant.FeiShuContents;
@@ -49,7 +48,7 @@ public class RedmineTimeTask implements BasicProcessor {
             List<RedmineNoneTimeVo> list = rdTimeEntryService.listNoneTimeUsers(dateTime, yesterday);
             Map<String, List<RedmineNoneTimeVo>> userMap = list.stream().collect(Collectors.groupingBy(RedmineNoneTimeVo::getUserName));
             sendFeishu(userMap, log);
-        }catch (Exception e){
+        } catch (Exception e) {
             result.setSuccess(false);
             ResultDTO<JobInfoDTO> resultDTO = client.fetchJob(context.getJobId());
             String taskName = resultDTO.getData().getJobName();
@@ -59,11 +58,19 @@ public class RedmineTimeTask implements BasicProcessor {
     }
 
     private void sendFeishu(Map<String, List<RedmineNoneTimeVo>> map, OmsLogger log) {
-        JSONObject con = new JSONObject(map);
+        StringBuilder builder = new StringBuilder();
+        map.forEach((name, list) -> {
+            builder.append("name: ").append(name);
+            list.forEach(e -> {
+                builder.append("spendOn: ").append(e.getSpentOn())
+                        .append("hours： ").append(e.getHours()).append(";").append("\r");
+            });
+            builder.append("-\r\n\t");
+        });
         MessageVo vo = new MessageVo();
         vo.setReceiveId(FeiShuContents.ADMIN_MEMBERS);
         vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-        vo.setContent(con.toJSONString());
+        vo.setContent(builder.toString());
         CreateMessageResp resp = BaseFeishu.message().sendText(vo, log);
         log.info("返回飞书发送状态，{}", resp.success());
     }
