@@ -1,10 +1,14 @@
 package com.q.reminder.reminder.task.me;
 
 import cn.hutool.core.date.DateUtil;
-import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
+import com.lark.oapi.service.im.v1.model.CreateMessageResp;
+import com.q.reminder.reminder.constant.FeiShuContents;
 import com.q.reminder.reminder.exception.FeishuException;
 import com.q.reminder.reminder.service.RdTimeEntryService;
+import com.q.reminder.reminder.util.feishu.BaseFeishu;
+import com.q.reminder.reminder.vo.MessageVo;
 import com.q.reminder.reminder.vo.RedmineNoneTimeVo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -55,26 +59,12 @@ public class RedmineTimeTask implements BasicProcessor {
     }
 
     private void sendFeishu(Map<String, List<RedmineNoneTimeVo>> map, OmsLogger log) {
-        JSONObject con = new JSONObject();
-        JSONObject all = new JSONObject();
-        con.put("zh_cn", all);
-        all.put("title", "周报已更新");
-        JSONArray contentJsonArray = new JSONArray();
-        all.put("content", contentJsonArray);
-        JSONArray subContentJsonArray = new JSONArray();
-        JSONObject subject = new JSONObject();
-        subject.put("tag", "text");
-        subject.put("text", "\r\n点击查看周报==》》 ");
-        subContentJsonArray.add(subject);
-        contentJsonArray.add(subContentJsonArray);
-
-//        MessageVo vo = new MessageVo();
-//        vo.setReceiveId(FeiShuContents.ADMIN_MEMBERS);
-//        vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-//        vo.setContent(con.toJSONString());
-//        vo.setMsgType("post");
-//        CreateMessageResp resp = BaseFeishu.message().sendContent(vo);
-//        log.info("返回飞书报文，{}", resp);
-        log.info("未填日报集合。{}", JSONObject.from(map));
+        JSONObject con = new JSONObject(map);
+        MessageVo vo = new MessageVo();
+        vo.setReceiveId(FeiShuContents.ADMIN_MEMBERS);
+        vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
+        vo.setContent(con.toJSONString());
+        CreateMessageResp resp = BaseFeishu.message().sendText(vo, log);
+        log.info("返回飞书发送状态，{}", resp.success());
     }
 }
