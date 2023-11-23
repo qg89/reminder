@@ -47,7 +47,7 @@ public class TableFeatureService {
             StringBuilder value = new StringBuilder();
             record.getFields().forEach((k, v) -> {
                 switch (k) {
-                    case "模块", "一级", "二级" -> value.append(v).append("-");
+                    case "模块", "一级", "二级" -> value.append(v).append("，");
                     default -> {
                     }
                 }
