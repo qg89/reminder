@@ -62,10 +62,10 @@ public class RedmineTimeTask implements BasicProcessor {
         map.forEach((name, list) -> {
             builder.append("name: ").append(name);
             list.forEach(e -> {
-                builder.append("spendOn: ").append(e.getSpentOn())
-                        .append("hours： ").append(e.getHours()).append(";").append("\r");
+                builder.append("spendOn: ").append(e.getSpentOn()).append("，")
+                        .append("hours： ").append(e.getHours()).append("；");
             });
-            builder.append("-\r\n\t");
+            builder.append("\r\n\t");
         });
         MessageVo vo = new MessageVo();
         vo.setReceiveId(FeiShuContents.ADMIN_MEMBERS);
