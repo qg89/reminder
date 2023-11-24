@@ -62,11 +62,7 @@ public class Message extends BaseFeishu {
         try {
             resp = CLIENT.im().message().create(req);
         } catch (Exception e) {
-            if (!resp.success() && redisUtils.invokeExceededTimes(key, 10, 5)) {
-                log.error("发送消息异常：error: {}, content:{}", resp.getMsg(), content);
-                sendContent(vo);
-            }
-//            throw new FeishuException(e, this.getClass().getName() + " 发送消息异常");
+            log.error("发送消息异常：error: {}, content:{}", resp.getMsg(), content);
         }
         if (!resp.success() && redisUtils.invokeExceededTimes(key, 10, 5)) {
             log.error("发送消息异常：fault: {}, content:{}", resp.getMsg(), content);
@@ -103,11 +99,7 @@ public class Message extends BaseFeishu {
         try {
             resp = this.CLIENT.im().message().create(req);
         } catch (Exception e) {
-            if (!resp.success() && redisUtils.invokeExceededTimes(key, 10, 5)) {
-                log.error("Task发送消息异常：error: {}, content:{}",  resp.getMsg(), content);
-                sendContent(vo, log);
-            }
-//            throw new FeishuException(e, this.getClass().getName() + " Task发送消息异常");
+            log.error("Task发送消息异常：error: {}, content:{}",  resp.getMsg(), content);
         }
         if (!resp.success() && redisUtils.invokeExceededTimes(key, 10, 5)) {
             log.error("Task发送消息异常：error: {}, content:{}",  resp.getMsg(), content);
