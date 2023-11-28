@@ -248,22 +248,27 @@
             t.hours AS hours
         FROM
         (
-            SELECT
-                ru.assignee_id,
-                ru.user_name,
-                sh.date
-            FROM
-                fs_user_member_info fu,
-                r_redmine_user_info ru,
-                s_holiday_config sh
-            WHERE
-                resign = 0
-                AND fu.`name` = ru.user_name
-                AND fu.is_delete = 0
-                AND ru.is_delete = 0
-                AND sh.`work` = 1
-                AND ru.redmine_type = 2
-                AND sh.date >= #{beginOfMonth}
+        SELECT
+            t.*,
+            IF(uc.member_id IS NULL, 0, 1) flag
+        FROM (
+                SELECT
+                    ru.assignee_id,
+                    ru.user_name,
+                    sh.date
+                FROM
+                    fs_user_member_info fu,
+                    r_redmine_user_info ru,
+                    s_holiday_config sh
+                WHERE
+                    resign = 0
+                    AND fu.`name` = ru.user_name
+                    AND fu.is_delete = 0
+                    AND ru.is_delete = 0
+                    AND sh.`work` = 1
+                    AND ru.redmine_type = 2
+                    AND sh.date >= #{beginOfMonth} AND sh.date <![CDATA[<=]]> #{yesterday}
+            ) t LEFT JOIN s_reminder_user_conf uc ON uc.`name` = t.user_name AND (t.date BETWEEN uc.start_date AND uc.end_date or `enable` = 1)
         ) u
         LEFT JOIN (
             SELECT
@@ -282,6 +287,7 @@
         ) t ON t.userId = u.assignee_id AND t.spentOn = u.date
         WHERE
             u.date <![CDATA[<=]]>  #{yesterday} AND (t.hours <![CDATA[<]]> 8 OR t.hours IS NULL)
+            AND u.flag = 0
     </select>
 </mapper>
 
