@@ -29,8 +29,9 @@ public class ReminderUserConf extends Model<ReminderUserConf> implements Seriali
     @TableId(type = IdType.AUTO)
     @TableField(value = "member_id")
     private String memberId;
-    
 
+    @TableField(value = "name")
+    private String name;
      
     @TableField(value = "enable")
     private Integer enable;
