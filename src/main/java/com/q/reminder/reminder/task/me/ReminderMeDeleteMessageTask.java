@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.task.me;
 
+import com.lark.oapi.service.im.v1.model.DeleteMessageResp;
 import com.q.reminder.reminder.constant.RedisKeyContents;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,10 @@ public class ReminderMeDeleteMessageTask implements BasicProcessor {
         OmsLogger omsLogger = context.getOmsLogger();
         Object messageId = redisTemplate.opsForValue().get(RedisKeyContents.FEISHU_MESSAGE_FEISHUMESSAGE);
         if (messageId != null) {
-            BaseFeishu.groupMessage().deleteMessage((String) messageId);
+            DeleteMessageResp resp = BaseFeishu.groupMessage().deleteMessage((String) messageId);
+            if (resp.success()) {
+                redisTemplate.delete(RedisKeyContents.FEISHU_MESSAGE_FEISHUMESSAGE);
+            }
         }
         omsLogger.info("消息已撤回：{}", messageId);
         return new ProcessResult(true);
