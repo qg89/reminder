@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.task.me;
 
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.CreateMessageResp;
@@ -20,7 +21,6 @@ import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 import tech.powerjob.worker.log.OmsLogger;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,11 +43,12 @@ public class RedmineTimeTask implements BasicProcessor {
     public ProcessResult process(TaskContext context) {
         OmsLogger log = context.getOmsLogger();
         ProcessResult result = new ProcessResult(true);
-        String dateTime = DateUtil.beginOfMonth(new Date()).toString("yyyy-MM-dd");
-        String yesterday = DateUtil.yesterday().toString("yyyy-MM-dd");
-        log.info("startDate：{},endDate：{}", dateTime, yesterday);
+        DateTime yesterday = DateUtil.yesterday();
+        String dateTime = DateUtil.beginOfMonth(yesterday).toString("yyyy-MM-dd");
+        String yestDay = yesterday.toString("yyyy-MM-dd");
+        log.info("startDate：{},endDate：{}", dateTime, yestDay);
         try {
-            List<RedmineNoneTimeVo> list = rdTimeEntryService.listNoneTimeUsers(dateTime, yesterday);
+            List<RedmineNoneTimeVo> list = rdTimeEntryService.listNoneTimeUsers(dateTime, yestDay);
             Map<String, List<RedmineNoneTimeVo>> userMap = list.stream().collect(Collectors.groupingBy(RedmineNoneTimeVo::getUserName));
             sendFeishu(userMap, log);
         } catch (Exception e) {
