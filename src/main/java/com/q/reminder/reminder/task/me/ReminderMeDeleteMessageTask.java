@@ -26,14 +26,16 @@ public class ReminderMeDeleteMessageTask implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
         OmsLogger omsLogger = context.getOmsLogger();
+        ProcessResult processResult = new ProcessResult(true);
         Object messageId = redisTemplate.opsForValue().get(RedisKeyContents.FEISHU_MESSAGE_FEISHUMESSAGE);
-        if (messageId != null) {
-            DeleteMessageResp resp = BaseFeishu.groupMessage().deleteMessage((String) messageId);
-            if (resp.success()) {
-                redisTemplate.delete(RedisKeyContents.FEISHU_MESSAGE_FEISHUMESSAGE);
-            }
+        if (messageId == null) {
+            return processResult;
+        }
+        DeleteMessageResp resp = BaseFeishu.groupMessage().deleteMessage((String) messageId);
+        if (resp.success()) {
+            redisTemplate.delete(RedisKeyContents.FEISHU_MESSAGE_FEISHUMESSAGE);
         }
         omsLogger.info("消息已撤回：{}", messageId);
-        return new ProcessResult(true);
+        return processResult;
     }
 }
