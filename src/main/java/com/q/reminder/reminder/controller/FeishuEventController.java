@@ -308,7 +308,12 @@ public class FeishuEventController {
                 roleList.add(role);
             }
         }
-        tableFeatureRoleService.saveOrUpdateBatchByMultiId(roleList);
+        if (CollectionUtil.isNotEmpty(roleList)) {
+            tableFeatureRoleService.saveOrUpdateBatchByMultiId(roleList);
+        }
+        if (StringUtils.isBlank(table.getProjectKey())) {
+            return;
+        }
         tableFeatureListService.saveOrUpdate(table);
     }
 
