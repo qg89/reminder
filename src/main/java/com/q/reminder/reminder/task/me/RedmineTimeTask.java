@@ -10,6 +10,7 @@ import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.MessageVo;
 import com.q.reminder.reminder.vo.RedmineNoneTimeVo;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import tech.powerjob.client.PowerJobClient;
 import tech.powerjob.common.response.JobInfoDTO;
@@ -44,6 +45,7 @@ public class RedmineTimeTask implements BasicProcessor {
         ProcessResult result = new ProcessResult(true);
         String dateTime = DateUtil.beginOfMonth(new Date()).toString("yyyy-MM-dd");
         String yesterday = DateUtil.yesterday().toString("yyyy-MM-dd");
+        log.info("startDate：{},endDate：{}", dateTime, yesterday);
         try {
             List<RedmineNoneTimeVo> list = rdTimeEntryService.listNoneTimeUsers(dateTime, yesterday);
             Map<String, List<RedmineNoneTimeVo>> userMap = list.stream().collect(Collectors.groupingBy(RedmineNoneTimeVo::getUserName));
@@ -67,6 +69,10 @@ public class RedmineTimeTask implements BasicProcessor {
             });
             builder.append("\r\n\t");
         });
+        if (StringUtils.isBlank(builder)) {
+            log.info("全部都已填写！");
+            return;
+        }
         MessageVo vo = new MessageVo();
         vo.setReceiveId(FeiShuContents.ADMIN_MEMBERS);
         vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
