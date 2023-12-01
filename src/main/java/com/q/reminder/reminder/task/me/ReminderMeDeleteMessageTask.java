@@ -27,8 +27,14 @@ public class ReminderMeDeleteMessageTask implements BasicProcessor {
     public ProcessResult process(TaskContext context) throws Exception {
         OmsLogger omsLogger = context.getOmsLogger();
         ProcessResult processResult = new ProcessResult(true);
+        Boolean hasKey = redisTemplate.hasKey(RedisKeyContents.FEISHU_MESSAGE_FEISHUMESSAGE);
+        if (Boolean.FALSE.equals(hasKey)) {
+            omsLogger.info("key 不存在");
+            return processResult;
+        }
         Object messageId = redisTemplate.opsForValue().get(RedisKeyContents.FEISHU_MESSAGE_FEISHUMESSAGE);
         if (messageId == null) {
+            omsLogger.info("已被删除");
             return processResult;
         }
         DeleteMessageResp resp = BaseFeishu.groupMessage().deleteMessage((String) messageId);
