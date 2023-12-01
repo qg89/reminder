@@ -156,12 +156,13 @@ public class GroupMessage extends BaseFeishu {
         return result;
     }
 
-    public void deleteMessage(String messageId) {
+    public DeleteMessageReq deleteMessage(String messageId) {
         DeleteMessageReq req = DeleteMessageReq.newBuilder().messageId(messageId).build();
         try {
-            CLIENT.im().message().delete(req, RequestOptions.newBuilder().build());
+            DeleteMessageResp resp = CLIENT.im().message().delete(req, RequestOptions.newBuilder().build());
         } catch (Exception e) {
             throw new FeishuException(e, this.getClass().getName() + " 消息撤回异常");
         }
+        return req;
     }
 }
