@@ -1,6 +1,7 @@
 package com.q.reminder.reminder.util.feishu.group;
 
 import cn.hutool.core.bean.BeanUtil;
+import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.service.im.v1.enums.GetChatMembersMemberIdTypeEnum;
 import com.lark.oapi.service.im.v1.enums.ListChatUserIdTypeEnum;
 import com.lark.oapi.service.im.v1.model.*;
@@ -25,7 +26,7 @@ public class GroupMessage extends BaseFeishu {
 
     private static GroupMessage groupMessage;
 
-    private GroupMessage(){
+    private GroupMessage() {
         super();
     }
 
@@ -35,7 +36,6 @@ public class GroupMessage extends BaseFeishu {
         }
         return groupMessage;
     }
-
 
 
     /**
@@ -66,7 +66,7 @@ public class GroupMessage extends BaseFeishu {
         return list;
     }
 
-    public List<UserMemgerInfo> getMembersInGroup( List<UserGroup> userGroupList) {
+    public List<UserMemgerInfo> getMembersInGroup(List<UserGroup> userGroupList) {
         String chatId = "oc_68be4dc6c1143059ebeaa5d6699773a2";
         List<UserMemgerInfo> items = new ArrayList<>();
         GetChatMembersReq req = GetChatMembersReq.newBuilder()
@@ -77,20 +77,20 @@ public class GroupMessage extends BaseFeishu {
         GetChatMembersResp resp;
         try {
             resp = CLIENT.im().chatMembers().get(req);
-            } catch (Exception e) {
-                throw new FeishuException(e, this.getClass().getName() + " 通过机器人获取人员异常");
-            }
-            GetChatMembersRespBody data = resp.getData();
-            for (ListMember dataItem : data.getItems()) {
-                UserMemgerInfo userMemgerInfo = new UserMemgerInfo();
-                BeanUtil.copyProperties(dataItem, userMemgerInfo);
-                items.add(userMemgerInfo);
-                addUserGroupList(chatId, userMemgerInfo, userGroupList);
-            }
-            String pageToken = data.getPageToken();
-            if (data.getHasMore()) {
-                query(items, chatId, userGroupList, pageToken, req);
-            }
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 通过机器人获取人员异常");
+        }
+        GetChatMembersRespBody data = resp.getData();
+        for (ListMember dataItem : data.getItems()) {
+            UserMemgerInfo userMemgerInfo = new UserMemgerInfo();
+            BeanUtil.copyProperties(dataItem, userMemgerInfo);
+            items.add(userMemgerInfo);
+            addUserGroupList(chatId, userMemgerInfo, userGroupList);
+        }
+        String pageToken = data.getPageToken();
+        if (data.getHasMore()) {
+            query(items, chatId, userGroupList, pageToken, req);
+        }
         return items.stream().distinct().toList();
     }
 
@@ -154,5 +154,14 @@ public class GroupMessage extends BaseFeishu {
             }
         }
         return result;
+    }
+
+    public void deleteMessage(String messageId) {
+        DeleteMessageReq req = DeleteMessageReq.newBuilder().messageId(messageId).build();
+        try {
+            CLIENT.im().message().delete(req, RequestOptions.newBuilder().build());
+        } catch (Exception e) {
+            throw new FeishuException(e, this.getClass().getName() + " 消息撤回异常");
+        }
     }
 }
