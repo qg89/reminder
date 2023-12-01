@@ -4,9 +4,13 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
+import com.lark.oapi.service.im.v1.model.CreateMessageResp;
 import com.q.reminder.reminder.constant.FeiShuContents;
+import com.q.reminder.reminder.constant.RedisKeyContents;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.MessageVo;
+import lombok.AllArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
@@ -23,7 +27,10 @@ import java.util.Map;
  * @date :  2023.11.29 12:53
  */
 @Component
+@AllArgsConstructor
 public class ReminderMeTask  implements BasicProcessor {
+    private final RedisTemplate<String, Object> redisTemplate;
+
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
         String jobParams = context.getJobParams();
@@ -38,7 +45,9 @@ public class ReminderMeTask  implements BasicProcessor {
         vo.setReceiveId(FeiShuContents.ADMIN_MEMBERS);
         vo.setContent(content);
         vo.setReceiveIdTypeEnum(CreateMessageReceiveIdTypeEnum.OPEN_ID);
-        BaseFeishu.message().sendText(vo, omsLogger);
+        CreateMessageResp resp = BaseFeishu.message().sendText(vo, omsLogger);
+        String messageId = resp.getData().getMessageId();
+        redisTemplate.opsForValue().set(RedisKeyContents.FEISHU_MESSAGE_FEISHUMESSAGE, messageId);
         return new ProcessResult(true);
     }
 }

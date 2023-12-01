@@ -14,7 +14,6 @@ public interface RedisKeyContents {
     String TABLE_USER_CONFIG = "table:user:config";
     String TABLE_RECORDS = "table:records";
     String FEISHU_MESSAGE_INVOKEEXCEEDEDTIMES = "feishu:message:invokeExceededTimes";
-    String USER_NAME_IP = "user:username";
-
+    String FEISHU_MESSAGE_FEISHUMESSAGE = "feishu:message:feishuMessageId";
     String COPQ_DAY = "copq:";
 }
