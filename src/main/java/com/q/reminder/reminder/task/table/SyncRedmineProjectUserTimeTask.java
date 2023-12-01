@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
  * @Description : 同步redmine上工时同步到数据库
  * @date :  2022.12.28 11:34
  */
+@Deprecated
 @Component
 @RequiredArgsConstructor
 public class SyncRedmineProjectUserTimeTask implements BasicProcessor {

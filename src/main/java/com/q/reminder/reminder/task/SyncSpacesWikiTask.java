@@ -33,6 +33,7 @@ import java.util.List;
  * @Description : 同步知识库中标准过程复制
  * @date :  2022.11.18 14:34
  */
+@Deprecated
 @Component
 @RequiredArgsConstructor
 public class SyncSpacesWikiTask implements BasicProcessor {

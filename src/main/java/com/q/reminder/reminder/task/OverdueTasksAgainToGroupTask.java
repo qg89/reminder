@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
  * @Description : 每天9点半提醒，群提醒
  * @date :  2022.10.18 17:02
  */
+@Deprecated
 @Component
 @RequiredArgsConstructor
 public class OverdueTasksAgainToGroupTask implements BasicProcessor {

@@ -49,6 +49,7 @@ import static com.q.reminder.reminder.util.WeeklyProjectUtils.getWeekNumToSunday
  * @Description : 周一中午12点 写日报
  * @date :  2022.11.01 17:55
  */
+@Deprecated
 @Log4j2
 @Component
 @RequiredArgsConstructor
