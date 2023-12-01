@@ -250,6 +250,8 @@ public class FeishuEventController {
         String recordId = actionJson.getString("record_id");
         table.setRecordId(recordId);
         if ("record_deleted".equals(action)) {
+            tableFeatureListService.removeById(recordId);
+            tableFeatureRoleService.remove(Wrappers.<TableFeatureRole>lambdaQuery().eq(TableFeatureRole::getRecordId, recordId));
             return;
         }
         List<String> fieldIds = List.of(
