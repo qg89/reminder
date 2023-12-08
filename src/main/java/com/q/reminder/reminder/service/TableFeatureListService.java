@@ -3,6 +3,8 @@ package com.q.reminder.reminder.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.q.reminder.reminder.entity.TableFeatureList;
 
+import java.util.List;
+
 
 /**
  * 需求管理表列表(TableFeatureList)表服务接口
@@ -12,4 +14,5 @@ import com.q.reminder.reminder.entity.TableFeatureList;
  */
 public interface TableFeatureListService extends IService<TableFeatureList> {
 
+    List<TableFeatureList> listToDo();
 }

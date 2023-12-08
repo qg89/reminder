@@ -27,6 +27,18 @@ spring:
       max-lifetime: 1800000         # 连接的生命时长（毫秒），超时而且没被使用则被释放（retired），默认： 30 分钟
       connection-test-query: SELECT 1
       pool-name: MakuHikariCP_Reminder
+  rabbitmq:
+    port: 5672
+    host: rbtmq-0609ef16ea34.rabbitmq.volces.com
+    username: Xo54OTrb-OSP8AKNoybjLmqOB0afTDOp
+    password: y6fANQx35OyruSu8TxjU8jKjt8y3jhAR
+    #这个配置是保证提供者确保消息推送到交换机中，不管成不成功，都会回调
+    publisher-confirm-type: correlated
+    #保证交换机能把消息推送到队列中
+    publisher-returns: true
+    virtual-host: /reminder
+    connectionTimeout: 1800000
+    requestedHeartbeat: 60
 logging:
 #  level:
 #    root: info

@@ -44,6 +44,8 @@ dependencies {
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
+	implementation 'org.springframework.boot:spring-boot-starter-amqp'
+
 	implementation 'mysql:mysql-connector-java:8.0.32'
 //	implementation 'com.alibaba:druid-spring-boot-starter:1.2.16'
 	implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3.1'

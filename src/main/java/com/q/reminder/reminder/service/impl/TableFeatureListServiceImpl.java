@@ -1,10 +1,14 @@
 package com.q.reminder.reminder.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.q.reminder.reminder.entity.TableFeatureList;
 import com.q.reminder.reminder.mapper.TableFeatureListMapping;
 import com.q.reminder.reminder.service.TableFeatureListService;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 /**
@@ -16,4 +20,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class TableFeatureListServiceImpl extends ServiceImpl<TableFeatureListMapping, TableFeatureList> implements TableFeatureListService {
 
+    @Override
+    public List<TableFeatureList> listToDo() {
+        LambdaQueryWrapper<TableFeatureList> wrapper = Wrappers.lambdaQuery();
+        wrapper.eq(TableFeatureList::getFeatureState, "待开发")
+                .isNull(TableFeatureList::getRedmineId);
+        return baseMapper.selectList(wrapper);
+    }
 }
