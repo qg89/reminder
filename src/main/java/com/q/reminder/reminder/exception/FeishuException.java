@@ -4,8 +4,11 @@ import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lark.oapi.service.im.v1.enums.CreateMessageReceiveIdTypeEnum;
 import com.q.reminder.reminder.constant.FeiShuContents;
+import com.q.reminder.reminder.constant.RedisKeyContents;
+import com.q.reminder.reminder.util.RedisUtils;
 import com.q.reminder.reminder.util.feishu.BaseFeishu;
 import com.q.reminder.reminder.vo.MessageVo;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -17,6 +20,7 @@ import java.util.LinkedHashMap;
  * @Description :
  * @date :  2023.03.29 09:53
  */
+@Log4j2
 public class FeishuException extends RuntimeException {
 
     public FeishuException() {
@@ -30,6 +34,10 @@ public class FeishuException extends RuntimeException {
     
 
     private void sendContent(String message, Throwable e) {
+        if (!RedisUtils.getInstance().invokeExceededTimes(RedisKeyContents.FEISHU_MESSAGE_INVOKEEXCEEDEDTIMES, 10, 5)) {
+            log.error("FeishuException, 发送异常~~~！！！");
+            return;
+        }
         JSONObject content = new JSONObject();
         JSONObject all = new JSONObject();
         JSONArray contentJsonArray = new JSONArray();
