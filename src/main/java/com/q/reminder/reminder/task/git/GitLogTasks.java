@@ -42,7 +42,9 @@ public class GitLogTasks implements BasicProcessor {
             String localPath = gitConf.getLocalPath();
             String remoteRepoPath = gitConf.getRemoteRepoPath();
             FileUtil.del(localPath);
+            omsLogger.info("del localPath done! {}", localPath);
             JGitUtils.gitClone(remoteRepoPath, localPath, keyPath);
+            omsLogger.info("clone done! {}", localPath);
             Integer id = gitConf.getId();
             List<GitCommitLog> gitCommitLogs = JGitUtils.commitResolver(localPath, branchMain);
             for (GitCommitLog gitCommitLog : gitCommitLogs) {
