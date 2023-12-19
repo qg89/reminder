@@ -3,7 +3,7 @@ package com.q.reminder.reminder.util;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import com.q.reminder.reminder.util.entity.GitCount;
+import com.q.reminder.reminder.entity.GitCommitLog;
 import lombok.extern.log4j.Log4j2;
 import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CloneCommand;
@@ -48,11 +48,11 @@ import java.util.*;
 public class JGitUtils {
 
     public static void main(String[] args) throws Exception {
-        String localPath = "/test";
+        String localPath = "D:\\Users\\Administrator\\Desktop\\新建文件夹\\telematics_adp\\";
         String remoteRepoPath = "ssh://git@192.168.3.40:1022/mx-4s/telematics/telematics_adp.git";
         String keyPath = "/id_rsa_46";
-        gitClone(remoteRepoPath, localPath, keyPath);
-        List<GitCount> master = commitResolver(localPath, "master");
+//        gitClone(remoteRepoPath, localPath, keyPath);
+        List<GitCommitLog> master = commitResolver(localPath, "master");
         System.out.println(master);
     }
 
@@ -424,9 +424,9 @@ public class JGitUtils {
      * @throws IOException
      * @throws GitAPIException
      */
-    public static List<GitCount> commitResolver(String localPath, String branchMain) throws IOException, GitAPIException {
+    public static List<GitCommitLog> commitResolver(String localPath, String branchMain) throws IOException, GitAPIException {
         // 定义数据及变量
-        List<GitCount> listGitCount = new ArrayList<>();
+        List<GitCommitLog> listGitCount = new ArrayList<>();
         List<Map<String, Object>> list = commitList(localPath, branchMain);
         for (Map maps : list) {
             String branch = (String) maps.get("branch");
@@ -447,17 +447,19 @@ public class JGitUtils {
                 String authName = revCommit.getAuthorIdent().getName();
                 String commitMessage = revCommit.getFullMessage();
                 String usrCde = revCommit.getAuthorIdent().getEmailAddress();
+                String string = revCommit.getTree().toString();
 
                 //System.out.println(usrCde + "-----" + authName + "----" + date + "----" + commitMessage + "新增：" + addLine + "删除：" + removeLine);
 
                 // 获取设置值放入对象中
-                GitCount gitCount = new GitCount();
+                GitCommitLog gitCount = new GitCommitLog();
                 gitCount.setEmailAddress(usrCde);
                 gitCount.setAuthName(authName);
                 gitCount.setCommitDate(date);
                 gitCount.setCommitMessage(commitMessage);
                 gitCount.setAddLine(addLine);
                 gitCount.setRemoveLine(removeLine);
+                gitCount.setCommitId(string.replace(" ", "").replace("tree", "").replace("-", ""));
                 gitCount.setBranch(branch);
                 if (commitMessage.contains("Merge")) {
                     gitCount.setIsMerge("Y");
@@ -526,7 +528,7 @@ public class JGitUtils {
 
             // 根据分支提取不重复commit对象
             Map<String, Object> map2 = new HashMap<>();
-            if (holdSet.size() == 0) {
+            if (holdSet.isEmpty()) {
                 List<Map<String, Object>> newList1 = new ArrayList<>(setMap);
                 List<Map<String, Object>> newList2 = new ArrayList<>(setMap);
                 holdSet = newList1;
