@@ -36,8 +36,13 @@ public class GitLogTasks implements BasicProcessor {
         List<GitConf> list = gitConfService.list();
         List<GitCommitLog> data = new ArrayList<>();
         for (GitConf gitConf : list) {
+            Integer id = gitConf.getId();
             List<GitCommitLog> gitCommitLogs = JGitUtils.commitResolver(gitConf.getLocalPath(), gitConf.getBranchMain());
-            data.addAll(gitCommitLogs);
+            for (GitCommitLog gitCommitLog : gitCommitLogs) {
+                gitCommitLog.setConfId(id);
+                data.add(gitCommitLog);
+            }
+            omsLogger.info("git config {}", gitConf);
         }
         gitCommitLogService.saveOrUpdateBatch(data);
         return processResult;
