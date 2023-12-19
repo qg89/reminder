@@ -47,14 +47,14 @@ import java.util.*;
 @Log4j2
 public class JGitUtils {
 
-    public static void main(String[] args) throws Exception {
-        String localPath = "D:\\Users\\Administrator\\Desktop\\新建文件夹\\telematics_adp\\";
-        String remoteRepoPath = "ssh://git@192.168.3.40:1022/mx-4s/telematics/telematics_adp.git";
-        String keyPath = "/id_rsa_46";
-//        gitClone(remoteRepoPath, localPath, keyPath);
-        List<GitCommitLog> master = commitResolver(localPath, "master");
-        System.out.println(master);
-    }
+//    public static void main(String[] args) throws Exception {
+//        String localPath = "D:\\Users\\Administrator\\Desktop\\新建文件夹\\telematics_adp\\";
+//        String remoteRepoPath = "ssh://git@192.168.3.40:1022/mx-4s/telematics/telematics_adp.git";
+//        String keyPath = "/id_rsa_46";
+////        gitClone(remoteRepoPath, localPath, keyPath);
+//        List<GitCommitLog> master = commitResolver(localPath, "master");
+//        System.out.println(master);
+//    }
 
     public static void gitClone(String remoteRepoPath, String localPath, String keyPath) throws URISyntaxException, TransportException {
         //ssh session的工厂,用来创建密匙连接
