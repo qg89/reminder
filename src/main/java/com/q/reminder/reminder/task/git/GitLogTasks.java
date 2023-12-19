@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.task.git;
 
+import cn.hutool.core.io.FileUtil;
 import com.q.reminder.reminder.entity.GitCommitLog;
 import com.q.reminder.reminder.entity.GitConf;
 import com.q.reminder.reminder.service.GitCommitLogService;
@@ -36,8 +37,14 @@ public class GitLogTasks implements BasicProcessor {
         List<GitConf> list = gitConfService.list();
         List<GitCommitLog> data = new ArrayList<>();
         for (GitConf gitConf : list) {
+            String keyPath = gitConf.getKeyPath();
+            String branchMain = gitConf.getBranchMain();
+            String localPath = gitConf.getLocalPath();
+            String remoteRepoPath = gitConf.getRemoteRepoPath();
+            FileUtil.del(localPath);
+            JGitUtils.gitClone(remoteRepoPath, localPath, keyPath);
             Integer id = gitConf.getId();
-            List<GitCommitLog> gitCommitLogs = JGitUtils.commitResolver(gitConf.getLocalPath(), gitConf.getBranchMain());
+            List<GitCommitLog> gitCommitLogs = JGitUtils.commitResolver(localPath, branchMain);
             for (GitCommitLog gitCommitLog : gitCommitLogs) {
                 gitCommitLog.setConfId(id);
                 data.add(gitCommitLog);
