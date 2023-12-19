@@ -25,7 +25,7 @@ public class GitCommitLog extends Model<GitCommitLog> implements Serializable {
     private static final long serialVersionUID = -24490759452541313L;
     
     
-    @TableId(type = IdType.AUTO)
+    @TableId(type = IdType.INPUT)
     @TableField(value = "commit_id")
     private String commitId;
     
