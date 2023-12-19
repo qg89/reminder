@@ -28,8 +28,9 @@ public class GitCommitLog extends Model<GitCommitLog> implements Serializable {
     @TableId(type = IdType.INPUT)
     @TableField(value = "commit_id")
     private String commitId;
-    
 
+    @TableField(value = "conf_id")
+    private Integer confId;
      
     @TableField(value = "branch")
     private String branch;
