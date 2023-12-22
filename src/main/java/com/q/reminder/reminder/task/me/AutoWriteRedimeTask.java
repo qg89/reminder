@@ -2,7 +2,7 @@ package com.q.reminder.reminder.task.me;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.http.HttpUtil;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.RedmineManagerFactory;
@@ -16,6 +16,8 @@ import tech.powerjob.worker.log.OmsLogger;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author : Administrator
@@ -35,10 +37,22 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         String dateTime = time.toString("yyyy-MM-dd");
         RedmineManager mgr = RedmineManagerFactory.createWithApiKey("http://redmine-pa.mxnavi.com", "e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
         Transport transport = mgr.getTransport();
-        String body = HttpUtil.createGet("https://redmine-pa.mxnavi.com/issues/38668/time_entries/autocomplete_for_time?q="+ dateTime).addHeaders(Map.of("Cookie", jobParams)).execute().body();
-        String spendOn = StrUtil.subBefore(StrUtil.subAfter(body, "当日耗时: ", true), ", ", false);
-        String estimateOn = StrUtil.subBefore(StrUtil.subAfter(body, "当天在岗预估时间：", true), "(", false);
-        float hours = BigDecimal.valueOf(Double.valueOf(estimateOn)).subtract(BigDecimal.valueOf(Double.valueOf(spendOn))).floatValue();
+        String body = HttpUtil.createGet("https://redmine-pa.mxnavi.com/issues/38668/time_entries/autocomplete_for_time?q=" + dateTime).addHeaders(Map.of("Cookie", jobParams)).execute().body();
+        Pattern pattern = Pattern.compile("\\d+\\.\\d+");
+        Matcher matcher = pattern.matcher(body);
+        double spendOn = 0.00D;
+        double estimateOn = 0.00D;
+        if (matcher.find() && NumberUtil.isNumber(matcher.group())) {
+            spendOn = Double.valueOf(matcher.group());
+            log.info("当日耗时：{}", spendOn);
+        }
+        if (matcher.find() && NumberUtil.isNumber(matcher.group())) {
+            estimateOn = Double.valueOf(matcher.group());
+            log.info("当天在岗预估时间：{}", spendOn);
+        }
+//        String spendOn = StrUtil.subBefore(StrUtil.subAfter(body, "当日耗时: ", true), ", ", false);
+//        String estimateOn = StrUtil.subBefore(StrUtil.subAfter(body, "当天在岗预估时间：", true), "(", false);
+        float hours = BigDecimal.valueOf(estimateOn).subtract(BigDecimal.valueOf(spendOn)).floatValue();
         if (hours <= 0) {
             return result;
         }
