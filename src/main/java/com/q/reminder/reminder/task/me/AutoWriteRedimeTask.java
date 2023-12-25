@@ -49,6 +49,10 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         String cookie = cookie();
         log.info("cookie:{}", cookie);
         String body = HttpUtil.createGet("https://redmine-pa.mxnavi.com/issues/38668/time_entries/autocomplete_for_time?q=" + dateTime).addHeaders(Map.of("Cookie", cookie)).execute().body();
+        if (StringUtils.isBlank(body)) {
+            log.info("body 为空");
+            return result;
+        }
         log.info("body:{}", body);
         Pattern pattern = Pattern.compile("\\d+\\.\\d+");
         Matcher matcher = pattern.matcher(body);
