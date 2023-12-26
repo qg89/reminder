@@ -44,8 +44,8 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         String dateTime = time.toString("yyyy-MM-dd");
         if (StringUtils.isNotBlank(jobParams) && isValidDateFormat(jobParams, "yyyy-MM-dd")) {
             dateTime = DateUtil.parse(jobParams).toString("yyyy-MM-dd");
-            log.info("日期：{}", dateTime);
         }
+        log.info("日期：{}", dateTime);
         String cookie = EdgeSeleniumUtils.cookie();
         log.info("cookie:{}", cookie);
         String body = HttpUtil.createGet("https://redmine-pa.mxnavi.com/issues/38668/time_entries/autocomplete_for_time?q=" + dateTime).addHeaders(Map.of("Cookie", cookie)).execute().body();
