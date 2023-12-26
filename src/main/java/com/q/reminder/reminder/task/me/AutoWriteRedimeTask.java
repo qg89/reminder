@@ -6,8 +6,10 @@ import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
+import com.q.reminder.reminder.entity.RProjectInfo;
+import com.q.reminder.reminder.util.RedmineApi;
+import com.q.reminder.reminder.util.selenium.EdgeSeleniumUtils;
 import com.taskadapter.redmineapi.RedmineManager;
-import com.taskadapter.redmineapi.RedmineManagerFactory;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.commons.lang3.StringUtils;
@@ -44,9 +46,7 @@ public class AutoWriteRedimeTask implements BasicProcessor {
             dateTime = DateUtil.parse(jobParams).toString("yyyy-MM-dd");
             log.info("日期：{}", dateTime);
         }
-        RedmineManager mgr = RedmineManagerFactory.createWithApiKey("http://redmine-pa.mxnavi.com", "e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
-        Transport transport = mgr.getTransport();
-        String cookie = cookie();
+        String cookie = EdgeSeleniumUtils.cookie();
         log.info("cookie:{}", cookie);
         String body = HttpUtil.createGet("https://redmine-pa.mxnavi.com/issues/38668/time_entries/autocomplete_for_time?q=" + dateTime).addHeaders(Map.of("Cookie", cookie)).execute().body();
         if (StringUtils.isBlank(body)) {
@@ -70,6 +70,11 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         if (hours <= 0) {
             return result;
         }
+        RProjectInfo info = new RProjectInfo();
+        info.setRedmineType("2");
+        info.setPmKey("e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
+        RedmineManager mgr = RedmineApi.getRedmineManager(info);
+        Transport transport = mgr.getTransport();
         TimeEntry timeEntry = new TimeEntry(transport);
         timeEntry.setHours(hours);
         timeEntry.setProjectId(260);
