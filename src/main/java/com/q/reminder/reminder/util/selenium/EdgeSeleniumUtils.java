@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.util.selenium;
 
+import com.q.reminder.reminder.util.SystemUtils;
 import lombok.extern.log4j.Log4j2;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
@@ -24,7 +25,11 @@ public class EdgeSeleniumUtils {
         WebDriver webDriver = null;
         try {
             // 设置 chromedirver 的存放位置
-            System.getProperties().setProperty("webdriver.edge.driver", "D:\\Users\\Administrator\\Desktop\\chromedriver-win64\\msedgedriver.exe");
+            if (SystemUtils.isLinux()) {
+                System.getProperties().setProperty("webdriver.edge.driver", "/usr/drive/msedgedrive");
+            } else  {
+                System.getProperties().setProperty("webdriver.edge.driver", "D:\\Users\\Administrator\\Desktop\\chromedriver-win64\\msedgedriver.exe");
+            }
             EdgeOptions edgeOptions = new EdgeOptions();
             Common.addArguments(edgeOptions);
             // 实例化
