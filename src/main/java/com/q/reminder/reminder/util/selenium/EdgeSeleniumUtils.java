@@ -20,11 +20,11 @@ import java.util.Set;
 @Log4j2
 public class EdgeSeleniumUtils {
 
-    public static String cookie(String path) {
+    public static String cookie(String webdriverPath) {
         WebDriver webDriver = null;
         try {
             // 设置 chromedirver 的存放位置
-            System.getProperties().setProperty("webdriver.edge.driver", path);
+            System.getProperties().setProperty("webdriver.edge.driver", webdriverPath);
             EdgeOptions edgeOptions = new EdgeOptions();
             Common.addArguments(edgeOptions);
             // 实例化
