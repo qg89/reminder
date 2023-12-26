@@ -24,7 +24,7 @@ public class FirefoxSeleniumUtils {
         WebDriver webDriver = null;
         try {
             // 设置 chromedirver 的存放位置
-            System.getProperties().setProperty("webdriver.gecko.drive", webdriverPath);
+            System.getProperties().setProperty("webdriver.gecko.driver", webdriverPath);
             FirefoxOptions firefoxOptions = new FirefoxOptions();
             Common1.addArguments(firefoxOptions);
             // 实例化
