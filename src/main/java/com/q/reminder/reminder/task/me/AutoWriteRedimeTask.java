@@ -40,7 +40,7 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         OmsLogger log = context.getOmsLogger();
         String jobParams = context.getJobParams();
         ProcessResult result = new ProcessResult(true);
-        DateTime time = DateUtil.beginOfMonth(DateUtil.yesterday());
+        DateTime time = DateUtil.yesterday();
         String dateTime = time.toString("yyyy-MM-dd");
         if (StringUtils.isNotBlank(jobParams) && isValidDateFormat(jobParams, "yyyy-MM-dd")) {
             dateTime = DateUtil.parse(jobParams).toString("yyyy-MM-dd");
