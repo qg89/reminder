@@ -8,6 +8,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.util.RedmineApi;
+import com.q.reminder.reminder.util.SystemUtils;
 import com.q.reminder.reminder.util.selenium.EdgeSeleniumUtils;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.bean.TimeEntry;
@@ -46,7 +47,13 @@ public class AutoWriteRedimeTask implements BasicProcessor {
             dateTime = DateUtil.parse(jobParams).toString("yyyy-MM-dd");
         }
         log.info("日期：{}", dateTime);
-        String cookie = EdgeSeleniumUtils.cookie();
+        String path;
+        if (SystemUtils.isLinux()) {
+            path = "/usr/drive/msedgedrive";
+        } else  {
+            path = "D:\\Users\\Administrator\\Desktop\\chromedriver-win64\\msedgedriver.exe";
+        }
+        String cookie = EdgeSeleniumUtils.cookie(path);
         log.info("cookie:{}", cookie);
         String body = HttpUtil.createGet("https://redmine-pa.mxnavi.com/issues/38668/time_entries/autocomplete_for_time?q=" + dateTime).addHeaders(Map.of("Cookie", cookie)).execute().body();
         if (StringUtils.isBlank(body)) {
