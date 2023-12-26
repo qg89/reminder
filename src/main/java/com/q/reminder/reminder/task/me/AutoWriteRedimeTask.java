@@ -49,9 +49,9 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         log.info("日期：{}", dateTime);
         String path;
         if (SystemUtils.isLinux()) {
-            path = "/usr/drive/msedgedrive";
+            path = "/usr/drive/geckodriver";
         } else  {
-            path = "D:\\Users\\Administrator\\Desktop\\chromedriver-win64\\msedgedriver.exe";
+            path = "D:\\Users\\Administrator\\Desktop\\webDrive\\msedgedriver.exe";
         }
         String cookie = EdgeSeleniumUtils.cookie(path);
         log.info("cookie:{}", cookie);
