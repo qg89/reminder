@@ -54,7 +54,7 @@ public class AutoWriteRedimeTask implements BasicProcessor {
             path = "/usr/drive/geckodriver";
             cookie = FirefoxSeleniumUtils.cookie(path);
         } else  {
-            path = "D:\\Users\\Administrator\\Desktop\\webDrive\\msedgedriver.exe";
+            path = "D:\\dev_tools\\webDrive\\msedgedriver.exe";
             cookie = EdgeSeleniumUtils.cookie(path);
         }
         log.info("cookie:{}", cookie);
