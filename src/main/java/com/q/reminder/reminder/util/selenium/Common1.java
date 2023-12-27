@@ -38,7 +38,8 @@ public class Common1 {
         // 禁用JavaScript
         options.addArguments("--disable-javascript");
         // 1、1解决403错误
-        options.addArguments("--remote-allow-origins=*");
+//        options.addArguments("--remote-allow-origins=*");
+        options.addArguments("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36");
         // 默认浏览器检查
         options.addArguments("no-default-browser-check");
         Map<String, Object> prefs = new HashMap();
