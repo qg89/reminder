@@ -22,6 +22,8 @@ import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 import tech.powerjob.worker.log.OmsLogger;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.net.HttpCookie;
 import java.util.List;
@@ -41,6 +43,21 @@ public class AutoWriteRedimeTask implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
         OmsLogger log = context.getOmsLogger();
+
+        Runtime runtime = Runtime.getRuntime();
+        Process process = runtime.exec("sh /usr/drive/rpm.sh");
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            log.info(line);
+        }
+
+        int exitCode = process.waitFor();
+        log.info("Exit Code: " + exitCode);
+
+
+
         String jobParams = context.getJobParams();
         ProcessResult result = new ProcessResult(true);
         DateTime time = DateUtil.yesterday();
