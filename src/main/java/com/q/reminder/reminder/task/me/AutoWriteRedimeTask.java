@@ -7,6 +7,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.q.reminder.reminder.entity.RProjectInfo;
+import com.q.reminder.reminder.util.HolidayUtils;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.util.SystemUtils;
 import com.q.reminder.reminder.util.selenium.EdgeSeleniumUtils;
@@ -48,6 +49,10 @@ public class AutoWriteRedimeTask implements BasicProcessor {
             dateTime = DateUtil.parse(jobParams).toString("yyyy-MM-dd");
         }
         log.info("日期：{}", dateTime);
+        if (!HolidayUtils.isHoliday(dateTime)) {
+            log.info("非工作日");
+            return result;
+        }
         String path;
         String cookie;
         if (SystemUtils.isLinux()) {
