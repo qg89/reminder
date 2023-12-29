@@ -9,13 +9,14 @@ import com.q.reminder.reminder.task.me.entity.AutoWriteRedmineUserInfoVo;
 import com.q.reminder.reminder.util.HolidayUtils;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.util.SystemUtils;
-import com.q.reminder.reminder.util.selenium.EdgeSeleniumUtils;
-import com.q.reminder.reminder.util.selenium.FirefoxSeleniumUtils;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.internal.Transport;
 import org.apache.commons.lang3.StringUtils;
+import org.openqa.selenium.*;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.stereotype.Component;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
@@ -23,9 +24,12 @@ import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 import tech.powerjob.worker.log.OmsLogger;
 
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +42,45 @@ import java.util.regex.Pattern;
  */
 @Component
 public class AutoWriteRedimeTask implements BasicProcessor {
+    public static String getCookie(OmsLogger log, DesiredCapabilities dc) {
+        RemoteWebDriver webDriver = null;
+        String cookie;
+        try {
+            URI uri = URI.create("http://192.168.3.46:4444");
+            webDriver = new RemoteWebDriver(uri.toURL(), dc);
+            // 1.模拟打开登陆页面
+            String loginUrl = "https://redmine-pa.mxnavi.com/login";
+            log.info("打开登录页面,地址是{}", loginUrl);
+            webDriver.get(loginUrl);
+            // 2.等3秒钟响应后再操作，不然内容可能还没有返回
+            Thread.sleep(3000L);
+            // xpath 输入框元素的绝对路径
+            // 3.找到账号的输入框，并模拟输入账号
+            WebElement accountInput = webDriver.findElement(By.id("username"));
+            accountInput.sendKeys("qig");
+            log.info("开始输入账号...");
+            Thread.sleep(1000L);
+            // 4.找到密码的输入框，并模拟输入密码
+            WebElement passwordInput = webDriver.findElement(By.id("password"));
+            passwordInput.sendKeys("MAnsiontech^7");
+            log.info("开始输入密码...");
+            Thread.sleep(1000L);
+            // 5.找到登陆的按钮，并模拟点击登陆
+            WebElement loginButton = webDriver.findElement(By.id("login-submit"));
+            loginButton.click();
+            log.info("开始点击登录...");
+            Thread.sleep(3000L);
+            return doSomeThing(webDriver);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        } finally {
+            if (webDriver != null) {
+                webDriver.quit();
+            }
+        }
+        return null;
+    }
+
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
         OmsLogger log = context.getOmsLogger();
@@ -72,24 +115,27 @@ public class AutoWriteRedimeTask implements BasicProcessor {
                 autoWrite(log, e);
             } catch (RedmineException ex) {
                 throw new RuntimeException(ex);
+            } catch (MalformedURLException ex) {
+                throw new RuntimeException(ex);
             }
         });
         return result;
     }
 
-    private static void autoWrite(OmsLogger log, AutoWriteRedmineUserInfoVo userInfoVo) throws RedmineException {
+    private static void autoWrite(OmsLogger log, AutoWriteRedmineUserInfoVo userInfoVo) throws RedmineException, MalformedURLException {
         String name = userInfoVo.getName();
         log.info("开始执行----------------------------{}", name);
         String spentOn = userInfoVo.getSpentOn();
         String path;
         String cookie;
+        DesiredCapabilities dc = new DesiredCapabilities();
+        dc.setBrowserName("chrome");
         if (SystemUtils.isLinux()) {
-            path = "/usr/drive/geckodriver";
-            cookie = FirefoxSeleniumUtils.cookie(path);
+            dc.setPlatform(Platform.LINUX);
         } else {
-            path = "D:\\dev_tools\\webDrive\\msedgedriver.exe";
-            cookie = EdgeSeleniumUtils.cookie(path);
+            dc.setPlatform(Platform.WIN11);
         }
+        cookie = getCookie(log, dc);
         log.info("cookie:{}", cookie);
         String body = HttpUtil.createGet("https://redmine-pa.mxnavi.com/issues/38668/time_entries/autocomplete_for_time?q=" + spentOn).addHeaders(Map.of("Cookie", cookie)).execute().body();
         if (StringUtils.isBlank(body)) {
@@ -138,5 +184,19 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private static String doSomeThing(WebDriver webDriver) {
+        // 获取cookie
+        Set<Cookie> coo = webDriver.manage().getCookies();
+        StringBuilder cookies = new StringBuilder();
+        if (coo != null) {
+            for (Cookie cookie : coo) {
+                String name = cookie.getName();
+                String value = cookie.getValue();
+                cookies.append(name).append("=").append(value).append("; ");
+            }
+        }
+        return cookies.toString();
     }
 }
