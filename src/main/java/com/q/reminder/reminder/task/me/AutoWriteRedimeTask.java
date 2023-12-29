@@ -42,7 +42,7 @@ import java.util.regex.Pattern;
  */
 @Component
 public class AutoWriteRedimeTask implements BasicProcessor {
-    public static String getCookie(OmsLogger log, DesiredCapabilities dc) {
+    private String getCookie(OmsLogger log, DesiredCapabilities dc) {
         RemoteWebDriver webDriver = null;
         String cookie;
         try {
