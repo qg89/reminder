@@ -31,7 +31,7 @@ public class TestTask implements BasicProcessor {
         dc.setBrowserName("chrome");
         dc.setPlatform(Platform.LINUX);
         try {
-            URI uri = URI.create("http://localhost:4442/wd/hub");
+            URI uri = URI.create("http://192.168.3.46/:4444/wd/hub");
             webDriver = new RemoteWebDriver(uri.toURL(), dc);
             // 1.模拟打开登陆页面
             String loginUrl = "https://redmine-pa.mxnavi.com/login";
