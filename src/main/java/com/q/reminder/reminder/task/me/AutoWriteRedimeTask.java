@@ -1,17 +1,17 @@
 package com.q.reminder.reminder.task.me;
 
-import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import com.q.reminder.reminder.entity.RProjectInfo;
+import com.q.reminder.reminder.task.me.entity.AutoWriteRedmineUserInfoVo;
 import com.q.reminder.reminder.util.HolidayUtils;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.util.SystemUtils;
 import com.q.reminder.reminder.util.selenium.EdgeSeleniumUtils;
 import com.q.reminder.reminder.util.selenium.FirefoxSeleniumUtils;
+import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.internal.Transport;
@@ -22,10 +22,8 @@ import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 import tech.powerjob.worker.log.OmsLogger;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.net.HttpCookie;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -43,47 +41,60 @@ public class AutoWriteRedimeTask implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
         OmsLogger log = context.getOmsLogger();
-
-        Runtime runtime = Runtime.getRuntime();
-        Process process = runtime.exec("sh /usr/drive/rpm.sh");
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-        String line;
-        while ((line = reader.readLine()) != null) {
-            log.info(line);
-        }
-
-        int exitCode = process.waitFor();
-        log.info("Exit Code: " + exitCode);
-
-
-
         String jobParams = context.getJobParams();
         ProcessResult result = new ProcessResult(true);
-        DateTime time = DateUtil.yesterday();
-        String dateTime = time.toString("yyyy-MM-dd");
+
+        String dateTime = DateUtil.yesterday().toString("yyyy-MM-dd");
         if (StringUtils.isNotBlank(jobParams) && isValidDateFormat(jobParams, "yyyy-MM-dd")) {
             dateTime = DateUtil.parse(jobParams).toString("yyyy-MM-dd");
         }
         log.info("日期：{}", dateTime);
-        if (!HolidayUtils.isHoliday(dateTime)) {
+        if (HolidayUtils.isHoliday(dateTime)) {
             log.info("非工作日");
             return result;
         }
+
+        List<AutoWriteRedmineUserInfoVo> list = new ArrayList<>();
+
+        AutoWriteRedmineUserInfoVo vo = new AutoWriteRedmineUserInfoVo();
+        vo.setSpentOn(dateTime);
+        vo.setIssueId(38668);
+        vo.setProjectId(260);
+        vo.setPmKey("e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
+        vo.setName("齐钢");
+        list.add(vo);
+        vo.setIssueId(35201);
+        vo.setPmKey("46b97ae85a3d42da0879c63ec292a2b3afc011c9");
+        vo.setName("徐鹏超");
+        list.add(vo);
+        list.forEach(e -> {
+            try {
+                autoWrite(log, e);
+            } catch (RedmineException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+        return result;
+    }
+
+    private static void autoWrite(OmsLogger log, AutoWriteRedmineUserInfoVo userInfoVo) throws RedmineException {
+        String name = userInfoVo.getName();
+        log.info("开始执行----------------------------{}", name);
+        String spentOn = userInfoVo.getSpentOn();
         String path;
         String cookie;
         if (SystemUtils.isLinux()) {
             path = "/usr/drive/geckodriver";
             cookie = FirefoxSeleniumUtils.cookie(path);
-        } else  {
+        } else {
             path = "D:\\dev_tools\\webDrive\\msedgedriver.exe";
             cookie = EdgeSeleniumUtils.cookie(path);
         }
         log.info("cookie:{}", cookie);
-        String body = HttpUtil.createGet("https://redmine-pa.mxnavi.com/issues/38668/time_entries/autocomplete_for_time?q=" + dateTime).addHeaders(Map.of("Cookie", cookie)).execute().body();
+        String body = HttpUtil.createGet("https://redmine-pa.mxnavi.com/issues/38668/time_entries/autocomplete_for_time?q=" + spentOn).addHeaders(Map.of("Cookie", cookie)).execute().body();
         if (StringUtils.isBlank(body)) {
             log.info("body 为空");
-            return result;
+            return;
         }
         log.info("body:{}", body);
         Pattern pattern = Pattern.compile("\\d+\\.\\d+");
@@ -100,33 +111,23 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         }
         float hours = BigDecimal.valueOf(estimateOn).subtract(BigDecimal.valueOf(spendOn)).floatValue();
         if (hours <= 0) {
-            return result;
+            log.info("耗时:0,{}", name);
+            return;
         }
         RProjectInfo info = new RProjectInfo();
         info.setRedmineType("2");
-        info.setPmKey("e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
+        info.setPmKey(userInfoVo.getPmKey());
         RedmineManager mgr = RedmineApi.getRedmineManager(info);
         Transport transport = mgr.getTransport();
         TimeEntry timeEntry = new TimeEntry(transport);
         timeEntry.setHours(hours);
-        timeEntry.setProjectId(260);
-        timeEntry.setSpentOn(time.toJdkDate());
-        timeEntry.setIssueId(38668);
+        timeEntry.setProjectId(userInfoVo.getProjectId());
+        timeEntry.setSpentOn(DateUtil.parse(spentOn, "yyyy-MM-dd").toJdkDate());
+        timeEntry.setIssueId(userInfoVo.getIssueId());
         mgr.getTimeEntryManager().createTimeEntry(timeEntry);
         log.info("当日已更新完成");
-        return result;
     }
 
-    private String cookie() {
-        String name;
-        String value;
-        HttpResponse execute = HttpUtil.createGet("https://redmine-pa.mxnavi.com/login").execute();
-        List<HttpCookie> cookies = execute.getCookies();
-        HttpCookie httpCookie = cookies.get(0);
-        name = httpCookie.getName();
-        value = httpCookie.getValue();
-        return name + "=" + value;
-    }
     public static boolean isValidDateFormat(String dateStr, String dateFormat) {
         if (ObjectUtil.isEmpty(dateStr)) {
             return false;
