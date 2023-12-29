@@ -26,12 +26,13 @@ public class TestTask implements BasicProcessor {
     @Override
     public ProcessResult process(TaskContext context) throws Exception {
         OmsLogger logger = context.getOmsLogger();
+        String jobParams = context.getJobParams();
         WebDriver webDriver = null;
         DesiredCapabilities dc = new DesiredCapabilities();
         dc.setBrowserName("chrome");
         dc.setPlatform(Platform.LINUX);
         try {
-            URI uri = URI.create("http://192.168.3.46:5555");
+            URI uri = URI.create(jobParams);
             webDriver = new RemoteWebDriver(uri.toURL(), dc);
             // 1.模拟打开登陆页面
             String loginUrl = "https://redmine-pa.mxnavi.com/login";
