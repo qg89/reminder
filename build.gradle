@@ -116,7 +116,7 @@ dependencies {
 
 	implementation 'net.java.dev.jna:jna:5.13.0'
 
-	implementation "org.seleniumhq.selenium:selenium-java:3.141.59"
+	implementation "org.seleniumhq.selenium:selenium-java:4.16.1"
 }
 
 
