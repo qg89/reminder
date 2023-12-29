@@ -113,16 +113,14 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         list.forEach(e -> {
             try {
                 autoWrite(log, e);
-            } catch (RedmineException ex) {
-                throw new RuntimeException(ex);
-            } catch (MalformedURLException ex) {
+            } catch (RedmineException | MalformedURLException ex) {
                 throw new RuntimeException(ex);
             }
         });
         return result;
     }
 
-    private static void autoWrite(OmsLogger log, AutoWriteRedmineUserInfoVo userInfoVo) throws RedmineException, MalformedURLException {
+    private void autoWrite(OmsLogger log, AutoWriteRedmineUserInfoVo userInfoVo) throws RedmineException, MalformedURLException {
         String name = userInfoVo.getName();
         log.info("开始执行----------------------------{}", name);
         String spentOn = userInfoVo.getSpentOn();
