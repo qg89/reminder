@@ -148,6 +148,9 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         }
         log.info("cookie:{}", cookie);
         String body = HttpUtil.createGet("https://redmine-pa.mxnavi.com/issues/38668/time_entries/autocomplete_for_time?q=" + spentOn).addHeaders(Map.of("Cookie", cookie)).execute().body();
+        if (webDriver != null) {
+            logout(log, webDriver);
+        }
         if (StringUtils.isBlank(body)) {
             log.info("body 为空");
             return;
@@ -181,10 +184,6 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         timeEntry.setIssueId(userInfoVo.getIssueId());
         TimeEntry entry = timeEntry.create();
         log.info("当日已更新完成，TimeEntryId：{}", entry.getId());
-        if (webDriver != null) {
-            logout(log, webDriver);
-            log.info("redmine 退出成功");
-        }
     }
 
     public static boolean isValidDateFormat(String dateStr, String dateFormat) {
