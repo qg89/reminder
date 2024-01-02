@@ -74,6 +74,8 @@ public class AutoWriteRedimeTask implements BasicProcessor {
             log.info("开始点击登录...");
             Thread.sleep(5000L);
             webDriver.get("https://redmine-pa.mxnavi.com/issues/38668/time_entries/new");
+            WebElement timeEntrySpentOn = webDriver.findElement(By.id("time_entry_spent_on"));
+            timeEntrySpentOn.sendKeys(userInfoVo.getSpentOn());
             WebElement dayLoggedTime = webDriver.findElement(By.id("day_logged_time"));
             String text = dayLoggedTime.getText();
             log.info("day_logged_time:{}", text);
