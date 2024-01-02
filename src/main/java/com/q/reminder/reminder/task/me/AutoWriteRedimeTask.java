@@ -161,8 +161,8 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         timeEntry.setProjectId(userInfoVo.getProjectId());
         timeEntry.setSpentOn(DateUtil.parse(spentOn, "yyyy-MM-dd").toJdkDate());
         timeEntry.setIssueId(userInfoVo.getIssueId());
-        mgr.getTimeEntryManager().createTimeEntry(timeEntry);
-        log.info("当日已更新完成");
+        TimeEntry entry = mgr.getTimeEntryManager().createTimeEntry(timeEntry);
+        log.info("当日已更新完成，TimeEntryId：{}", entry.getId());
     }
 
     public static boolean isValidDateFormat(String dateStr, String dateFormat) {
