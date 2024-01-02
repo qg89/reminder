@@ -69,8 +69,11 @@ public class AutoWriteRedimeTask implements BasicProcessor {
             WebElement loginButton = webDriver.findElement(By.id("login-submit"));
             loginButton.click();
             log.info("开始点击登录...");
-            Thread.sleep(5000L);
-            webDriver.get("https://redmine-pa.mxnavi.com/issues/38668/time_entries/autocomplete_for_time?q=" + userInfoVo.getSpentOn());
+            Thread.sleep(3000L);
+            String autocompleteForTimeUrl = "https://redmine-pa.mxnavi.com/issues/38668/time_entries/autocomplete_for_time?q=" + userInfoVo.getSpentOn();
+            webDriver.get(autocompleteForTimeUrl);
+            log.info("打开页面,地址是{}", autocompleteForTimeUrl);
+            Thread.sleep(3000L);
             WebElement body = webDriver.findElement(By.tagName("body"));
             return body.getText();
         } catch (Exception e) {
