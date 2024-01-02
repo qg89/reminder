@@ -126,6 +126,10 @@ public class AutoWriteRedimeTask implements BasicProcessor {
             dc.setPlatform(Platform.WIN11);
         }
         cookie = getCookie(log, dc, userInfoVo);
+        if (StringUtils.isBlank(cookie)) {
+            log.info("cookie 为空");
+            return;
+        }
         log.info("cookie:{}", cookie);
         String body = HttpUtil.createGet("https://redmine-pa.mxnavi.com/issues/38668/time_entries/autocomplete_for_time?q=" + spentOn).addHeaders(Map.of("Cookie", cookie)).execute().body();
         if (StringUtils.isBlank(body)) {
