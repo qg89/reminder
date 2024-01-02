@@ -1,5 +1,6 @@
 package com.q.reminder.reminder.task;
 
+import cn.hutool.core.date.DateUtil;
 import com.lark.oapi.Client;
 import com.lark.oapi.core.Config;
 import com.lark.oapi.core.enums.AppType;
@@ -9,13 +10,16 @@ import com.lark.oapi.core.request.RequestOptions;
 import com.lark.oapi.core.utils.OKHttps;
 import com.lark.oapi.service.bitable.v1.model.ListAppTableFieldReq;
 import com.lark.oapi.service.bitable.v1.model.ListAppTableFieldResp;
-import com.q.reminder.reminder.cpp.FeiShuToken;
+import com.nlf.calendar.Holiday;
+import com.nlf.calendar.util.HolidayUtil;
+import com.q.reminder.reminder.entity.SHolidayConfig;
 import com.q.reminder.reminder.service.ProjectInfoService;
 import com.q.reminder.reminder.service.SHolidayConfigService;
 import com.q.reminder.reminder.service.TableFieldsChangeService;
 import com.q.reminder.reminder.service.impl.FeishuService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
 import org.springframework.stereotype.Component;
 import tech.powerjob.client.PowerJobClient;
 import tech.powerjob.worker.core.processor.ProcessResult;
@@ -23,6 +27,9 @@ import tech.powerjob.worker.core.processor.TaskContext;
 import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 import tech.powerjob.worker.log.OmsLogger;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -47,48 +54,48 @@ public class AlarmablePowerJob implements BasicProcessor {
         String jobParams = context.getJobParams();
         ProcessResult processResult = new ProcessResult(true);
         OmsLogger omsLogger = context.getOmsLogger();
-        omsLogger.info("init - system loadLibary");
-        omsLogger.info("instanceParams path:{}" , instanceParams);
-        omsLogger.info("jobParams path:{}" , jobParams);
-        if (StringUtils.isBlank(jobParams)) {
-            jobParams = instanceParams;
-        }
-        System.load(jobParams);
-        FeiShuToken feiShuToken = new FeiShuToken();
-        String i = feiShuToken.getToken();
-        omsLogger.info("报文信息:" , i);
+//        omsLogger.info("init - system loadLibary");
+//        omsLogger.info("instanceParams path:{}" , instanceParams);
+//        omsLogger.info("jobParams path:{}" , jobParams);
+//        if (StringUtils.isBlank(jobParams)) {
+//            jobParams = instanceParams;
+//        }
+//        System.load(jobParams);
+//        FeiShuToken feiShuToken = new FeiShuToken();
+//        String i = feiShuToken.getToken();
+//        omsLogger.info("报文信息:" , i);
 
 //        Boolean test = RedisUtils.getInstance().invokeExceededTimes("test", 10, 10);
 //
 //        List<FsGroupInfo> groupToChats = BaseFeishu.groupMessage().getGroupToChats();
 //        System.out.println();
-//        DateTime now = new DateTime(context.getInstanceParams()).minusDays(1);
-//        boolean flag = true;
-//        List<SHolidayConfig> data = new ArrayList<>();
-//        while (flag) {
-//            now = now.plusDays(1);
-//            Date nowDate = now.toDate();
-//            Holiday holiday = HolidayUtil.getHoliday(now.toString("yyyy-MM-dd"));
-//            SHolidayConfig sHolidayConfig = new SHolidayConfig();
-//            if ((holiday == null && !DateUtil.isWeekend(nowDate)) || holiday != null && holiday.isWork()) {
-//                sHolidayConfig.setDate(nowDate);
-//                sHolidayConfig.setWork(1);
-//                if (holiday != null) {
-//                    sHolidayConfig.setName(holiday.toString());
-//                }
-//            } else {
-//                sHolidayConfig.setWork(0);
-//                sHolidayConfig.setDate(nowDate);
-//                if (holiday != null) {
-//                    sHolidayConfig.setName(holiday.getName());
-//                }
-//            }
-//            data.add(sHolidayConfig);
-//            if (DateUtil.isLastDayOfMonth(nowDate)) {
-//                flag = false;
-//            }
-//        }
-//        service.saveOrUpdateBatch(data);
+        DateTime now = new DateTime(context.getInstanceParams()).minusDays(1);
+        boolean flag = true;
+        List<SHolidayConfig> data = new ArrayList<>();
+        while (flag) {
+            now = now.plusDays(1);
+            Date nowDate = now.toDate();
+            Holiday holiday = HolidayUtil.getHoliday(now.toString("yyyy-MM-dd"));
+            SHolidayConfig sHolidayConfig = new SHolidayConfig();
+            if ((holiday == null && !DateUtil.isWeekend(nowDate)) || holiday != null && holiday.isWork()) {
+                sHolidayConfig.setDate(nowDate);
+                sHolidayConfig.setWork(1);
+                if (holiday != null) {
+                    sHolidayConfig.setName(holiday.toString());
+                }
+            } else {
+                sHolidayConfig.setWork(0);
+                sHolidayConfig.setDate(nowDate);
+                if (holiday != null) {
+                    sHolidayConfig.setName(holiday.getName());
+                }
+            }
+            data.add(sHolidayConfig);
+            if (DateUtil.isLastDayOfMonth(nowDate)) {
+                flag = false;
+            }
+        }
+        service.saveOrUpdateBatch(data);
 //        List<TableFieldsChange> list = new ArrayList<>();
 //        String token = "";
 //        ListAppTableFieldRespBody data = chan(token).getData();
