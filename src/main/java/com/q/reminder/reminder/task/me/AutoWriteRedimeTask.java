@@ -3,7 +3,6 @@ package com.q.reminder.reminder.task.me;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.http.HttpUtil;
 import com.q.reminder.reminder.entity.MeRedmineUserInfo;
 import com.q.reminder.reminder.entity.RProjectInfo;
 import com.q.reminder.reminder.service.MeRedmineUserInfoService;
@@ -28,7 +27,6 @@ import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,8 +44,7 @@ public class AutoWriteRedimeTask implements BasicProcessor {
 
     private final MeRedmineUserInfoService meRedmineUserInfoService;
 
-    private String getCookie(OmsLogger log, DesiredCapabilities dc, MeRedmineUserInfo userInfoVo, RemoteWebDriver webDriver) {
-        String cookie;
+    private String getText(OmsLogger log, DesiredCapabilities dc, MeRedmineUserInfo userInfoVo, RemoteWebDriver webDriver) {
         try {
             URI uri = URI.create("http://192.168.3.46:4444");
             webDriver = new RemoteWebDriver(uri.toURL(), dc);
@@ -75,8 +72,7 @@ public class AutoWriteRedimeTask implements BasicProcessor {
             Thread.sleep(5000L);
             webDriver.get("https://redmine-pa.mxnavi.com/issues/38668/time_entries/autocomplete_for_time?q=" + userInfoVo.getSpentOn());
             WebElement body = webDriver.findElement(By.tagName("body"));
-            log.info("autocomplete_for_time body{}", body);
-            return doSomeThing(webDriver);
+            return body.getText();
         } catch (Exception e) {
             log.error(e.getMessage());
         } finally {
@@ -135,7 +131,7 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         log.info("开始执行----------------------------{}", name);
         String spentOn = userInfoVo.getSpentOn();
         String path;
-        String cookie;
+        String body;
         DesiredCapabilities dc = new DesiredCapabilities();
         dc.setBrowserName("chrome");
         if (SystemUtils.isLinux()) {
@@ -144,16 +140,15 @@ public class AutoWriteRedimeTask implements BasicProcessor {
             dc.setPlatform(Platform.WIN11);
         }
         RemoteWebDriver webDriver = null;
-        cookie = getCookie(log, dc, userInfoVo, webDriver);
-        if (StringUtils.isBlank(cookie)) {
+        body = getText(log, dc, userInfoVo, webDriver);
+        if (StringUtils.isBlank(body)) {
             log.info("cookie 为空");
             return;
         }
-        log.info("cookie:{}", cookie);
-        String body = HttpUtil.createGet("https://redmine-pa.mxnavi.com/issues/38668/time_entries/autocomplete_for_time?q=" + spentOn).addHeaders(Map.of("Cookie", cookie)).execute().body();
-        if (webDriver != null) {
-            logout(log, webDriver);
-        }
+        log.info("autocomplete_for_time body:{}", body);
+//        if (webDriver != null) {
+//            logout(log, webDriver);
+//        }
         if (StringUtils.isBlank(body)) {
             log.info("body 为空");
             return;
