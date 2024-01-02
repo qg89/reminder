@@ -142,7 +142,7 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         RemoteWebDriver webDriver = null;
         body = getText(log, dc, userInfoVo, webDriver);
         if (StringUtils.isBlank(body)) {
-            log.info("cookie 为空");
+            log.info("autocomplete_for_time body 为空");
             return;
         }
         log.info("autocomplete_for_time body:{}", body);
