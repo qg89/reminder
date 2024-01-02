@@ -73,7 +73,7 @@ public class AlarmablePowerJob implements BasicProcessor {
         boolean flag = true;
         List<SHolidayConfig> data = new ArrayList<>();
         while (flag) {
-            now = now.plusDays(1);
+            now = now.minusDays(1);
             Date nowDate = now.toDate();
             Holiday holiday = HolidayUtil.getHoliday(now.toString("yyyy-MM-dd"));
             SHolidayConfig sHolidayConfig = new SHolidayConfig();
@@ -91,7 +91,7 @@ public class AlarmablePowerJob implements BasicProcessor {
                 }
             }
             data.add(sHolidayConfig);
-            if (DateUtil.isLastDayOfMonth(nowDate)) {
+            if (DateUtil.isSameDay(new Date(), nowDate)) {
                 flag = false;
             }
         }
