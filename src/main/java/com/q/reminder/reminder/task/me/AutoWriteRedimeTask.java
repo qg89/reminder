@@ -46,8 +46,7 @@ public class AutoWriteRedimeTask implements BasicProcessor {
 
     private final MeRedmineUserInfoService meRedmineUserInfoService;
 
-    private String getCookie(OmsLogger log, DesiredCapabilities dc, MeRedmineUserInfo userInfoVo) {
-        RemoteWebDriver webDriver = null;
+    private String getCookie(OmsLogger log, DesiredCapabilities dc, MeRedmineUserInfo userInfoVo, RemoteWebDriver webDriver) {
         String cookie;
         try {
             URI uri = URI.create("http://192.168.3.46:4444");
@@ -83,6 +82,22 @@ public class AutoWriteRedimeTask implements BasicProcessor {
             }
         }
         return null;
+    }
+
+    private void logout(OmsLogger log, RemoteWebDriver webDriver) {
+        // 1.模拟打开登陆页面
+        String loginUrl = "https://redmine-pa.mxnavi.com/logout";
+        log.info("打开登录页面,地址是{}", loginUrl);
+        webDriver.get(loginUrl);
+        // 2.等3秒钟响应后再操作，不然内容可能还没有返回
+        try {
+            Thread.sleep(3000L);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        WebElement loginButton = webDriver.findElement(By.className("logout"));
+        loginButton.click();
+        log.info("开始点击退出...");
     }
 
     @Override
@@ -125,7 +140,8 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         } else {
             dc.setPlatform(Platform.WIN11);
         }
-        cookie = getCookie(log, dc, userInfoVo);
+        RemoteWebDriver webDriver = null;
+        cookie = getCookie(log, dc, userInfoVo, webDriver);
         if (StringUtils.isBlank(cookie)) {
             log.info("cookie 为空");
             return;
@@ -165,6 +181,10 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         timeEntry.setIssueId(userInfoVo.getIssueId());
         TimeEntry entry = timeEntry.create();
         log.info("当日已更新完成，TimeEntryId：{}", entry.getId());
+        if (webDriver != null) {
+            logout(log, webDriver);
+            log.info("redmine 退出成功");
+        }
     }
 
     public static boolean isValidDateFormat(String dateStr, String dateFormat) {
