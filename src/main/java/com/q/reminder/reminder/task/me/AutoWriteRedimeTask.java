@@ -13,7 +13,6 @@ import com.q.reminder.reminder.util.SystemUtils;
 import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.bean.TimeEntry;
-import com.taskadapter.redmineapi.internal.Transport;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
@@ -155,13 +154,12 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         info.setRedmineType("2");
         info.setPmKey(userInfoVo.getApiKey());
         RedmineManager mgr = RedmineApi.getRedmineManager(info);
-        Transport transport = mgr.getTransport();
-        TimeEntry timeEntry = new TimeEntry(transport);
+        TimeEntry timeEntry = new TimeEntry(mgr.getTransport());
         timeEntry.setHours(hours);
         timeEntry.setProjectId(userInfoVo.getProjectId());
         timeEntry.setSpentOn(DateUtil.parse(spentOn, "yyyy-MM-dd").toJdkDate());
         timeEntry.setIssueId(userInfoVo.getIssueId());
-        TimeEntry entry = mgr.getTimeEntryManager().createTimeEntry(timeEntry);
+        TimeEntry entry = timeEntry.create();
         log.info("当日已更新完成，TimeEntryId：{}", entry.getId());
     }
 
