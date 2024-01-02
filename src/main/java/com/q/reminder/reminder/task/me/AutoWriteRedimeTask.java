@@ -119,13 +119,10 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         }
 
         List<MeRedmineUserInfo> list = meRedmineUserInfoService.list();
-        list.forEach(e -> {
-            try {
-                autoWrite(log, e);
-            } catch (RedmineException | MalformedURLException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
+        for (MeRedmineUserInfo info : list) {
+            info.setSpentOn(dateTime);
+            autoWrite(log, info);
+        }
         return result;
     }
 
@@ -133,7 +130,6 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         String name = userInfoVo.getName();
         log.info("开始执行----------------------------{}", name);
         String spentOn = userInfoVo.getSpentOn();
-        String path;
         String body;
         DesiredCapabilities dc = new DesiredCapabilities();
         dc.setBrowserName("chrome");
