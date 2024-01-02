@@ -151,8 +151,10 @@ public class AutoWriteRedimeTask implements BasicProcessor {
 //            logout(log, webDriver);
 //        }
         } finally {
-            webDriver.quit();
-            webDriver.close();
+            if (webDriver != null) {
+                webDriver.quit();
+                webDriver.close();
+            }
         }
         if (StringUtils.isBlank(body)) {
             log.info("body 为空");
