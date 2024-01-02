@@ -4,8 +4,9 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpUtil;
+import com.q.reminder.reminder.entity.MeRedmineUserInfo;
 import com.q.reminder.reminder.entity.RProjectInfo;
-import com.q.reminder.reminder.task.me.entity.AutoWriteRedmineUserInfoVo;
+import com.q.reminder.reminder.service.MeRedmineUserInfoService;
 import com.q.reminder.reminder.util.HolidayUtils;
 import com.q.reminder.reminder.util.RedmineApi;
 import com.q.reminder.reminder.util.SystemUtils;
@@ -13,6 +14,7 @@ import com.taskadapter.redmineapi.RedmineException;
 import com.taskadapter.redmineapi.RedmineManager;
 import com.taskadapter.redmineapi.bean.TimeEntry;
 import com.taskadapter.redmineapi.internal.Transport;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.*;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -26,7 +28,6 @@ import tech.powerjob.worker.log.OmsLogger;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,8 +41,12 @@ import java.util.regex.Pattern;
  * @Description :
  * @date :  2023.12.22 11:43
  */
+@AllArgsConstructor
 @Component
 public class AutoWriteRedimeTask implements BasicProcessor {
+
+    private final MeRedmineUserInfoService meRedmineUserInfoService;
+
     private String getCookie(OmsLogger log, DesiredCapabilities dc) {
         RemoteWebDriver webDriver = null;
         String cookie;
@@ -97,19 +102,7 @@ public class AutoWriteRedimeTask implements BasicProcessor {
             return result;
         }
 
-        List<AutoWriteRedmineUserInfoVo> list = new ArrayList<>();
-
-        AutoWriteRedmineUserInfoVo vo = new AutoWriteRedmineUserInfoVo();
-        vo.setSpentOn(dateTime);
-        vo.setIssueId(38668);
-        vo.setProjectId(260);
-        vo.setPmKey("e47f8dbff40521057e2cd7d6d0fed2765d474d4f");
-        vo.setName("齐钢");
-        list.add(vo);
-        vo.setIssueId(35201);
-        vo.setPmKey("46b97ae85a3d42da0879c63ec292a2b3afc011c9");
-        vo.setName("徐鹏超");
-        list.add(vo);
+        List<MeRedmineUserInfo> list = meRedmineUserInfoService.list();
         list.forEach(e -> {
             try {
                 autoWrite(log, e);
@@ -120,7 +113,7 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         return result;
     }
 
-    private void autoWrite(OmsLogger log, AutoWriteRedmineUserInfoVo userInfoVo) throws RedmineException, MalformedURLException {
+    private void autoWrite(OmsLogger log, MeRedmineUserInfo userInfoVo) throws RedmineException, MalformedURLException {
         String name = userInfoVo.getName();
         log.info("开始执行----------------------------{}", name);
         String spentOn = userInfoVo.getSpentOn();
@@ -160,7 +153,7 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         }
         RProjectInfo info = new RProjectInfo();
         info.setRedmineType("2");
-        info.setPmKey(userInfoVo.getPmKey());
+        info.setPmKey(userInfoVo.getApiKey());
         RedmineManager mgr = RedmineApi.getRedmineManager(info);
         Transport transport = mgr.getTransport();
         TimeEntry timeEntry = new TimeEntry(transport);
