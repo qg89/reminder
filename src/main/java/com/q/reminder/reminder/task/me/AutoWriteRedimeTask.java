@@ -46,7 +46,7 @@ public class AutoWriteRedimeTask implements BasicProcessor {
 
     private final MeRedmineUserInfoService meRedmineUserInfoService;
 
-    private String getCookie(OmsLogger log, DesiredCapabilities dc) {
+    private String getCookie(OmsLogger log, DesiredCapabilities dc, MeRedmineUserInfo userInfoVo) {
         RemoteWebDriver webDriver = null;
         String cookie;
         try {
@@ -61,19 +61,19 @@ public class AutoWriteRedimeTask implements BasicProcessor {
             // xpath 输入框元素的绝对路径
             // 3.找到账号的输入框，并模拟输入账号
             WebElement accountInput = webDriver.findElement(By.id("username"));
-            accountInput.sendKeys("qig");
+            accountInput.sendKeys(userInfoVo.getUsername());
             log.info("开始输入账号...");
             Thread.sleep(1000L);
             // 4.找到密码的输入框，并模拟输入密码
             WebElement passwordInput = webDriver.findElement(By.id("password"));
-            passwordInput.sendKeys("MAnsiontech^7");
+            passwordInput.sendKeys(userInfoVo.getPassword());
             log.info("开始输入密码...");
             Thread.sleep(1000L);
             // 5.找到登陆的按钮，并模拟点击登陆
             WebElement loginButton = webDriver.findElement(By.id("login-submit"));
             loginButton.click();
             log.info("开始点击登录...");
-            Thread.sleep(3000L);
+            Thread.sleep(5000L);
             return doSomeThing(webDriver);
         } catch (Exception e) {
             log.error(e.getMessage());
@@ -125,7 +125,7 @@ public class AutoWriteRedimeTask implements BasicProcessor {
         } else {
             dc.setPlatform(Platform.WIN11);
         }
-        cookie = getCookie(log, dc);
+        cookie = getCookie(log, dc, userInfoVo);
         log.info("cookie:{}", cookie);
         String body = HttpUtil.createGet("https://redmine-pa.mxnavi.com/issues/38668/time_entries/autocomplete_for_time?q=" + spentOn).addHeaders(Map.of("Cookie", cookie)).execute().body();
         if (StringUtils.isBlank(body)) {
